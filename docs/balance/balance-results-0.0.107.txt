@@ -1,0 +1,78 @@
+
+== Full followings, all recruits (1000 fights each): row's win rate against column; avg = average over the other six
+             Men   Uruk   Levy    Orc Goblin    Elf  Dwarf    avg
+     Men       -   0.51   0.61   0.53   0.60   0.40   0.48   0.52
+    Uruk    0.51      -   0.55   0.56   0.48   0.47   0.45   0.50
+    Levy    0.37   0.47      -   0.49   0.61   0.54   0.47   0.49
+     Orc    0.48   0.45   0.53      -   0.62   0.58   0.54   0.53
+  Goblin    0.42   0.51   0.38   0.35      -   0.59   0.57   0.47
+     Elf    0.60   0.54   0.49   0.44   0.40      -   0.50   0.49
+   Dwarf    0.59   0.56   0.52   0.45   0.46   0.46      -   0.51
+
+== Full followings, all warriors (1000 fights each): row's win rate against column; avg = average over the other six
+             Men   Uruk   Levy    Orc Goblin    Elf  Dwarf    avg
+     Men       -   0.39   0.56   0.55   0.50   0.41   0.38   0.47
+    Uruk    0.62      -   0.68   0.69   0.60   0.42   0.46   0.58
+    Levy    0.41   0.30      -   0.48   0.64   0.52   0.47   0.47
+     Orc    0.44   0.34   0.53      -   0.67   0.46   0.48   0.49
+  Goblin    0.51   0.42   0.35   0.33      -   0.68   0.58   0.48
+     Elf    0.60   0.59   0.49   0.55   0.30      -   0.52   0.51
+   Dwarf    0.60   0.56   0.52   0.50   0.48   0.46      -   0.52
+
+== Full followings, all captains (1000 fights each): row's win rate against column; avg = average over the other six
+             Men   Uruk   Levy    Orc Goblin    Elf  Dwarf    avg
+     Men       -   0.43   0.58   0.62   0.52   0.36   0.40   0.48
+    Uruk    0.53      -   0.65   0.65   0.58   0.39   0.44   0.54
+    Levy    0.44   0.33      -   0.45   0.60   0.54   0.51   0.48
+     Orc    0.40   0.34   0.54      -   0.61   0.60   0.55   0.51
+  Goblin    0.47   0.41   0.38   0.39      -   0.58   0.71   0.49
+     Elf    0.65   0.56   0.49   0.41   0.43      -   0.53   0.51
+   Dwarf    0.60   0.56   0.50   0.42   0.29   0.46      -   0.47
+
+== Full followings, all archers (1000 fights each): row's win rate against column; avg = average over the other six
+             Men   Uruk   Levy    Orc Goblin    Elf  Dwarf    avg
+     Men       -   0.47   0.52   0.53   0.52   0.53   0.49   0.51
+    Uruk    0.56      -   0.56   0.58   0.57   0.62   0.53   0.57
+    Levy    0.51   0.47      -   0.52   0.54   0.52   0.49   0.51
+     Orc    0.46   0.43   0.49      -   0.48   0.50   0.48   0.48
+  Goblin    0.49   0.46   0.48   0.52      -   0.54   0.46   0.49
+     Elf    0.47   0.43   0.49   0.49   0.51      -   0.46   0.48
+   Dwarf    0.49   0.49   0.52   0.53   0.55   0.54      -   0.52
+
+== Full followings, mixed (captain limit share, 20% archers) (1000 fights each): row's win rate against column; avg = average over the other six
+             Men   Uruk   Levy    Orc Goblin    Elf  Dwarf    avg
+     Men       -   0.48   0.55   0.52   0.59   0.44   0.43   0.50
+    Uruk    0.50      -   0.56   0.57   0.61   0.43   0.41   0.51
+    Levy    0.46   0.42      -   0.47   0.57   0.36   0.37   0.44
+     Orc    0.49   0.45   0.54      -   0.55   0.40   0.39   0.47
+  Goblin    0.39   0.36   0.41   0.42      -   0.34   0.32   0.38
+     Elf    0.59   0.54   0.62   0.60   0.67      -   0.52   0.59
+   Dwarf    0.60   0.58   0.66   0.60   0.66   0.46      -   0.59
+
+== Equal headcount 10 v 10, mixed (1000 fights each): row's win rate against column; avg = average over the other six
+             Men   Uruk   Levy    Orc Goblin    Elf  Dwarf    avg
+     Men       -   0.47   0.94   0.92   1.00   0.04   0.03   0.57
+    Uruk    0.54      -   0.94   0.94   1.00   0.04   0.04   0.58
+    Levy    0.06   0.05      -   0.45   0.99   0.00   0.00   0.26
+     Orc    0.10   0.06   0.54      -   1.00   0.00   0.00   0.28
+  Goblin    0.00   0.00   0.01   0.01      -   0.00   0.00   0.00
+     Elf    0.97   0.96   1.00   1.00   1.00      -   0.50   0.91
+   Dwarf    0.96   0.96   1.00   1.00   1.00   0.46      -   0.90
+
+== Equal coin: 150 coins each, bought like a player (captain limit, roster cap) (1000 fights each): row's win rate against column; avg = average over the other six
+             Men   Uruk   Levy    Orc Goblin    Elf  Dwarf    avg
+     Men       -   0.84   0.73   0.29   0.64   0.57   0.56   0.61
+    Uruk    0.18      -   0.34   0.05   0.17   0.22   0.21   0.19
+    Levy    0.30   0.65      -   0.13   0.37   0.34   0.32   0.35
+     Orc    0.70   0.94   0.86      -   0.81   0.75   0.75   0.80
+  Goblin    0.37   0.80   0.65   0.19      -   0.41   0.42   0.47
+     Elf    0.45   0.81   0.69   0.25   0.56      -   0.52   0.55
+   Dwarf    0.44   0.83   0.67   0.24   0.57   0.47      -   0.54
+
+== 100 wild Mordor orcs v 50 wild Haradrim (Men tier), zone-spawn mix
+  0.0.101 orc stats, no attacker cap   orcs win 1.00   average survivors (+ orcs, - Haradrim) +67.9
+  0.0.101 orc stats, cap 4             orcs win 1.00   average survivors (+ orcs, - Haradrim) +68.0
+  0.0.103+ orc stats, cap 4 (now)      orcs win 1.00   average survivors (+ orcs, - Haradrim) +84.3
+  50 orcs v 50 Haradrim (now)            orcs win 0.01
+  70 orcs v 50 Haradrim (now)            orcs win 0.99
+  85 orcs v 50 Haradrim (now)            orcs win 1.00

@@ -13,9 +13,17 @@ Current version: 0.0.109 (see `tools/gen_testnpcs.py` and `docs/test-checklist.m
 - `tools/balance/` combat simulator and the fitting scripts behind the faction stats and hire prices.
 - `docs/` design doc, config guide, test checklist, handoff notes.
 
-## Build inputs not in this repo
+## Build inputs
 
-Third-party and owner asset zips live in the Claude project files, not here: LRC 0.4.1 (bundled with the authors' permission, credits in `tools/CREDITS.txt`), FA Races 1.3.3 (seraph-faceless shape for the tests), haradrim-armor 0.1.3, gundabad-bone-armor 0.3.0.
+`build-inputs/` holds the asset zips the build reads: LRC 0.4.1 (bundled with the authors' permission, credits in `tools/CREDITS.txt`; this repo is private), FA Races 1.3.3 (seraph-faceless shape for the tests), and the owner's haradrim-armor 0.1.3 and gundabad-bone-armor 0.3.0 with their original files.
+
+## Test builds
+
+`releases/` holds the latest test zip (now 0.0.109). Older zips stay in the Claude project files.
+
+## Notes and decisions
+
+See `docs/README.md` for where everything is: decisions and their reasons (`docs/notes/`), the design review, balance results, per-version history and the test checklist.
 
 ## Packaging
 

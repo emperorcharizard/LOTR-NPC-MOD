@@ -1,0 +1,2442 @@
+diff -ruN '--exclude=bin' '--exclude=obj' '--exclude=out' a/lotrnpcs/src/Battle.cs b/lotrnpcs/src/Battle.cs
+--- a/lotrnpcs/src/Battle.cs	2026-11-05 04:02:20.000000000 +0000
++++ b/lotrnpcs/src/Battle.cs	2026-11-09 15:05:24.556810146 +0000
+@@ -30,8 +30,9 @@
+         public const long ClaimMs = 6000;
+         // 0.0.82: 3 became 2 (config version 17 moves an unchanged 3). 0.0.85 (owner, 2026-11-04: "remove the limit for
+         // how many npcs can target 1 npc as that seems to be causing the issue"): no limit by default (config version 18
+-        // moves an unchanged 2; 17 moves an unchanged 3 straight to no limit).
+-        public const int OldDefaultMaxAttackers = 3, Default082MaxAttackers = 2, DefaultMaxAttackers = 0;
++        // moves an unchanged 2; 17 moves an unchanged 3 straight to no limit). 0.0.102 (owner, 2026-11-09: "Implement it
++        // again, do 4 per though"): 4 by default (config version 24 moves an unchanged 0).
++        public const int OldDefaultMaxAttackers = 3, Default082MaxAttackers = 2, Default085MaxAttackers = 0, DefaultMaxAttackers = 4;
+         // 0.0.55 (user, 2026-11-03: "make npcs inclined to spread out when fighting as a big group just a bit more"):
+         // 1.5 became 2.0. 0.0.82 (owner: 1.5 blocks between neighbours in a line): back to 1.5, now only between NPCs of
+         // the same side (config version 17 moves an unchanged 2.0).
+@@ -92,6 +93,41 @@
+             public int Count;
+         }
+ 
++        // 0.0.98 (owner, 2026-11-08: in a 3 on 1 "they all swing at the same time, but only ones damage is applied"; owner
++        // chose staggered swings over skipping the game's hurt window): after any hit the game drops further damage to
++        // that entity for 500 ms ("invulnerable" activity, EntityBehaviorHealth). Target -> earliest time the next of our
++        // melee hits on it may land, so attackers take turns at least HitGapMs apart instead of hitting in unison.
++        public const int HitGapMs = 550, HitJitterMs = 200;
++        readonly Dictionary<long, long> nextHitAt = new Dictionary<long, long>();
++        readonly List<long> hitSweepKeys = new List<long>();
++        long nextHitSweep;
++
++        // Every 10 s drops turns that have passed, so targets that never die or unload through our behavior (players,
++        // animals) don't pile up.
++        void SweepHits(long now)
++        {
++            nextHitSweep = now + 10000;
++            hitSweepKeys.Clear();
++            foreach (KeyValuePair<long, long> kv in nextHitAt) if (kv.Value < now) hitSweepKeys.Add(kv.Key);
++            foreach (long key in hitSweepKeys) nextHitAt.Remove(key);
++        }
++
++        /// <summary>For tests: how many targets have a booked melee turn.</summary>
++        public int TrackedHitTurns => nextHitAt.Count;
++
++        /// <summary>How long (ms) a melee hit that would land at hitAt (world ms) must wait to be clear of the last booked
++        /// hit on the target; 0 when it is clear now.</summary>
++        public long HitWaitMs(long target, long hitAt) => nextHitAt.TryGetValue(target, out long free) && hitAt < free ? free - hitAt : 0;
++
++        /// <summary>Books a melee hit on the target landing at hitAt: the next one waits HitGapMs plus jitterMs after it.
++        /// A later booking for the same hit (the swing landed late, after turning) only ever moves the turn later.</summary>
++        public void BookHit(long target, long hitAt, int jitterMs)
++        {
++            if (hitAt >= nextHitSweep) SweepHits(hitAt);
++            long next = hitAt + HitGapMs + Math.Max(0, jitterMs);
++            if (!nextHitAt.TryGetValue(target, out long free) || next > free) nextHitAt[target] = next;
++        }
++
+         readonly Dictionary<long, Claims> byTarget = new Dictionary<long, Claims>();
+         // Attacker -> the target it claimed (one at a time).
+         readonly Dictionary<long, long> byAttacker = new Dictionary<long, long>();
+@@ -171,6 +207,7 @@
+         public void Forget(long id)
+         {
+             Release(id);
++            nextHitAt.Remove(id);
+             if (!byTarget.TryGetValue(id, out Claims c)) return;
+             for (int i = 0; i < c.Count; i++)
+             {
+@@ -295,6 +332,40 @@
+             return true;
+         }
+ 
++        // 0.0.104 (owner: "check their neighbors in a small block radius around themselves, between 4-6"; chose "Push
++        // always + 5-block look-ahead"): out of a fight NPCs of one side keep BodySpacing apart; a walking NPC (Motion
++        // above WalkingMotion blocks a tick) looks LookAhead blocks ahead within AvoidWidth of its way.
++        public const double BodySpacing = 1.0, LookAhead = 5, AvoidWidth = 1.2, BrakeDistance = 1.6, BrakeWidth = 0.6, BrakeShare = 0.15;
++        public const double WalkingMotion = 0.004;
++
++        /// <summary>Is this NPC catching up with a neighbour ahead (0.0.104)? Speeds along its heading, in blocks a tick:
++        /// the neighbour is slower by more than ClosingShare of its own speed.</summary>
++        public const double ClosingShare = 0.3;
++        public static bool Closing(double mine, double theirs) => mine > 0 && mine - theirs > mine * ClosingShare;
++
++        /// <summary>
++        /// Adds the steer around one neighbour ahead (0.0.104). (hx, hz) is the unit heading, (dx, dz) from this NPC to
++        /// the neighbour. Nothing for one behind, farther than LookAhead or more than AvoidWidth off the way; otherwise a
++        /// sideways push away from the way it is on, stronger the nearer and the more in the way it is (a neighbour
++        /// right on the line splits by the entity id), and a brake for one within BrakeDistance and BrakeWidth. True if
++        /// the neighbour was in the way.
++        /// </summary>
++        public static bool AddAvoid(ref double px, ref double pz, ref double brake, double hx, double hz, double dx, double dz, long tieBreak)
++        {
++            double ahead = dx * hx + dz * hz;
++            if (ahead <= 0 || ahead >= LookAhead) return false;
++            double lateral = dx * hz - dz * hx;   // > 0: the neighbour is to the right
++            double off = Math.Abs(lateral);
++            if (off >= AvoidWidth) return false;
++            double weight = (1 - ahead / LookAhead) * (1 - off / AvoidWidth);
++            double side = lateral > 0.05 ? -1 : lateral < -0.05 ? 1 : ((tieBreak & 1) == 0 ? 1 : -1);
++            // Right of the heading is (hz, -hx); steer to the side away from the neighbour.
++            px += side * hz * weight;
++            pz += side * -hx * weight;
++            if (ahead < BrakeDistance && off < BrakeWidth) brake += 1 - ahead / BrakeDistance;
++            return true;
++        }
++
+         /// <summary>
+         /// Motion to add this tick for a push of strength 1. Vanilla ground physics adds motion and keeps 70% of it
+         /// every 1/60 s, so a nudge moves the entity 0.7 / 0.3 = 2.33 times its size in all; spread over the ticks of
+diff -ruN '--exclude=bin' '--exclude=obj' '--exclude=out' a/lotrnpcs/src/BattleLines.cs b/lotrnpcs/src/BattleLines.cs
+--- a/lotrnpcs/src/BattleLines.cs	2026-11-05 03:47:20.000000000 +0000
++++ b/lotrnpcs/src/BattleLines.cs	2026-11-09 15:03:28.065095485 +0000
+@@ -15,8 +15,11 @@
+         /// <summary>How many members stand in the front rank: perEnemy for each enemy (0.0.82: 2, owner: extras "wrap the
+         /// flanks", "never more than 2" on one enemy), at least one, at most every member; the rest are the rear rank.
+         /// 0.0.85 (owner: "remove the limit for how many npcs can target 1 npc"): perEnemy is MaxAttackersPerTarget, 0 by
+-        /// default, and 0 puts every member in the front rank.</summary>
+-        public static int FrontCount(int members, int enemies, int perEnemy = 2) =>
++        /// default, and 0 puts every member in the front rank.
++        /// 0.0.104 (owner, 2026-11-09: lines "stay in that line until they outnumber the enemy where they start to
++        /// surround them"): one front place per enemy (LinesPerEnemy); the members past that are the side's extras.</summary>
++        public const int LinesPerEnemy = 1;
++        public static int FrontCount(int members, int enemies, int perEnemy = LinesPerEnemy) =>
+             members <= 0 ? 0 : perEnemy <= 0 ? members : Math.Clamp(perEnemy * Math.Max(1, enemies), 1, members);
+ 
+         /// <summary>A slot's place across the line (right of the center, in blocks) and behind it (0 for the front rank).</summary>
+@@ -227,7 +230,7 @@
+                 lines.Add(line);
+             }
+             line.Members.Add(id);
+-            line.Front = LineMath.FrontCount(line.Members.Count, line.Enemies, PerEnemy);
++            line.Front = LineMath.FrontCount(line.Members.Count, line.Enemies);
+             line.Dirty = true;
+             lineOf[id] = line;
+             return line;
+@@ -265,12 +268,28 @@
+             {
+                 if (line.Contact || td <= (line.Advances ? EngageRange : HoldRange)) return false;
+             }
+-            else if (td <= RearStrikeRange) return false;
++            // 0.0.104: once the lines have met, the extras (the side outnumbers the enemy) go round to surround.
++            else if (line.Contact || td <= RearStrikeRange) return false;
+             LineMath.SlotOffset(i, line.Members.Count, line.Front, Gap, out double right, out double back);
+             LineMath.SlotAt(line.Px, line.Pz, line.Dx, line.Dz, right, back, out x, out z);
+             return true;
+         }
+ 
++        /// <summary>
++        /// 0.0.104 (owner: "stay in that line"): a front member of a line that has met the enemy keeps its place in the
++        /// line while it fights: it stands on its own side of its enemy, facing the way the line faces, instead of
++        /// walking round it. (dx, dz) is the line's facing. False for others (extras surround, the rest as before).
++        /// </summary>
++        public bool HoldsFront(Entity npc, out double dx, out double dz)
++        {
++            dx = dz = 0;
++            if (!lineOf.TryGetValue(npc.EntityId, out BattleLine line) || !line.Contact) return false;
++            int i = line.Members.IndexOf(npc.EntityId);
++            if (i < 0 || i >= line.Front) return false;
++            dx = line.Dx; dz = line.Dz;
++            return true;
++        }
++
+         // Scratch lists for Update (main thread only).
+         readonly List<BattleLine> scratchLines = new List<BattleLine>();
+         readonly List<double> xs = new List<double>(), zs = new List<double>();
+@@ -360,7 +379,7 @@
+             line.Py = my;
+ 
+             // Ranks.
+-            int front = LineMath.FrontCount(n, line.Enemies, PerEnemy);
++            int front = LineMath.FrontCount(n, line.Enemies);
+             if (front != line.Front) { line.Front = front; line.Dirty = true; }
+             if (line.Dirty)
+             {
+diff -ruN '--exclude=bin' '--exclude=obj' '--exclude=out' a/lotrnpcs/src/EdgeGuard.cs b/lotrnpcs/src/EdgeGuard.cs
+--- a/lotrnpcs/src/EdgeGuard.cs	2026-11-05 04:08:07.000000000 +0000
++++ b/lotrnpcs/src/EdgeGuard.cs	2026-11-09 15:19:51.088440535 +0000
+@@ -25,6 +25,12 @@
+         public const int MaxSafeDrop = 4;
+         /// <summary>How far ahead of its middle the ground is checked: half the NPC's width and a step.</summary>
+         public const double EdgeLookAhead = 0.6;
++        /// <summary>0.0.105 (owner, 2026-11-09: archers "end up jumping off walls in order to enter melee combat"): archers
++        /// step down at most this far while fighting, so they stay up on walls and hills (out of a fight they follow
++        /// their leader down like anyone).</summary>
++        public const int ArcherMaxDrop = 1;
++        int archer = -1;
++        EntityBehaviorFactionMember member;
+ 
+         public EntityBehaviorEdgeGuard(Entity entity) : base(entity) { }
+ 
+@@ -78,7 +84,9 @@
+             IBlockAccessor blocks = entity.World.BlockAccessor;
+             tmp.dimension = entity.Pos.Dimension;
+             cellFn ??= (x, y, z) => { tmp.Set(x, y, z); return CellAt(entity.World.BlockAccessor, tmp); };
+-            if (!Unsafe(cellFn, bx, by, bz, MaxSafeDrop)) return;
++            if (archer < 0) { archer = Recruit.IsArcher(entity) ? 1 : 0; member = entity.GetBehavior<EntityBehaviorFactionMember>(); }
++            int maxDrop = archer == 1 && member != null && member.Fighting(entity.World.ElapsedMilliseconds) ? ArcherMaxDrop : MaxSafeDrop;
++            if (!Unsafe(cellFn, bx, by, bz, maxDrop)) return;
+ 
+             entity.GetBehavior<EntityBehaviorTaskAI>()?.PathTraverser?.Stop();
+             agent.Controls.WalkVector.Set(0, 0, 0);
+diff -ruN '--exclude=bin' '--exclude=obj' '--exclude=out' a/lotrnpcs/src/Factions.cs b/lotrnpcs/src/Factions.cs
+--- a/lotrnpcs/src/Factions.cs	2026-11-06 06:24:50.000000000 +0000
++++ b/lotrnpcs/src/Factions.cs	2026-11-09 19:11:12.766621258 +0000
+@@ -127,13 +127,33 @@
+             return promote;
+         }
+ 
+-        public static readonly FactionTier Men = T("men", 5, 16, 1f, 1f, R(22, 34, 48, 34), R(3.05f, 4f, 7.05f, 3f), 5, 15, 40, 15, 10, 10, 30);
+-        public static readonly FactionTier Uruk = T("uruk", 5, 15, 1.05f, 1.03f, R(23, 32, 48, 35), R(2.95f, 4.3f, 7.15f, 2.95f), 6, 17, 44, 17, 11, 11, 33);
+-        public static readonly FactionTier Levy = T("levy", 6, 19, 0.85f, 0.85f, R(18, 29, 41, 28), R(2.7f, 3.4f, 6f, 2.6f), 4, 13, 33, 13, 8, 8, 25);
+-        public static readonly FactionTier Orc = T("orc", 7, 22, 0.66f, 0.85f, R(15, 27, 31, 22), R(2.5f, 2.8f, 5.95f, 2.45f), 4, 11, 29, 11, 7, 7, 21);
+-        public static readonly FactionTier Goblin = T("goblin", 8, 26, 0.57f, 0.73f, R(16, 21, 31, 19), R(1.85f, 2.85f, 4.75f, 2.2f), 3, 9, 25, 9, 6, 6, 19);
+-        public static readonly FactionTier Elf = T("elf", 4, 13, 1.14f, 1.35f, R(27, 37, 53, 37), R(3.65f, 5.4f, 9.6f, 4.25f), 6, 19, 50, 19, 13, 13, 38);
+-        public static readonly FactionTier Dwarf = T("dwarf", 4, 13, 1.33f, 1.15f, R(30, 46, 63, 46), R(3.25f, 4.35f, 7.9f, 3.4f), 6, 19, 50, 19, 13, 13, 38);
++        public static readonly FactionTier Men = T("men", 5, 16, 1f, 1f, R(22, 34, 48, 35), R(3.1f, 4f, 7f, 3.05f), 5, 15, 40, 15, 10, 10, 30);
++        public static readonly FactionTier Uruk = T("uruk", 5, 15, 1.05f, 1.03f, R(23, 32, 48, 36), R(2.95f, 4.35f, 7.1f, 3f), 6, 17, 44, 17, 11, 11, 33);
++        public static readonly FactionTier Levy = T("levy", 6, 19, 0.85f, 0.85f, R(18, 29, 42, 28), R(2.9f, 3.6f, 6.1f, 2.8f), 4, 13, 33, 13, 8, 8, 25);
++        // 0.0.103 (owner, 2026-11-09: "Maybe the stats only need to be slightly different instead of vastly"; chose
++        // "Narrow orcs to ~0.78 of a Man"): health x damage per rank went from about 0.55 of the Men's to about 0.78,
++        // roughly even per coin (orcs hire for about 0.75 of a Man). Config version 25 moves unchanged 0.0.91 tables.
++        public static readonly Dictionary<string, float> OrcHealth091 = R(15, 27, 31, 22), OrcDamage091 = R(2.5f, 2.8f, 5.95f, 2.45f);
++        public static readonly FactionTier Orc = T("orc", 6, 22, 0.66f, 0.85f, R(19, 30, 41, 30), R(2.75f, 3.5f, 6.3f, 2.6f), 4, 11, 29, 11, 7, 7, 21);
++        public static readonly FactionTier Goblin = T("goblin", 8, 26, 0.57f, 0.73f, R(18, 24, 34, 22), R(1.85f, 2.8f, 4.85f, 2.2f), 3, 9, 25, 9, 6, 6, 19);
++        public static readonly FactionTier Elf = T("elf", 4, 13, 1.14f, 1.35f, R(26, 36, 50, 36), R(3.65f, 5.35f, 9.6f, 4.25f), 6, 19, 50, 19, 13, 13, 38);
++        public static readonly FactionTier Dwarf = T("dwarf", 4, 13, 1.33f, 1.15f, R(30, 46, 61, 47), R(3.15f, 4.15f, 7.8f, 3.3f), 6, 19, 50, 19, 13, 13, 38);
++
++        // 0.0.107 (owner chose "Orcs to 6 followers + refit all"): orcs follow 6 (was 7), and every tier's per-rank
++        // health and damage refitted with tools/balance/fit105.py under the 0.0.105 rules (hit turns, the attacker cap of
++        // 4, the hit spread) so each full same-rank following averages about 0.5 against the others (Uruk-hai 0.55),
++        // pulled toward the 0.0.103 values. The 0.0.103 tables, for config version 27:
++        public static readonly Dictionary<string, (Dictionary<string, float> Health, Dictionary<string, float> Damage)> Tables103 = new Dictionary<string, (Dictionary<string, float>, Dictionary<string, float>)>
++        {
++            ["men"] = (R(22, 34, 48, 34), R(3.05f, 4f, 7.05f, 3f)),
++            ["uruk"] = (R(23, 32, 48, 35), R(2.95f, 4.3f, 7.15f, 2.95f)),
++            ["levy"] = (R(18, 29, 41, 28), R(2.7f, 3.4f, 6f, 2.6f)),
++            ["orc"] = (R(19, 30, 41, 29), R(2.75f, 3.6f, 6.3f, 2.7f)),
++            ["goblin"] = (R(16, 21, 31, 19), R(1.85f, 2.85f, 4.75f, 2.2f)),
++            ["elf"] = (R(27, 37, 53, 37), R(3.65f, 5.4f, 9.6f, 4.25f)),
++            ["dwarf"] = (R(30, 46, 63, 46), R(3.25f, 4.35f, 7.9f, 3.4f)),
++        };
++        public const int OrcFollowers103 = 7;
+ 
+         static readonly Dictionary<string, FactionTier> ByFaction = new Dictionary<string, FactionTier>
+         {
+@@ -192,9 +212,9 @@
+         [JsonProperty("#Instructions")]
+         public List<string> Instructions;
+         // Format of the file. 0 = written by 0.0.31, 1 = by 0.0.32, 2 = by 0.0.33, 3 = by 0.0.34, 4 = by 0.0.35 to
+-        // 0.0.38, 5 = by 0.0.39 and 0.0.40, 6 = by 0.0.41 to 0.0.43, 7 = by 0.0.44 to 0.0.47, 8 = by 0.0.48 to 0.0.50, 9 = by 0.0.51 and 0.0.52, 10 = by 0.0.53, 11 = by 0.0.54, 12 = by 0.0.55 to 0.0.58, 13 = by 0.0.59 to 0.0.61, 14 = by 0.0.62 to 0.0.73, 15 = by 0.0.74 and 0.0.75, 16 = by 0.0.76 to 0.0.81, 17 = by 0.0.82 to 0.0.84, 18 = by 0.0.85 to 0.0.89, 19 = by 0.0.90, 20 = by 0.0.91, 21 = by 0.0.92;
++        // 0.0.38, 5 = by 0.0.39 and 0.0.40, 6 = by 0.0.41 to 0.0.43, 7 = by 0.0.44 to 0.0.47, 8 = by 0.0.48 to 0.0.50, 9 = by 0.0.51 and 0.0.52, 10 = by 0.0.53, 11 = by 0.0.54, 12 = by 0.0.55 to 0.0.58, 13 = by 0.0.59 to 0.0.61, 14 = by 0.0.62 to 0.0.73, 15 = by 0.0.74 and 0.0.75, 16 = by 0.0.76 to 0.0.81, 17 = by 0.0.82 to 0.0.84, 18 = by 0.0.85 to 0.0.89, 19 = by 0.0.90, 20 = by 0.0.91, 21 = by 0.0.92, 22 = by 0.0.93, 23 = by 0.0.94 to 0.0.101, 24 = by 0.0.102, 25 = by 0.0.103, 26 = by 0.0.104 to 0.0.106, 27 = by 0.0.107;
+         // Migrate() updates older files once and then stores them.
+-        public const int CurrentVersion = 23;
++        public const int CurrentVersion = 27;
+         public int Version;
+         public Dictionary<string, FactionDef> Factions;
+         public List<FactionRelationDef> Relations;
+@@ -212,6 +232,11 @@
+         public int? OldCapField;
+         public bool ShouldSerializeOldCapField() => false;
+         public int MaxFollowers = DefaultMaxFollowers;
++        // 0.0.104 (owner, 2026-11-09: "limit the ranks of units per cap. Like 1-2 captains only"; chose "1 captain per 8
++        // roster places"): one captain per RosterPerCaptain places of a faction's roster, rounded so that 13 places
++        // give 1, 16 give 2 and 22 give 3 (CaptainsOf). 0 turns the limit off.
++        public const int DefaultRosterPerCaptain = 8;
++        public int RosterPerCaptain = DefaultRosterPerCaptain;
+         // Out-of-combat healing (user, 2026-11-03: "increase the regen of the npcs", then "just a bit faster"), as a
+         // multiple of vanilla's creature regeneration of 0.01 health a second: 30 heals a recruit (22 health since
+         // 0.0.43) in about 1.2 minutes and a captain (48) in about 2.7. In a fight, and for RegenDelaySeconds after the
+@@ -226,7 +251,7 @@
+ 
+         public static int ClampGuardRadius(int radius) => GameMath.Clamp(radius, MinGuardRadius, MaxGuardRadius);
+         // Battle spacing (0.0.53, user, 2026-11-03: "maybe put a minimum distance npcs have to one another when
+-        // fighting"): most NPCs that go for one NPC at once (0 = no limit; players are never limited), and how far
++        // fighting"): most NPCs that go for one NPC at once (0 = no limit, 4 by default since 0.0.102; players are never limited), and how far
+         // apart fighting NPCs keep (BattleSpacing.MinSpacing to MaxSpacing blocks).
+         public int MaxAttackersPerTarget = BattleSpacing.DefaultMaxAttackers;
+         public double CombatSpacing = BattleSpacing.DefaultSpacing;
+@@ -239,8 +264,10 @@
+         // 0.0.82 battle lines and duel band (owner's combat answers, 2026-11-04; Battle.cs, BattleLines.cs).
+         // 0.0.85 (owner, 2026-11-04: "the goal is to have the npcs fight first, then maintain formation second"): off
+         // by default, since a line keeps NPCs in their places until an enemy comes near. Version 18 turns an unchanged
+-        // true off once.
+-        public bool BattleLines = false;
++        // true off once. 0.0.104 (owner, 2026-11-09: lines "stay in that line until they outnumber the enemy where they
++        // start to surround them"; chose "Yes, and turn lines on by default"): on by default again; version 26 turns an
++        // old false on once.
++        public bool BattleLines = true;
+         public double DuelDistanceMin = BattleSpacing.DefaultDuelMin;
+         public double DuelDistanceMax = BattleSpacing.DefaultDuelMax;
+         public double LineHoldRange = 6;
+@@ -342,6 +369,11 @@
+         public int FollowersOf(string faction) => Def(faction)?.MaxFollowers ?? Math.Max(1, MaxFollowers);
+         /// <summary>How many of this faction's recruits a player may have.</summary>
+         public int RosterOf(string faction) => Def(faction)?.MaxRecruits ?? Math.Max(1, MaxRecruits);
++        /// <summary>How many captains a player may lead of this faction alone (0.0.104): roster / RosterPerCaptain,
++        /// a fraction of .75 or more rounding up, at least 1; int.MaxValue with the limit off.</summary>
++        public int CaptainsOf(string faction) => CaptainsFor(RosterOf(faction), RosterPerCaptain);
++        public static int CaptainsFor(int roster, int perCaptain) =>
++            perCaptain <= 0 ? int.MaxValue : Math.Max(1, (int)Math.Floor(roster / (double)perCaptain + 0.25 + 1e-9));
+         /// <summary>The health of this faction's NPCs of this rank (0.0.91), or null: the type's own (a faction the
+         /// config doesn't know, a rank without an entry, a rankless NPC).</summary>
+         public float? HealthFor(string faction, string rank) =>
+@@ -352,7 +384,7 @@
+         /// <summary>The spread on every NPC hit (0.0.91), 0 to 0.9.</summary>
+         public double Spread => double.IsNaN(DamageSpread) ? DefaultDamageSpread : GameMath.Clamp(DamageSpread, 0, 0.9);
+         /// <summary>How much bigger this faction's wild groups are than the baseline's: its follow limit over the
+-        /// baseline MaxFollowers (orcs 7/5).</summary>
++        /// baseline MaxFollowers (orcs 6/5 since 0.0.107).</summary>
+         public double GroupScaleOf(string faction) => FollowersOf(faction) / (double)Math.Max(1, MaxFollowers);
+ 
+         // Hire prices (user, 2026-11-02): 5, 15 and 40 coins for every faction for now; the coin can differ per faction.
+@@ -387,10 +419,11 @@
+             "Relations: how two factions treat each other. Relation is \"ally\", \"enemy\" or \"neutral\", and two factions without an entry are enemies. No factions are allies by default. Allies never fight and come to help each other; neutral factions leave each other's NPCs alone.",
+             "ShareFriends (allies only): true makes each faction's members safe from the other's NPCs too, and lets them hire the other's NPCs. Otherwise a player is safe only from their own factions and hires only from them.",
+             "MonsterCodes: creatures every faction attacks on sight (* is a wildcard). GrudgeSeconds: how long NPCs fight someone who hurt them or an ally. CallForHelpRange: how many blocks away allies come to help.",
+-            "MaxAttackersPerTarget: how many NPCs may fight one NPC at a time. 0 (the default) means no limit. With a limit, the rest look for another enemy, wait one step behind in a battle line, or, outside a line, join a full enemy anyway when there is no other within reach. Either way an NPC takes an enemy nobody is fighting before one already being fought. Players are never limited, and an NPC always strikes back at whoever hits it.",
++            "RosterPerCaptain: one captain per this many places of a faction's roster (8 by default: Men 2, orcs and goblins 3, elves and dwarves 1, Uruk-hai and Dunlendings 2). Hiring or promoting past it is refused; captains a player already has stay. With several factions on one roster each captain counts its share. 0 means no limit.",
++            "MaxAttackersPerTarget: how many NPCs may fight one NPC at a time. 4 by default; 0 means no limit. With a limit, the rest look for another enemy, wait one step behind in a battle line, or, outside a line, join a full enemy anyway when there is no other within reach. Either way an NPC takes an enemy nobody is fighting before one already being fought. Players are never limited, and an NPC always strikes back at whoever hits it.",
+             "CombatSpacing: how far apart, in blocks, fighting NPCs of the same side keep from each other, and the gap between neighbours in a battle line (0.8 to 4, 1.5 by default). Enemies only keep DuelDistanceMin apart. As many attackers as fit round an enemy this far apart (5 by default) fight it; the others take another enemy with room first, or else wait in a second ring one CombatSpacing farther out and step in when a place opens.",
+             "DuelDistanceMin and DuelDistanceMax: how far from the center of the NPC it fights an attacker stands (1.0 to 1.6 blocks by default): it closes in when farther, steps back when closer, and stands and fights in between. Players are approached the vanilla way.",
+-            "BattleLines (false by default: NPCs fight first and keep formation second): true makes groups of NPCs line up when they meet another faction's NPCs, waiting in their places until an enemy comes near: wild NPCs, and recruits following in any formation but Loose. Each NPC takes an enemy nobody is fighting first, so the lines pair off, and the extras join in on enemies already being fought (with a MaxAttackersPerTarget limit, the rest wait one step behind until a place opens). Wild NPCs and aggressive or raid recruits march to meet the enemy; defensive recruits hold their line until an enemy is within LineHoldRange blocks. Loose followers, guards, archers, and fights with players or monsters don't make lines.",
++            "BattleLines (true by default): groups of NPCs line up when they meet another faction's NPCs, waiting in their places until an enemy comes near: wild NPCs, and recruits following in any formation but Loose. The front rank has one place per enemy; when the lines meet each front NPC fights the enemy facing it from its place in the line. NPCs past that (the side outnumbers the enemy) wait one step behind until the lines meet, then go round to surround, up to MaxAttackersPerTarget on one enemy. Wild NPCs and aggressive or raid recruits march to meet the enemy; defensive recruits hold their line until an enemy is within LineHoldRange blocks. Loose followers, guards, archers, and fights with players or monsters don't make lines. false lets NPCs fight as they find enemies.",
+             "HelmetChance: the chance (0 to 1) that a newly spawned NPC that may go bare-headed wears its outfit's helmet. Which units may go bare-headed is set by the mod for each unit (all orcs and Uruk-hai, and the units of other factions marked so); the others always spawn with theirs. A helmet it doesn't wear is kept, and its owner can put it on or take any helmet off from the recruit's menu. Helmets are only for looks: NPC protection comes from rank. CaptainsAlwaysHelmeted: true makes every captain always wear theirs (false by default since 0.0.82).",
+             "ShieldChance: the chance (0 to 1) that a newly spawned Mordor orc carries a shield. Shields are only for looks, are never carried with the poleaxe, and the owner can take one off or put it on from the recruit's menu.",
+             "HealthRegenSpeed: how fast NPCs heal out of combat, as a multiple of vanilla's creature healing (1 = vanilla, 0.01 health a second; 30 = 0.3 a second). RegenDelaySeconds: how long after its last hit an NPC starts healing at that speed.",
+@@ -584,6 +617,43 @@
+                         kv.Value.PromotePrices = FactionTiers.PromoteFor(kv.Value.HirePrices);
+                 }
+             }
++            // 0.0.107 (version 27, owner chose "Orcs to 6 followers + refit all"): health and damage tables still exactly as
++            // 0.0.103 to 0.0.106 shipped them take the refitted ones, and an orc-tier follow limit still at the old 7
++            // (scaled by the file's MaxFollowers) becomes 6; values the admin chose stay. (The version 25 orc
++            // move below lands on the new tables too.)
++            if (Version < 27 && Version > 0)
++            {
++                foreach (KeyValuePair<string, FactionDef> kv in Factions)
++                {
++                    if (kv.Value == null) continue;
++                    FactionTier tier = FactionTiers.Of(kv.Key);
++                    if (FactionTiers.Tables103.TryGetValue(tier.Name, out var old))
++                    {
++                        if (SameTable(kv.Value.Health, old.Health)) kv.Value.Health = new Dictionary<string, float>(tier.Health);
++                        if (SameTable(kv.Value.Damage, old.Damage)) kv.Value.Damage = new Dictionary<string, float>(tier.Damage);
++                    }
++                    int baseFollowers = Math.Max(1, MaxFollowers);
++                    if (tier == FactionTiers.Orc && kv.Value.MaxFollowers == FactionTiers.Round(FactionTiers.OrcFollowers103 * (double)baseFollowers / DefaultMaxFollowers))
++                        kv.Value.MaxFollowers = FactionTiers.Round(tier.Followers * (double)baseFollowers / DefaultMaxFollowers);
++                }
++            }
++            // 0.0.104 (version 26, owner chose "Yes, and turn lines on by default"): lines go on once. RosterPerCaptain
++            // comes in with its default.
++            if (Version < 26 && Version > 0) BattleLines = true;
++            // 0.0.103 (version 25, owner chose "Narrow orcs to ~0.78 of a Man"): orc-tier factions (Mordor, Angmar,
++            // Gundabad, and any with the orc tables) whose health or damage table is still exactly 0.0.91's take the new
++            // one; a table the admin changed stays.
++            if (Version < 25 && Version > 0)
++            {
++                foreach (KeyValuePair<string, FactionDef> kv in Factions)
++                {
++                    if (kv.Value == null || FactionTiers.Of(kv.Key) != FactionTiers.Orc) continue;
++                    if (SameTable(kv.Value.Health, FactionTiers.OrcHealth091)) kv.Value.Health = new Dictionary<string, float>(FactionTiers.Orc.Health);
++                    if (SameTable(kv.Value.Damage, FactionTiers.OrcDamage091)) kv.Value.Damage = new Dictionary<string, float>(FactionTiers.Orc.Damage);
++                }
++            }
++            // 0.0.102 (version 24, owner: "Implement it again, do 4 per though"): the unchanged no-limit 0 becomes 4.
++            if (Version < 24 && Version > 0 && MaxAttackersPerTarget == BattleSpacing.Default085MaxAttackers) MaxAttackersPerTarget = BattleSpacing.DefaultMaxAttackers;
+             foreach (FactionDef def in Factions.Values)
+             {
+                 if (def == null) continue;
+@@ -594,6 +664,9 @@
+             return true;
+         }
+ 
++        static bool SameTable(Dictionary<string, float> a, Dictionary<string, float> b) =>
++            a != null && b != null && a.Count == b.Count && b.All(kv => a.TryGetValue(kv.Key, out float v) && Math.Abs(v - kv.Value) < 1e-4);
++
+         static bool SamePrices(Dictionary<string, int> a, Dictionary<string, int> b) =>
+             a != null && b != null && a.Count == b.Count && a.All(kv => b.TryGetValue(kv.Key, out int v) && v == kv.Value);
+ 
+@@ -1162,8 +1235,8 @@
+         /// Does a recruit pick this target? Never its owner or the owner's other recruits, and nothing while passive
+         /// or breaking off after a movement order. Otherwise it fights whoever hurt the owner or one of them, and
+         /// whatever is going for them; defensive recruits fight only those. Aggressive ones (the default) also attack
+-        /// enemies on sight: faction NPCs that would attack the owner on sight, and monsters; other players and other
+-        /// players' recruits only when they started it. Raiding ones attack every player and creature that isn't
++        /// enemies on sight: faction NPCs that would attack the owner on sight, monsters, and (0.0.102) players of an
++        /// enemy side and their recruits (EnemyForces); other players and their recruits only when they started it. Raiding ones attack every player and creature that isn't
+         /// allied (RaidTarget). Guarding ones (Guard here, 0.0.44) pick nothing on sight outside their area, and inside
+         /// it they also attack intruders (IsIntruder).
+         /// </summary>
+@@ -1181,12 +1254,57 @@
+             if (guarding && !InGuardArea(recruit, target)) return false;
+             if (stance == Recruit.Raid) return RaidTarget(recruit, ownerUid, target);
+             if (guarding && IsIntruder(ownerUid, target)) return true;
+-            if (target is EntityPlayer || Recruit.OwnerUidOf(target) != null) return false;
++            // 0.0.102 (owner, 2026-11-09: two hired armies sent at each other on Aggressive "did not fight each other";
++            // chose "Enemy players and recruits"): players of an enemy side (survival mode) and their recruits are fought
++            // on sight. Until 0.0.101 Aggressive left every player and player's recruit alone unless provoked.
++            if (target is EntityPlayer targetPlayer) return CanBeAttacked(targetPlayer) && EnemyForces(recruit, ownerUid, Attrs.Uid(targetPlayer), null);
++            if (Recruit.OwnerUidOf(target) is string otherOwner) return EnemyForces(recruit, ownerUid, otherOwner, target);
+             if (FactionOf(target) is string other) return WouldAttackRecruit(other, recruit, ownerUid);
+             return IsMonster(target);
+         }
+ 
+         /// <summary>
++        /// Are two players' forces enemies (0.0.102)? Each side is its player's factions (race, groups or admin setting)
++        /// plus, for a recruit, the recruit's own faction, so two players' hired armies of enemy factions fight even when
++        /// the players themselves belong to no faction. Enemies when some pair of their factions is at war and no pair is
++        /// allied (the same faction counts as allied). Players on the same side (group, allied factions, whitelist) never
++        /// are, and a side with no faction is nobody's enemy.
++        /// </summary>
++        public bool EnemyForces(Entity recruit, string ownerUid, string otherUid, Entity otherRecruit)
++        {
++            if (otherUid == null || ownerUid == null || otherUid == ownerUid || Friendly(ownerUid, otherUid)) return false;
++            HashSet<string> mine = SideOf(ownerUid).FriendOf, theirs = SideOf(otherUid).FriendOf;
++            string mineExtra = FactionOf(recruit), theirsExtra = otherRecruit == null ? null : FactionOf(otherRecruit);
++            bool war = false;
++            foreach (string a in mine)
++            {
++                if (!PairAtWar(a, theirs, theirsExtra, ref war)) return false;
++            }
++            if (mineExtra != null && !mine.Contains(mineExtra) && !PairAtWar(mineExtra, theirs, theirsExtra, ref war)) return false;
++            return war;
++        }
++
++        // One of a side's factions against all of the other side's: false if any pair is allied; war set if any is at war
++        // and the other side's faction attacks on sight (as with wild NPCs, WouldAttackRecruit: a Gondor army leaves the
++        // defensive Shire alone, while Shire recruits on Aggressive go for Gondor's).
++        bool PairAtWar(string a, HashSet<string> theirs, string theirsExtra, ref bool war)
++        {
++            foreach (string b in theirs)
++            {
++                FactionRelation r = Relation(a, b);
++                if (r == FactionRelation.Ally) return false;
++                if (r == FactionRelation.Enemy && IsAggressive(b)) war = true;
++            }
++            if (theirsExtra != null && !theirs.Contains(theirsExtra))
++            {
++                FactionRelation r = Relation(a, theirsExtra);
++                if (r == FactionRelation.Ally) return false;
++                if (r == FactionRelation.Enemy && IsAggressive(theirsExtra)) war = true;
++            }
++            return true;
++        }
++
++        /// <summary>
+         /// Guard here (design doc, 2026-10-30: "any non-friendly player inside the radius, even while the owner is
+         /// offline"): a player who isn't on the owner's side (Friendly) and can be attacked, or such a player's recruit.
+         /// </summary>
+@@ -1399,10 +1517,11 @@
+         // Battle spacing (0.0.53): until when this NPC counts as fighting, and the push away from NPCs standing too
+         // close, worked out a few times a second from the entity partitions (no allocation: the callback is cached).
+         public const long FightingMs = 3000;
+-        const float ScanSeconds = 0.25f;
++        const float ScanSeconds = 0.25f, IdleScanSeconds = 1f;
+         long fightingUntil;
+         float sinceScan;
+-        double pushX, pushZ, scanSpacing, enemySpacing;
++        double pushX, pushZ, scanSpacing, enemySpacing, brake, headX, headZ;
++        bool lookAhead;
+         // 0.0.82: the turn toward the NPC it fights, at most FaceRadPerSec, while standing within FaceRange of it.
+         public const double FaceRange = 4, FaceRadPerSec = 6;
+         long scanTarget;
+@@ -1505,26 +1624,38 @@
+         }
+ 
+         // Fighting NPCs closer than CombatSpacing to another NPC drift apart, at up to BattleSpacing.PushSpeed blocks
+-        // a second, sideways to whatever they are doing. NPCs that aren't fighting (followers, formations) never are.
++        // a second, sideways to whatever they are doing. 0.0.104 (owner, 2026-11-09: men "walking through each other",
++        // chose "Push always + 5-block look-ahead"): NPCs that aren't fighting keep BodySpacing apart too, and a walking
++        // NPC looks LookAhead blocks along its way for its own side, steering past them and slowing behind one that is
++        // right in front. Only neighbours from the entity partitions are looked at, never every NPC. Standing NPCs that
++        // aren't fighting scan once a second, walking or fighting ones four times a second.
+         void Separate(float dt)
+         {
+             long now = entity.World.ElapsedMilliseconds;
+-            if (now >= fightingUntil)
+-            {
+-                pushX = pushZ = 0;
+-                sinceScan = ScanSeconds;
+-                return;
+-            }
++            bool fighting = now < fightingUntil;
++            double mx = entity.Pos.Motion.X, mz = entity.Pos.Motion.Z;
++            bool walking = mx * mx + mz * mz > BattleSpacing.WalkingMotion * BattleSpacing.WalkingMotion;
+             sinceScan += dt;
+-            if (sinceScan >= ScanSeconds)
++            if (sinceScan >= (fighting || walking ? ScanSeconds : IdleScanSeconds))
+             {
+                 sinceScan = 0;
+-                Scan(now);
++                Scan(now, fighting, walking);
+             }
+-            if ((pushX == 0 && pushZ == 0) || !entity.OnGround) return;
++            if ((pushX == 0 && pushZ == 0 && brake == 0) || !entity.OnGround) return;
+             double k = BattleSpacing.PushImpulse(dt);
+             entity.Pos.Motion.X += pushX * k;
+             entity.Pos.Motion.Z += pushZ * k;
++            if (brake > 0)
++            {
++                // Takes away up to BrakeShare of the speed along the way each tick, never turning it around.
++                double along = mx * headX + mz * headZ;
++                if (along > 0)
++                {
++                    double cut = along * Math.Min(1, brake) * BattleSpacing.BrakeShare;
++                    entity.Pos.Motion.X -= headX * cut;
++                    entity.Pos.Motion.Z -= headZ * cut;
++                }
++            }
+         }
+ 
+         // 0.0.82: a fighting NPC that isn't walking turns toward the NPC it fights (or, in a battle line, the enemy it
+@@ -1548,19 +1679,27 @@
+             entity.Pos.Yaw = (entity.Pos.Yaw + GameMath.Clamp(diff, -max, max)) % GameMath.TWOPI;
+         }
+ 
+-        void Scan(long now)
++        void Scan(long now, bool fighting, bool walking)
+         {
+-            pushX = pushZ = 0;
++            pushX = pushZ = 0; brake = 0;
+             BattleSpacing spacing = factions.Spacing;
+-            scanSpacing = spacing.Spacing;
+             // 0.0.82: enemies, the one it fights included, may come as close as the duel minimum; only its own side
+-            // keeps CombatSpacing (before, every NPC but its target did, which shoved fighters out of reach).
+-            enemySpacing = spacing.DuelMin;
++            // keeps CombatSpacing (before, every NPC but its target did, which shoved fighters out of reach). 0.0.104:
++            // out of a fight its own side keeps BodySpacing (formations stand 1.8 apart, so they are left as they are).
++            scanSpacing = fighting ? spacing.Spacing : Math.Min(spacing.Spacing, BattleSpacing.BodySpacing);
++            enemySpacing = Math.Min(spacing.DuelMin, scanSpacing);
+             scanTarget = spacing.TargetOf(entity.EntityId, now);
++            lookAhead = walking;
++            if (walking)
++            {
++                double mx = entity.Pos.Motion.X, mz = entity.Pos.Motion.Z, len = Math.Sqrt(mx * mx + mz * mz);
++                headX = mx / len; headZ = mz / len;
++            }
+             partitions ??= entity.Api.ModLoader.GetModSystem<EntityPartitioning>();
+             if (partitions == null) return;
+             onNeighbor ??= OnNeighbor;
+-            partitions.WalkEntities(entity.Pos.X, entity.Pos.InternalY, entity.Pos.Z, scanSpacing + 0.5, onNeighbor, null, EnumEntitySearchType.Creatures);
++            double radius = walking ? Math.Max(scanSpacing + 0.5, BattleSpacing.LookAhead) : scanSpacing + 0.5;
++            partitions.WalkEntities(entity.Pos.X, entity.Pos.InternalY, entity.Pos.Z, radius, onNeighbor, null, EnumEntitySearchType.Creatures);
+             double length = Math.Sqrt(pushX * pushX + pushZ * pushZ);
+             if (length < 1e-6) { pushX = pushZ = 0; return; }
+             double nx = pushX / length, nz = pushZ / length;
+@@ -1573,8 +1712,19 @@
+         {
+             if (e == entity || !e.Alive || e is EntityPlayer || FactionSystem.FactionOf(e) == null) return true;
+             if (Math.Abs(e.Pos.InternalY - entity.Pos.InternalY) > 1.5) return true;
+-            BattleSpacing.AddPush(ref pushX, ref pushZ, entity.Pos.X - e.Pos.X, entity.Pos.Z - e.Pos.Z,
+-                e.EntityId != scanTarget && factions.SameSide(entity, e) ? scanSpacing : enemySpacing, entity.EntityId);
++            double dx = entity.Pos.X - e.Pos.X, dz = entity.Pos.Z - e.Pos.Z;
++            bool target = e.EntityId == scanTarget;
++            // Cheap distance check first: most neighbours of a 5-block look-ahead scan are neither close nor ahead.
++            double d2 = dx * dx + dz * dz;
++            bool near = d2 < scanSpacing * scanSpacing;
++            bool ahead = lookAhead && !target && d2 < BattleSpacing.LookAhead * BattleSpacing.LookAhead && dx * headX + dz * headZ < 0;
++            if (!near && !ahead) return true;
++            bool sameSide = !target && factions.SameSide(entity, e);
++            if (near) BattleSpacing.AddPush(ref pushX, ref pushZ, dx, dz, sameSide ? scanSpacing : enemySpacing, entity.EntityId);
++            // Only one it is catching up with: a neighbour walking the same way about as fast (a column, a marching
++            // line's rear rank) is left alone, or formations would be pushed out of shape.
++            if (ahead && sameSide && BattleSpacing.Closing(entity.Pos.Motion.X * headX + entity.Pos.Motion.Z * headZ, e.Pos.Motion.X * headX + e.Pos.Motion.Z * headZ))
++                BattleSpacing.AddAvoid(ref pushX, ref pushZ, ref brake, headX, headZ, -dx, -dz, entity.EntityId);
+             return true;
+         }
+ 
+@@ -1693,14 +1843,21 @@
+             }
+         }
+ 
+-        /// <summary>An archer close enough to shoot, with a clear shot, stays where it is.</summary>
++        /// <summary>An archer close enough to shoot, with a clear shot, stays where it is. 0.0.105 (owner, 2026-11-09:
++        /// archers "end up jumping off walls in order to enter melee combat"): so does one standing more than
++        /// ArcherHoldHeight blocks above its target within standOff, shot or not: it keeps its height and waits for a
++        /// shot (or for the enemy to come up, when its melee fights as before) instead of going down to it.</summary>
+         bool CanShootFromHere(Entity target)
+         {
+             if (standOff <= 0 || target == null || Shoot == null) return false;
+             double dx = target.Pos.X - entity.Pos.X, dz = target.Pos.Z - entity.Pos.Z;
+-            return dx * dx + dz * dz <= standOff * standOff && Shoot.ClearShot(target);
++            if (dx * dx + dz * dz > standOff * standOff) return false;
++            return HoldsHeight(entity.Pos.Y - target.Pos.Y) || Shoot.ClearShot(target);
+         }
+ 
++        public const double ArcherHoldHeight = 2;
++        public static bool HoldsHeight(double above) => above > ArcherHoldHeight;
++
+         // Recruits choose as RecruitWantsToAttack says, guards only within their leash, so the search picks the
+         // nearest target they may chase. Without a faction, vanilla rules apply. The cheap checks (alive, range, game
+         // mode) come first, the crowd check last.
+@@ -1796,6 +1953,19 @@
+             slotSpot = false;
+             double bearing = Bearing(target);
+             spacing.Claim(entity.EntityId, target.EntityId, bearing, now);
++            // 0.0.104: a front member of a line that has met the enemy fights from its own side, keeping the line.
++            if (factions.Lines.HoldsFront(entity, out double fdx, out double fdz))
++            {
++                double front = Math.Atan2(-fdx, -fdz);
++                BattleSpacing.SpotAt(target.Pos.X, target.Pos.Z, front, spacing.SurroundRadius, out double fx, out double fz);
++                if (EntityBehaviorFactionMember.CanStepTo(entity.World.BlockAccessor, fx, target.Pos.InternalY, fz))
++                {
++                    spotOuter = false;
++                    spot.Set(fx, target.Pos.InternalY, fz);
++                    spotAngle = front;
++                    return true;
++                }
++            }
+             if (!spacing.SurroundAngle(entity.EntityId, target.EntityId, bearing, now, out double angle, out bool inner)) return false;
+             spotOuter = !inner;
+             BattleSpacing.SpotAt(target.Pos.X, target.Pos.Z, angle, inner ? spacing.SurroundRadius : spacing.OuterRadius, out double x, out double z);
+diff -ruN '--exclude=bin' '--exclude=obj' '--exclude=out' a/lotrnpcs/src/Hiring.cs b/lotrnpcs/src/Hiring.cs
+--- a/lotrnpcs/src/Hiring.cs	2026-11-06 00:41:54.000000000 +0000
++++ b/lotrnpcs/src/Hiring.cs	2026-11-09 17:52:38.797981252 +0000
+@@ -43,6 +43,8 @@
+         // 0.0.91 (owner, 2026-11-05: "since the number has changed, players should be notified how many recruits they
+         // have left in their capacity"): how many more of each faction fit the roster ({7}, "Room on your roster: ...").
+         public List<RoomEntry> RosterRoom = new List<RoomEntry>();
++        // 0.0.104: the player's captain places are full, so no captain is offered.
++        public bool CaptainsFull;
+     }
+ 
+     /// <summary>One faction in the room line (0.0.90): how many more of its recruits fit the following.</summary>
+@@ -67,6 +69,8 @@
+         // 0.0.90: each recruit's faction by entity id, so its roster share is known while it isn't loaded. Recruits
+         // hired before 0.0.90 are added when they next load; until then they count at the baseline share.
+         public Dictionary<long, string> RecruitFactions = new Dictionary<long, string>();
++        // 0.0.104: which recruits are captains, for the captain limit while they aren't loaded.
++        public HashSet<long> Captains = new HashSet<long>();
+         // Players the owner's recruits never attack on sight (design doc: a whitelist with add, remove and list,
+         // now /recruits whitelist), by UID, with the name they had when added.
+         public Dictionary<string, string> Whitelist = new Dictionary<string, string>();
+@@ -471,8 +475,32 @@
+         {
+             string faction = FactionSystem.FactionOf(npc);
+             if (owner != null && faction != null) owner.RecruitFactions[npc.EntityId] = faction;
++            if (owner == null) return;
++            owner.Captains ??= new HashSet<long>();
++            if (RankOf(npc) == "captain") owner.Captains.Add(npc.EntityId);
++            else owner.Captains.Remove(npc.EntityId);
+         }
+ 
++        /// <summary>A captain's share of the player's captain places (0.0.104): 1 / CaptainsOf(its faction).</summary>
++        public double CaptainShare(string faction)
++        {
++            int n = Factions?.Config.CaptainsOf(faction) ?? FactionConfig.CaptainsFor(FactionConfig.DefaultMaxRecruits, FactionConfig.DefaultRosterPerCaptain);
++            return n == int.MaxValue ? 0 : 1.0 / n;
++        }
++
++        /// <summary>How much of the player's captain places their captains use (0.0.104).</summary>
++        public double CaptainsUsed(string uid)
++        {
++            if (!(Owner(uid) is HiringOwner owner) || owner.Captains == null) return 0;
++            double used = 0;
++            foreach (long id in owner.Captains)
++                if (owner.Recruits.Contains(id)) used += CaptainShare(owner.RecruitFactions.TryGetValue(id, out string f) ? f : null);
++            return used;
++        }
++
++        /// <summary>Room for one more captain of this faction (0.0.104)?</summary>
++        public bool CaptainFits(string uid, string faction) => CaptainShare(faction) == 0 || Fits(CaptainsUsed(uid), CaptainShare(faction));
++
+         /// <summary>The player's loaded, living recruits that are told to follow them, wherever they are.</summary>
+         List<EntityAgent> Followers(string uid) => Led(uid).Where(e => Recruit.OrderOf(e) == Recruit.Follow).ToList();
+ 
+@@ -648,6 +676,13 @@
+                 Factions.Config.Factions.TryGetValue(faction, out FactionDef ownDef);
+                 state.Coin = ownDef?.HireCoin ?? FactionConfig.DefaultHireCoin;
+                 if (Promotions != null) state.Promote = Promotions.Offers(npc, ownDef);
++                // 0.0.104: no captain offer while the player's captain places are full.
++                if (state.Promote != null && state.Promote.ContainsKey("captain") && RankOf(npc) != "captain" && !CaptainFits(player.PlayerUID, faction))
++                {
++                    state.Promote = new Dictionary<string, int>(state.Promote);
++                    state.Promote.Remove("captain");
++                    state.CaptainsFull = true;
++                }
+             }
+             else if (owner != null && borrower == player.PlayerUID)
+             {
+@@ -738,7 +773,9 @@
+                 case string promote when promote.StartsWith("promote:"):
+                     {
+                         string rank = promote.Substring("promote:".Length);
+-                        if (state.Mode != "own" || !state.Promote.TryGetValue(rank, out int price)) return state;
++                        if (state.Mode != "own") return state;
++                        if (rank == "captain" && state.CaptainsFull) return StateFor(npc, player, "talk-captains-full");
++                        if (state.Promote == null || !state.Promote.TryGetValue(rank, out int price)) return state;
+                         if (Pay(player, state.Coin, price) is string poor)
+                         {
+                             TalkState refused = StateFor(npc, player, poor == "talk-poor" ? "talk-promote-poor" : "talk-promote-nocoin");
+@@ -768,6 +805,7 @@
+             // 0.0.90: room on the roster for one more of this faction (shares, not a count).
+             string faction = FactionSystem.FactionOf(npc);
+             if (!Fits(RosterUsed(player.PlayerUID), RosterShare(faction))) { state.Reply = "talk-full"; return state; }
++            if (RankOf(npc) == "captain" && !CaptainFits(player.PlayerUID, faction)) { state.Reply = "talk-captains-full"; return state; }
+             if (Pay(player, state.Coin, state.Price) is string poor) { state.Reply = poor; return state; }
+ 
+             // Past the follow share, a new recruit guards the spot where it was hired instead of following.
+@@ -827,6 +865,7 @@
+             else if (!owner.Recruits.Contains(next.EntityId)) owner.Recruits.Add(next.EntityId);
+             // Same faction (promotion only changes the rank), so the same shares.
+             owner.RecruitFactions.Remove(old.EntityId);
++            owner.Captains?.Remove(old.EntityId);
+             Learn(owner, next);
+             Promotion.SyncOwnerGroups(next, owner.Groups);
+             if (sapi?.World.PlayerByUid(uid)?.Entity is EntityPlayer by) RefreshFollowSlots(owner, by);
+@@ -1017,6 +1056,7 @@
+             if (Owner(uid) is not HiringOwner owner) return;
+             owner.Recruits.Remove(npc.EntityId);
+             owner.RecruitFactions.Remove(npc.EntityId);
++            owner.Captains?.Remove(npc.EntityId);
+             if (!died || sapi == null) return;
+             sapi.Logger.Notification("[lotrnpcs] " + owner.Name + "'s recruit " + npc.Code + " (" + npc.EntityId + ") died.");
+             if (sapi.World.PlayerByUid(uid) is IServerPlayer player && player.ConnectionState == EnumClientState.Playing)
+@@ -1222,8 +1262,8 @@
+             }
+             List<Vec2d> slots = Formation.FollowOffsets(formation, followers.Count);
+             Vec3d at = by.Pos.XYZ;
+-            int[] spotOf = Formation.Assign(followers.Select(e => e.Pos.XYZ).ToList(),
+-                slots.Select(o => Formation.World(at, owner.HeadX, owner.HeadZ, o)).ToList(), slots, followers.Select(Recruit.IsArcher).ToList());
++            int[] spotOf = Formation.AssignByRank(followers.Select(e => e.Pos.XYZ).ToList(),
++                slots.Select(o => Formation.World(at, owner.HeadX, owner.HeadZ, o)).ToList(), slots, followers.Select(e => Formation.OrderOfRank(RankOf(e))).ToList());
+             for (int i = 0; i < followers.Count; i++) Recruit.SetFollowSlot(followers[i], slots[spotOf[i]]);
+         }
+ 
+@@ -1238,7 +1278,7 @@
+                 if (Ground.StandHeight(sapi.World.BlockAccessor, p.X, anchor.Y + 0.5, p.Z, dimension, 10) is double y) p.Y = y;
+                 return p;
+             }).ToList();
+-            int[] spotOf = Formation.Assign(crew.Select(e => e.Pos.XYZ).ToList(), spots, offsets, crew.Select(Recruit.IsArcher).ToList());
++            int[] spotOf = Formation.AssignByRank(crew.Select(e => e.Pos.XYZ).ToList(), spots, offsets, crew.Select(e => Formation.OrderOfRank(RankOf(e))).ToList());
+             for (int i = 0; i < crew.Count; i++)
+             {
+                 if (guards) Recruit.SetGuardSpot(crew[i], spots[spotOf[i]]); else Recruit.SetHoldAt(crew[i], spots[spotOf[i]]);
+@@ -1479,6 +1519,7 @@
+                     owner.Whitelist ??= new Dictionary<string, string>();
+                     owner.PendingDismiss ??= new List<long>();
+                     owner.RecruitFactions ??= new Dictionary<long, string>();
++                    owner.Captains ??= new HashSet<long>();
+                 }
+                 sapi.Logger.Notification("[lotrnpcs] Loaded " + owners.Values.Sum(o => o.Recruits.Count) + " recruits of " + owners.Count + " players.");
+             }
+@@ -1495,6 +1536,7 @@
+             {
+                 if (owner.RecruitFactions == null) continue;
+                 foreach (long id in owner.RecruitFactions.Keys.Where(id => !owner.Recruits.Contains(id)).ToList()) owner.RecruitFactions.Remove(id);
++                owner.Captains?.RemoveWhere(id => !owner.Recruits.Contains(id));
+             }
+             sapi.WorldManager.SaveGame.StoreData(SaveKey, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(owners)));
+         }
+diff -ruN '--exclude=bin' '--exclude=obj' '--exclude=out' a/lotrnpcs/src/LotrNpcsModSystem.cs b/lotrnpcs/src/LotrNpcsModSystem.cs
+--- a/lotrnpcs/src/LotrNpcsModSystem.cs	2026-11-06 06:24:50.000000000 +0000
++++ b/lotrnpcs/src/LotrNpcsModSystem.cs	2026-11-08 19:29:51.785262820 +0000
+@@ -124,6 +124,14 @@
+         // The damage the task's config gives (0.0.90), used when the faction has none for this rank, and the rank.
+         readonly float baseDamage;
+         readonly string rank;
++        // The task's own damagePlayerAtMs, used when the weapon has no wind-up of its own (0.0.99).
++        readonly int baseHitMs;
++        // 0.0.99 swing sync: when this attack started, and whether its swing animation has begun.
++        long startedMs;
++        bool swingStarted;
++        // Longest the damage timer waits for the NPC to turn to its target before the vanilla timing takes over (so
++        // an attack on a target it can never face still ends).
++        const long MaxTurnWaitMs = 1000;
+ 
+         public AiTaskChestMeleeAttack(EntityAgent entity, JsonObject taskConfig, JsonObject aiConfig) : base(entity, taskConfig, aiConfig)
+         {
+@@ -131,6 +139,7 @@
+             faction = FactionSystem.FactionOf(entity);
+             unarmedAnimation = animMeta;
+             baseDamage = damage;
++            baseHitMs = damagePlayerAtMs;
+             rank = EntityBehaviorFactionMember.RankOf(entity);
+         }
+ 
+@@ -153,14 +162,37 @@
+         public override bool ShouldExecute()
+         {
+             if (!base.ShouldExecute()) return false;
+-            if (factions == null || targetEntity == null || targetEntity == attackedByEntity) return true;
+-            long claimed = factions.Spacing.TargetOf(entity.EntityId, entity.World.ElapsedMilliseconds);
+-            if (claimed == 0 || claimed == targetEntity.EntityId) return true;
+-            Entity partner = entity.World.GetEntityById(claimed);
+-            if (partner != null && partner.Alive && hasDirectContact(partner, minDist, minVerDist)) targetEntity = partner;
++            if (factions == null || targetEntity == null) return true;
++            if (targetEntity != attackedByEntity)
++            {
++                long claimed = factions.Spacing.TargetOf(entity.EntityId, entity.World.ElapsedMilliseconds);
++                if (claimed != 0 && claimed != targetEntity.EntityId)
++                {
++                    Entity partner = entity.World.GetEntityById(claimed);
++                    if (partner != null && partner.Alive && hasDirectContact(partner, minDist, minVerDist)) targetEntity = partner;
++                }
++            }
++            // 0.0.99: this weapon's own wind-up (gen HIT_MS), set before the turn check below, which uses it.
++            int weaponHitMs = Weapon?.HitMs ?? 0;
++            damagePlayerAtMs = weaponHitMs > 0 ? weaponHitMs : baseHitMs;
++            // 0.0.98 staggered swings (BattleSpacing.HitWaitMs): a hit that would land inside the target's hurt window
++            // after another NPC's hit would be thrown away, so this NPC waits its turn. It looks again when the turn is
++            // due (at least TurnRetryMs later), not every tick, so waiting costs no extra target searches.
++            long now = entity.World.ElapsedMilliseconds;
++            long wait = factions.Spacing.HitWaitMs(targetEntity.EntityId, now + damagePlayerAtMs);
++            if (wait > 0)
++            {
++                // The vanilla check waits attackDurationMs after lastCheckOrAttackMs.
++                lastCheckOrAttackMs = now - attackDurationMs + Math.Min(Math.Max(wait, TurnRetryMs), attackDurationMs);
++                targetEntity = null;
++                return false;
++            }
+             return true;
+         }
+ 
++        // Soonest an NPC waiting for its turn on a target looks again.
++        const long TurnRetryMs = 100;
++
+         public override void StartExecute()
+         {
+             // Battle spacing (0.0.53): a swing renews this NPC's place on its target, or takes one if it had none.
+@@ -170,6 +202,7 @@
+                 if (!(targetEntity is EntityPlayer))
+                     factions.Spacing.Swing(entity.EntityId, targetEntity.EntityId, Math.Atan2(entity.Pos.X - targetEntity.Pos.X, entity.Pos.Z - targetEntity.Pos.Z), now);
+                 entity.GetBehavior<EntityBehaviorFactionMember>()?.MarkFighting(now);
++                factions.Spacing.BookHit(targetEntity.EntityId, lastCheckOrAttackMs + damagePlayerAtMs, entity.World.Rand.Next(BattleSpacing.HitJitterMs + 1));
+             }
+             // 0.0.91: the faction's damage for this rank, read at each swing so /recruits faction reload applies at
+             // once, varied by DamageSpread (owner: "add a +-20% spread on hits"). The damage tier stays (it sets armor
+@@ -179,9 +212,28 @@
+             // Chosen before the vanilla task starts the animation, which it does once the NPC faces its target.
+             animMeta = Weapon?.AttackAnimation ?? unarmedAnimation;
+             Weapon?.Lower();
++            startedMs = entity.World.ElapsedMilliseconds;
++            swingStarted = false;
+             base.StartExecute();
+         }
+ 
++        // 0.0.99 swing sync (owner chose "Swing sync + weapon wind-ups"): vanilla counts down to the blow from when the
++        // NPC decided to attack, but starts the swing only once it faces its target, so after a turn the damage landed
++        // while the weapon was barely raised. Until the swing starts, the countdown (lastCheckOrAttackMs) is held at now,
++        // so the blow lands damagePlayerAtMs after the swing really starts, and the attack lasts its full length from
++        // there. The swing starts inside base.ContinueExecute, the same tick it is held for the last time. The game keys
++        // active animations by their shape animation (animMeta.Animation, e.g. "axehit"), not the config code.
++        public override bool ContinueExecute(float dt)
++        {
++            if (!swingStarted)
++            {
++                long now = entity.World.ElapsedMilliseconds;
++                if (animMeta != null && entity.AnimManager?.IsAnimationActive(animMeta.Animation) == true) swingStarted = true;
++                else if (now - startedMs <= MaxTurnWaitMs) lastCheckOrAttackMs = now;
++            }
++            return base.ContinueExecute(dt);
++        }
++
+         public override void FinishExecute(bool cancelled)
+         {
+             base.FinishExecute(cancelled);
+@@ -201,6 +253,8 @@
+ 
+         protected override void attackTarget()
+         {
++            // 0.0.98: the hit lands now, which is later than booked if the NPC was still turning to face its target.
++            if (factions != null && targetEntity != null) factions.Spacing.BookHit(targetEntity.EntityId, entity.World.ElapsedMilliseconds, 0);
+             if (!(targetEntity is EntityPlayer) || !ChestHitDamage.Available)
+             {
+                 base.attackTarget();
+diff -ruN '--exclude=bin' '--exclude=obj' '--exclude=out' a/lotrnpcs/src/Orders.cs b/lotrnpcs/src/Orders.cs
+--- a/lotrnpcs/src/Orders.cs	2026-11-05 04:20:32.000000000 +0000
++++ b/lotrnpcs/src/Orders.cs	2026-11-09 17:52:38.795112404 +0000
+@@ -164,6 +164,35 @@
+             return spotOf;
+         }
+ 
++        /// <summary>A member's place in the formation order (0.0.106): captains, warriors, recruits (and rankless), archers.</summary>
++        public static int OrderOfRank(string rank) => rank switch { "captain" => 0, "warrior" => 1, "archer" => 3, _ => 2 };
++
++        /// <summary>
++        /// 0.0.106 (owner, 2026-11-09: "captains to try and be in the front middle, then warriors, then recruits", "with
++        /// archers trying to be at the back or ends of formations"): spots ranked front first, then middle first (larger
++        /// Y forward, smaller |X| inside); captains take the best of them, then warriors, then recruits, and archers what
++        /// is left, which is the back rows or, in a single line, the ends. Within one group each spot goes to the
++        /// nearest member still free, so members of a rank don't cross each other. Returns the spot index per member.
++        /// </summary>
++        public static int[] AssignByRank(IList<Vec3d> members, IList<Vec3d> spots, IList<Vec2d> offsets, IList<int> order)
++        {
++            int n = Math.Min(members.Count, spots.Count);
++            if (offsets == null || order == null) return Assign(members, spots);
++            int[] ranked = Enumerable.Range(0, spots.Count)
++                .OrderByDescending(j => Math.Round(offsets[j].Y, 3)).ThenBy(j => Math.Round(Math.Abs(offsets[j].X), 3)).ThenBy(j => j).ToArray();
++            int[] spotOf = new int[members.Count];
++            int next = 0;
++            foreach (int group in Enumerable.Range(0, members.Count).Select(i => order[i]).Distinct().OrderBy(g => g))
++            {
++                List<int> who = Enumerable.Range(0, members.Count).Where(i => order[i] == group).ToList();
++                List<int> where = ranked.Skip(next).Take(who.Count).ToList();
++                next += who.Count;
++                int[] sub = Assign(who.Select(i => members[i]).ToList(), where.Select(j => spots[j]).ToList());
++                for (int k = 0; k < who.Count; k++) spotOf[who[k]] = where[sub[k]];
++            }
++            return spotOf;
++        }
++
+         /// <summary>Which spot each member takes: spots in order (front first) go to the nearest member still free.
+         /// Returns the spot index for each member.</summary>
+         public static int[] Assign(IList<Vec3d> members, IList<Vec3d> spots)
+diff -ruN '--exclude=bin' '--exclude=obj' '--exclude=out' a/lotrnpcs/src/SpawnZones.cs b/lotrnpcs/src/SpawnZones.cs
+--- a/lotrnpcs/src/SpawnZones.cs	2026-11-06 06:26:13.000000000 +0000
++++ b/lotrnpcs/src/SpawnZones.cs	2026-11-09 19:11:12.768816091 +0000
+@@ -404,7 +404,7 @@
+         List<string> GroupRanks(bool captainGroup, bool archers, string faction) => GroupRanks(config, rand, captainGroup, archers, GroupScale(faction));
+ 
+         // 0.0.90 (owner chose "A": wild groups scale with the follow limit): a faction's group size over the baseline's
+-        // (its MaxFollowers over the file's baseline; orcs 7/5, elves 4/5), and what one of its NPCs counts for in
++        // (its MaxFollowers over the file's baseline; orcs 6/5 since 0.0.107, elves 4/5), and what one of its NPCs counts for in
+         // MaxNearby (1 over that).
+         double GroupScale(string faction)
+         {
+diff -ruN '--exclude=bin' '--exclude=obj' '--exclude=out' a/lotrnpcs/src/Weapons.cs b/lotrnpcs/src/Weapons.cs
+--- a/lotrnpcs/src/Weapons.cs	2026-11-05 02:42:47.000000000 +0000
++++ b/lotrnpcs/src/Weapons.cs	2026-11-08 19:29:32.102010885 +0000
+@@ -21,6 +21,9 @@
+         /// <summary>How likely it is picked against the others in the list (0.0.82, the owner's "prefer spears" and the
+         /// like): an entry with weight 3 comes up three times as often as one with weight 1. At least 1.</summary>
+         public int Weight = 1;
++        /// <summary>When the blow lands, in ms after the swing starts (0.0.99, each weapon's own wind-up); 0 keeps the
++        /// melee task's damagePlayerAtMs.</summary>
++        public int HitMs;
+         /// <summary>The weapon in other poses, first match wins (0.0.59 the drawn bow; 0.0.73 the string pulled back by
+         /// stages). Empty when the weapon has one look.</summary>
+         public List<WeaponPose> Poses = new List<WeaponPose>();
+@@ -142,7 +145,7 @@
+                 string attack = Clean(entry?["attackAnimation"].AsString());
+                 if (item == null || attack == null || read.Any(w => w.Item == item)) continue;
+                 if (!item.Contains(':')) item = "lotrnpcs:" + item;
+-                NpcWeapon weapon = new NpcWeapon { Item = item, AttackAnimation = attack, HoldAnimation = Clean(entry["holdAnimation"].AsString()), TwoHanded = entry["twoHanded"].AsBool(false), Weight = Math.Max(1, entry["weight"].AsInt(1)) };
++                NpcWeapon weapon = new NpcWeapon { Item = item, AttackAnimation = attack, HoldAnimation = Clean(entry["holdAnimation"].AsString()), TwoHanded = entry["twoHanded"].AsBool(false), Weight = Math.Max(1, entry["weight"].AsInt(1)), HitMs = Math.Max(0, entry["hitMs"].AsInt(0)) };
+                 // "poses": [{ "item": ..., "while": { anim: [from, until] } }] (0.0.73), in order; the 0.0.59 form
+                 // "drawnItem" + "drawnWhile": { anim: until } still reads, as one pose after them.
+                 foreach (JsonObject pose in entry["poses"].AsArray() ?? Array.Empty<JsonObject>())
+@@ -279,6 +282,9 @@
+             }
+         }
+ 
++        /// <summary>Server: when the current weapon's blow lands, in ms after its swing starts, or 0 for the task's own.</summary>
++        public int HitMs => Current?.HitMs ?? 0;
++
+         /// <summary>Server: drops the guard pose before a swing.</summary>
+         public void Lower()
+         {
+Binary files a/lotrnpcs/tools/__pycache__/bbmodel_to_vs.cpython-313.pyc and b/lotrnpcs/tools/__pycache__/bbmodel_to_vs.cpython-313.pyc differ
+diff -ruN '--exclude=bin' '--exclude=obj' '--exclude=out' a/lotrnpcs/tools/balance/fit-0.0.107-archer.json b/lotrnpcs/tools/balance/fit-0.0.107-archer.json
+--- a/lotrnpcs/tools/balance/fit-0.0.107-archer.json	1970-01-01 00:00:00.000000000 +0000
++++ b/lotrnpcs/tools/balance/fit-0.0.107-archer.json	2026-11-09 19:14:22.434546246 +0000
+@@ -0,0 +1,37 @@
++{
++ "Men": {
++  "health": 35.0,
++  "damage": 3.05,
++  "average": 0.517
++ },
++ "Uruk": {
++  "health": 36.0,
++  "damage": 3.0,
++  "average": 0.537
++ },
++ "Levy": {
++  "health": 28.0,
++  "damage": 2.8,
++  "average": 0.499
++ },
++ "Orc": {
++  "health": 30.0,
++  "damage": 2.6,
++  "average": 0.47
++ },
++ "Goblin": {
++  "health": 22.0,
++  "damage": 2.2,
++  "average": 0.495
++ },
++ "Elf": {
++  "health": 36.0,
++  "damage": 4.25,
++  "average": 0.475
++ },
++ "Dwarf": {
++  "health": 47.0,
++  "damage": 3.3,
++  "average": 0.506
++ }
++}
+\ No newline at end of file
+diff -ruN '--exclude=bin' '--exclude=obj' '--exclude=out' a/lotrnpcs/tools/balance/fit-0.0.107-captain.json b/lotrnpcs/tools/balance/fit-0.0.107-captain.json
+--- a/lotrnpcs/tools/balance/fit-0.0.107-captain.json	1970-01-01 00:00:00.000000000 +0000
++++ b/lotrnpcs/tools/balance/fit-0.0.107-captain.json	2026-11-09 19:14:22.433207254 +0000
+@@ -0,0 +1,37 @@
++{
++ "Men": {
++  "health": 48.0,
++  "damage": 7.0,
++  "average": 0.487
++ },
++ "Uruk": {
++  "health": 48.0,
++  "damage": 7.1,
++  "average": 0.552
++ },
++ "Levy": {
++  "health": 42.0,
++  "damage": 6.1,
++  "average": 0.48
++ },
++ "Orc": {
++  "health": 41.0,
++  "damage": 6.3,
++  "average": 0.509
++ },
++ "Goblin": {
++  "health": 34.0,
++  "damage": 4.85,
++  "average": 0.486
++ },
++ "Elf": {
++  "health": 50.0,
++  "damage": 9.6,
++  "average": 0.497
++ },
++ "Dwarf": {
++  "health": 61.0,
++  "damage": 7.8,
++  "average": 0.489
++ }
++}
+\ No newline at end of file
+diff -ruN '--exclude=bin' '--exclude=obj' '--exclude=out' a/lotrnpcs/tools/balance/fit-0.0.107-recruit.json b/lotrnpcs/tools/balance/fit-0.0.107-recruit.json
+--- a/lotrnpcs/tools/balance/fit-0.0.107-recruit.json	1970-01-01 00:00:00.000000000 +0000
++++ b/lotrnpcs/tools/balance/fit-0.0.107-recruit.json	2026-11-09 19:14:22.430311987 +0000
+@@ -0,0 +1,37 @@
++{
++ "Men": {
++  "health": 22.0,
++  "damage": 3.1,
++  "average": 0.511
++ },
++ "Uruk": {
++  "health": 23.0,
++  "damage": 2.95,
++  "average": 0.499
++ },
++ "Levy": {
++  "health": 18.0,
++  "damage": 2.9,
++  "average": 0.481
++ },
++ "Orc": {
++  "health": 19.0,
++  "damage": 2.75,
++  "average": 0.533
++ },
++ "Goblin": {
++  "health": 18.0,
++  "damage": 1.85,
++  "average": 0.48
++ },
++ "Elf": {
++  "health": 26.0,
++  "damage": 3.65,
++  "average": 0.495
++ },
++ "Dwarf": {
++  "health": 30.0,
++  "damage": 3.15,
++  "average": 0.501
++ }
++}
+\ No newline at end of file
+diff -ruN '--exclude=bin' '--exclude=obj' '--exclude=out' a/lotrnpcs/tools/balance/fit-0.0.107-warrior.json b/lotrnpcs/tools/balance/fit-0.0.107-warrior.json
+--- a/lotrnpcs/tools/balance/fit-0.0.107-warrior.json	1970-01-01 00:00:00.000000000 +0000
++++ b/lotrnpcs/tools/balance/fit-0.0.107-warrior.json	2026-11-09 19:14:22.431726772 +0000
+@@ -0,0 +1,37 @@
++{
++ "Men": {
++  "health": 34.0,
++  "damage": 4.0,
++  "average": 0.459
++ },
++ "Uruk": {
++  "health": 32.0,
++  "damage": 4.35,
++  "average": 0.573
++ },
++ "Levy": {
++  "health": 29.0,
++  "damage": 3.6,
++  "average": 0.471
++ },
++ "Orc": {
++  "health": 30.0,
++  "damage": 3.5,
++  "average": 0.495
++ },
++ "Goblin": {
++  "health": 24.0,
++  "damage": 2.8,
++  "average": 0.477
++ },
++ "Elf": {
++  "health": 36.0,
++  "damage": 5.35,
++  "average": 0.515
++ },
++ "Dwarf": {
++  "health": 46.0,
++  "damage": 4.15,
++  "average": 0.509
++ }
++}
+\ No newline at end of file
+diff -ruN '--exclude=bin' '--exclude=obj' '--exclude=out' a/lotrnpcs/tools/balance/fit105.py b/lotrnpcs/tools/balance/fit105.py
+--- a/lotrnpcs/tools/balance/fit105.py	1970-01-01 00:00:00.000000000 +0000
++++ b/lotrnpcs/tools/balance/fit105.py	2026-11-09 19:14:22.428627167 +0000
+@@ -0,0 +1,47 @@
++"""0.0.107 refit (owner chose "Orcs to 6 followers + refit all"): per rank, every tier's full same-rank following
++plays every other's under the 0.0.105 rules (sim105.fight: spread, hit turns, cap 4, arrows lost in i-frames).
++Objective: sum over tiers of (average win rate - target)^2 (Uruk 0.55, others even) plus a pull toward the tier's
++current (0.0.103) values so the flavour stays. Hill climbing, health +-1 / damage +-0.05, common random numbers.
++Usage: python3 fit105.py <Factions.cs> RANK RUNS STEPS"""
++import sys, random, json
++SRC, RANK, RUNS, STEPS = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4])
++sys.argv = [sys.argv[0], SRC, str(RUNS)]
++import sim105 as S
++from multiprocessing import Pool
++names = list(S.TIERS)
++N = {t: S.TIERS[t]["followers"] for t in names}; N["Orc"] = 6
++START = {t: (S.TIERS[t]["hp"][RANK], S.TIERS[t]["dmg"][RANK]) for t in names}
++UR = 0.55; OTHER = (3.5 - UR) / 6
++TARGET = {t: (UR if t == "Uruk" else OTHER) for t in names}
++pairs = [(a, b) for i, a in enumerate(names) for b in names[i + 1:]]
++def band(side, n, hp, dmg):
++    t = {"hp": {RANK: hp}, "dmg": {RANK: dmg}}
++    return [S.U(side, t, RANK) for _ in range(n)]
++def rate(args):
++    a, ha, da, b, hb, db, runs, seed = args
++    rnd = random.Random(seed)
++    return sum(S.fight(band(0, N[a], ha, da), band(1, N[b], hb, db), rnd)[0] for _ in range(runs)) / runs
++def seed_of(a, b, salt=0): return hash((RANK, a, b, salt)) & 0xffffff
++def avgs(mat): return {t: sum(mat[(t, b)] if (t, b) in mat else 1 - mat[(b, t)] for b in names if b != t) / 6 for t in names}
++def objective(vals, mat):
++    av = avgs(mat)
++    return sum((av[t] - TARGET[t]) ** 2 + 0.003 * ((vals[t][0] / START[t][0] - 1) ** 2 + (vals[t][1] / START[t][1] - 1) ** 2) for t in names)
++if __name__ == "__main__":
++    vals = dict(START); rng = random.Random(7)
++    with Pool() as pool:
++        def matrix(vals, salt=0, runs=RUNS, only=None):
++            ps = [p for p in pairs if only is None or only in p]
++            jobs = [(a, vals[a][0], vals[a][1], b, vals[b][0], vals[b][1], runs, seed_of(a, b, salt)) for a, b in ps]
++            return dict(zip(ps, pool.map(rate, jobs)))
++        mat = matrix(vals); obj = objective(vals, mat)
++        for step in range(STEPS):
++            t = rng.choice(names); h, d = vals[t]
++            if rng.random() < 0.5: h = max(1, h + rng.choice((-1, 1)))
++            else: d = round(max(0.1, d + rng.choice((-0.05, 0.05))), 2)
++            trial = dict(vals); trial[t] = (h, d)
++            new = dict(mat); new.update(matrix(trial, only=t))
++            o = objective(trial, new)
++            if o < obj: vals, mat, obj = trial, new, o
++        check = matrix(vals, salt=1, runs=RUNS * 4); av = avgs(check)
++        print(f"== {RANK}: " + ", ".join(f"{t} {vals[t][0]:g}/{vals[t][1]:.2f} avg {av[t]:.2f}" for t in names), flush=True)
++        json.dump({t: {"health": vals[t][0], "damage": vals[t][1], "average": round(av[t], 3)} for t in names}, open(f"fit-{RANK}.json", "w"), indent=1)
+diff -ruN '--exclude=bin' '--exclude=obj' '--exclude=out' a/lotrnpcs/tools/balance/sim105.py b/lotrnpcs/tools/balance/sim105.py
+--- a/lotrnpcs/tools/balance/sim105.py	1970-01-01 00:00:00.000000000 +0000
++++ b/lotrnpcs/tools/balance/sim105.py	2026-11-09 17:50:52.549072097 +0000
+@@ -0,0 +1,130 @@
++"""lotrnpcs 0.0.105 combat balance simulator. Event-driven NPC-on-NPC fights with the current rules:
++per-rank health/damage tables (FactionTiers, parsed from src/Factions.cs), +-20% hit spread, melee every 1.95-2.35 s
++(90% land), arrows every 3.1-3.9 s (70% land, shooting from the start while melee closes in 3-5 s), hit turns (0.0.98:
++melee hits on one target at least 0.55-0.75 s apart, later swings wait their turn), vanilla 0.5 s invulnerability after
++a hit (arrows that land inside it are lost; melee never does since turns are booked), at most CAP melee attackers per
++target (0.0.102: 4), free enemies first, 0.8-1.5 s walk after a kill. Left out: terrain, formations/lines geometry,
++knockback, armor (NPC damage tier 8-9 passes every rank armor), Combat Overhaul, player.
++Usage: python3 -I sim105.py <Factions.cs> [runs]"""
++import heapq, random, re, sys, json
++from multiprocessing import Pool
++
++SRC = sys.argv[1]; RUNS = int(sys.argv[2]) if len(sys.argv) > 2 else 1000
++RANKS = ("recruit", "warrior", "captain", "archer")
++TIERS = {}
++for m in re.finditer(r'FactionTier (\w+) = T\("\w+", (\d+), (\d+), [\d.]+f, [\d.]+f, R\(([^)]*)\), R\(([^)]*)\), (\d+), (\d+), (\d+), (\d+)', open(SRC).read()):
++    name, fol, ros, hp, dm, *price = m.groups()
++    hp = [float(x.strip().rstrip("f")) for x in hp.split(",")]; dm = [float(x.strip().rstrip("f")) for x in dm.split(",")]
++    TIERS[name] = dict(followers=int(fol), roster=int(ros), hp=dict(zip(RANKS, hp)), dmg=dict(zip(RANKS, dm)), price=dict(zip(RANKS, map(int, price))))
++OLD_ORC = dict(TIERS["Orc"], hp=dict(zip(RANKS, (15, 27, 31, 22))), dmg=dict(zip(RANKS, (2.5, 2.8, 5.95, 2.45))))
++MELEE_CD = (1.95, 2.35); ARROW_CD = (3.1, 3.9); MELEE_HIT, ARROW_HIT = 0.9, 0.7
++WALK = (0.8, 1.5); CONTACT = (3.0, 5.0); SPREAD = 0.2; GAP = (0.55, 0.75); INVULN = 0.5; SHOVE = 3.0
++
++def captains_for(roster): return max(1, int(roster / 8 + 0.25))
++
++class U:
++    __slots__ = ("side", "hp", "dmg", "archer", "target", "alive", "free_at", "hurt_at")
++    def __init__(s, side, tier, rank):
++        s.side = side; s.hp = tier["hp"][rank]; s.dmg = tier["dmg"][rank]; s.archer = rank == "archer"
++        s.target = None; s.alive = True; s.free_at = 0.0; s.hurt_at = -9.0
++
++def fight(a, b, rnd, cap=4, turns=True):
++    units = a + b; foes = {0: b, 1: a}; att = {id(u): 0 for u in units}; alive = [len(a), len(b)]; q = []
++    for u in units: heapq.heappush(q, (rnd.uniform(0, 1) if u.archer else rnd.uniform(*CONTACT), rnd.random(), u))
++    def pick(u):
++        fs = [e for e in foes[u.side] if e.alive and (cap <= 0 or att[id(e)] < cap)]
++        if not fs: return None
++        low = min(att[id(e)] for e in fs); e = rnd.choice([e for e in fs if att[id(e)] == low]); att[id(e)] += 1; return e
++    def hurt(e, dmg, t):
++        e.hp -= dmg * rnd.uniform(1 - SPREAD, 1 + SPREAD); e.hurt_at = t
++        if e.hp <= 0 and e.alive:
++            e.alive = False; alive[e.side] -= 1
++            if e.target is not None: att[id(e.target)] -= 1
++    while q and alive[0] and alive[1]:
++        t, _, u = heapq.heappop(q)
++        if not u.alive: continue
++        if u.archer:
++            e = rnd.choice([e for e in foes[u.side] if e.alive])
++            if rnd.random() < ARROW_HIT and t - e.hurt_at >= INVULN: hurt(e, u.dmg, t)
++            heapq.heappush(q, (t + rnd.uniform(*ARROW_CD), rnd.random(), u)); continue
++        if u.target is None or not u.target.alive:
++            had = u.target is not None
++            if had: u.target = None
++            u.target = pick(u)
++            heapq.heappush(q, (t + (rnd.uniform(*WALK) if had and u.target else 0.5 if u.target is None else 0), rnd.random(), u))
++            if u.target is None or had: continue
++        e = u.target
++        if turns and e.free_at > t:
++            heapq.heappush(q, (e.free_at, rnd.random(), u)); continue
++        if turns: e.free_at = t + rnd.uniform(*GAP)
++        if rnd.random() < MELEE_HIT and (turns or t - e.hurt_at >= INVULN): hurt(e, u.dmg, t)
++        heapq.heappush(q, (t + rnd.uniform(*MELEE_CD), rnd.random(), u))
++    return alive[0] > 0, alive[0], alive[1]
++
++def mixed(tier, n, rnd, archers=0.2):
++    """A warband: captains up to the captain limit share (one per CaptainsFor/followers place, at least 1), then
++    archers by share, the rest half warriors, half recruits."""
++    caps = max(1, round(n * captains_for(tier["roster"]) / tier["roster"])) if n >= 3 else 0
++    r = ["captain"] * caps
++    for _ in range(n - caps): r.append("archer" if rnd.random() < archers else ("warrior" if rnd.random() < 0.5 else "recruit"))
++    return r
++
++def wild(tier, n, rnd):
++    """Zone spawns: recruits, 35% warriors, 20% archers, captains about 1 in 25."""
++    return ["captain" if rnd.random() < 0.04 else "archer" if rnd.random() < 0.2 else "warrior" if rnd.random() < 0.35 else "recruit" for _ in range(n)]
++
++def buy(tier, coins, rnd):
++    """Spend coins like a player would: the captain limit's worth of captains, then warriors/recruits/archers
++    (20% archers) until the money runs out (roster capped)."""
++    r = []; left = coins; caps = captains_for(tier["roster"])
++    for _ in range(caps):
++        if left - tier["price"]["captain"] >= coins / 2: r.append("captain"); left -= tier["price"]["captain"]
++    while len(r) < tier["roster"]:
++        k = "archer" if rnd.random() < 0.2 else ("warrior" if rnd.random() < 0.5 else "recruit")
++        if left >= tier["price"][k]: r.append(k); left -= tier["price"][k]
++        elif left >= tier["price"]["recruit"]: r.append("recruit"); left -= tier["price"]["recruit"]
++        else: break
++    return r
++
++def job(args):
++    kind, a, b, na, nb, seed, extra = args
++    rnd = random.Random(seed); ta = OLD_ORC if a == "OldOrc" else TIERS[a]; tb = OLD_ORC if b == "OldOrc" else TIERS[b]
++    wins = 0; left = 0
++    for _ in range(RUNS):
++        if kind == "rank": ra, rb = [extra] * na, [extra] * nb
++        elif kind == "mixed": ra, rb = mixed(ta, na, rnd), mixed(tb, nb, rnd)
++        elif kind == "coin": ra, rb = buy(ta, extra, rnd), buy(tb, extra, rnd)
++        elif kind == "wild": ra, rb = wild(ta, na, rnd), wild(tb, nb, rnd)
++        cap = 4 if kind != "nocap" else 0
++        w, la, lb = fight([U(0, ta, r) for r in ra], [U(1, tb, r) for r in rb], rnd, cap=extra if kind == "wild" else 4)
++        wins += w; left += la if w else -lb
++    return wins / RUNS, left / RUNS
++
++if __name__ == "__main__":
++    names = list(TIERS); out = {}
++    def matrix(kind, sizes, extra, label):
++        jobs = [(kind, a, b, sizes(a), sizes(b), hash((label, a, b)) & 0xffffff, extra) for a in names for b in names if a != b]
++        with Pool() as p: res = p.map(job, jobs)
++        m = {(j[1], j[2]): r for j, r in zip(jobs, res)}
++        print(f"\n== {label} ({RUNS} fights each): row's win rate against column; avg = average over the other six")
++        print("         " + "".join(f"{c:>7}" for c in names) + "    avg")
++        for a in names:
++            row = [m[(a, b)][0] if a != b else None for b in names]
++            avg = sum(x for x in row if x is not None) / (len(names) - 1)
++            print(f"{a:>8} " + "".join("      -" if x is None else f"{x:7.2f}" for x in row) + f"  {avg:5.2f}")
++        out[label] = {f"{a} v {b}": m[(a, b)][0] for a, b in m}
++    F = lambda t: TIERS[t]["followers"]
++    for r in RANKS: matrix("rank", F, r, f"Full followings, all {r}s")
++    matrix("mixed", F, None, "Full followings, mixed (captain limit share, 20% archers)")
++    matrix("mixed", lambda t: 10, None, "Equal headcount 10 v 10, mixed")
++    matrix("coin", F, 150, "Equal coin: 150 coins each, bought like a player (captain limit, roster cap)")
++    # The reported battle.
++    print("\n== 100 wild Mordor orcs v 50 wild Haradrim (Men tier), zone-spawn mix")
++    for lab, orc, cap in (("0.0.101 orc stats, no attacker cap", "OldOrc", 0), ("0.0.101 orc stats, cap 4", "OldOrc", 4), ("0.0.103+ orc stats, cap 4 (now)", "Orc", 4)):
++        with Pool() as p: res = p.map(job, [("wild", orc, "Men", 100, 50, s, cap) for s in range(4)])
++        w = sum(r[0] for r in res) / 4; l = sum(r[1] for r in res) / 4
++        print(f"  {lab:<36} orcs win {w:.2f}   average survivors (+ orcs, - Haradrim) {l:+.1f}")
++    for n in (50, 70, 85):
++        with Pool() as p: res = p.map(job, [("wild", "Orc", "Men", n, 50, s, 4) for s in range(4)])
++        print(f"  {n} orcs v 50 Haradrim (now)            orcs win {sum(r[0] for r in res)/4:.2f}")
++    json.dump(out, open("results-0.0.105.json", "w"), indent=1)
+diff -ruN '--exclude=bin' '--exclude=obj' '--exclude=out' a/lotrnpcs/tools/gen_testnpcs.py b/lotrnpcs/tools/gen_testnpcs.py
+--- a/lotrnpcs/tools/gen_testnpcs.py	2026-11-07 23:52:32.000000000 +0000
++++ b/lotrnpcs/tools/gen_testnpcs.py	2026-11-09 19:11:19.348598597 +0000
+@@ -43,8 +43,18 @@
+      "elementBlendMode": {"UpperArmR": "AddAverage", "LowerArmR": "AddAverage", "UpperArmL": "AddAverage", "LowerArmL": "AddAverage"}},
+ ]
+ 
+-# When a melee hit lands, in ms after the attack starts. The weapon swings below are timed to strike at this moment.
++# When a melee hit lands, in ms after the attack starts. The unarmed punch and the archers' shove strike at this moment.
+ DAMAGE_AT_MS = 400
++# 0.0.99 (owner, 2026-11-08: "Review the animations and try to improve them"; chose "Swing sync + weapon wind-ups"):
++# until 0.0.98 every weapon struck at DAMAGE_AT_MS, so the game's swings were sped up or slowed down to fit (axehit
++# 1.9x, hammerhit 1.4x, knifestab and spearhit 0.8x). Now each swing strikes when it naturally would, close to its own
++# speed: light thrusts first, heavy chops last. Only the first blow of a fight comes later; the time between blows
++# (attack plus cooldown) is unchanged, so damage per second stays the same. A swing not listed keeps DAMAGE_AT_MS.
++HIT_MS = {"knifestab": 350, "spearhit": 350, "falx": 420, "poleaxechop": 500, "hammerhit": 550, "axehit": 600}
++
++
++def hit_ms(w):
++    return HIT_MS.get(w["attack"], DAMAGE_AT_MS)
+ 
+ AI_TASKS = [
+     # Our melee task: always hits a player's chest under Combat Overhaul (user: no head shots).
+@@ -251,6 +261,35 @@
+ # actual model"), held with the game's own hand transform and swung like the scimitar. Code from the game's item list
+ # (wiki image Blade-falx-iron); a wrong code only leaves the hand empty, with a warning in the client log.
+ FALX = {"falx": {"item": "game:blade-falx-iron", "attack": "falx", "impact": 12.5}}
++# 0.0.101 (owner, 2026-11-08: "with the removal of not only spears expansion, what base game equivalents can be given";
++# then "build it that way"): the game's own weapons as stand-ins until the owner's models arrive, held with the game's
++# hand transforms. Codes read from the server's Combat Overhaul fork 0.18.9 (assets/game/itemtypes/combatoverhaul),
++# which redefines the game's weapons under the same codes; "ruined" ones are rusty. Spears thrust and are held level
++# like the owner's spears, swords slash like the falx, clubs and maces swing like the hammer, axes like the axe. The
++# bardiche (a polearm) is swung one-handed like the axe, with no shield; the game's item has no two-handed hold of ours.
++_GAME_SPEAR = {"attack": "spearhit", "impact": 10} | SPEAR_HOLD
++_GAME_SWORD = {"attack": "falx", "impact": 12.5}
++_GAME_CLUB = {"attack": "hammerhit", "impact": 17}
++_GAME_AXE = {"attack": "axehit", "impact": 22.5}
++GAME_WEAPONS = {
++    "steelspear": {"item": "game:spear-generic-steel"} | _GAME_SPEAR,
++    "ironspear": {"item": "game:spear-generic-iron"} | _GAME_SPEAR,
++    "bbronzespear": {"item": "game:spear-generic-blackbronze"} | _GAME_SPEAR,
++    "flintspear": {"item": "game:spear-generic-flint"} | _GAME_SPEAR,
++    "silverspear": {"item": "game:spear-generic-ornatesilver"} | _GAME_SPEAR,
++    "scrapspear": {"item": "game:spear-scrap-scrap"} | _GAME_SPEAR,
++    "steelfalx": {"item": "game:blade-falx-steel"} | _GAME_SWORD,
++    "blackguard": {"item": "game:blade-blackguard-iron"} | _GAME_SWORD,
++    "forlorn": {"item": "game:blade-forlorn-iron"} | _GAME_SWORD,
++    "ruinedsabre": {"item": "game:blade-sabre-ruined"} | _GAME_SWORD,
++    "ruinedgladius": {"item": "game:blade-gladius-ruined"} | _GAME_SWORD,
++    "woodclub": {"item": "game:club-generic-wood"} | _GAME_CLUB,
++    "scrapmace": {"item": "game:club-scrapmace-scrap"} | _GAME_CLUB,
++    "ruinedmace": {"item": "game:club-flanged-ruined"} | _GAME_CLUB,
++    "ruinedbeardedaxe": {"item": "game:axe-bearded-ruined"} | _GAME_AXE,
++    "ruinedbattleaxe": {"item": "game:axe-battle-ruined"} | _GAME_AXE,
++    "ruinedbardiche": {"item": "game:axe-bardiche-ruined", "twoHanded": True} | _GAME_AXE,
++}
+ # Every orc faction but Isengard may carry the Mordor dagger and axe (0.0.76, user: "the orc dagger and the orc axe
+ # should now be eligible accessories for all orc factions except isengard").
+ ORC_SHARED = {k: WEAPONS[k] for k in ("dagger", "axe")}
+@@ -269,16 +308,33 @@
+ # tormented elves). The weapons each faction still needs are in docs/model-checklist.md, with the owner's preferences
+ # from the 0.0.82 loadout list ("prefer spears" and the like), so they can be weighted again when the models come.
+ # NPCs already holding a Spear Expansion item pick again when they load (it is no longer in their list).
+-ALL_WEAPONS = {**WEAPONS, **MM_WEAPONS, **ELF_WEAPONS, **DWARF_WEAPONS, **HARADRIM_WEAPONS, **GONDOR_WEAPONS, **FALX}
++ALL_WEAPONS = {**WEAPONS, **MM_WEAPONS, **ELF_WEAPONS, **DWARF_WEAPONS, **HARADRIM_WEAPONS, **GONDOR_WEAPONS, **FALX, **GAME_WEAPONS}
+ # Weapons by rank, with weights (0.0.82, owner's list: "Prefer spears" and the like). "Prefer" = weight 3 against 1
+ # for the faction's other weapons (my default). Races and ranks not listed carry WEAPONS_OF's list, all weight 1.
+ PREFER = 3
+ _DWARF_RANKS = {"recruit": {"dwaxe": PREFER, "dwbattleaxe": PREFER, "dwwarhammer": PREFER, "dwshorthammer": PREFER, "dwdagger": 1, "dwspear": 1},
+                 "warrior": {"dwaxe": PREFER, "dwbattleaxe": PREFER, "dwwarhammer": PREFER, "dwshorthammer": PREFER, "dwdagger": 1, "dwspear": 1},
+                 "captain": {"dwwarhammer": PREFER, "dwshorthammer": PREFER, "dwaxe": 1, "dwbattleaxe": 1, "dwdagger": 1, "dwspear": 1}}
++# 0.0.101 game stand-ins by faction (owner: "build it that way"), every rank alike; PREFER marks the owner's 0.0.82
++# preferences (Gondor, Arnor: spears). Replaced by the owner's models as they come (docs/model-checklist.md).
++_RANKS = ("recruit", "warrior", "captain")
++GAME_LOADOUTS = {
++    "gondor": {"steelspear": PREFER, "steelfalx": 1},
++    "arnor": {"steelspear": PREFER, "steelfalx": 1},
++    "rohan": {"ironspear": 1, "falx": 1},
++    "dale": {"ironspear": 1, "falx": 1},
++    "dunlending": {"woodclub": 1, "flintspear": 1, "ruinedbeardedaxe": 1},
++    "blacknumenorean": {"blackguard": 1, "ruinedmace": 1, "bbronzespear": 1},
++    "easterling": {"bbronzespear": 1, "forlorn": 1, "ruinedbardiche": 1},
++    "uruk": {"falx": 1, "ironspear": 1, "ruinedbattleaxe": 1},
++    "tormentedelf": {"ruinedsabre": 1, "ruinedgladius": 1, "silverspear": 1},
++    "angmarorc": {"dagger": 1, "axe": 1, "scrapspear": 1, "scrapmace": 1},
++    "gundabadorc": {"dagger": 1, "axe": 1, "mmspear": 1, "scrapmace": 1},
++}
+ WEAPON_PREFS = {
+-    # Gondor captains: the owner's captain's sword (0.0.95, in the falx's place). Recruits and warriors: the falx.
+-    "gondor": {"captain": {"gdcaptsword": 1}},
++    **{f: {r: dict(w) for r in _RANKS} for f, w in GAME_LOADOUTS.items()},
++    # Gondor captains: the owner's captain's sword (0.0.95). Recruits and warriors: the game stand-ins (0.0.101).
++    "gondor": {"recruit": dict(GAME_LOADOUTS["gondor"]), "warrior": dict(GAME_LOADOUTS["gondor"]), "captain": {"gdcaptsword": 1}},
+     # Haradrim (owner, 0.0.86: no falx): the owner's spear (0.0.94), sword and curved sword (0.0.97), evenly.
+     "haradrim": {r: {"hdspear": 1, "hdsword": 1, "hdcurvedsword": 1} for r in ("recruit", "warrior", "captain")},
+     # Elves: the owner's elven spear, plus the falx as their sword.
+@@ -349,10 +405,17 @@
+ # world): the plate then sits on the sleeve, and those back parts sink into the arm, hidden behind the shield.
+ # Measured with the race's own body (dwarf, elf, human). The curved Gondor shield's sides wrap toward the arm, so it
+ # moves less.
+-SHIELD_IN = {"dwtowershield": 1.0, "dwshield": 1.0, "elfshield": 1.0, "boromirshield": 1.0, "gondorshield": 0.75}
++# 0.0.100 (owner, 2026-11-08: "make sure the positioning of all the weapons seems correct on your end, with no floating
++# gaps"): measured every held item against the hand (bottom 3 px of the lower arm) on the human, dwarf and elf bodies.
++# The Numenorean kite, Easterling and Gondorian shields' grips stopped 0.46 to 0.65 px short of the hand (the left hand
++# visibly not touching the handle). Moved in like the others: kite and Easterling 1.0, Gondor 0.75 -> 1.75. Now every
++# shield touches the hand; their backs sink at most 0.44 px into the forearm (Mordor's 0.38, Haradrim's 0.69, hidden
++# behind the shield) and 0.31 into the upper arm (the dwarven tower shield's 0.25).
++SHIELD_IN = {"dwtowershield": 1.0, "dwshield": 1.0, "elfshield": 1.0, "boromirshield": 1.0, "gondorshield": 1.75,
++             "kiteshield": 1.0, "eastshield": 1.0}
+ _NEW_SHIELD_ROT = dict(SHIELD["hand"]["rotation"], z=SHIELD["hand"]["rotation"]["z"] - 90)
+ KITE_SHIELD = {"model": "numenorean_kite_shield.json", "atlas": "numenorean_kite_shield.png", "name": "Numenorean shield",
+-               "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (8.0, 21.9, 12.8 - SHIELD_OUT), _NEW_SHIELD_ROT)}
++               "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (8.0, 21.9, 12.8 - SHIELD_OUT + SHIELD_IN["kiteshield"]), _NEW_SHIELD_ROT)}
+ DW_TOWER_SHIELD = {"model": "dwarven_tower_shield.json", "atlas": "dwarven_tower_shield.png", "name": "Dwarven tower shield",
+                    "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (5.25, 18.0, 7.3 - SHIELD_OUT + SHIELD_IN["dwtowershield"]), _NEW_SHIELD_ROT)}
+ DW_IRON_SHIELD = {"model": "dwarven_iron_shield.json", "atlas": "dwarven_iron_shield.png", "name": "Dwarven shield",
+@@ -361,7 +424,7 @@
+ # tools/weapons/source/easterling_shield.bbmodel): built like the tower shield, with the same upright handle bar on the
+ # back (x 6 to 6.5, y 15 to 17, z 6.78 to 7.98 on the converted model), so the tower shield's hold at that bar's middle.
+ EASTERLING_SHIELD = {"model": "easterling_shield.json", "atlas": "easterling_shield.png", "name": "Easterling shield",
+-                     "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (6.25, 16.0, 7.38 - SHIELD_OUT), _NEW_SHIELD_ROT)}
++                     "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (6.25, 16.0, 7.38 - SHIELD_OUT + SHIELD_IN["eastshield"]), _NEW_SHIELD_ROT)}
+ # 0.0.94 (owner's models, 2026-11-05/06, converted at build time from tools/weapons/source): all three are upright
+ # with the face to +Z and the handle behind, like the tower shield, so the same hold at their own handle, slid out by
+ # SHIELD_OUT. Gondor's curved shield (gondorianshieldV2) has a flat grip plate behind the middle (x 4.5 to 10.5, y 13.7
+@@ -395,7 +458,10 @@
+            "hdheavyshield": HD_HEAVY_SHIELD}
+ # Races whose melee NPCs may carry a shield, and which. Several: each NPC that rolls a shield picks one at random
+ # (0.0.76, dwarves). Mordor since 0.0.55, Misty Mountains 0.0.71, Black Numenoreans and dwarves 0.0.76.
+-SHIELD_OF = {"mordororc": ["shield"], "goblin": ["mmshield"], "blacknumenorean": ["kiteshield"],
++# 0.0.101: a full "domain:code" is a game shield (stand-ins: Rohan and Dale the wood-and-metal shield, Dunlendings the
++# crude one), drawn as the game draws it.
++SHIELD_OF = {"rohan": ["game:shield-woodmetal"], "dale": ["game:shield-woodmetal"], "dunlending": ["game:shield-crude"],
++             "mordororc": ["shield"], "goblin": ["mmshield"], "blacknumenorean": ["kiteshield"],
+              "dwarf": ["dwtowershield", "dwshield"], "easterling": ["eastshield"],
+              # 0.0.94: Gondor (owner: "gondor only"; both shields at random, "A") and elves (owner: "elves only").
+              "gondor": ["gondorshield", "boromirshield"], "elf": ["elfshield"],
+@@ -478,7 +544,10 @@
+                 + [{"item": "lotrnpcs:orcweapon-mmbow-drawn", "while": {a: [0, ms] for a, ms in DRAWN_WHILE.items()}}])
+ # Each archer race's bow, by item and poses. 0.0.76 (user: "the default bow should be the vanilla longbow, not the orc
+ # bow"): every race not listed carries the game's longbow, with the game's own hand transform and no string stages.
+-BOW_OF = {"mordororc": ("lotrnpcs:orcweapon-bow", BOW_POSES), "goblin": ("lotrnpcs:orcweapon-mmbow", MM_BOW_POSES)}
++BOW_OF = {"mordororc": ("lotrnpcs:orcweapon-bow", BOW_POSES), "goblin": ("lotrnpcs:orcweapon-mmbow", MM_BOW_POSES),
++          # 0.0.101 game stand-ins: the recurve bow for elves, Easterlings and Haradrim, the simple bow for Dunlendings.
++          "elf": ("game:bow-recurve", []), "easterling": ("game:bow-recurve", []), "haradrim": ("game:bow-recurve", []),
++          "dunlending": ("game:bow-simple", [])}
+ DEFAULT_BOW = ("game:bow-long", [])
+ 
+ 
+@@ -588,7 +657,7 @@
+         anims.append(dict(a, elementWeight=HOLD_WEIGHTS if a["elementWeight"] == "hold" else ATTACK_WEIGHTS))
+     for name, w in ALL_WEAPONS.items():
+         anims.append({"code": f"lotrnpcs-{name}-attack", "animation": w["attack"],
+-                      "animationSpeed": round(w["impact"] / 30 / (DAMAGE_AT_MS / 1000), 3),
++                      "animationSpeed": round(w["impact"] / 30 / (hit_ms(w) / 1000), 3),
+                       "blendMode": "Average", "weight": 0.01, "elementWeight": ATTACK_WEIGHTS})
+         if w.get("hold"):
+             anims.append({"code": f"lotrnpcs-{name}-hold", "animation": w["hold"], "blendMode": "Average", "weight": 0.01,
+@@ -599,6 +668,7 @@
+ def weapon_list(weapons=WEAPONS, weights=None):
+     """The lotrnpcs:heldweapon behavior's list (weights: name -> weight, 0.0.82; 1 is left out)."""
+     return [{"item": w.get("item", f"lotrnpcs:orcweapon-{name}"), "attackAnimation": f"lotrnpcs-{name}-attack"}
++            | ({"hitMs": hit_ms(w)} if hit_ms(w) != DAMAGE_AT_MS else {})
+             | ({"holdAnimation": f"lotrnpcs-{name}-hold"} if w.get("hold") else {})
+             | ({"twoHanded": True} if w.get("twoHanded") else {})
+             | ({"weight": weights[name]} if weights and weights.get(name, 1) != 1 else {}) for name, w in weapons.items()]
+@@ -618,7 +688,7 @@
+         shields = SHIELD_OF[faction]
+         shields = shields.get(rank, []) if isinstance(shields, dict) else shields
+         if shields:
+-            behavior["shields"] = [f"lotrnpcs:orcweapon-{s}" for s in shields]
++            behavior["shields"] = [s if ":" in s else f"lotrnpcs:orcweapon-{s}" for s in shields]
+     return behavior
+ 
+ 
+@@ -1524,6 +1594,7 @@
+     "talk-hired-guard": "Your coin is good. Your band is full, so I'll keep watch here until you call for me.",
+     "talk-followfull": "Your band is full. {6} Send someone off first.",
+     "talk-full": "You lead as many recruits as anyone can keep in line. {7}",
++    "talk-captains-full": "Your band already has as many captains as it can keep. Another would only quarrel with them.",
+     "talk-poor": "That's not enough. I want {0} × {1}.",
+     "talk-nocoin": "I'd want {0} × {1}, but nobody here has seen such a coin. (An admin can change HireCoin in lotrnpcs-factions.json.)",
+     "talk-follow": "Lead the way.",
+@@ -1803,7 +1874,7 @@
+         "type": "code",
+         "modid": "lotrnpcs",
+         "name": "LOTR NPCs",
+-        "version": "0.0.97",
++        "version": "0.0.107",
+         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
+                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Race models from "
+                        "LOTR Races and Classes by Dango Dango Dango, Shakgriig and Buggoi, used with their permission.",
+Binary files a/lotrnpcs/tools/preview/__pycache__/vsrender.cpython-313.pyc and b/lotrnpcs/tools/preview/__pycache__/vsrender.cpython-313.pyc differ
+diff -ruN '--exclude=bin' '--exclude=obj' '--exclude=out' a/lotrnpcs/tools/tests/factions/Program.cs b/lotrnpcs/tools/tests/factions/Program.cs
+--- a/lotrnpcs/tools/tests/factions/Program.cs	2026-11-07 23:53:29.000000000 +0000
++++ b/lotrnpcs/tools/tests/factions/Program.cs	2026-11-09 19:12:38.344511970 +0000
+@@ -165,7 +165,7 @@
+ 
+         // migrating older files
+         var freshCfg = FactionConfig.FromFile(null, out bool storeFresh);
+-        Check(storeFresh && freshCfg.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 23 && json.Contains("\"Version\": 23") && !json.Contains("MaxHirelings") && json.Contains("\"ShieldChance\": 0.5") && json.Contains("\"HelmetChance\": 0.6") && json.Contains("\"CaptainsAlwaysHelmeted\": false") && json.Contains("\"MaxAttackersPerTarget\": 0") && json.Contains("\"CombatSpacing\": 1.5") && json.Contains("\"BattleLines\": false") && json.Contains("\"DuelDistanceMin\": 1.0") && json.Contains("\"DuelDistanceMax\": 1.6") && json.Contains("\"LineHoldRange\": 6.0") && json.Contains("\"MaxRecruits\": 16") && json.Contains("\"MaxFollowers\": 5") && json.Contains("\"GuardRadius\": 16") && json.Contains("\"HealthRegenSpeed\": 30.0") && json.Contains("\"ShareFriends\": false") && json.Contains("\"Relation\": \"enemy\"") && !freshCfg.Relations.Any(r => r.Relation == "ally") && freshCfg.Relations.Count == 1, "a new file is written with version 23 (no MaxHirelings, no alliance), the example entry, the battle spacing, helmet and shield settings, the regen settings, the guard radius and the hire and follow caps");
++        Check(storeFresh && freshCfg.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 27 && json.Contains("\"Version\": 27") && json.Contains("\"RosterPerCaptain\": 8") && !json.Contains("MaxHirelings") && json.Contains("\"ShieldChance\": 0.5") && json.Contains("\"HelmetChance\": 0.6") && json.Contains("\"CaptainsAlwaysHelmeted\": false") && json.Contains("\"MaxAttackersPerTarget\": 4") && json.Contains("\"CombatSpacing\": 1.5") && json.Contains("\"BattleLines\": true") && json.Contains("\"DuelDistanceMin\": 1.0") && json.Contains("\"DuelDistanceMax\": 1.6") && json.Contains("\"LineHoldRange\": 6.0") && json.Contains("\"MaxRecruits\": 16") && json.Contains("\"MaxFollowers\": 5") && json.Contains("\"GuardRadius\": 16") && json.Contains("\"HealthRegenSpeed\": 30.0") && json.Contains("\"ShareFriends\": false") && json.Contains("\"Relation\": \"enemy\"") && !freshCfg.Relations.Any(r => r.Relation == "ally") && freshCfg.Relations.Count == 1, "a new file is written with version 27 (no MaxHirelings, no alliance), the example entry, the battle spacing, helmet and shield settings, the regen settings, the guard radius and the hire and follow caps");
+         var current = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(json.Replace("\"Stance\": \"aggressive\"", "\"Stance\": \"defensive\"")), out bool storeCurrent);
+         Check(!storeCurrent && current.Factions["gondor"].Stance == "defensive", "a current file is left alone, even with defensive factions");
+         string oldJson = @"{
+@@ -367,7 +367,21 @@
+         Check(fs.RecruitWantsToAttack(guard, uid, wildMordor) && fs.RecruitWantsToAttack(guard, uid, wildRohan) && fs.RecruitWantsToAttack(guard, uid, drifter), "...attacks NPCs that would attack its owner, and monsters, on sight");
+         Check(!fs.RecruitWantsToAttack(guard, uid, wildGondor) && !fs.RecruitWantsToAttack(guard, uid, hobbitNpc) && !fs.RecruitWantsToAttack(guard, uid, animal), "...leaves its owner's faction, the Shire and animals alone");
+         var stranger = Player(null); var theirs = Hired("test-mordororc-warrior", stranger.PlayerUID);
+-        Check(!fs.RecruitWantsToAttack(guard, uid, stranger) && !fs.RecruitWantsToAttack(guard, uid, theirs), "...and other players and their recruits, unless they start it");
++        Check(!fs.RecruitWantsToAttack(guard, uid, stranger) && fs.RecruitWantsToAttack(guard, uid, theirs) && fs.RecruitWantsToAttack(theirs, stranger.PlayerUID, lord), "0.0.102: a player of no faction is left alone, but their recruit of an enemy faction is fought (and goes for the Gondor member too)");
++        Check(fs.RecruitWantsToAttack(theirs, stranger.PlayerUID, guard), "...both ways: the faction-less player's Mordor orc goes for the Gondor member's recruit");
++        // 0.0.102 (owner: two players' armies on Aggressive must fight): enemy-faction players and their recruits on sight.
++        var enemyLord = Member(null, "mordor"); var enemyOrc = Hired("test-mordororc-warrior", enemyLord.PlayerUID); var enemyMan = Hired("test-gondor-recruit", enemyLord.PlayerUID);
++        Check(fs.RecruitWantsToAttack(guard, uid, enemyLord) && fs.RecruitWantsToAttack(guard, uid, enemyOrc) && fs.RecruitWantsToAttack(enemyOrc, enemyLord.PlayerUID, guard) && fs.RecruitWantsToAttack(enemyOrc, enemyLord.PlayerUID, lord),
++            "0.0.102: a Gondor member's recruits attack a Mordor member and their recruits on sight, and the other way round");
++        Check(!fs.RecruitWantsToAttack(guard, uid, enemyMan), "...but not a Gondor-looking recruit of theirs (the same faction counts as allied)");
++        var friendGondor = Member(null, "gondor"); var friendsMan = Hired("test-gondor-warrior", friendGondor.PlayerUID);
++        var shireling = Member(null, "shire"); var shiresHobbit = Hired("test-hobbit", shireling.PlayerUID);
++        Check(!fs.RecruitWantsToAttack(guard, uid, friendGondor) && !fs.RecruitWantsToAttack(guard, uid, friendsMan) && !fs.RecruitWantsToAttack(guard, uid, shireling) && !fs.RecruitWantsToAttack(guard, uid, shiresHobbit),
++            "...nor another Gondor member or theirs, nor a member of the defensive Shire or theirs");
++        Check(fs.RecruitWantsToAttack(shiresHobbit, shireling.PlayerUID, guard) && fs.RecruitWantsToAttack(shiresHobbit, shireling.PlayerUID, lord), "...while the Shire member's aggressive recruits go for Gondor's, whose wild NPCs would attack them on sight");
++        Recruit.SetStance(guard, Recruit.Defensive);
++        Check(!fs.RecruitWantsToAttack(guard, uid, enemyLord) && !fs.RecruitWantsToAttack(guard, uid, enemyOrc), "...defensive recruits still only fight back");
++        Recruit.SetStance(guard, Recruit.Aggressive);
+         hiring.RecordTeamGrudge(uid, stranger); hiring.RecordTeamGrudge(uid, animal); hiring.RecordTeamGrudge(uid, wildGondor);
+         Check(fs.RecruitWantsToAttack(guard, uid, stranger) && fs.RecruitWantsToAttack(guard2, uid, animal) && fs.RecruitWantsToAttack(guard, uid, wildGondor), "every recruit of the owner fights whoever hurt the owner or one of them, even of their own faction");
+         Check(!fs.RecruitWantsToAttack(theirs, stranger.PlayerUID, animal), "...other owners' recruits don't");
+@@ -1072,6 +1086,18 @@
+             Check(bMin == BattleSpacing.MaxDuel - 0.2 && bMax == BattleSpacing.MaxDuel && band.DuelMin == BattleSpacing.MinDuel && band.DuelMax == BattleSpacing.MaxDuel
+                 && band.InDuelBand(1.0) && !new BattleSpacing().InDuelBand(0.9) && new BattleSpacing().InDuelBand(1.6) && !new BattleSpacing().InDuelBand(1.7),
+                 "the duel band is kept within 0.6 to 2.2 blocks, its top 0.2 past its bottom, and both ends count as inside");
++            // 0.0.98 staggered swings: hits on one target land at least HitGapMs apart (the game's hurt window is 500 ms).
++            var turns = new BattleSpacing(); const long HT = 77;
++            bool freeFirst = turns.HitWaitMs(HT, 1000) == 0;
++            turns.BookHit(HT, 1000, 100);
++            long w2 = turns.HitWaitMs(HT, 1000), w3 = turns.HitWaitMs(HT, 1000 + BattleSpacing.HitGapMs + 100);
++            turns.BookHit(HT, 900, 0); long kept = turns.HitWaitMs(HT, 1000);
++            turns.BookHit(HT, 2000, 0); long late = turns.HitWaitMs(HT, 2000);
++            Check(freeFirst && w2 == BattleSpacing.HitGapMs + 100 && w3 == 0 && kept == BattleSpacing.HitGapMs + 100 && late == BattleSpacing.HitGapMs
++                && BattleSpacing.HitGapMs > 500, "0.0.98: a second hit on a target waits out the first one's hurt window, an earlier booking never shortens the wait, a late hit moves it later");
++            turns.Forget(HT); bool forgot = turns.HitWaitMs(HT, 2000) == 0;
++            turns.BookHit(99, 3000, 0); turns.BookHit(88, 20000, 0);
++            Check(forgot && turns.TrackedHitTurns == 1 && turns.HitWaitMs(99, 3000) == 0, "0.0.98: a dead or unloaded target's turn is forgotten, and turns that passed are swept");
+             bs.Spacing = 1.5;
+ 
+             // Places: three NPCs coming from the same side walk to a third of a turn apart and stay there.
+@@ -1144,7 +1170,7 @@
+             v9tree["Version"] = 9; v9tree.Remove("MaxAttackersPerTarget"); v9tree.Remove("CombatSpacing");
+             string v9json = v9tree.ToString();
+             var m9 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v9json), out bool store9);
+-            Check(v9tree["CombatSpacing"] == null && store9 && m9.Version == FactionConfig.CurrentVersion && m9.MaxAttackersPerTarget == 0 && m9.CombatSpacing == 1.5, "a version 9 file gains MaxAttackersPerTarget 0 (no limit, 0.0.85) and CombatSpacing 1.5 (0.0.82) and is written back");
++            Check(v9tree["CombatSpacing"] == null && store9 && m9.Version == FactionConfig.CurrentVersion && m9.MaxAttackersPerTarget == 4 && m9.CombatSpacing == 1.5, "a version 9 file gains MaxAttackersPerTarget 4 (0.0.102) and CombatSpacing 1.5 (0.0.82) and is written back");
+             var fsys = new FactionSystem();
+             var cfgS = FactionConfig.FromFile(null, out _); cfgS.MaxAttackersPerTarget = 5; cfgS.CombatSpacing = 9;
+             SetLegacy(fsys, cfgS);
+@@ -1291,9 +1317,10 @@
+             string ShieldsWanted(string c) => c.EndsWith("-archer") ? null : c.StartsWith("test-mordororc-") ? "lotrnpcs:orcweapon-shield" : c.StartsWith("test-goblin-") ? "lotrnpcs:orcweapon-mmshield"
+                 : c.StartsWith("test-blacknumenorean-") ? "lotrnpcs:orcweapon-kiteshield" : c.StartsWith("test-dwarf-") ? "lotrnpcs:orcweapon-dwtowershield|lotrnpcs:orcweapon-dwshield" : c.StartsWith("test-easterling-") ? "lotrnpcs:orcweapon-eastshield"
+                 : c.StartsWith("test-gondor-") ? "lotrnpcs:orcweapon-gondorshield|lotrnpcs:orcweapon-boromirshield" : c.StartsWith("test-elf-") ? "lotrnpcs:orcweapon-elfshield"
+-                : c == "test-haradrim-recruit" ? "lotrnpcs:orcweapon-hdlightshield" : c == "test-haradrim-warrior" || c == "test-haradrim-captain" ? "lotrnpcs:orcweapon-hdheavyshield" : null;
++                : c == "test-haradrim-recruit" ? "lotrnpcs:orcweapon-hdlightshield" : c == "test-haradrim-warrior" || c == "test-haradrim-captain" ? "lotrnpcs:orcweapon-hdheavyshield"
++                : c.StartsWith("test-rohan-") || c.StartsWith("test-dale-") ? "game:shield-woodmetal" : c.StartsWith("test-dunlending-") ? "game:shield-crude" : null;
+             Check(ShieldOf("test-mordororc-warrior") == "lotrnpcs:orcweapon-shield" && entityFiles.Keys.All(c => ShieldOf(c) == ShieldsWanted(c)),
+-                "Mordor orcs (not archers) may carry the Mordor shield, Misty Mountains orcs (0.0.71) theirs, Black Numenoreans the kite shield dwarves one of their two (0.0.76), Easterlings theirs (0.0.77), Gondor one of its two and elves theirs (0.0.94), Haradrim recruits the light and warriors and captains the heavy shield (0.0.97); nobody else has one");
++                "Mordor orcs (not archers) may carry the Mordor shield, Misty Mountains orcs (0.0.71) theirs, Black Numenoreans the kite shield dwarves one of their two (0.0.76), Easterlings theirs (0.0.77), Gondor one of its two and elves theirs (0.0.94), Haradrim recruits the light and warriors and captains the heavy shield (0.0.97), Rohan and Dale the game's wood-and-metal and Dunlendings its crude shield (0.0.101); nobody else has one");
+             var mmItem = JObject.Parse(File.ReadAllText(Path.Combine(assets, "itemtypes", "orcweapon-mmshield.json")));
+             var mmShape = JObject.Parse(File.ReadAllText(Path.Combine(assets, "shapes", "item", "orcweapon", "mmshield.json")));
+             Check((string)mmItem["shape"]["base"] == "lotrnpcs:item/orcweapon/mmshield" && mmItem["tpOffHandTransform"] != null && lang["item-orcweapon-mmshield"] != null
+@@ -1370,11 +1397,12 @@
+             string[] orcArchers = entityFiles.Keys.Where(c => c.EndsWith("-archer") && c != "test-mordororc-archer").ToArray();
+             var archerFactions = orcArchers.Select(c => types[c].Attributes["lotrnpcsFaction"].AsString()).Append("mordor").ToList();
+             Check(archerFactions.Distinct().Count() == 17 && !archerFactions.Contains("shire") && FactionConfig.DefaultFactions().Keys.All(f => f == "shire" || archerFactions.Contains(f)), "...one per faction, every faction but the Shire");
++            string GameBowOf(string c) => c is "test-elf-archer" or "test-easterling-archer" or "test-haradrim-archer" ? "game:bow-recurve" : c == "test-dunlending-archer" ? "game:bow-simple" : "game:bow-long";
+             var orcArcherFaction = orcArchers.ToDictionary(c => c, c => types[c].Attributes["lotrnpcsFaction"].AsString());
+             JToken TaskList(string c) => entityFiles[c]["server"]["behaviors"].First(b => (string)b["code"] == "taskai")["aitasks"];
+             Check(orcArchers.All(c => types[c].Attributes["lotrnpcsRank"].AsString() == "archer" && types[c].Attributes["lotrnpcsFaction"].AsString() == orcArcherFaction[c]
+                     && JToken.DeepEquals(TaskList(c).First(t => (string)t["code"] == "lotrnpcs:shootattack"), TaskList("test-mordororc-archer").First(t => (string)t["code"] == "lotrnpcs:shootattack"))
+-                    && (string)HeldWeapon(entityFiles[c], "server")["weapons"][0]["item"] == (c == "test-goblin-archer" ? "lotrnpcs:orcweapon-mmbow" : "game:bow-long")
++                    && (string)HeldWeapon(entityFiles[c], "server")["weapons"][0]["item"] == (c == "test-goblin-archer" ? "lotrnpcs:orcweapon-mmbow" : GameBowOf(c))
+                     && (c == "test-gondor-archer" ? GearSets(entityFiles[c]).ToString().Contains("gondorrangerarmor") && !GearSets(entityFiles[c]).ToString().Contains("chain")
+                         : GearSets(entityFiles[c]).ToString() == GearSets(entityFiles[c.Replace("-archer", "-recruit")]).ToString())
+                     && JsonMaxHealth(c) == 34),
+@@ -1458,8 +1486,8 @@
+                 && mmBowW.Poses[0].While[drawA] == (1031, 0) && mmBowW.Poses[1].While[drawA] == (928, 0) && mmBowW.Poses[2].While[drawA] == (825, 0)
+                 && JToken.DeepEquals(JToken.FromObject(mmBowW.Poses[3].While), JToken.FromObject(bowW.Poses[3].While))
+                 && (string)HeldWeapon(entityFiles["test-mordororc-archer"], "server")["weapons"][0]["item"] == "lotrnpcs:orcweapon-bow"
+-                && entityFiles.Keys.Where(c => c.EndsWith("-archer") && c != "test-goblin-archer" && c != "test-mordororc-archer").All(c => (string)HeldWeapon(entityFiles[c], "server")["weapons"][0]["item"] == "game:bow-long" && HeldWeapon(entityFiles[c], "server")["weapons"][0]["poses"] == null),
+-                "Misty Mountains archers carry the Moria bow, its string pulled from 825, 928 and 1031 ms; Mordor keeps the orc bow; everyone else the game's longbow with no string stages (0.0.76)");
++                && entityFiles.Keys.Where(c => c.EndsWith("-archer") && c != "test-goblin-archer" && c != "test-mordororc-archer").All(c => (string)HeldWeapon(entityFiles[c], "server")["weapons"][0]["item"] == GameBowOf(c) && HeldWeapon(entityFiles[c], "server")["weapons"][0]["poses"] == null),
++                "Misty Mountains archers carry the Moria bow, its string pulled from 825, 928 and 1031 ms; Mordor keeps the orc bow; everyone else a game bow with no string stages: the longbow (0.0.76), the recurve for elves, Easterlings and Haradrim and the simple bow for Dunlendings (0.0.101)");
+             Check(Gap(HandPoint(Tf("mmbow"), 3.25, 0.8, 8), HandPoint(Tf("bow"), 2.6, 0.9, 8)) < 0.002 && Gap(HandPoint(Tf("mmbow-drawn"), 3.25, 0.8, 8), HandPoint(Tf("bow-drawn"), 2.6, 0.9, 8)) < 0.002
+                 && JToken.DeepEquals(Tf("mmbow")["rotation"], Tf("bow")["rotation"]) && JToken.DeepEquals(Tf("mmbow-drawn")["rotation"], Tf("bow-drawn")["rotation"])
+                 && new[] { "mmbow-pull1", "mmbow-pull2", "mmbow-pull3" }.All(n => JToken.DeepEquals(Tf(n), Tf("mmbow-drawn"))),
+@@ -1494,9 +1522,9 @@
+                 "the dwarven axe, battleaxe, dagger and boar spear, the elven spear (60 units since 0.0.94) and the Haradrim spear are each held by their grip; the poleaxe grip is 0.25 blocks further up the shaft (6.67 px)");
+             JToken OffTf(string item) => JObject.Parse(File.ReadAllText(Path.Combine(assets, "itemtypes", "orcweapon-" + item + ".json")))["tpOffHandTransform"];
+             double[] mordorGrip = HandPoint(OffTf("shield"), 3.7, 0.75, 6.0);
+-            Check(new (string item, double x, double y, double z)[] { ("kiteshield", 8.0, 21.9, 12.8 - 1.4), ("dwtowershield", 5.25, 18.0, 7.3 - 1.4 + 1.0), ("dwshield", 7.0, 17.85, 4.9 - 1.4 + 1.0) }
++            Check(new (string item, double x, double y, double z)[] { ("kiteshield", 8.0, 21.9, 12.8 - 1.4 + 1.0), ("eastshield", 6.25, 16.0, 7.38 - 1.4 + 1.0), ("gondorshield", 7.5, 16.68, 7.3 - 1.4 + 1.75), ("dwtowershield", 5.25, 18.0, 7.3 - 1.4 + 1.0), ("dwshield", 7.0, 17.85, 4.9 - 1.4 + 1.0) }
+                     .All(g => Gap(HandPoint(OffTf(g.item), g.x, g.y, g.z), mordorGrip) < 0.002 && Math.Abs((double)OffTf(g.item)["rotation"]["z"] - ((double)OffTf("shield")["rotation"]["z"] - 90)) < 0.01),
+-                "the new shields are held like the Mordor shield, turned a quarter to stand along the forearm, each by its handle slid 1.4 px out so it clears the arm (the dwarven ones 1 px back in since 0.0.96, owner: \"a little bit closer\")");
++                "the new shields are held like the Mordor shield, turned a quarter to stand along the forearm, each by its handle slid 1.4 px out so it clears the arm (the dwarven ones 1 px back in since 0.0.96, owner: \"a little bit closer\"; 0.0.100: the kite and Easterling 1 px and the Gondorian 1.75 px in, so the hand meets the handle)");
+             var converted = new[] { "elfspear", "kiteshield", "dwaxe", "dwbattleaxe", "dwtowershield", "dwshield", "dwdagger" };
+             Check(converted.All(n => {
+                     var shp = JObject.Parse(File.ReadAllText(Path.Combine(assets, "shapes", "item", "orcweapon", n + ".json")));
+@@ -1703,13 +1731,26 @@
+             // 0.0.96 (owner, 2026-11-07: "remove the not only spears expansion dependancy, as it wont be implemented into
+             // the server"): no NPC names a Spear Expansion item or animation; factions carry the owner's models and the game's
+             // falx; the Haradrim still carry no falx (0.0.86); wicked dwarves like the dwarves.
++            var gameStandIns = new HashSet<string> { "game:blade-falx-iron", "game:blade-falx-steel", "game:blade-blackguard-iron", "game:blade-forlorn-iron", "game:blade-sabre-ruined", "game:blade-gladius-ruined",
++                "game:spear-generic-steel", "game:spear-generic-iron", "game:spear-generic-blackbronze", "game:spear-generic-flint", "game:spear-generic-ornatesilver", "game:spear-scrap-scrap",
++                "game:club-generic-wood", "game:club-scrapmace-scrap", "game:club-flanged-ruined", "game:axe-bearded-ruined", "game:axe-battle-ruined", "game:axe-bardiche-ruined" };
+             string[] armedRaces = { "gondor", "rohan", "dale", "arnor", "haradrim", "dunlending", "blacknumenorean", "tormentedelf", "uruk", "elf", "angmarorc", "gundabadorc", "dwarf", "wickeddwarf", "easterling", "mordororc", "goblin" };
+             Check(entityFiles.Values.All(f => !f.ToString().Contains("spearexpantion") && !f.ToString().Contains("lotrnpcs-sx"))
+-                && armedRaces.All(r => new[] { "recruit", "warrior", "captain" }.All(k => Items("test-" + r + "-" + k).Length >= 1 && Items("test-" + r + "-" + k).All(i => i.StartsWith("lotrnpcs:") || i == "game:blade-falx-iron")))
++                && armedRaces.All(r => new[] { "recruit", "warrior", "captain" }.All(k => Items("test-" + r + "-" + k).Length >= 1 && Items("test-" + r + "-" + k).All(i => i.StartsWith("lotrnpcs:") || gameStandIns.Contains(i))))
+                 && new[] { "recruit", "warrior", "captain" }.All(k => Items("test-haradrim-" + k).SequenceEqual(new[] { "lotrnpcs:orcweapon-hdspear", "lotrnpcs:orcweapon-hdsword", "lotrnpcs:orcweapon-hdcurvedsword" }))
+-                && new[] { "rohan", "dale", "arnor", "dunlending", "blacknumenorean", "tormentedelf", "uruk", "easterling" }.All(r => new[] { "recruit", "warrior", "captain" }.All(k => Items("test-" + r + "-" + k).SequenceEqual(new[] { "game:blade-falx-iron" })))
++                && new (string race, string[] items)[] {
++                    ("rohan", new[] { "game:spear-generic-iron", "game:blade-falx-iron" }), ("dale", new[] { "game:spear-generic-iron", "game:blade-falx-iron" }),
++                    ("arnor", new[] { "game:spear-generic-steel", "game:blade-falx-steel" }),
++                    ("dunlending", new[] { "game:club-generic-wood", "game:spear-generic-flint", "game:axe-bearded-ruined" }),
++                    ("blacknumenorean", new[] { "game:blade-blackguard-iron", "game:club-flanged-ruined", "game:spear-generic-blackbronze" }),
++                    ("easterling", new[] { "game:spear-generic-blackbronze", "game:blade-forlorn-iron", "game:axe-bardiche-ruined" }),
++                    ("uruk", new[] { "game:blade-falx-iron", "game:spear-generic-iron", "game:axe-battle-ruined" }),
++                    ("tormentedelf", new[] { "game:blade-sabre-ruined", "game:blade-gladius-ruined", "game:spear-generic-ornatesilver" }),
++                    ("angmarorc", new[] { "lotrnpcs:orcweapon-dagger", "lotrnpcs:orcweapon-axe", "game:spear-scrap-scrap", "game:club-scrapmace-scrap" }) }
++                    .All(x => new[] { "recruit", "warrior", "captain" }.All(k => Items("test-" + x.race + "-" + k).SequenceEqual(x.items)))
++                && HeldWeapon(entityFiles["test-easterling-warrior"], "server")["weapons"].First(w => (string)w["item"] == "game:axe-bardiche-ruined")["twoHanded"]?.Value<bool>() == true
+                 && Items("test-wickeddwarf-warrior").OrderBy(x => x).SequenceEqual(Items("test-dwarf-warrior").OrderBy(x => x)),
+-                "no Spear Expansion items or animations left; every armed rank carries at least one weapon, all ours or the game's falx; the Haradrim their spear, sword or curved sword (0.0.97; no falx); Men, Uruks and tormented elves the falx until their models come; wicked dwarves like the dwarves");
++                "no Spear Expansion items or animations left; every armed rank carries at least one weapon, all ours or the game's stand-ins; the Haradrim their spear, sword or curved sword (0.0.97; no falx); Men, Uruks, tormented elves and Angmar the game's stand-ins until their models come (0.0.101; the bardiche two-handed, so no shield); wicked dwarves like the dwarves");
+             // 0.0.97 (owner's Haradrim sword, curved sword, light and heavy shields): the swords are one-handed and
+             // slash; recruits carry the light shield, warriors and captains the heavy one, archers none.
+             string[] ShieldsOf(string code) => HeldWeapon(entityFiles[code], "server")["shields"]?.Select(t => (string)t).ToArray() ?? new string[0];
+@@ -1728,17 +1769,17 @@
+             // 0.0.96 (owner: "Let the gundabad orcs use the moria spear"): Gundabad's dagger, axe and the Moria spear, held
+             // like the Misty Mountains orcs hold it.
+             var gbAnims = entityFiles["test-gundabadorc-warrior"]["client"]["animations"].ToDictionary(a => (string)a["code"], a => a);
+-            Check(new[] { "recruit", "warrior", "captain" }.All(k => Items("test-gundabadorc-" + k).SequenceEqual(new[] { "lotrnpcs:orcweapon-dagger", "lotrnpcs:orcweapon-axe", "lotrnpcs:orcweapon-mmspear" }))
++            Check(new[] { "recruit", "warrior", "captain" }.All(k => Items("test-gundabadorc-" + k).SequenceEqual(new[] { "lotrnpcs:orcweapon-dagger", "lotrnpcs:orcweapon-axe", "lotrnpcs:orcweapon-mmspear", "game:club-scrapmace-scrap" }))
+                 && (string)gbAnims["lotrnpcs-mmspear-attack"]["animation"] == "spearhit" && (string)gbAnims["lotrnpcs-mmspear-hold"]["animation"] == "spearidle"
+                 && (string)HeldWeapon(entityFiles["test-gundabadorc-captain"], "server")["weapons"][2]["holdAnimation"] == "lotrnpcs-mmspear-hold",
+-                "Gundabad orcs carry the orc dagger, the orc axe or the Moria spear, thrust and held as the Misty Mountains orcs do");
++                "Gundabad orcs carry the orc dagger, the orc axe, the Moria spear (thrust and held as the Misty Mountains orcs do) or the game's scrap mace (0.0.101)");
+             // 0.0.82 (owner's loadout list, "prefer spears" and the like): weights stay where there is more than one model.
+             int WeightOf(string code, string item) => HeldWeapon(entityFiles[code], "server")["weapons"].Where(w => (string)w["item"] == item).Select(w => (int?)w["weight"] ?? 1).DefaultIfEmpty(0).First();
+             Check(WeightOf("test-dwarf-recruit", "lotrnpcs:orcweapon-dwaxe") == 3 && WeightOf("test-dwarf-recruit", "lotrnpcs:orcweapon-dwwarhammer") == 3 && WeightOf("test-dwarf-recruit", "lotrnpcs:orcweapon-dwshorthammer") == 3 && WeightOf("test-dwarf-captain", "lotrnpcs:orcweapon-dwwarhammer") == 3 && WeightOf("test-dwarf-captain", "lotrnpcs:orcweapon-dwshorthammer") == 3 && WeightOf("test-dwarf-captain", "lotrnpcs:orcweapon-dwaxe") == 1
+                 && WeightOf("test-wickeddwarf-captain", "lotrnpcs:orcweapon-dwwarhammer") == 3
+                 && Items("test-gondor-captain").SequenceEqual(new[] { "lotrnpcs:orcweapon-gdcaptsword" })
+-                && Items("test-gondor-warrior").SequenceEqual(new[] { "game:blade-falx-iron" }) && Items("test-elf-warrior").SequenceEqual(new[] { "lotrnpcs:orcweapon-elfspear", "game:blade-falx-iron" }),
+-                "dwarven axes and hammers come up three times as often as the others; Gondor captains carry the captain's sword, Gondor recruits and warriors the falx, elves the elven spear or the falx");
++                && Items("test-gondor-warrior").SequenceEqual(new[] { "game:spear-generic-steel", "game:blade-falx-steel" }) && WeightOf("test-gondor-recruit", "game:spear-generic-steel") == 3 && WeightOf("test-arnor-captain", "game:spear-generic-steel") == 3 && Items("test-elf-warrior").SequenceEqual(new[] { "lotrnpcs:orcweapon-elfspear", "game:blade-falx-iron" }),
++                "dwarven axes and hammers come up three times as often as the others; Gondor captains carry the captain's sword, Gondor recruits and warriors the game's steel spear (three times as often, as for Arnor) or steel falx (0.0.101), elves the elven spear or the falx");
+             var wrand = new Random(11); int spears = 0;
+             var wlist = new[] { new NpcWeapon { Item = "a:spear", Weight = 3 }, new NpcWeapon { Item = "a:sword", Weight = 1 } };
+             for (int i = 0; i < 4000; i++) if (EntityBehaviorHeldWeapon.PickWeapon(null, wlist, wrand) == "a:spear") spears++;
+@@ -1825,8 +1866,8 @@
+         {
+             // Line geometry.
+             Check(LineMath.FrontCount(7, 3, 0) == 7 && LineMath.FrontCount(1, 4, 0) == 1, "0.0.85: with no attacker limit every member stands in the front rank");
+-            Check(LineMath.FrontCount(5, 3) == 5 && LineMath.FrontCount(7, 3) == 6 && LineMath.FrontCount(3, 5) == 3 && LineMath.FrontCount(4, 0) == 2 && LineMath.FrontCount(0, 2) == 0,
+-                "with a limit of 2 the front rank holds two per enemy (extras wrap the flanks), the rest wait behind");
++            Check(LineMath.FrontCount(5, 3) == 3 && LineMath.FrontCount(7, 3) == 3 && LineMath.FrontCount(3, 5) == 3 && LineMath.FrontCount(4, 0) == 1 && LineMath.FrontCount(0, 2) == 0 && LineMath.FrontCount(7, 3, 2) == 6,
++                "0.0.104: the front rank holds one per enemy; the members past that are the extras");
+             LineMath.SlotOffset(0, 5, 3, 1.5, out double r0, out double b0); LineMath.SlotOffset(2, 5, 3, 1.5, out double r2, out double b2);
+             LineMath.SlotOffset(3, 5, 3, 1.5, out double r3, out double b3); LineMath.SlotOffset(4, 5, 3, 1.5, out double r4, out double b4);
+             Check(r0 == -1.5 && r2 == 1.5 && b0 == 0 && b2 == 0 && r3 == -0.75 && r4 == 0.75 && b3 == 1.5 && b4 == 1.5,
+@@ -1902,8 +1943,8 @@
+             SetLegacy(fs, new FactionConfig { BattleLines = false });
+             Check(!fs.Lines.Enabled && fs.Lines.Join(o1, g1, 0) == null, "BattleLines false turns lines off");
+             SetLegacy(fs, new FactionConfig { BattleLines = true });
+-            Check(fs.Lines.Enabled && fs.Lines.Gap == 1.5 && fs.Lines.HoldRange == 6 && fs.Spacing.DuelMin == 1.0 && fs.Spacing.DuelMax == 1.6 && fs.Spacing.MaxAttackers == 0 && fs.Lines.PerEnemy == 0,
+-                "the faction system passes the line gap, hold range, duel band and the attacker limit (none by default since 0.0.85) on");
++            Check(fs.Lines.Enabled && fs.Lines.Gap == 1.5 && fs.Lines.HoldRange == 6 && fs.Spacing.DuelMin == 1.0 && fs.Spacing.DuelMax == 1.6 && fs.Spacing.MaxAttackers == 4 && fs.Lines.PerEnemy == 4,
++                "the faction system passes the line gap, hold range, duel band and the attacker limit (4 by default since 0.0.102) on");
+             Check(fs.SameSide(o1, Wild("test-mordororc-captain")) && !fs.SameSide(o1, g1) && !fs.SameSide(o1, rec) && FactionConfig.InstructionText.Any(l => l.StartsWith("BattleLines") && l.Contains("LineHoldRange"))
+                 && FactionConfig.InstructionText.Any(l => l.StartsWith("DuelDistanceMin")),
+                 "same side = one faction (or allies) or one leader's recruits; #Instructions explain lines and the duel band");
+@@ -1927,11 +1968,11 @@
+             v16["Version"] = 16; v16["MaxAttackersPerTarget"] = 3; v16["CombatSpacing"] = 2.0; v16["CaptainsAlwaysHelmeted"] = true;
+             v16.Remove("BattleLines"); v16.Remove("DuelDistanceMin"); v16.Remove("DuelDistanceMax"); v16.Remove("LineHoldRange");
+             var m16 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v16.ToString()), out bool store16);
+-            v16["MaxAttackersPerTarget"] = 4; v16["CombatSpacing"] = 1.8;
++            v16["MaxAttackersPerTarget"] = 5; v16["CombatSpacing"] = 1.8;
+             var m16b = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v16.ToString()), out _);
+-            Check(store16 && m16.Version == FactionConfig.CurrentVersion && m16.MaxAttackersPerTarget == 0 && m16.CombatSpacing == 1.5 && !m16.CaptainsAlwaysHelmeted && !m16.BattleLines && m16.DuelDistanceMin == 1.0 && m16.DuelDistanceMax == 1.6 && m16.LineHoldRange == 6
+-                && m16b.MaxAttackersPerTarget == 4 && m16b.CombatSpacing == 1.8,
+-                "a version 16 file moves the old defaults to no attacker limit, 1.5 spacing and no forced captain helmets, gains the line and duel settings, and keeps values the admin chose");
++            Check(store16 && m16.Version == FactionConfig.CurrentVersion && m16.MaxAttackersPerTarget == 4 && m16.CombatSpacing == 1.5 && !m16.CaptainsAlwaysHelmeted && m16.BattleLines && m16.DuelDistanceMin == 1.0 && m16.DuelDistanceMax == 1.6 && m16.LineHoldRange == 6
++                && m16b.MaxAttackersPerTarget == 5 && m16b.CombatSpacing == 1.8,
++                "a version 16 file moves the old defaults to the attacker limit 4 (0.0.102), 1.5 spacing and no forced captain helmets, gains the line and duel settings, and keeps values the admin chose");
+         }
+ 
+         {
+@@ -1940,11 +1981,149 @@
+             var m17 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v17.ToString()), out bool store17);
+             v17["MaxAttackersPerTarget"] = 5;
+             var m17b = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v17.ToString()), out _);
+-            Check(store17 && m17.Version == FactionConfig.CurrentVersion && m17.MaxAttackersPerTarget == 0 && m17b.MaxAttackersPerTarget == 5 && !new BattleSpacing().Crowded(1, 2, false, 0)
+-                && FactionConfig.InstructionText.Any(l => l.StartsWith("MaxAttackersPerTarget") && l.Contains("0 (the default) means no limit")),
+-                "0.0.85 (owner: \"remove the limit for how many npcs can target 1 npc\"): a version 17 file's unchanged 2 becomes no limit, a limit the admin chose stays, and a new battle has no limit");
+-            Check(!m17.BattleLines && !new FactionConfig().BattleLines,
+-                "0.0.85 (owner: \"fight first, then maintain formation second\"): battle lines are off by default, and a version 17 file turns them off once");
++            Check(store17 && m17.Version == FactionConfig.CurrentVersion && m17.MaxAttackersPerTarget == 4 && m17b.MaxAttackersPerTarget == 5 && !new BattleSpacing().Crowded(1, 2, false, 0)
++                && FactionConfig.InstructionText.Any(l => l.StartsWith("MaxAttackersPerTarget") && l.Contains("4 by default; 0 means no limit")),
++                "0.0.85 (owner: \"remove the limit for how many npcs can target 1 npc\"): a version 17 file's unchanged 2 ends at 4 since 0.0.102, a limit the admin chose stays, and a new battle starts uncrowded");
++            Check(m17.BattleLines && new FactionConfig().BattleLines,
++                "0.0.104 (owner chose \"Yes, and turn lines on by default\"): battle lines are on by default again, and old files (0.0.85 turned them off) turn them on once");
++        }
++
++        // ---- 0.0.106 (owner: captains "in the front middle, then warriors, then recruits", archers "at the back or ends") ----
++        {
++            // A line of 7 facing +Y, members standing in a jumble: captain, 2 warriors, 2 recruits, 2 archers.
++            var lineOff = Formation.Offsets(Formation.Line, 7);
++            var lineSpots = lineOff.Select(o => new Vec3d(o.X, 0, o.Y)).ToList();
++            var jumble = new List<Vec3d> { new Vec3d(5, 0, 3), new Vec3d(-4, 0, 1), new Vec3d(4, 0, -2), new Vec3d(0, 0, 0), new Vec3d(1, 0, 1), new Vec3d(-1, 0, 2), new Vec3d(-5, 0, 0) };
++            string[] rk = { "captain", "warrior", "warrior", "recruit", "recruit", "archer", "archer" };
++            int[] at = Formation.AssignByRank(jumble, lineSpots, lineOff, rk.Select(Formation.OrderOfRank).ToList());
++            double Ax(int i) => Math.Abs(lineOff[at[i]].X);
++            Check(at.Distinct().Count() == 7 && Ax(0) < 0.01 && Ax(1) < 2 && Ax(2) < 2 && Ax(3) > 3 && Ax(3) < 4 && Ax(4) > 3 && Ax(4) < 4 && Ax(5) > 5 && Ax(6) > 5,
++                "in a line the captain stands in the middle, warriors beside him, recruits further out and archers at the ends");
++            var sqOff = Formation.Offsets(Formation.Square, 9);
++            var sqSpots = sqOff.Select(o => new Vec3d(o.X, 0, o.Y)).ToList();
++            var rnd9 = new Random(3); var mem9 = Enumerable.Range(0, 9).Select(_ => new Vec3d(rnd9.NextDouble() * 6 - 3, 0, rnd9.NextDouble() * 6 - 3)).ToList();
++            string[] rk9 = { "archer", "recruit", "captain", "recruit", "warrior", "archer", "recruit", "warrior", "archer" };
++            int[] at9 = Formation.AssignByRank(mem9, sqSpots, sqOff, rk9.Select(Formation.OrderOfRank).ToList());
++            double frontY = sqOff.Max(o => o.Y), backY = sqOff.Min(o => o.Y);
++            Check(Math.Abs(sqOff[at9[2]].Y - frontY) < 0.01 && Math.Abs(sqOff[at9[2]].X) < 0.01 && Math.Abs(sqOff[at9[4]].Y - frontY) < 0.01 && Math.Abs(sqOff[at9[7]].Y - frontY) < 0.01
++                && new[] { 0, 5, 8 }.All(i => Math.Abs(sqOff[at9[i]].Y - backY) < 0.01),
++                "in a square the captain takes the front middle, warriors the rest of the front row, recruits the middle row and archers the back row");
++        }
++
++        // ---- 0.0.105 (owner: archers "end up jumping off walls in order to enter melee combat") ----
++        {
++            EntityBehaviorEdgeGuard.Cell Wall(int x, int y, int z) => y <= 0 ? EntityBehaviorEdgeGuard.Cell.Solid : (x == 0 && y <= 3 ? EntityBehaviorEdgeGuard.Cell.Solid : EntityBehaviorEdgeGuard.Cell.Air);
++            // Standing on a wall 3 high at x = 0 (feet at y 4); stepping out to x = 1 drops 3 blocks.
++            Check(!EntityBehaviorEdgeGuard.Unsafe(Wall, 1, 4, 0, EntityBehaviorEdgeGuard.MaxSafeDrop) && EntityBehaviorEdgeGuard.Unsafe(Wall, 1, 4, 0, EntityBehaviorEdgeGuard.ArcherMaxDrop)
++                && !EntityBehaviorEdgeGuard.Unsafe(Wall, 1, 1, 0, EntityBehaviorEdgeGuard.ArcherMaxDrop),
++                "a fighting archer won't step off a 3-block wall (others still may), but takes a one-block step down");
++            Check(AiTaskFactionSeek.HoldsHeight(3) && !AiTaskFactionSeek.HoldsHeight(1.5) && !AiTaskFactionSeek.HoldsHeight(-4),
++                "an archer more than 2 blocks above its target holds its height instead of going down to it");
++        }
++
++        // ---- 0.0.104: walking-through fix (owner chose "Push always + 5-block look-ahead"), holding lines (chose "Yes, and
++        // turn lines on by default"), captain limit (chose "1 captain per 8 roster places") ----
++        {
++            double ax = 0, az = 0, br = 0;
++            bool inWay = BattleSpacing.AddAvoid(ref ax, ref az, ref br, 1, 0, 2, 0.3, 7);
++            Check(inWay && Math.Abs(ax) < 1e-9 && az < 0 && br == 0, "a walking NPC steers right (-z, heading +x) around a friend 2 blocks ahead and a little to its left, without braking");
++            double cx = 0, cz = 0, cb = 0;
++            BattleSpacing.AddAvoid(ref cx, ref cz, ref cb, 1, 0, 1, 0.1, 7);
++            Check(cb > 0.3 && Math.Abs(cz) > Math.Abs(az), "...and brakes, steering harder, for one right in front within 1.6 blocks");
++            double nx0 = 0, nz0 = 0, nb = 0;
++            Check(!BattleSpacing.AddAvoid(ref nx0, ref nz0, ref nb, 1, 0, -1, 0, 7) && !BattleSpacing.AddAvoid(ref nx0, ref nz0, ref nb, 1, 0, 6, 0, 7) && !BattleSpacing.AddAvoid(ref nx0, ref nz0, ref nb, 1, 0, 2, 1.5, 7)
++                && nx0 == 0 && nz0 == 0 && nb == 0 && BattleSpacing.LookAhead == 5,
++                "nothing for a friend behind, more than 5 blocks ahead, or well off its way");
++            double t1x = 0, t1z = 0, t1b = 0, t2x = 0, t2z = 0, t2b = 0;
++            BattleSpacing.AddAvoid(ref t1x, ref t1z, ref t1b, 0, 1, 0, 2, 2); BattleSpacing.AddAvoid(ref t2x, ref t2z, ref t2b, 0, 1, 0, 2, 3);
++            Check(t1x * t2x < 0, "two NPCs with one dead ahead pick sides by their id, so they don't both dodge the same way");
++            Check(BattleSpacing.Closing(0.04, 0) && BattleSpacing.Closing(0.04, 0.02) && !BattleSpacing.Closing(0.04, 0.035) && !BattleSpacing.Closing(0.04, 0.05) && !BattleSpacing.Closing(0, 0),
++                "only a friend it is catching up with (standing, or much slower) is steered round; one marching along with it in a column or rank isn't");
++
++            Check(FactionConfig.CaptainsFor(16, 8) == 2 && FactionConfig.CaptainsFor(22, 8) == 3 && FactionConfig.CaptainsFor(26, 8) == 3 && FactionConfig.CaptainsFor(13, 8) == 1
++                && FactionConfig.CaptainsFor(15, 8) == 2 && FactionConfig.CaptainsFor(19, 8) == 2 && FactionConfig.CaptainsFor(3, 8) == 1 && FactionConfig.CaptainsFor(16, 0) == int.MaxValue,
++                "captains per roster: Men 2, orcs 3, goblins 3, elves and dwarves 1, Uruk-hai and Dunlendings 2; at least 1; 0 turns the limit off");
++            var fsC = new FactionSystem(); SetLegacy(fsC, new FactionConfig());
++            var hC = new HiringSystem { Factions = fsC }; fsC.Hiring = hC;
++            var capOwner = new HiringOwner { Name = "Cap" }; hC.SetOwner("capuid", capOwner);
++            void AddRecruit(long id, string faction, bool captain) { capOwner.Recruits.Add(id); capOwner.RecruitFactions[id] = faction; if (captain) capOwner.Captains.Add(id); }
++            AddRecruit(1, "gondor", true); AddRecruit(2, "gondor", false); AddRecruit(3, "gondor", false);
++            bool oneMore = hC.CaptainFits("capuid", "gondor");
++            AddRecruit(4, "gondor", true);
++            Check(oneMore && !hC.CaptainFits("capuid", "gondor") && !hC.CaptainFits("capuid", "elves"), "a Gondor player with one captain may take a second, not a third (warriors and recruits don't count), and then no elf captain either");
++            capOwner.Recruits.Remove(4);
++            Check(hC.CaptainFits("capuid", "gondor"), "a captain who died or was dismissed frees the place");
++            var orcOwner = new HiringOwner { Name = "Orc" }; hC.SetOwner("orcuid", orcOwner);
++            foreach (long id in new long[] { 11, 12 }) { orcOwner.Recruits.Add(id); orcOwner.RecruitFactions[id] = "mordor"; orcOwner.Captains.Add(id); }
++            bool third = hC.CaptainFits("orcuid", "mordor");
++            orcOwner.Recruits.Add(13); orcOwner.RecruitFactions[13] = "mordor"; orcOwner.Captains.Add(13);
++            Check(third && !hC.CaptainFits("orcuid", "mordor") && FactionConfig.InstructionText.Any(l => l.StartsWith("RosterPerCaptain")), "a Mordor player may lead 3 captains, not 4; #Instructions explain RosterPerCaptain");
++            var offC = new FactionConfig { RosterPerCaptain = 0 }; SetLegacy(fsC, offC);
++            Check(hC.CaptainFits("orcuid", "mordor") && hC.CaptainFits("capuid", "elves"), "RosterPerCaptain 0 turns the limit off");
++
++            // Lines: one front place per enemy; at contact the front holds its side, the extras go round.
++            var lsC = new BattleLineSystem(fsC);
++            TestAgent LineNpc(string code, double x, double z) { var e = Npc(code); e.EntityId = 60000 + nextId++; e.Pos.SetPos(x, 0, z); return e; }
++            var f1 = LineNpc("test-mordororc-warrior", 0, 0); var f2 = LineNpc("test-mordororc-recruit", 0, 2); var en = LineNpc("test-gondor-warrior", 12, 1);
++            var lineC = lsC.Join(f1, en, 0); lsC.Join(f2, en, 0);
++            int extraIdx = 1; var extra = lineC.Members[extraIdx] == f1.EntityId ? f1 : f2; var frontNpc = extra == f1 ? f2 : f1;
++            bool extraWaits = lsC.HoldSlot(extra, en, out _, out _);
++            bool noHoldBefore = !lsC.HoldsFront(frontNpc, out _, out _);
++            lineC.Contact = true;
++            Check(lineC.Front == 1 && extraWaits && noHoldBefore && !lsC.HoldSlot(extra, en, out _, out _) && lsC.HoldsFront(frontNpc, out double hfx, out double hfz) && Math.Abs(hfx * hfx + hfz * hfz - 1) < 1e-6 && !lsC.HoldsFront(extra, out _, out _),
++                "two orcs against one man: one in front, the extra waits behind; once the lines meet the front orc keeps its side of the man and the extra goes round to surround");
++
++            var v25 = Newtonsoft.Json.Linq.JObject.FromObject(FactionConfig.FromFile(null, out _)); v25["Version"] = 25; v25["BattleLines"] = false; v25.Remove("RosterPerCaptain");
++            var m25 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v25.ToString()), out bool store25);
++            Check(store25 && m25.Version == FactionConfig.CurrentVersion && m25.BattleLines && m25.RosterPerCaptain == 8, "a version 25 file turns battle lines on once and gains RosterPerCaptain 8");
++            Check(lang["talk-captains-full"] != null, "the captain-limit reply is in the lang file");
++            // 0.0.107: a version 26 file with the 0.0.103 tables and orcs following 7 takes the refit; the admin's values stay.
++            string T4(Dictionary<string, float> t) => string.Join("/", FactionTiers.Ranks.Select(r => t[r].ToString(System.Globalization.CultureInfo.InvariantCulture)));
++            var v26 = Newtonsoft.Json.Linq.JObject.FromObject(FactionConfig.FromFile(null, out _)); v26["Version"] = 26;
++            foreach (var f in ((Newtonsoft.Json.Linq.JObject)v26["Factions"]).Properties())
++            {
++                var old = FactionTiers.Tables103[FactionTiers.Of(f.Name).Name];
++                f.Value["Health"] = Newtonsoft.Json.Linq.JObject.FromObject(old.Health); f.Value["Damage"] = Newtonsoft.Json.Linq.JObject.FromObject(old.Damage);
++                if (FactionTiers.Of(f.Name) == FactionTiers.Orc) f.Value["MaxFollowers"] = 7;
++            }
++            v26["Factions"]["gundabad"]["MaxFollowers"] = 9; v26["Factions"]["elves"]["Health"]["captain"] = 70;
++            var m26 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v26.ToString()), out bool store26);
++            Check(store26 && m26.Factions["mordor"].MaxFollowers == 6 && m26.Factions["angmar"].MaxFollowers == 6 && m26.Factions["gundabad"].MaxFollowers == 9
++                && T4(m26.Factions["gondor"].Health) == "22/34/48/35" && T4(m26.Factions["mistymountains"].Health) == "18/24/34/22" && T4(m26.Factions["dwarves"].Damage) == "3.15/4.15/7.8/3.3"
++                && T4(m26.Factions["elves"].Health) == "27/37/70/37" && T4(m26.Factions["elves"].Damage) == "3.65/5.35/9.6/4.25",
++                "0.0.107: a version 26 file's 0.0.103 tables take the refit and orcs following 7 follow 6; a follow limit or table the admin changed stays");
++        }
++
++        // ---- 0.0.103 (owner chose "Narrow orcs to ~0.78 of a Man"): unchanged 0.0.91 orc tables move, the admin's stay ----
++        {
++            string T3(Dictionary<string, float> t) => string.Join("/", FactionTiers.Ranks.Select(r => t[r].ToString(System.Globalization.CultureInfo.InvariantCulture)));
++            var v24 = Newtonsoft.Json.Linq.JObject.FromObject(FactionConfig.FromFile(null, out _)); v24["Version"] = 24;
++            foreach (string f in new[] { "mordor", "angmar", "gundabad" })
++            {
++                v24["Factions"][f]["Health"] = Newtonsoft.Json.Linq.JObject.FromObject(FactionTiers.OrcHealth091);
++                v24["Factions"][f]["Damage"] = Newtonsoft.Json.Linq.JObject.FromObject(FactionTiers.OrcDamage091);
++            }
++            v24["Factions"]["angmar"]["Health"]["captain"] = 60;   // the admin's own Angmar health stays, its damage still moves
++            var m24 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v24.ToString()), out bool store24);
++            double Strength(string tier, string rank) { var t = tier == "orc" ? FactionTiers.Orc : FactionTiers.Men; return t.Health[rank] * t.Damage[rank]; }
++            Check(store24 && T3(m24.Factions["mordor"].Health) == "19/30/41/30" && T3(m24.Factions["gundabad"].Damage) == "2.75/3.5/6.3/2.6"
++                && T3(m24.Factions["angmar"].Health) == "15/27/60/22" && T3(m24.Factions["angmar"].Damage) == "2.75/3.5/6.3/2.6" && T3(m24.Factions["gondor"].Health) == "22/34/48/35"
++                && FactionTiers.Ranks.All(r => Strength("orc", r) / Strength("men", r) > 0.7 && Strength("orc", r) / Strength("men", r) < 0.82),
++                "0.0.103: orcs narrowed to about 0.78 of a Man per rank (health x damage; 0.73 to 0.77 after the 0.0.107 refit); a version 24 file's unchanged orc tables move, a value the admin changed keeps that table");
++        }
++
++        // ---- 0.0.102 (owner: "Implement it again, do 4 per though"): a version 23 file's unchanged 0 becomes 4 ----
++        {
++            var v23 = Newtonsoft.Json.Linq.JObject.FromObject(FactionConfig.FromFile(null, out _));
++            v23["Version"] = 23; v23["MaxAttackersPerTarget"] = 0;
++            var m23 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v23.ToString()), out bool store23);
++            v23["MaxAttackersPerTarget"] = 6;
++            var m23b = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v23.ToString()), out _);
++            var cap = new BattleSpacing(); long tc = 100000;
++            for (long a = 1; a <= 4; a++) cap.Claim(a, 50, 0, tc);
++            Check(store23 && m23.Version == FactionConfig.CurrentVersion && m23.MaxAttackersPerTarget == 4 && m23b.MaxAttackersPerTarget == 6 && BattleSpacing.DefaultMaxAttackers == 4
++                && cap.Crowded(5, 50, false, tc) && !cap.Crowded(4, 50, false, tc),
++                "0.0.102: a version 23 file's no-limit 0 becomes 4, a limit the admin chose stays; a new battle lets 4 NPCs at one enemy and turns the fifth away");
+         }
+ 
+         // ---- 0.0.87: inner and outer rings (owner's screenshot: a big group on two enemies is one pile) ----
+@@ -2008,16 +2187,16 @@
+             var c90 = FactionConfig.FromFile(null, out bool store90);
+             string j90 = Newtonsoft.Json.JsonConvert.SerializeObject(c90, Newtonsoft.Json.Formatting.Indented);
+             FactionDef D(string f) => c90.Factions[f];
+-            Check(store90 && c90.Version == FactionConfig.CurrentVersion && j90.Contains("\"MaxFollowers\": 7") && j90.Contains("\"Health\": {") && !j90.Contains("Multiplier") && j90.Contains("\"DamageSpread\": 0.2") && c90.Factions.Count == 18
++            Check(store90 && c90.Version == FactionConfig.CurrentVersion && j90.Contains("\"MaxFollowers\": 6") && j90.Contains("\"Health\": {") && !j90.Contains("Multiplier") && j90.Contains("\"DamageSpread\": 0.2") && c90.Factions.Count == 18
+                 && c90.Factions.Values.All(d => d.MaxFollowers != null && d.MaxRecruits != null && d.Health?.Count == 4 && d.Damage?.Count == 4),
+                 "a new file is version 20: every faction has MaxFollowers, MaxRecruits and Health and Damage for each rank (no multipliers), and DamageSpread 0.2");
+             string RT(Dictionary<string, float> t) => string.Join("/", new[] { "recruit", "warrior", "captain", "archer" }.Select(r => t[r].ToString(System.Globalization.CultureInfo.InvariantCulture)));
+             bool Tier(string f, int fol, int ros, string h, string d) => D(f).MaxFollowers == fol && D(f).MaxRecruits == ros && RT(D(f).Health) == h && RT(D(f).Damage) == d;
+-            Check(new[] { "gondor", "rohan", "dale", "arnor", "haradrim", "easterlings", "blacknumenoreans", "shire" }.All(f => Tier(f, 5, 16, "22/34/48/34", "3.05/4/7.05/3"))
+-                && Tier("isengard", 5, 15, "23/32/48/35", "2.95/4.3/7.15/2.95") && Tier("dunlendings", 6, 19, "18/29/41/28", "2.7/3.4/6/2.6")
+-                && new[] { "mordor", "angmar", "gundabad" }.All(f => Tier(f, 7, 22, "15/27/31/22", "2.5/2.8/5.95/2.45")) && Tier("mistymountains", 8, 26, "16/21/31/19", "1.85/2.85/4.75/2.2")
+-                && new[] { "elves", "tormentedelves" }.All(f => Tier(f, 4, 13, "27/37/53/37", "3.65/5.4/9.6/4.25")) && new[] { "dwarves", "wickeddwarves" }.All(f => Tier(f, 4, 13, "30/46/63/46", "3.25/4.35/7.9/3.4")),
+-                "the tiers (0.0.91 per-rank fit): Men 5/16 22/34/48/34 health, orcs 7/22 15/27/31/22 health and 2.5/2.8/5.95/2.45 damage, elves 4/13, dwarves 4/13, goblins 8/26, Dunlendings 6/19, Uruks 5/15");
++            Check(new[] { "gondor", "rohan", "dale", "arnor", "haradrim", "easterlings", "blacknumenoreans", "shire" }.All(f => Tier(f, 5, 16, "22/34/48/35", "3.1/4/7/3.05"))
++                && Tier("isengard", 5, 15, "23/32/48/36", "2.95/4.35/7.1/3") && Tier("dunlendings", 6, 19, "18/29/42/28", "2.9/3.6/6.1/2.8")
++                && new[] { "mordor", "angmar", "gundabad" }.All(f => Tier(f, 6, 22, "19/30/41/30", "2.75/3.5/6.3/2.6")) && Tier("mistymountains", 8, 26, "18/24/34/22", "1.85/2.8/4.85/2.2")
++                && new[] { "elves", "tormentedelves" }.All(f => Tier(f, 4, 13, "26/36/50/36", "3.65/5.35/9.6/4.25")) && new[] { "dwarves", "wickeddwarves" }.All(f => Tier(f, 4, 13, "30/46/61/47", "3.15/4.15/7.8/3.3")),
++                "the tiers (0.0.107 refit): Men 5/16 22/34/48/35 health, orcs 6/22 19/30/41/30 health and 2.75/3.5/6.3/2.6 damage, elves 4/13, dwarves 4/13, goblins 8/26, Dunlendings 6/19, Uruks 5/15");
+             string P(Dictionary<string, int> p, params string[] ranks) => string.Join("/", ranks.Select(r => p[r]));
+             string[] H = { "recruit", "warrior", "captain", "archer" }, Pr = { "warrior", "archer", "captain" };
+             Check(P(D("gondor").HirePrices, H) == "5/15/40/15" && P(D("isengard").HirePrices, H) == "6/17/44/17" && P(D("dunlendings").HirePrices, H) == "4/13/33/13"
+@@ -2036,23 +2215,23 @@
+             o18["Factions"]["mordor"]["HirePrices"]["recruit"] = 2;
+             o18["Factions"]["elves"]["PromotePrices"]["captain"] = 99;
+             var m18 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(o18.ToString()), out bool store18);
+-            Check(store18 && m18.Version == FactionConfig.CurrentVersion && m18.Factions["mordor"].MaxFollowers == 7 && RT(m18.Factions["mordor"].Health) == "15/27/31/22" && m18.Factions["mistymountains"].MaxRecruits == 26
++            Check(store18 && m18.Version == FactionConfig.CurrentVersion && m18.Factions["mordor"].MaxFollowers == 6 && RT(m18.Factions["mordor"].Health) == "19/30/41/30" && m18.Factions["mistymountains"].MaxRecruits == 26
+                 && P(m18.Factions["dwarves"].HirePrices, H) == "6/19/50/19" && P(m18.Factions["gondor"].HirePrices, H) == "5/15/40/15"
+                 && m18.Factions["mordor"].HirePrices["recruit"] == 2 && m18.Factions["mordor"].HirePrices["warrior"] == 15 && P(m18.Factions["mordor"].PromotePrices, Pr) == "12/12/36"
+                 && m18.Factions["elves"].PromotePrices["captain"] == 99 && P(m18.Factions["elves"].HirePrices, H) == "6/19/50/19",
+                 "a version 18 file gets the tiers; prices still exactly as shipped take the tier's, prices the admin changed stay as they are");
+             var o18b = Newtonsoft.Json.Linq.JObject.Parse(o18.ToString()); o18b["MaxFollowers"] = 10; o18b["MaxRecruits"] = 32;
+             var m18b = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(o18b.ToString()), out _);
+-            Check(m18b.Factions["gondor"].MaxFollowers == 10 && m18b.Factions["gondor"].MaxRecruits == 32 && m18b.Factions["mordor"].MaxFollowers == 14 && m18b.Factions["mordor"].MaxRecruits == 44 && m18b.Factions["elves"].MaxFollowers == 8,
+-                "an admin who raised the old caps to 10 and 32 keeps the proportions: Men 10/32, orcs 14/44, elves 8");
++            Check(m18b.Factions["gondor"].MaxFollowers == 10 && m18b.Factions["gondor"].MaxRecruits == 32 && m18b.Factions["mordor"].MaxFollowers == 12 && m18b.Factions["mordor"].MaxRecruits == 44 && m18b.Factions["elves"].MaxFollowers == 8,
++                "an admin who raised the old caps to 10 and 32 keeps the proportions: Men 10/32, orcs 12/44, elves 8");
+             var oldCap = Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(@"{ ""Version"": 7, ""MaxHirelings"": 5, ""Factions"": { ""mordor"": {}, ""gondor"": {} } }");
+             var mOld = FactionConfig.FromFile(oldCap, out _);
+             Check(mOld.MaxRecruits == 16 && mOld.Factions["mordor"].MaxRecruits == 22 && mOld.Factions["gondor"].MaxRecruits == 16,
+                 "an old file's cap migrations run first, so a 0.0.47-era cap of 5 still ends with the Men's 16 and the orcs' 22");
+             var mine = Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(@"{ ""Version"": 20, ""DamageSpread"": 7, ""Factions"": { ""rivendell"": { ""Stance"": ""aggressive"" }, ""mordor"": { ""MaxFollowers"": 99, ""Health"": { ""Recruit"": 0, ""warrior"": 26.4 }, ""Damage"": { ""captain"": 6.5 } } } }");
+             var mMine = FactionConfig.FromFile(mine, out _);
+-            Check(mMine.Factions["rivendell"].MaxFollowers == 5 && mMine.Factions["rivendell"].MaxRecruits == 16 && RT(mMine.Factions["rivendell"].Health) == "22/34/48/34" && P(mMine.Factions["rivendell"].HirePrices, H) == "5/15/40/15"
+-                && mMine.Factions["mordor"].MaxFollowers == 32 && RT(mMine.Factions["mordor"].Health) == "1/26/31/22" && RT(mMine.Factions["mordor"].Damage) == "2.5/2.8/6.5/2.45" && mMine.Factions["mordor"].MaxRecruits == 22 && mMine.Spread == 0.9,
++            Check(mMine.Factions["rivendell"].MaxFollowers == 5 && mMine.Factions["rivendell"].MaxRecruits == 16 && RT(mMine.Factions["rivendell"].Health) == "22/34/48/35" && P(mMine.Factions["rivendell"].HirePrices, H) == "5/15/40/15"
++                && mMine.Factions["mordor"].MaxFollowers == 32 && RT(mMine.Factions["mordor"].Health) == "1/26/41/30" && RT(mMine.Factions["mordor"].Damage) == "2.75/3.5/6.5/2.6" && mMine.Factions["mordor"].MaxRecruits == 22 && mMine.Spread == 0.9,
+                 "a faction the mod doesn't ship gets the baseline; out of range values are clamped (follow 1 to 32, health at least 1 and whole, spread at most 0.9), rank names in any case, missing ranks filled from the tier");
+             Check(mMine.FollowersOf("nobody") == 5 && mMine.RosterOf(null) == 16 && mMine.HealthFor("nobody", "recruit") == null && mMine.DamageFor("mordor", null) == null && mMine.HealthFor("mordor", "warrior") == 26 && mMine.DamageFor("mordor", "captain") == 6.5f,
+                 "a faction the config doesn't know, or a rankless NPC, keeps its type's health and damage; a faction's own rank values are used");
+@@ -2067,8 +2246,8 @@
+             o19["Factions"]["elves"]["DamageMultiplier"] = 2.0;
+             var m19 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(o19.ToString()), out bool store19);
+             string j19 = Newtonsoft.Json.JsonConvert.SerializeObject(m19);
+-            Check(store19 && m19.Version == FactionConfig.CurrentVersion && RT(m19.Factions["gondor"].Health) == "22/34/48/34" && RT(m19.Factions["dwarves"].Damage) == "3.25/4.35/7.9/3.4"
+-                && RT(m19.Factions["mordor"].Health) == "22/34/48/34" && RT(m19.Factions["mordor"].Damage) == "2.5/2.8/5.95/2.45" && RT(m19.Factions["elves"].Damage) == "6/8/14/6" && RT(m19.Factions["elves"].Health) == "27/37/53/37"
++            Check(store19 && m19.Version == FactionConfig.CurrentVersion && RT(m19.Factions["gondor"].Health) == "22/34/48/35" && RT(m19.Factions["dwarves"].Damage) == "3.15/4.15/7.8/3.3"
++                && RT(m19.Factions["mordor"].Health) == "22/34/48/34" && RT(m19.Factions["mordor"].Damage) == "2.75/3.5/6.3/2.6" && RT(m19.Factions["elves"].Damage) == "6/8/14/6" && RT(m19.Factions["elves"].Health) == "26/36/50/36"
+                 && !j19.Contains("Multiplier") && m19.DamageSpread == 0.2,
+                 "a version 19 file: multipliers as 0.0.90 shipped them take the fitted per-rank tables; ones the admin changed become the units' own values times theirs (orcs 22/34/48/34, elves hit 6/8/14/6); the multipliers aren't written back; DamageSpread 0.2 comes in");
+             // The spread.
+@@ -2093,29 +2272,29 @@
+             bool c3 = EntityBehaviorFactionMember.SyncMaxHealth(manNew, S(manNew, 22));
+             EntityBehaviorFactionMember.SyncMaxHealth(dwNew, S(dwNew, 48));
+             Console.WriteLine($"   > health: orc recruit {Hv(orcNew, "maxhealth")}/{Hv(orcNew, "currenthealth")} (changed {c1}), orc captain {Hv(orcHurt, "maxhealth")}/{Hv(orcHurt, "currenthealth")}, man {Hv(manNew, "maxhealth")} (changed {c3}), dwarf captain {Hv(dwNew, "maxhealth")}/{Hv(dwNew, "currenthealth")}");
+-            Check(c1 && Hv(orcNew, "maxhealth") == 15 && Hv(orcNew, "currenthealth") == 15 && Hv(orcHurt, "maxhealth") == 31 && Hv(orcHurt, "currenthealth") == 23
+-                && !c3 && Hv(manNew, "maxhealth") == 22 && Hv(dwNew, "maxhealth") == 63 && Hv(dwNew, "currenthealth") == 63
++            Check(c1 && Hv(orcNew, "maxhealth") == 19 && Hv(orcNew, "currenthealth") == 19 && Hv(orcHurt, "maxhealth") == 41 && Hv(orcHurt, "currenthealth") == 33
++                && !c3 && Hv(manNew, "maxhealth") == 22 && Hv(dwNew, "maxhealth") == 61 && Hv(dwNew, "currenthealth") == 61
+                 && !EntityBehaviorFactionMember.SyncMaxHealth(orcNew, S(orcNew, 22)) && EntityBehaviorFactionMember.ScaledMaxHealth(orcNew, null) == 0,
+-                "on load an orc recruit takes 15 health (full stays full), a wounded orc captain keeps its 8 wounds (23 of 31), a man is unchanged, a dwarf captain gets 63; a second load changes nothing");
+-            Check(fs90.Config.DamageFor("mordor", "recruit") == 2.5f && fs90.Config.DamageFor("gondor", "recruit") == 3.05f && fs90.Config.DamageFor("elves", "captain") == 9.6f && fs90.Config.DamageFor("mordor", "archer") == 2.45f
++                "on load an orc recruit takes 19 health (full stays full), a wounded orc captain keeps its 8 wounds (33 of 41), a man is unchanged, a dwarf captain gets 61; a second load changes nothing");
++            Check(fs90.Config.DamageFor("mordor", "recruit") == 2.75f && fs90.Config.DamageFor("gondor", "recruit") == 3.1f && fs90.Config.DamageFor("elves", "captain") == 9.6f && fs90.Config.DamageFor("mordor", "archer") == 2.6f
+                 && EntityBehaviorFactionMember.RankOf(Npc("test-mordororc-archer")) == "archer" && EntityBehaviorFactionMember.RankOf(Npc("test-goblin")) == null,
+-                "damage per rank: an orc recruit hits for 2.5, a Men recruit 3.05, an elf captain 9.6, an orc archer's arrow 2.45 (before the spread); the rankless goblin keeps its own");
++                "damage per rank: an orc recruit hits for 2.75, a Men recruit 3.1, an elf captain 9.6, an orc archer's arrow 2.6 (before the spread); the rankless goblin keeps its own");
+ 
+             // Shares.
+             var h90 = new HiringSystem { Factions = fs90 };
+             double men = h90.FollowShare("gondor"), orcS = h90.FollowShare("mordor"), gob = h90.FollowShare("mistymountains"), elf = h90.FollowShare("elves"), dw = h90.FollowShare("dwarves");
+-            Check(HiringSystem.Fits(4 * men, men) && !HiringSystem.Fits(5 * men, men) && HiringSystem.Fits(6 * orcS, orcS) && !HiringSystem.Fits(7 * orcS, orcS) && HiringSystem.Fits(7 * gob, gob) && !HiringSystem.Fits(8 * gob, gob)
++            Check(HiringSystem.Fits(4 * men, men) && !HiringSystem.Fits(5 * men, men) && HiringSystem.Fits(5 * orcS, orcS) && !HiringSystem.Fits(6 * orcS, orcS) && HiringSystem.Fits(7 * gob, gob) && !HiringSystem.Fits(8 * gob, gob)
+                 && HiringSystem.Fits(3 * men + orcS, orcS) && !HiringSystem.Fits(3 * men + 2 * orcS, orcS) && !HiringSystem.Fits(3 * men + 2 * orcS, gob)
+                 && HiringSystem.Fits(2 * elf + dw, dw) && HiringSystem.Fits(elf + 5 * gob, gob) && !HiringSystem.Fits(4 * men, elf),
+-                "follow shares: 5 men, 7 orcs or 8 goblins fill a band; 3 men and 2 orcs fit but not a third orc or a goblin; 2 elves and 2 dwarves fill it exactly; 4 men leave no room for an elf (never over 1)");
++                "follow shares: 5 men, 6 orcs or 8 goblins fill a band; 3 men and 2 orcs fit but not a third orc or a goblin; 2 elves and 2 dwarves fill it exactly; 4 men leave no room for an elf (never over 1)");
+             Check(h90.FollowShare("nobody") == 0.2 && Math.Abs(h90.RosterShare("mordor") - 1.0 / 22) < 1e-12 && Math.Abs(h90.RosterShare(null) - 1.0 / 16) < 1e-12,
+                 "an unknown faction takes the baseline share (1/5, 1/16); an orc takes 1/22 of the roster");
+             var room = h90.Room("uidNobody", "mordor");
+             JObject langJ = lang;
+             string LangF(string k, object[] a) { string t = (string)langJ[k] ?? ("lotrnpcs:" + k); return a.Length == 0 ? t : string.Format(t, a); }
+-            Check(room.Count == 1 && room[0].Faction == "mordor" && room[0].Count == 7 && HiringSystem.RoomText(room, LangF) == "Room in your band: Mordor orcs 7."
++            Check(room.Count == 1 && room[0].Faction == "mordor" && room[0].Count == 6 && HiringSystem.RoomText(room, LangF) == "Room in your band: Mordor orcs 6."
+                 && HiringSystem.RoomText(new List<RoomEntry>(), LangF) == "" && HiringSystem.Folk("rivendell", LangF) == "rivendell",
+-                "the room line: \"Room in your band: Mordor orcs 7.\" for a player with nobody following; a faction without a folk name shows its id");
++                "the room line: \"Room in your band: Mordor orcs 6.\" for a player with nobody following; a faction without a folk name shows its id");
+ 
+             // Over the limits (owner chose "B", then "BB").
+             string ou = "uidOver";
+@@ -2170,7 +2349,7 @@
+                 && FactionConfig.InstructionText.Any(l => l.StartsWith("DamageSpread")) && !FactionConfig.InstructionText.Any(l => l.Contains("Multiplier"))
+                 && FactionConfig.InstructionText.Any(l => l.StartsWith("ShareFriends") && l.Contains("hire")) && FactionConfig.InstructionText.Any(l => l.StartsWith("Hiring:") && l.Contains("ShareFriends")),
+                 "#Instructions explain follow shares, the multipliers, and that ShareFriends allies can hire each other's NPCs (owner: \"every faction they are allied to\")");
+-            Check(fs90.DescribeFactions().Contains("mordor: aggressive") && fs90.DescribeFactions().Contains("follow 7, roster 22, health 15/27/31/22, damage 2.5/2.8/5.95/2.45") && fs90.DescribeFactions().Contains("Hits vary by 20% either way."),
++            Check(fs90.DescribeFactions().Contains("mordor: aggressive") && fs90.DescribeFactions().Contains("follow 6, roster 22, health 19/30/41/30, damage 2.75/3.5/6.3/2.6") && fs90.DescribeFactions().Contains("Hits vary by 20% either way."),
+                 "/recruits faction list shows each faction's follow limit, roster and per-rank health and damage, and the hit spread");
+         }
+ 
+@@ -2191,7 +2370,7 @@
+             c92.Factions["wickeddwarves"].Joinable = false; fs92.SetConfig(c92);
+             var opts = JoinSystem.Options(c92);
+             Check(opts.Count == 17 && opts[0].Faction == "shire" && opts[1].Faction == "gondor" && opts.All(o => o.Faction != "wickeddwarves")
+-                && opts.First(o => o.Faction == "mordor").Followers == 7 && opts.First(o => o.Faction == "mordor").Roster == 22 && opts.First(o => o.Faction == "shire").Stance == "defensive",
++                && opts.First(o => o.Faction == "mordor").Followers == 6 && opts.First(o => o.Faction == "mordor").Roster == 22 && opts.First(o => o.Faction == "shire").Stance == "defensive",
+                 "the menu lists every Joinable faction in the creative tab's order, with its stance, follow limit and roster; Joinable false leaves one out");
+             var r1 = JoinSystem.Pick(fs92, "uidNew", "Frodo", "Mordor");
+             var r2 = JoinSystem.Pick(fs92, "uidNew", "Frodo", "gondor");
+@@ -2217,7 +2396,7 @@
+         {
+             var c93 = FactionConfig.FromFile(null, out _);
+             string P93(Dictionary<string, int> p) => string.Join("/", new[] { "warrior", "archer", "captain" }.Select(r => p[r]));
+-            Check(c93.Version == 23 && P93(c93.Factions["gondor"].PromotePrices) == "12/12/36" && P93(c93.Factions["shire"].PromotePrices) == "12/12/36"
++            Check(c93.Version == FactionConfig.CurrentVersion && P93(c93.Factions["gondor"].PromotePrices) == "12/12/36" && P93(c93.Factions["shire"].PromotePrices) == "12/12/36"
+                 && P93(c93.Factions["isengard"].PromotePrices) == "14/14/40" && P93(c93.Factions["dunlendings"].PromotePrices) == "10/10/29"
+                 && P93(c93.Factions["mordor"].PromotePrices) == "8/8/25" && P93(c93.Factions["gundabad"].PromotePrices) == "8/8/25" && P93(c93.Factions["mistymountains"].PromotePrices) == "6/6/21"
+                 && P93(c93.Factions["elves"].PromotePrices) == "16/16/46" && P93(c93.Factions["dwarves"].PromotePrices) == "16/16/46",
+@@ -2233,7 +2412,7 @@
+             o21["Factions"]["rohan"]["HirePrices"]["warrior"] = 20;
+             o21["Factions"]["dale"]["PromotePrices"] = Newtonsoft.Json.Linq.JObject.Parse(@"{ ""warrior"": 1, ""archer"": 10, ""captain"": 30 }");
+             var m21 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(o21.ToString()), out bool store21);
+-            Check(store21 && m21.Version == 23 && P93(m21.Factions["gondor"].PromotePrices) == "12/12/36" && P93(m21.Factions["mordor"].PromotePrices) == "8/8/25"
++            Check(store21 && m21.Version == FactionConfig.CurrentVersion && P93(m21.Factions["gondor"].PromotePrices) == "12/12/36" && P93(m21.Factions["mordor"].PromotePrices) == "8/8/25"
+                 && P93(m21.Factions["mistymountains"].PromotePrices) == "6/6/21" && P93(m21.Factions["elves"].PromotePrices) == "13/13/99"
+                 && P93(m21.Factions["rohan"].PromotePrices) == "17/12/36" && P93(m21.Factions["dale"].PromotePrices) == "1/10/30",
+                 "a version 21 file: promotion prices as shipped become hire price less the discount (an admin's hire price counts); promotion prices the admin changed stay");
+@@ -2333,8 +2512,8 @@
+             foreach (var f in ((Newtonsoft.Json.Linq.JObject)o22["Factions"]).Properties()) f.Value["HireCoin"] = "coinage:planchet-silver-lg";
+             o22["Factions"]["rohan"]["HireCoin"] = "game:ingot-copper";
+             var m22 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(o22.ToString()), out bool store22);
+-            Check(c94.Version == 23 && c94.Factions.Values.All(d => d.HireCoin == "game:gear-rusty") && FactionConfig.DefaultHireCoin == "game:gear-rusty"
+-                && store22 && m22.Version == 23 && m22.Factions.Where(kv => kv.Key != "rohan").All(kv => kv.Value.HireCoin == "game:gear-rusty") && m22.Factions["rohan"].HireCoin == "game:ingot-copper",
++            Check(c94.Version == FactionConfig.CurrentVersion && c94.Factions.Values.All(d => d.HireCoin == "game:gear-rusty") && FactionConfig.DefaultHireCoin == "game:gear-rusty"
++                && store22 && m22.Version == FactionConfig.CurrentVersion && m22.Factions.Where(kv => kv.Key != "rohan").All(kv => kv.Value.HireCoin == "game:gear-rusty") && m22.Factions["rohan"].HireCoin == "game:ingot-copper",
+                 "hiring and promotion are paid in rusty gears; a version 22 file's planchets become rusty gears, a coin the admin chose stays");
+         }
+ 
+diff -ruN '--exclude=bin' '--exclude=obj' '--exclude=out' a/lotrnpcs/tools/tests/factions/factions-default.json b/lotrnpcs/tools/tests/factions/factions-default.json
+--- a/lotrnpcs/tools/tests/factions/factions-default.json	2026-11-07 23:53:32.000000000 +0000
++++ b/lotrnpcs/tools/tests/factions/factions-default.json	2026-11-09 19:12:41.328529938 +0000
+@@ -15,16 +15,17 @@
+     "Relations: how two factions treat each other. Relation is \"ally\", \"enemy\" or \"neutral\", and two factions without an entry are enemies. No factions are allies by default. Allies never fight and come to help each other; neutral factions leave each other's NPCs alone.",
+     "ShareFriends (allies only): true makes each faction's members safe from the other's NPCs too, and lets them hire the other's NPCs. Otherwise a player is safe only from their own factions and hires only from them.",
+     "MonsterCodes: creatures every faction attacks on sight (* is a wildcard). GrudgeSeconds: how long NPCs fight someone who hurt them or an ally. CallForHelpRange: how many blocks away allies come to help.",
+-    "MaxAttackersPerTarget: how many NPCs may fight one NPC at a time. 0 (the default) means no limit. With a limit, the rest look for another enemy, wait one step behind in a battle line, or, outside a line, join a full enemy anyway when there is no other within reach. Either way an NPC takes an enemy nobody is fighting before one already being fought. Players are never limited, and an NPC always strikes back at whoever hits it.",
++    "RosterPerCaptain: one captain per this many places of a faction's roster (8 by default: Men 2, orcs and goblins 3, elves and dwarves 1, Uruk-hai and Dunlendings 2). Hiring or promoting past it is refused; captains a player already has stay. With several factions on one roster each captain counts its share. 0 means no limit.",
++    "MaxAttackersPerTarget: how many NPCs may fight one NPC at a time. 4 by default; 0 means no limit. With a limit, the rest look for another enemy, wait one step behind in a battle line, or, outside a line, join a full enemy anyway when there is no other within reach. Either way an NPC takes an enemy nobody is fighting before one already being fought. Players are never limited, and an NPC always strikes back at whoever hits it.",
+     "CombatSpacing: how far apart, in blocks, fighting NPCs of the same side keep from each other, and the gap between neighbours in a battle line (0.8 to 4, 1.5 by default). Enemies only keep DuelDistanceMin apart. As many attackers as fit round an enemy this far apart (5 by default) fight it; the others take another enemy with room first, or else wait in a second ring one CombatSpacing farther out and step in when a place opens.",
+     "DuelDistanceMin and DuelDistanceMax: how far from the center of the NPC it fights an attacker stands (1.0 to 1.6 blocks by default): it closes in when farther, steps back when closer, and stands and fights in between. Players are approached the vanilla way.",
+-    "BattleLines (false by default: NPCs fight first and keep formation second): true makes groups of NPCs line up when they meet another faction's NPCs, waiting in their places until an enemy comes near: wild NPCs, and recruits following in any formation but Loose. Each NPC takes an enemy nobody is fighting first, so the lines pair off, and the extras join in on enemies already being fought (with a MaxAttackersPerTarget limit, the rest wait one step behind until a place opens). Wild NPCs and aggressive or raid recruits march to meet the enemy; defensive recruits hold their line until an enemy is within LineHoldRange blocks. Loose followers, guards, archers, and fights with players or monsters don't make lines.",
++    "BattleLines (true by default): groups of NPCs line up when they meet another faction's NPCs, waiting in their places until an enemy comes near: wild NPCs, and recruits following in any formation but Loose. The front rank has one place per enemy; when the lines meet each front NPC fights the enemy facing it from its place in the line. NPCs past that (the side outnumbers the enemy) wait one step behind until the lines meet, then go round to surround, up to MaxAttackersPerTarget on one enemy. Wild NPCs and aggressive or raid recruits march to meet the enemy; defensive recruits hold their line until an enemy is within LineHoldRange blocks. Loose followers, guards, archers, and fights with players or monsters don't make lines. false lets NPCs fight as they find enemies.",
+     "HelmetChance: the chance (0 to 1) that a newly spawned NPC that may go bare-headed wears its outfit's helmet. Which units may go bare-headed is set by the mod for each unit (all orcs and Uruk-hai, and the units of other factions marked so); the others always spawn with theirs. A helmet it doesn't wear is kept, and its owner can put it on or take any helmet off from the recruit's menu. Helmets are only for looks: NPC protection comes from rank. CaptainsAlwaysHelmeted: true makes every captain always wear theirs (false by default since 0.0.82).",
+     "ShieldChance: the chance (0 to 1) that a newly spawned Mordor orc carries a shield. Shields are only for looks, are never carried with the poleaxe, and the owner can take one off or put it on from the recruit's menu.",
+     "HealthRegenSpeed: how fast NPCs heal out of combat, as a multiple of vanilla's creature healing (1 = vanilla, 0.01 health a second; 30 = 0.3 a second). RegenDelaySeconds: how long after its last hit an NPC starts healing at that speed.",
+     "Version: the file format. Don't change it; the mod updates older files once."
+   ],
+-  "Version": 23,
++  "Version": 27,
+   "Factions": {
+     "gondor": {
+       "Stance": "aggressive",
+@@ -49,13 +50,13 @@
+         "recruit": 22.0,
+         "warrior": 34.0,
+         "captain": 48.0,
+-        "archer": 34.0
++        "archer": 35.0
+       },
+       "Damage": {
+-        "recruit": 3.05,
++        "recruit": 3.1,
+         "warrior": 4.0,
+-        "captain": 7.05,
+-        "archer": 3.0
++        "captain": 7.0,
++        "archer": 3.05
+       }
+     },
+     "rohan": {
+@@ -81,13 +82,13 @@
+         "recruit": 22.0,
+         "warrior": 34.0,
+         "captain": 48.0,
+-        "archer": 34.0
++        "archer": 35.0
+       },
+       "Damage": {
+-        "recruit": 3.05,
++        "recruit": 3.1,
+         "warrior": 4.0,
+-        "captain": 7.05,
+-        "archer": 3.0
++        "captain": 7.0,
++        "archer": 3.05
+       }
+     },
+     "dale": {
+@@ -113,13 +114,13 @@
+         "recruit": 22.0,
+         "warrior": 34.0,
+         "captain": 48.0,
+-        "archer": 34.0
++        "archer": 35.0
+       },
+       "Damage": {
+-        "recruit": 3.05,
++        "recruit": 3.1,
+         "warrior": 4.0,
+-        "captain": 7.05,
+-        "archer": 3.0
++        "captain": 7.0,
++        "archer": 3.05
+       }
+     },
+     "arnor": {
+@@ -145,13 +146,13 @@
+         "recruit": 22.0,
+         "warrior": 34.0,
+         "captain": 48.0,
+-        "archer": 34.0
++        "archer": 35.0
+       },
+       "Damage": {
+-        "recruit": 3.05,
++        "recruit": 3.1,
+         "warrior": 4.0,
+-        "captain": 7.05,
+-        "archer": 3.0
++        "captain": 7.0,
++        "archer": 3.05
+       }
+     },
+     "haradrim": {
+@@ -179,13 +180,13 @@
+         "recruit": 22.0,
+         "warrior": 34.0,
+         "captain": 48.0,
+-        "archer": 34.0
++        "archer": 35.0
+       },
+       "Damage": {
+-        "recruit": 3.05,
++        "recruit": 3.1,
+         "warrior": 4.0,
+-        "captain": 7.05,
+-        "archer": 3.0
++        "captain": 7.0,
++        "archer": 3.05
+       }
+     },
+     "dunlendings": {
+@@ -212,14 +213,14 @@
+       "Health": {
+         "recruit": 18.0,
+         "warrior": 29.0,
+-        "captain": 41.0,
++        "captain": 42.0,
+         "archer": 28.0
+       },
+       "Damage": {
+-        "recruit": 2.7,
+-        "warrior": 3.4,
+-        "captain": 6.0,
+-        "archer": 2.6
++        "recruit": 2.9,
++        "warrior": 3.6,
++        "captain": 6.1,
++        "archer": 2.8
+       }
+     },
+     "blacknumenoreans": {
+@@ -247,13 +248,13 @@
+         "recruit": 22.0,
+         "warrior": 34.0,
+         "captain": 48.0,
+-        "archer": 34.0
++        "archer": 35.0
+       },
+       "Damage": {
+-        "recruit": 3.05,
++        "recruit": 3.1,
+         "warrior": 4.0,
+-        "captain": 7.05,
+-        "archer": 3.0
++        "captain": 7.0,
++        "archer": 3.05
+       }
+     },
+     "easterlings": {
+@@ -282,13 +283,13 @@
+         "recruit": 22.0,
+         "warrior": 34.0,
+         "captain": 48.0,
+-        "archer": 34.0
++        "archer": 35.0
+       },
+       "Damage": {
+-        "recruit": 3.05,
++        "recruit": 3.1,
+         "warrior": 4.0,
+-        "captain": 7.05,
+-        "archer": 3.0
++        "captain": 7.0,
++        "archer": 3.05
+       }
+     },
+     "dwarves": {
+@@ -317,14 +318,14 @@
+       "Health": {
+         "recruit": 30.0,
+         "warrior": 46.0,
+-        "captain": 63.0,
+-        "archer": 46.0
++        "captain": 61.0,
++        "archer": 47.0
+       },
+       "Damage": {
+-        "recruit": 3.25,
+-        "warrior": 4.35,
+-        "captain": 7.9,
+-        "archer": 3.4
++        "recruit": 3.15,
++        "warrior": 4.15,
++        "captain": 7.8,
++        "archer": 3.3
+       }
+     },
+     "wickeddwarves": {
+@@ -351,14 +352,14 @@
+       "Health": {
+         "recruit": 30.0,
+         "warrior": 46.0,
+-        "captain": 63.0,
+-        "archer": 46.0
++        "captain": 61.0,
++        "archer": 47.0
+       },
+       "Damage": {
+-        "recruit": 3.25,
+-        "warrior": 4.35,
+-        "captain": 7.9,
+-        "archer": 3.4
++        "recruit": 3.15,
++        "warrior": 4.15,
++        "captain": 7.8,
++        "archer": 3.3
+       }
+     },
+     "shire": {
+@@ -389,13 +390,13 @@
+         "recruit": 22.0,
+         "warrior": 34.0,
+         "captain": 48.0,
+-        "archer": 34.0
++        "archer": 35.0
+       },
+       "Damage": {
+-        "recruit": 3.05,
++        "recruit": 3.1,
+         "warrior": 4.0,
+-        "captain": 7.05,
+-        "archer": 3.0
++        "captain": 7.0,
++        "archer": 3.05
+       }
+     },
+     "elves": {
+@@ -423,14 +424,14 @@
+       "MaxRecruits": 13,
+       "Joinable": true,
+       "Health": {
+-        "recruit": 27.0,
+-        "warrior": 37.0,
+-        "captain": 53.0,
+-        "archer": 37.0
++        "recruit": 26.0,
++        "warrior": 36.0,
++        "captain": 50.0,
++        "archer": 36.0
+       },
+       "Damage": {
+         "recruit": 3.65,
+-        "warrior": 5.4,
++        "warrior": 5.35,
+         "captain": 9.6,
+         "archer": 4.25
+       }
+@@ -457,14 +458,14 @@
+       "MaxRecruits": 13,
+       "Joinable": true,
+       "Health": {
+-        "recruit": 27.0,
+-        "warrior": 37.0,
+-        "captain": 53.0,
+-        "archer": 37.0
++        "recruit": 26.0,
++        "warrior": 36.0,
++        "captain": 50.0,
++        "archer": 36.0
+       },
+       "Damage": {
+         "recruit": 3.65,
+-        "warrior": 5.4,
++        "warrior": 5.35,
+         "captain": 9.6,
+         "archer": 4.25
+       }
+@@ -485,20 +486,20 @@
+         "archer": 8,
+         "captain": 25
+       },
+-      "MaxFollowers": 7,
++      "MaxFollowers": 6,
+       "MaxRecruits": 22,
+       "Joinable": true,
+       "Health": {
+-        "recruit": 15.0,
+-        "warrior": 27.0,
+-        "captain": 31.0,
+-        "archer": 22.0
++        "recruit": 19.0,
++        "warrior": 30.0,
++        "captain": 41.0,
++        "archer": 30.0
+       },
+       "Damage": {
+-        "recruit": 2.5,
+-        "warrior": 2.8,
+-        "captain": 5.95,
+-        "archer": 2.45
++        "recruit": 2.75,
++        "warrior": 3.5,
++        "captain": 6.3,
++        "archer": 2.6
+       }
+     },
+     "angmar": {
+@@ -517,20 +518,20 @@
+         "archer": 8,
+         "captain": 25
+       },
+-      "MaxFollowers": 7,
++      "MaxFollowers": 6,
+       "MaxRecruits": 22,
+       "Joinable": true,
+       "Health": {
+-        "recruit": 15.0,
+-        "warrior": 27.0,
+-        "captain": 31.0,
+-        "archer": 22.0
++        "recruit": 19.0,
++        "warrior": 30.0,
++        "captain": 41.0,
++        "archer": 30.0
+       },
+       "Damage": {
+-        "recruit": 2.5,
+-        "warrior": 2.8,
+-        "captain": 5.95,
+-        "archer": 2.45
++        "recruit": 2.75,
++        "warrior": 3.5,
++        "captain": 6.3,
++        "archer": 2.6
+       }
+     },
+     "mistymountains": {
+@@ -553,15 +554,15 @@
+       "MaxRecruits": 26,
+       "Joinable": true,
+       "Health": {
+-        "recruit": 16.0,
+-        "warrior": 21.0,
+-        "captain": 31.0,
+-        "archer": 19.0
++        "recruit": 18.0,
++        "warrior": 24.0,
++        "captain": 34.0,
++        "archer": 22.0
+       },
+       "Damage": {
+         "recruit": 1.85,
+-        "warrior": 2.85,
+-        "captain": 4.75,
++        "warrior": 2.8,
++        "captain": 4.85,
+         "archer": 2.2
+       }
+     },
+@@ -581,20 +582,20 @@
+         "archer": 8,
+         "captain": 25
+       },
+-      "MaxFollowers": 7,
++      "MaxFollowers": 6,
+       "MaxRecruits": 22,
+       "Joinable": true,
+       "Health": {
+-        "recruit": 15.0,
+-        "warrior": 27.0,
+-        "captain": 31.0,
+-        "archer": 22.0
++        "recruit": 19.0,
++        "warrior": 30.0,
++        "captain": 41.0,
++        "archer": 30.0
+       },
+       "Damage": {
+-        "recruit": 2.5,
+-        "warrior": 2.8,
+-        "captain": 5.95,
+-        "archer": 2.45
++        "recruit": 2.75,
++        "warrior": 3.5,
++        "captain": 6.3,
++        "archer": 2.6
+       }
+     },
+     "isengard": {
+@@ -620,13 +621,13 @@
+         "recruit": 23.0,
+         "warrior": 32.0,
+         "captain": 48.0,
+-        "archer": 35.0
++        "archer": 36.0
+       },
+       "Damage": {
+         "recruit": 2.95,
+-        "warrior": 4.3,
+-        "captain": 7.15,
+-        "archer": 2.95
++        "warrior": 4.35,
++        "captain": 7.1,
++        "archer": 3.0
+       }
+     }
+   },
+@@ -649,14 +650,15 @@
+   "CallForHelpRange": 16,
+   "MaxRecruits": 16,
+   "MaxFollowers": 5,
++  "RosterPerCaptain": 8,
+   "HealthRegenSpeed": 30.0,
+   "RegenDelaySeconds": 10,
+   "GuardRadius": 16,
+-  "MaxAttackersPerTarget": 0,
++  "MaxAttackersPerTarget": 4,
+   "CombatSpacing": 1.5,
+   "HelmetChance": 0.6,
+   "CaptainsAlwaysHelmeted": false,
+-  "BattleLines": false,
++  "BattleLines": true,
+   "DuelDistanceMin": 1.0,
+   "DuelDistanceMax": 1.6,
+   "LineHoldRange": 6.0,
+diff -ruN '--exclude=bin' '--exclude=obj' '--exclude=out' a/lotrnpcs/tools/tests/spawnzones/Program.cs b/lotrnpcs/tools/tests/spawnzones/Program.cs
+--- a/lotrnpcs/tools/tests/spawnzones/Program.cs	2026-11-06 06:26:13.000000000 +0000
++++ b/lotrnpcs/tools/tests/spawnzones/Program.cs	2026-11-09 19:13:10.123864505 +0000
+@@ -333,14 +333,14 @@
+             (int, int) Escort(string f) { var gs = Many(f, true); return (gs.Min(g => g.Count) - 1, gs.Max(g => g.Count) - 1); }
+             var menG = Many("gondor", false); var orcG = Many("mordor", false);
+             Console.WriteLine($"   > largest groups: men {MaxSize("gondor")}, levy {MaxSize("dunlendings")}, orcs {MaxSize("mordor")}, goblins {MaxSize("mistymountains")}, elves {MaxSize("elves")}, dwarves {MaxSize("dwarves")}; average men {menG.Average(g => g.Count):F2}, orcs {orcG.Average(g => g.Count):F2}");
+-            Check(MaxSize("gondor") == 5 && MaxSize("isengard") == 5 && MaxSize("dunlendings") == 6 && MaxSize("mordor") == 7 && MaxSize("mistymountains") == 8 && MaxSize("elves") == 4 && MaxSize("dwarves") == 4 && MaxSize("shire") == 5,
+-                "wild groups are up to 5 men or Uruks, 6 Dunlendings, 7 orcs, 8 goblins, 4 elves or dwarves");
+-            Check(orcG.Average(g => g.Count) > menG.Average(g => g.Count) * 1.25 && menG.All(g => g[0] == "recruit") && orcG.All(g => g[0] == "recruit"),
++            Check(MaxSize("gondor") == 5 && MaxSize("isengard") == 5 && MaxSize("dunlendings") == 6 && MaxSize("mordor") == 6 && MaxSize("mistymountains") == 8 && MaxSize("elves") == 4 && MaxSize("dwarves") == 4 && MaxSize("shire") == 5,
++                "wild groups are up to 5 men or Uruks, 6 Dunlendings, 6 orcs (0.0.107), 8 goblins, 4 elves or dwarves");
++            Check(orcG.Average(g => g.Count) > menG.Average(g => g.Count) * 1.1 && menG.All(g => g[0] == "recruit") && orcG.All(g => g[0] == "recruit"),
+                 "orc groups are bigger on average than men's, and every group still starts with a recruit");
+             Check(Escort("gondor") == (1, 3) && Escort("mordor") == (1, 4) && Escort("mistymountains") == (1, 5) && Escort("elves") == (1, 2),
+                 "a captain's escort is 1 to 3 for men, 1 to 4 for orcs, 1 to 5 for goblins, 1 to 2 for elves");
+-            Check(Math.Abs(fc.GroupScaleOf("mordor") - 1.4) < 1e-9 && Math.Abs(1 / fc.GroupScaleOf("mistymountains") - 0.625) < 1e-9 && Math.Abs(1 / fc.GroupScaleOf("elves") - 1.25) < 1e-9 && fc.GroupScaleOf("nobody") == 1,
+-                "in MaxNearby an orc counts 5/7, a goblin 5/8 and an elf 5/4 of a man; an unknown faction counts as one");
++            Check(Math.Abs(fc.GroupScaleOf("mordor") - 1.2) < 1e-9 && Math.Abs(1 / fc.GroupScaleOf("mistymountains") - 0.625) < 1e-9 && Math.Abs(1 / fc.GroupScaleOf("elves") - 1.25) < 1e-9 && fc.GroupScaleOf("nobody") == 1,
++                "in MaxNearby an orc counts 5/6 (0.0.107), a goblin 5/8 and an elf 5/4 of a man; an unknown faction counts as one");
+             // Eight goblins nearby weigh 5, under MaxNearby 8: another group may still come. Eight elves weigh 10: none.
+             typeof(SpawnZoneSystem).GetField("groupScale", F).SetValue(sys, (System.Func<string, double>)(f => fc.GroupScaleOf(f)));
+             var weight = typeof(SpawnZoneSystem).GetMethod("Weight", F);

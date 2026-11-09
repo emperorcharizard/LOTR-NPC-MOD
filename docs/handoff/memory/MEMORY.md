@@ -1,0 +1,37 @@
+- [vs-base-code-reference](vs-base-code-reference.md) — NPC base-code reference doc link + key class/file facts from anegostudios repos
+- [example-npc-mods](example-npc-mods.md) — 40 example mod zips: locations, ingestion report link, key takeaways
+- Working style (user, 2026-10-30): act as critical advisor/design interviewer. Challenge ideas, no empty praise; ask one question at a time, most important first; push back on vague answers; offer alternatives with a recommendation; separate confirmed facts / user intent / interpretation / recommendation / open questions; never invent project details; no code or file changes until the user agrees on direction and asks to implement.
+- Mod goal (user, 2026-10-30): for a LOTR-themed Vintage Story server. NPCs from all LOTR races dotted around the map; players either fight them or tame/use them. Aim: more realistic enemies than vanilla skeletons/drifters. User has further goals still being drawn out in "Design the NPC mod maker" thread.
+- [npc-mod-maker-goals](npc-mod-maker-goals.md) — design doc link + all confirmed design decisions for the LOTR NPC mod + open questions
+- [lotrnpcs-build](lotrnpcs-build.md) — where the lotrnpcs mod source/test zips live and how it is built without game DLLs (stub API)
+- LRC assets (user, 2026-10-30): user has LRC authors' permission to bundle LRC race assets, with credits in the config. Mod must work on two servers, one without LRC, so bundle only used races under our name, disabled for players; Player Model Lib stays a dependency.
+- Faction armor assets (user, 2026-11-02, replaces 2026-10-31 bundling decision): do NOT bundle faction armor. Orcs reference armor from the installed faction mods (Mordor, Angmar, Misty Mountains, Isengard); missing mod → vanilla outfit fallback. Done in lotrnpcs 0.0.25.
+- Creative tab (user, 2026-11-02): NPCs have their own "LOTR NPCs" creative tab. Done in 0.0.26.
+- Captain armor (user, 2026-11-02): Angmar captains = Wight Guard, Misty Mountains captains = Gundabad Warlord (0.0.27); Mordor captain = red warrior armor + red Servant of the Eye helmet (in progress).
+- Angmar orcs (user, 2026-11-02): aggressive. Their side still open.
+- Spawning (user, 2026-11-02): orc recruits/warriors spawn naturally only inside admin zones (rectangles, overlap and multi-faction allowed, /lotrzone), rarer than animals, captains very rare; modelled on Fantasy Creatures goblins. Replaces camps. Built in lotrnpcs 0.0.29.
+- Player Model Lib 1.24.0 bug: NPCs shrink camera near plane cumulatively → world render glitches. lotrnpcs 0.0.28 blocks non-own entities changing it; user confirmed fixed.
+- [combat-overhaul-numbers](combat-overhaul-numbers.md) — Combat Overhaul armor formula, CO drifter stats, LOTR faction armor resists, for NPC rank balancing
+- [server-modpack](server-modpack.md) — full server modpack ingestion report link + NPC-relevant findings (faction armor, CO resists player-only, skipped patches)
+- [npc-ai-tuning](npc-ai-tuning.md) — orc AI chase speed, swing cadence and awareness (seek range, scan rate) values + vanilla AI code facts
+- [lotrnpcs-factions](lotrnpcs-factions.md) — faction system (0.0.31-0.0.35): 17 factions, all aggressive but Shire, allies only via config, /lotrfaction set, hire prices 5/15/40, migration
+- [lotrnpcs-hiring](lotrnpcs-hiring.md) — hiring: talk menu + hire (0.0.37); hold-R orders menu, formations, stances (0.0.38); Guard here + /hirelings whitelist (0.0.44)
+- Hire caps (user, 2026-11-03): hire up to 16 (changed from 15 in 0.0.51), max 5 following at once; extra hires guard where hired. Settings in lotrnpcs-factions.json.
+- Shared guards (user, 2026-11-03): opt-in "Guard this area for our people" option; owner's /group members borrow free (counts to their 5), returns to watch when posted/logoff; owner keeps ownership. Built 0.0.49.
+- Guard formations (user, 2026-11-03): guards in a formation stand still in it at their post (user chose this over marching); Loose patrols. 0.0.50; 0.0.51 tightened spots and stopped idle spinning (untested in game).
+- [lotrnpcs-performance](lotrnpcs-performance.md) — targeting benchmark and 0.0.43 vs 0.0.44 numbers, VS API hot-path costs (GetString interns), cache rules
+- [lotrnpcs-outfits](lotrnpcs-outfits.md) — user-picked Haradrim/Easterling/tormented elf outfits (0.0.41), "@slot" gear syntax, vanilla item name source
+- [lotrnpcs-weapons](lotrnpcs-weapons.md) — 0.0.45 cosmetic Mordor orc weapons: client-only hand slot, grips/anims/impact frames, texture swaps, offline preview tool
+- Weapons (user, 2026-11-03): dagger orientation as of 0.0.46 is correct (user confirmed); user's textures bundled 0.0.46; poleaxe guard grip fixed 0.0.48 (untested in game).
+- Coinage silver planchet code: coinage:planchet-silver-lg (for hire prices).
+- Active thread: "Continue polishing the LOTR NPC mod" (replaced "Build Guard here and polish the NPC mod", which hit its attachment limit).
+- [lotrnpcs-archery](lotrnpcs-archery.md) — 0.0.55 rankless Mordor orc archers + cosmetic shield (no poleaxe): decisions, AI values, rig transforms
+- 0.0.57 (built 2026-11-03, untested in game): 0.0.55 + 0.0.56 (shield across forearm, rank-then-name titles, rival enemy groups) + Mordor orcs without tusks (LRC faces).
+- [lotrnpcs-titles-rivals](lotrnpcs-titles-rivals.md) — 0.0.56: "Warrior Gorbag" titles instead of "hireling", RivalGroupChance enemy groups in shared/overlapping zones
+- [lotrnpcs-0058-0063](lotrnpcs-0058-0063.md) — second account (2026-11-03 evening): 0.0.58 to 0.0.63, R fix, helmet chooser, bow rest/draw, planchet coin, Gundabad faction + armor fix
+- Latest build 0.0.63 (2026-11-03). Earlier lines in this index stop at 0.0.57; HANDOFF.md section 3 Summary is the current state.
+- [lotrnpcs-base-0063](lotrnpcs-base-0063.md) — third account (2026-11-04): how it took over the 0.0.63 base, verified build, the Gundabad mod name conflict (resolved: `gundabad` is the real armor mod)
+- [gundabad-armor-fixes](gundabad-armor-fixes.md) — third account: gundabad-bone-armor 0.1.2, 0.1.3, 0.2.0 (owner's new chest piece), lotrnpcs 0.0.64 (later removed hair), vsrender view labels
+- [lotrnpcs-0065-0071](lotrnpcs-0065-0071.md) — third account: lotrnpcs 0.0.65-0.0.72: owner's orc weapons + knife, dreadlocks/messy hair, poleaxe chop, archers for every faction but the Shire, owner's bow and shields, creative tab grouped by faction
+- Latest build (2026-11-04): lotrnpcs 0.0.72 (`lotrnpcs/dist/`), gundabad-bone-armor 0.2.0 (`build-inputs/`). HANDOFF.md section 3 Summary is the current state.
+- [lotrnpcs-0077](lotrnpcs-0077.md) — second account: lotrnpcs 0.0.77: server animations from base shape, follow-and-fight, crowding fallback, archers, Easterling shield.

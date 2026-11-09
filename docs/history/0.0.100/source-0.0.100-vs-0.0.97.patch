@@ -1,0 +1,307 @@
+--- a/lotrnpcs/src/Battle.cs	2026-11-05 04:02:20.000000000 +0000
++++ b/lotrnpcs/src/Battle.cs	2026-11-08 19:23:15.863595994 +0000
+@@ -92,6 +92,41 @@
+             public int Count;
+         }
+ 
++        // 0.0.98 (owner, 2026-11-08: in a 3 on 1 "they all swing at the same time, but only ones damage is applied"; owner
++        // chose staggered swings over skipping the game's hurt window): after any hit the game drops further damage to
++        // that entity for 500 ms ("invulnerable" activity, EntityBehaviorHealth). Target -> earliest time the next of our
++        // melee hits on it may land, so attackers take turns at least HitGapMs apart instead of hitting in unison.
++        public const int HitGapMs = 550, HitJitterMs = 200;
++        readonly Dictionary<long, long> nextHitAt = new Dictionary<long, long>();
++        readonly List<long> hitSweepKeys = new List<long>();
++        long nextHitSweep;
++
++        // Every 10 s drops turns that have passed, so targets that never die or unload through our behavior (players,
++        // animals) don't pile up.
++        void SweepHits(long now)
++        {
++            nextHitSweep = now + 10000;
++            hitSweepKeys.Clear();
++            foreach (KeyValuePair<long, long> kv in nextHitAt) if (kv.Value < now) hitSweepKeys.Add(kv.Key);
++            foreach (long key in hitSweepKeys) nextHitAt.Remove(key);
++        }
++
++        /// <summary>For tests: how many targets have a booked melee turn.</summary>
++        public int TrackedHitTurns => nextHitAt.Count;
++
++        /// <summary>How long (ms) a melee hit that would land at hitAt (world ms) must wait to be clear of the last booked
++        /// hit on the target; 0 when it is clear now.</summary>
++        public long HitWaitMs(long target, long hitAt) => nextHitAt.TryGetValue(target, out long free) && hitAt < free ? free - hitAt : 0;
++
++        /// <summary>Books a melee hit on the target landing at hitAt: the next one waits HitGapMs plus jitterMs after it.
++        /// A later booking for the same hit (the swing landed late, after turning) only ever moves the turn later.</summary>
++        public void BookHit(long target, long hitAt, int jitterMs)
++        {
++            if (hitAt >= nextHitSweep) SweepHits(hitAt);
++            long next = hitAt + HitGapMs + Math.Max(0, jitterMs);
++            if (!nextHitAt.TryGetValue(target, out long free) || next > free) nextHitAt[target] = next;
++        }
++
+         readonly Dictionary<long, Claims> byTarget = new Dictionary<long, Claims>();
+         // Attacker -> the target it claimed (one at a time).
+         readonly Dictionary<long, long> byAttacker = new Dictionary<long, long>();
+@@ -171,6 +206,7 @@
+         public void Forget(long id)
+         {
+             Release(id);
++            nextHitAt.Remove(id);
+             if (!byTarget.TryGetValue(id, out Claims c)) return;
+             for (int i = 0; i < c.Count; i++)
+             {
+--- a/lotrnpcs/src/LotrNpcsModSystem.cs	2026-11-06 06:24:50.000000000 +0000
++++ b/lotrnpcs/src/LotrNpcsModSystem.cs	2026-11-08 19:29:51.785262820 +0000
+@@ -124,6 +124,14 @@
+         // The damage the task's config gives (0.0.90), used when the faction has none for this rank, and the rank.
+         readonly float baseDamage;
+         readonly string rank;
++        // The task's own damagePlayerAtMs, used when the weapon has no wind-up of its own (0.0.99).
++        readonly int baseHitMs;
++        // 0.0.99 swing sync: when this attack started, and whether its swing animation has begun.
++        long startedMs;
++        bool swingStarted;
++        // Longest the damage timer waits for the NPC to turn to its target before the vanilla timing takes over (so
++        // an attack on a target it can never face still ends).
++        const long MaxTurnWaitMs = 1000;
+ 
+         public AiTaskChestMeleeAttack(EntityAgent entity, JsonObject taskConfig, JsonObject aiConfig) : base(entity, taskConfig, aiConfig)
+         {
+@@ -131,6 +139,7 @@
+             faction = FactionSystem.FactionOf(entity);
+             unarmedAnimation = animMeta;
+             baseDamage = damage;
++            baseHitMs = damagePlayerAtMs;
+             rank = EntityBehaviorFactionMember.RankOf(entity);
+         }
+ 
+@@ -153,14 +162,37 @@
+         public override bool ShouldExecute()
+         {
+             if (!base.ShouldExecute()) return false;
+-            if (factions == null || targetEntity == null || targetEntity == attackedByEntity) return true;
+-            long claimed = factions.Spacing.TargetOf(entity.EntityId, entity.World.ElapsedMilliseconds);
+-            if (claimed == 0 || claimed == targetEntity.EntityId) return true;
+-            Entity partner = entity.World.GetEntityById(claimed);
+-            if (partner != null && partner.Alive && hasDirectContact(partner, minDist, minVerDist)) targetEntity = partner;
++            if (factions == null || targetEntity == null) return true;
++            if (targetEntity != attackedByEntity)
++            {
++                long claimed = factions.Spacing.TargetOf(entity.EntityId, entity.World.ElapsedMilliseconds);
++                if (claimed != 0 && claimed != targetEntity.EntityId)
++                {
++                    Entity partner = entity.World.GetEntityById(claimed);
++                    if (partner != null && partner.Alive && hasDirectContact(partner, minDist, minVerDist)) targetEntity = partner;
++                }
++            }
++            // 0.0.99: this weapon's own wind-up (gen HIT_MS), set before the turn check below, which uses it.
++            int weaponHitMs = Weapon?.HitMs ?? 0;
++            damagePlayerAtMs = weaponHitMs > 0 ? weaponHitMs : baseHitMs;
++            // 0.0.98 staggered swings (BattleSpacing.HitWaitMs): a hit that would land inside the target's hurt window
++            // after another NPC's hit would be thrown away, so this NPC waits its turn. It looks again when the turn is
++            // due (at least TurnRetryMs later), not every tick, so waiting costs no extra target searches.
++            long now = entity.World.ElapsedMilliseconds;
++            long wait = factions.Spacing.HitWaitMs(targetEntity.EntityId, now + damagePlayerAtMs);
++            if (wait > 0)
++            {
++                // The vanilla check waits attackDurationMs after lastCheckOrAttackMs.
++                lastCheckOrAttackMs = now - attackDurationMs + Math.Min(Math.Max(wait, TurnRetryMs), attackDurationMs);
++                targetEntity = null;
++                return false;
++            }
+             return true;
+         }
+ 
++        // Soonest an NPC waiting for its turn on a target looks again.
++        const long TurnRetryMs = 100;
++
+         public override void StartExecute()
+         {
+             // Battle spacing (0.0.53): a swing renews this NPC's place on its target, or takes one if it had none.
+@@ -170,6 +202,7 @@
+                 if (!(targetEntity is EntityPlayer))
+                     factions.Spacing.Swing(entity.EntityId, targetEntity.EntityId, Math.Atan2(entity.Pos.X - targetEntity.Pos.X, entity.Pos.Z - targetEntity.Pos.Z), now);
+                 entity.GetBehavior<EntityBehaviorFactionMember>()?.MarkFighting(now);
++                factions.Spacing.BookHit(targetEntity.EntityId, lastCheckOrAttackMs + damagePlayerAtMs, entity.World.Rand.Next(BattleSpacing.HitJitterMs + 1));
+             }
+             // 0.0.91: the faction's damage for this rank, read at each swing so /recruits faction reload applies at
+             // once, varied by DamageSpread (owner: "add a +-20% spread on hits"). The damage tier stays (it sets armor
+@@ -179,9 +212,28 @@
+             // Chosen before the vanilla task starts the animation, which it does once the NPC faces its target.
+             animMeta = Weapon?.AttackAnimation ?? unarmedAnimation;
+             Weapon?.Lower();
++            startedMs = entity.World.ElapsedMilliseconds;
++            swingStarted = false;
+             base.StartExecute();
+         }
+ 
++        // 0.0.99 swing sync (owner chose "Swing sync + weapon wind-ups"): vanilla counts down to the blow from when the
++        // NPC decided to attack, but starts the swing only once it faces its target, so after a turn the damage landed
++        // while the weapon was barely raised. Until the swing starts, the countdown (lastCheckOrAttackMs) is held at now,
++        // so the blow lands damagePlayerAtMs after the swing really starts, and the attack lasts its full length from
++        // there. The swing starts inside base.ContinueExecute, the same tick it is held for the last time. The game keys
++        // active animations by their shape animation (animMeta.Animation, e.g. "axehit"), not the config code.
++        public override bool ContinueExecute(float dt)
++        {
++            if (!swingStarted)
++            {
++                long now = entity.World.ElapsedMilliseconds;
++                if (animMeta != null && entity.AnimManager?.IsAnimationActive(animMeta.Animation) == true) swingStarted = true;
++                else if (now - startedMs <= MaxTurnWaitMs) lastCheckOrAttackMs = now;
++            }
++            return base.ContinueExecute(dt);
++        }
++
+         public override void FinishExecute(bool cancelled)
+         {
+             base.FinishExecute(cancelled);
+@@ -201,6 +253,8 @@
+ 
+         protected override void attackTarget()
+         {
++            // 0.0.98: the hit lands now, which is later than booked if the NPC was still turning to face its target.
++            if (factions != null && targetEntity != null) factions.Spacing.BookHit(targetEntity.EntityId, entity.World.ElapsedMilliseconds, 0);
+             if (!(targetEntity is EntityPlayer) || !ChestHitDamage.Available)
+             {
+                 base.attackTarget();
+--- a/lotrnpcs/src/Weapons.cs	2026-11-05 02:42:47.000000000 +0000
++++ b/lotrnpcs/src/Weapons.cs	2026-11-08 19:29:32.102010885 +0000
+@@ -21,6 +21,9 @@
+         /// <summary>How likely it is picked against the others in the list (0.0.82, the owner's "prefer spears" and the
+         /// like): an entry with weight 3 comes up three times as often as one with weight 1. At least 1.</summary>
+         public int Weight = 1;
++        /// <summary>When the blow lands, in ms after the swing starts (0.0.99, each weapon's own wind-up); 0 keeps the
++        /// melee task's damagePlayerAtMs.</summary>
++        public int HitMs;
+         /// <summary>The weapon in other poses, first match wins (0.0.59 the drawn bow; 0.0.73 the string pulled back by
+         /// stages). Empty when the weapon has one look.</summary>
+         public List<WeaponPose> Poses = new List<WeaponPose>();
+@@ -142,7 +145,7 @@
+                 string attack = Clean(entry?["attackAnimation"].AsString());
+                 if (item == null || attack == null || read.Any(w => w.Item == item)) continue;
+                 if (!item.Contains(':')) item = "lotrnpcs:" + item;
+-                NpcWeapon weapon = new NpcWeapon { Item = item, AttackAnimation = attack, HoldAnimation = Clean(entry["holdAnimation"].AsString()), TwoHanded = entry["twoHanded"].AsBool(false), Weight = Math.Max(1, entry["weight"].AsInt(1)) };
++                NpcWeapon weapon = new NpcWeapon { Item = item, AttackAnimation = attack, HoldAnimation = Clean(entry["holdAnimation"].AsString()), TwoHanded = entry["twoHanded"].AsBool(false), Weight = Math.Max(1, entry["weight"].AsInt(1)), HitMs = Math.Max(0, entry["hitMs"].AsInt(0)) };
+                 // "poses": [{ "item": ..., "while": { anim: [from, until] } }] (0.0.73), in order; the 0.0.59 form
+                 // "drawnItem" + "drawnWhile": { anim: until } still reads, as one pose after them.
+                 foreach (JsonObject pose in entry["poses"].AsArray() ?? Array.Empty<JsonObject>())
+@@ -279,6 +282,9 @@
+             }
+         }
+ 
++        /// <summary>Server: when the current weapon's blow lands, in ms after its swing starts, or 0 for the task's own.</summary>
++        public int HitMs => Current?.HitMs ?? 0;
++
+         /// <summary>Server: drops the guard pose before a swing.</summary>
+         public void Lower()
+         {
+--- a/lotrnpcs/tools/gen_testnpcs.py	2026-11-07 23:52:32.000000000 +0000
++++ b/lotrnpcs/tools/gen_testnpcs.py	2026-11-08 20:42:29.046450905 +0000
+@@ -43,8 +43,18 @@
+      "elementBlendMode": {"UpperArmR": "AddAverage", "LowerArmR": "AddAverage", "UpperArmL": "AddAverage", "LowerArmL": "AddAverage"}},
+ ]
+ 
+-# When a melee hit lands, in ms after the attack starts. The weapon swings below are timed to strike at this moment.
++# When a melee hit lands, in ms after the attack starts. The unarmed punch and the archers' shove strike at this moment.
+ DAMAGE_AT_MS = 400
++# 0.0.99 (owner, 2026-11-08: "Review the animations and try to improve them"; chose "Swing sync + weapon wind-ups"):
++# until 0.0.98 every weapon struck at DAMAGE_AT_MS, so the game's swings were sped up or slowed down to fit (axehit
++# 1.9x, hammerhit 1.4x, knifestab and spearhit 0.8x). Now each swing strikes when it naturally would, close to its own
++# speed: light thrusts first, heavy chops last. Only the first blow of a fight comes later; the time between blows
++# (attack plus cooldown) is unchanged, so damage per second stays the same. A swing not listed keeps DAMAGE_AT_MS.
++HIT_MS = {"knifestab": 350, "spearhit": 350, "falx": 420, "poleaxechop": 500, "hammerhit": 550, "axehit": 600}
++
++
++def hit_ms(w):
++    return HIT_MS.get(w["attack"], DAMAGE_AT_MS)
+ 
+ AI_TASKS = [
+     # Our melee task: always hits a player's chest under Combat Overhaul (user: no head shots).
+@@ -349,10 +359,17 @@
+ # world): the plate then sits on the sleeve, and those back parts sink into the arm, hidden behind the shield.
+ # Measured with the race's own body (dwarf, elf, human). The curved Gondor shield's sides wrap toward the arm, so it
+ # moves less.
+-SHIELD_IN = {"dwtowershield": 1.0, "dwshield": 1.0, "elfshield": 1.0, "boromirshield": 1.0, "gondorshield": 0.75}
++# 0.0.100 (owner, 2026-11-08: "make sure the positioning of all the weapons seems correct on your end, with no floating
++# gaps"): measured every held item against the hand (bottom 3 px of the lower arm) on the human, dwarf and elf bodies.
++# The Numenorean kite, Easterling and Gondorian shields' grips stopped 0.46 to 0.65 px short of the hand (the left hand
++# visibly not touching the handle). Moved in like the others: kite and Easterling 1.0, Gondor 0.75 -> 1.75. Now every
++# shield touches the hand; their backs sink at most 0.44 px into the forearm (Mordor's 0.38, Haradrim's 0.69, hidden
++# behind the shield) and 0.31 into the upper arm (the dwarven tower shield's 0.25).
++SHIELD_IN = {"dwtowershield": 1.0, "dwshield": 1.0, "elfshield": 1.0, "boromirshield": 1.0, "gondorshield": 1.75,
++             "kiteshield": 1.0, "eastshield": 1.0}
+ _NEW_SHIELD_ROT = dict(SHIELD["hand"]["rotation"], z=SHIELD["hand"]["rotation"]["z"] - 90)
+ KITE_SHIELD = {"model": "numenorean_kite_shield.json", "atlas": "numenorean_kite_shield.png", "name": "Numenorean shield",
+-               "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (8.0, 21.9, 12.8 - SHIELD_OUT), _NEW_SHIELD_ROT)}
++               "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (8.0, 21.9, 12.8 - SHIELD_OUT + SHIELD_IN["kiteshield"]), _NEW_SHIELD_ROT)}
+ DW_TOWER_SHIELD = {"model": "dwarven_tower_shield.json", "atlas": "dwarven_tower_shield.png", "name": "Dwarven tower shield",
+                    "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (5.25, 18.0, 7.3 - SHIELD_OUT + SHIELD_IN["dwtowershield"]), _NEW_SHIELD_ROT)}
+ DW_IRON_SHIELD = {"model": "dwarven_iron_shield.json", "atlas": "dwarven_iron_shield.png", "name": "Dwarven shield",
+@@ -361,7 +378,7 @@
+ # tools/weapons/source/easterling_shield.bbmodel): built like the tower shield, with the same upright handle bar on the
+ # back (x 6 to 6.5, y 15 to 17, z 6.78 to 7.98 on the converted model), so the tower shield's hold at that bar's middle.
+ EASTERLING_SHIELD = {"model": "easterling_shield.json", "atlas": "easterling_shield.png", "name": "Easterling shield",
+-                     "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (6.25, 16.0, 7.38 - SHIELD_OUT), _NEW_SHIELD_ROT)}
++                     "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (6.25, 16.0, 7.38 - SHIELD_OUT + SHIELD_IN["eastshield"]), _NEW_SHIELD_ROT)}
+ # 0.0.94 (owner's models, 2026-11-05/06, converted at build time from tools/weapons/source): all three are upright
+ # with the face to +Z and the handle behind, like the tower shield, so the same hold at their own handle, slid out by
+ # SHIELD_OUT. Gondor's curved shield (gondorianshieldV2) has a flat grip plate behind the middle (x 4.5 to 10.5, y 13.7
+@@ -588,7 +605,7 @@
+         anims.append(dict(a, elementWeight=HOLD_WEIGHTS if a["elementWeight"] == "hold" else ATTACK_WEIGHTS))
+     for name, w in ALL_WEAPONS.items():
+         anims.append({"code": f"lotrnpcs-{name}-attack", "animation": w["attack"],
+-                      "animationSpeed": round(w["impact"] / 30 / (DAMAGE_AT_MS / 1000), 3),
++                      "animationSpeed": round(w["impact"] / 30 / (hit_ms(w) / 1000), 3),
+                       "blendMode": "Average", "weight": 0.01, "elementWeight": ATTACK_WEIGHTS})
+         if w.get("hold"):
+             anims.append({"code": f"lotrnpcs-{name}-hold", "animation": w["hold"], "blendMode": "Average", "weight": 0.01,
+@@ -599,6 +616,7 @@
+ def weapon_list(weapons=WEAPONS, weights=None):
+     """The lotrnpcs:heldweapon behavior's list (weights: name -> weight, 0.0.82; 1 is left out)."""
+     return [{"item": w.get("item", f"lotrnpcs:orcweapon-{name}"), "attackAnimation": f"lotrnpcs-{name}-attack"}
++            | ({"hitMs": hit_ms(w)} if hit_ms(w) != DAMAGE_AT_MS else {})
+             | ({"holdAnimation": f"lotrnpcs-{name}-hold"} if w.get("hold") else {})
+             | ({"twoHanded": True} if w.get("twoHanded") else {})
+             | ({"weight": weights[name]} if weights and weights.get(name, 1) != 1 else {}) for name, w in weapons.items()]
+@@ -1803,7 +1821,7 @@
+         "type": "code",
+         "modid": "lotrnpcs",
+         "name": "LOTR NPCs",
+-        "version": "0.0.97",
++        "version": "0.0.100",
+         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
+                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Race models from "
+                        "LOTR Races and Classes by Dango Dango Dango, Shakgriig and Buggoi, used with their permission.",
+--- a/lotrnpcs/tools/tests/factions/Program.cs	2026-11-07 23:53:29.000000000 +0000
++++ b/lotrnpcs/tools/tests/factions/Program.cs	2026-11-08 20:43:05.627097417 +0000
+@@ -1072,6 +1072,18 @@
+             Check(bMin == BattleSpacing.MaxDuel - 0.2 && bMax == BattleSpacing.MaxDuel && band.DuelMin == BattleSpacing.MinDuel && band.DuelMax == BattleSpacing.MaxDuel
+                 && band.InDuelBand(1.0) && !new BattleSpacing().InDuelBand(0.9) && new BattleSpacing().InDuelBand(1.6) && !new BattleSpacing().InDuelBand(1.7),
+                 "the duel band is kept within 0.6 to 2.2 blocks, its top 0.2 past its bottom, and both ends count as inside");
++            // 0.0.98 staggered swings: hits on one target land at least HitGapMs apart (the game's hurt window is 500 ms).
++            var turns = new BattleSpacing(); const long HT = 77;
++            bool freeFirst = turns.HitWaitMs(HT, 1000) == 0;
++            turns.BookHit(HT, 1000, 100);
++            long w2 = turns.HitWaitMs(HT, 1000), w3 = turns.HitWaitMs(HT, 1000 + BattleSpacing.HitGapMs + 100);
++            turns.BookHit(HT, 900, 0); long kept = turns.HitWaitMs(HT, 1000);
++            turns.BookHit(HT, 2000, 0); long late = turns.HitWaitMs(HT, 2000);
++            Check(freeFirst && w2 == BattleSpacing.HitGapMs + 100 && w3 == 0 && kept == BattleSpacing.HitGapMs + 100 && late == BattleSpacing.HitGapMs
++                && BattleSpacing.HitGapMs > 500, "0.0.98: a second hit on a target waits out the first one's hurt window, an earlier booking never shortens the wait, a late hit moves it later");
++            turns.Forget(HT); bool forgot = turns.HitWaitMs(HT, 2000) == 0;
++            turns.BookHit(99, 3000, 0); turns.BookHit(88, 20000, 0);
++            Check(forgot && turns.TrackedHitTurns == 1 && turns.HitWaitMs(99, 3000) == 0, "0.0.98: a dead or unloaded target's turn is forgotten, and turns that passed are swept");
+             bs.Spacing = 1.5;
+ 
+             // Places: three NPCs coming from the same side walk to a third of a turn apart and stay there.
+@@ -1494,9 +1506,9 @@
+                 "the dwarven axe, battleaxe, dagger and boar spear, the elven spear (60 units since 0.0.94) and the Haradrim spear are each held by their grip; the poleaxe grip is 0.25 blocks further up the shaft (6.67 px)");
+             JToken OffTf(string item) => JObject.Parse(File.ReadAllText(Path.Combine(assets, "itemtypes", "orcweapon-" + item + ".json")))["tpOffHandTransform"];
+             double[] mordorGrip = HandPoint(OffTf("shield"), 3.7, 0.75, 6.0);
+-            Check(new (string item, double x, double y, double z)[] { ("kiteshield", 8.0, 21.9, 12.8 - 1.4), ("dwtowershield", 5.25, 18.0, 7.3 - 1.4 + 1.0), ("dwshield", 7.0, 17.85, 4.9 - 1.4 + 1.0) }
++            Check(new (string item, double x, double y, double z)[] { ("kiteshield", 8.0, 21.9, 12.8 - 1.4 + 1.0), ("eastshield", 6.25, 16.0, 7.38 - 1.4 + 1.0), ("gondorshield", 7.5, 16.68, 7.3 - 1.4 + 1.75), ("dwtowershield", 5.25, 18.0, 7.3 - 1.4 + 1.0), ("dwshield", 7.0, 17.85, 4.9 - 1.4 + 1.0) }
+                     .All(g => Gap(HandPoint(OffTf(g.item), g.x, g.y, g.z), mordorGrip) < 0.002 && Math.Abs((double)OffTf(g.item)["rotation"]["z"] - ((double)OffTf("shield")["rotation"]["z"] - 90)) < 0.01),
+-                "the new shields are held like the Mordor shield, turned a quarter to stand along the forearm, each by its handle slid 1.4 px out so it clears the arm (the dwarven ones 1 px back in since 0.0.96, owner: \"a little bit closer\")");
++                "the new shields are held like the Mordor shield, turned a quarter to stand along the forearm, each by its handle slid 1.4 px out so it clears the arm (the dwarven ones 1 px back in since 0.0.96, owner: \"a little bit closer\"; 0.0.100: the kite and Easterling 1 px and the Gondorian 1.75 px in, so the hand meets the handle)");
+             var converted = new[] { "elfspear", "kiteshield", "dwaxe", "dwbattleaxe", "dwtowershield", "dwshield", "dwdagger" };
+             Check(converted.All(n => {
+                     var shp = JObject.Parse(File.ReadAllText(Path.Combine(assets, "shapes", "item", "orcweapon", n + ".json")));

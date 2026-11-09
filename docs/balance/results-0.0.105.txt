@@ -1,0 +1,90 @@
+
+== Full followings, all recruits (1000 fights each): row's win rate against column; avg = average over the other six
+             Men   Uruk   Levy    Orc Goblin    Elf  Dwarf    avg
+     Men       -   0.45   0.82   0.01   0.86   0.24   0.26   0.44
+    Uruk    0.55      -   0.80   0.00   0.92   0.30   0.32   0.48
+    Levy    0.19   0.20      -   0.00   0.84   0.19   0.18   0.27
+     Orc    1.00   0.99   1.00      -   1.00   0.99   0.99   0.99
+  Goblin    0.12   0.08   0.19   0.00      -   0.12   0.07   0.10
+     Elf    0.75   0.68   0.82   0.01   0.88      -   0.57   0.62
+   Dwarf    0.74   0.70   0.82   0.01   0.93   0.47      -   0.61
+
+== Full followings, all warriors (1000 fights each): row's win rate against column; avg = average over the other six
+             Men   Uruk   Levy    Orc Goblin    Elf  Dwarf    avg
+     Men       -   0.47   0.79   0.00   0.84   0.26   0.18   0.42
+    Uruk    0.57      -   0.84   0.00   0.90   0.28   0.27   0.48
+    Levy    0.23   0.14      -   0.00   0.80   0.18   0.09   0.24
+     Orc    1.00   1.00   1.00      -   1.00   1.00   1.00   1.00
+  Goblin    0.12   0.09   0.19   0.00      -   0.10   0.04   0.09
+     Elf    0.73   0.72   0.81   0.01   0.90      -   0.52   0.61
+   Dwarf    0.80   0.73   0.90   0.00   0.95   0.52      -   0.65
+
+== Full followings, all captains (1000 fights each): row's win rate against column; avg = average over the other six
+             Men   Uruk   Levy    Orc Goblin    Elf  Dwarf    avg
+     Men       -   0.43   0.79   0.02   0.85   0.23   0.28   0.43
+    Uruk    0.55      -   0.83   0.02   0.85   0.25   0.34   0.47
+    Levy    0.21   0.21      -   0.01   0.80   0.22   0.21   0.28
+     Orc    0.99   0.97   1.00      -   1.00   0.98   0.98   0.99
+  Goblin    0.17   0.14   0.21   0.00      -   0.18   0.09   0.13
+     Elf    0.77   0.76   0.74   0.02   0.83      -   0.57   0.61
+   Dwarf    0.75   0.68   0.79   0.01   0.93   0.45      -   0.60
+
+== Full followings, all archers (1000 fights each): row's win rate against column; avg = average over the other six
+             Men   Uruk   Levy    Orc Goblin    Elf  Dwarf    avg
+     Men       -   0.47   0.60   0.00   0.81   0.33   0.33   0.42
+    Uruk    0.54      -   0.68   0.01   0.86   0.32   0.37   0.46
+    Levy    0.40   0.34      -   0.00   0.75   0.23   0.23   0.32
+     Orc    1.00   0.99   1.00      -   1.00   0.96   0.99   0.99
+  Goblin    0.17   0.12   0.25   0.00      -   0.08   0.06   0.11
+     Elf    0.68   0.64   0.79   0.04   0.91      -   0.51   0.59
+   Dwarf    0.65   0.63   0.77   0.01   0.93   0.46      -   0.58
+
+== Full followings, mixed (captain limit share, 20% archers) (1000 fights each): row's win rate against column; avg = average over the other six
+             Men   Uruk   Levy    Orc Goblin    Elf  Dwarf    avg
+     Men       -   0.46   0.62   0.16   0.76   0.33   0.31   0.44
+    Uruk    0.53      -   0.68   0.19   0.79   0.39   0.38   0.49
+    Levy    0.38   0.37      -   0.10   0.66   0.22   0.23   0.33
+     Orc    0.83   0.82   0.92      -   0.96   0.70   0.69   0.82
+  Goblin    0.23   0.20   0.33   0.02      -   0.14   0.13   0.17
+     Elf    0.68   0.57   0.73   0.29   0.85      -   0.50   0.61
+   Dwarf    0.68   0.62   0.76   0.29   0.88   0.47      -   0.62
+
+== Equal headcount 10 v 10, mixed (1000 fights each): row's win rate against column; avg = average over the other six
+             Men   Uruk   Levy    Orc Goblin    Elf  Dwarf    avg
+     Men       -   0.44   0.97   0.91   1.00   0.03   0.02   0.56
+    Uruk    0.52      -   0.97   0.91   1.00   0.02   0.03   0.58
+    Levy    0.04   0.04      -   0.33   0.99   0.00   0.00   0.23
+     Orc    0.09   0.09   0.67      -   1.00   0.00   0.00   0.31
+  Goblin    0.00   0.00   0.01   0.01      -   0.00   0.00   0.00
+     Elf    0.98   0.97   1.00   1.00   1.00      -   0.55   0.92
+   Dwarf    0.97   0.97   1.00   1.00   1.00   0.51      -   0.91
+
+== Equal coin: 150 coins each, bought like a player (captain limit, roster cap) (1000 fights each): row's win rate against column; avg = average over the other six
+             Men   Uruk   Levy    Orc Goblin    Elf  Dwarf    avg
+     Men       -   0.83   0.78   0.29   0.81   0.46   0.46   0.60
+    Uruk    0.17      -   0.41   0.04   0.37   0.15   0.14   0.21
+    Levy    0.21   0.59      -   0.09   0.47   0.22   0.23   0.30
+     Orc    0.70   0.96   0.94      -   0.94   0.69   0.70   0.82
+  Goblin    0.19   0.62   0.52   0.06      -   0.21   0.20   0.30
+     Elf    0.53   0.86   0.80   0.29   0.79      -   0.51   0.63
+   Dwarf    0.54   0.85   0.77   0.31   0.82   0.46      -   0.63
+
+== 100 wild Mordor orcs v 50 wild Haradrim (Men tier), zone-spawn mix
+  0.0.101 orc stats, no attacker cap   orcs win 1.00   average survivors (+ orcs, - Haradrim) +68.5
+  0.0.101 orc stats, cap 4             orcs win 1.00   average survivors (+ orcs, - Haradrim) +68.6
+  0.0.103+ orc stats, cap 4 (now)      orcs win 1.00   average survivors (+ orcs, - Haradrim) +84.8
+  50 orcs v 50 Haradrim (now)            orcs win 0.02
+  70 orcs v 50 Haradrim (now)            orcs win 1.00
+  85 orcs v 50 Haradrim (now)            orcs win 1.00
+
+== Rules then and now (full mixed followings, average win rate)
+0.0.97 rules (no hit turns, cap 5), 0.0.91 orc stats: average win rate of full mixed followings: Men 0.55, Uruk 0.58, Levy 0.37, Orc 0.26, Goblin 0.16, Elf 0.79, Dwarf 0.77
+0.0.105 rules, 0.0.91 orc stats: average win rate of full mixed followings: Men 0.53, Uruk 0.56, Levy 0.43, Orc 0.33, Goblin 0.25, Elf 0.70, Dwarf 0.71
+0.0.105 rules, 0.0.103 orc stats (current): average win rate of full mixed followings: Men 0.44, Uruk 0.48, Levy 0.34, Orc 0.83, Goblin 0.18, Elf 0.61, Dwarf 0.63
+
+== Orc variants (average win rate against the other six)
+Orc now, 7 followers: avg win mixed 0.82, recruit 1.00, warrior 1.00, captain 0.99
+Orc 0.0.103 stats, 6 followers: avg win mixed 0.50, recruit 0.60, warrior 0.63, captain 0.50
+Orc 0.0.103 stats, 5 followers: avg win mixed 0.17, recruit 0.03, warrior 0.03, captain 0.02
+Orc halfway stats (~0.67), 7 followers: avg win mixed 0.61, recruit 0.82, warrior 0.91, captain 0.75
+Orc 0.0.91 stats, 7 followers: avg win mixed 0.34, recruit 0.31, warrior 0.25, captain 0.28

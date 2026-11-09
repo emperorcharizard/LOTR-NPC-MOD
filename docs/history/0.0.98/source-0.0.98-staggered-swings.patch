@@ -1,0 +1,143 @@
+--- a/lotrnpcs/src/Battle.cs	2026-11-05 04:02:20.000000000 +0000
++++ b/lotrnpcs/src/Battle.cs	2026-11-08 19:23:15.863595994 +0000
+@@ -92,6 +92,41 @@
+             public int Count;
+         }
+ 
++        // 0.0.98 (owner, 2026-11-08: in a 3 on 1 "they all swing at the same time, but only ones damage is applied"; owner
++        // chose staggered swings over skipping the game's hurt window): after any hit the game drops further damage to
++        // that entity for 500 ms ("invulnerable" activity, EntityBehaviorHealth). Target -> earliest time the next of our
++        // melee hits on it may land, so attackers take turns at least HitGapMs apart instead of hitting in unison.
++        public const int HitGapMs = 550, HitJitterMs = 200;
++        readonly Dictionary<long, long> nextHitAt = new Dictionary<long, long>();
++        readonly List<long> hitSweepKeys = new List<long>();
++        long nextHitSweep;
++
++        // Every 10 s drops turns that have passed, so targets that never die or unload through our behavior (players,
++        // animals) don't pile up.
++        void SweepHits(long now)
++        {
++            nextHitSweep = now + 10000;
++            hitSweepKeys.Clear();
++            foreach (KeyValuePair<long, long> kv in nextHitAt) if (kv.Value < now) hitSweepKeys.Add(kv.Key);
++            foreach (long key in hitSweepKeys) nextHitAt.Remove(key);
++        }
++
++        /// <summary>For tests: how many targets have a booked melee turn.</summary>
++        public int TrackedHitTurns => nextHitAt.Count;
++
++        /// <summary>How long (ms) a melee hit that would land at hitAt (world ms) must wait to be clear of the last booked
++        /// hit on the target; 0 when it is clear now.</summary>
++        public long HitWaitMs(long target, long hitAt) => nextHitAt.TryGetValue(target, out long free) && hitAt < free ? free - hitAt : 0;
++
++        /// <summary>Books a melee hit on the target landing at hitAt: the next one waits HitGapMs plus jitterMs after it.
++        /// A later booking for the same hit (the swing landed late, after turning) only ever moves the turn later.</summary>
++        public void BookHit(long target, long hitAt, int jitterMs)
++        {
++            if (hitAt >= nextHitSweep) SweepHits(hitAt);
++            long next = hitAt + HitGapMs + Math.Max(0, jitterMs);
++            if (!nextHitAt.TryGetValue(target, out long free) || next > free) nextHitAt[target] = next;
++        }
++
+         readonly Dictionary<long, Claims> byTarget = new Dictionary<long, Claims>();
+         // Attacker -> the target it claimed (one at a time).
+         readonly Dictionary<long, long> byAttacker = new Dictionary<long, long>();
+@@ -171,6 +206,7 @@
+         public void Forget(long id)
+         {
+             Release(id);
++            nextHitAt.Remove(id);
+             if (!byTarget.TryGetValue(id, out Claims c)) return;
+             for (int i = 0; i < c.Count; i++)
+             {
+--- a/lotrnpcs/src/LotrNpcsModSystem.cs	2026-11-06 06:24:50.000000000 +0000
++++ b/lotrnpcs/src/LotrNpcsModSystem.cs	2026-11-08 19:23:23.421592174 +0000
+@@ -153,14 +153,34 @@
+         public override bool ShouldExecute()
+         {
+             if (!base.ShouldExecute()) return false;
+-            if (factions == null || targetEntity == null || targetEntity == attackedByEntity) return true;
+-            long claimed = factions.Spacing.TargetOf(entity.EntityId, entity.World.ElapsedMilliseconds);
+-            if (claimed == 0 || claimed == targetEntity.EntityId) return true;
+-            Entity partner = entity.World.GetEntityById(claimed);
+-            if (partner != null && partner.Alive && hasDirectContact(partner, minDist, minVerDist)) targetEntity = partner;
++            if (factions == null || targetEntity == null) return true;
++            if (targetEntity != attackedByEntity)
++            {
++                long claimed = factions.Spacing.TargetOf(entity.EntityId, entity.World.ElapsedMilliseconds);
++                if (claimed != 0 && claimed != targetEntity.EntityId)
++                {
++                    Entity partner = entity.World.GetEntityById(claimed);
++                    if (partner != null && partner.Alive && hasDirectContact(partner, minDist, minVerDist)) targetEntity = partner;
++                }
++            }
++            // 0.0.98 staggered swings (BattleSpacing.HitWaitMs): a hit that would land inside the target's hurt window
++            // after another NPC's hit would be thrown away, so this NPC waits its turn. It looks again when the turn is
++            // due (at least TurnRetryMs later), not every tick, so waiting costs no extra target searches.
++            long now = entity.World.ElapsedMilliseconds;
++            long wait = factions.Spacing.HitWaitMs(targetEntity.EntityId, now + damagePlayerAtMs);
++            if (wait > 0)
++            {
++                // The vanilla check waits attackDurationMs after lastCheckOrAttackMs.
++                lastCheckOrAttackMs = now - attackDurationMs + Math.Min(Math.Max(wait, TurnRetryMs), attackDurationMs);
++                targetEntity = null;
++                return false;
++            }
+             return true;
+         }
+ 
++        // Soonest an NPC waiting for its turn on a target looks again.
++        const long TurnRetryMs = 100;
++
+         public override void StartExecute()
+         {
+             // Battle spacing (0.0.53): a swing renews this NPC's place on its target, or takes one if it had none.
+@@ -170,6 +190,7 @@
+                 if (!(targetEntity is EntityPlayer))
+                     factions.Spacing.Swing(entity.EntityId, targetEntity.EntityId, Math.Atan2(entity.Pos.X - targetEntity.Pos.X, entity.Pos.Z - targetEntity.Pos.Z), now);
+                 entity.GetBehavior<EntityBehaviorFactionMember>()?.MarkFighting(now);
++                factions.Spacing.BookHit(targetEntity.EntityId, lastCheckOrAttackMs + damagePlayerAtMs, entity.World.Rand.Next(BattleSpacing.HitJitterMs + 1));
+             }
+             // 0.0.91: the faction's damage for this rank, read at each swing so /recruits faction reload applies at
+             // once, varied by DamageSpread (owner: "add a +-20% spread on hits"). The damage tier stays (it sets armor
+@@ -201,6 +222,8 @@
+ 
+         protected override void attackTarget()
+         {
++            // 0.0.98: the hit lands now, which is later than booked if the NPC was still turning to face its target.
++            if (factions != null && targetEntity != null) factions.Spacing.BookHit(targetEntity.EntityId, entity.World.ElapsedMilliseconds, 0);
+             if (!(targetEntity is EntityPlayer) || !ChestHitDamage.Available)
+             {
+                 base.attackTarget();
+--- a/lotrnpcs/tools/gen_testnpcs.py	2026-11-07 23:52:32.000000000 +0000
++++ b/lotrnpcs/tools/gen_testnpcs.py	2026-11-08 00:08:16.788314197 +0000
+@@ -1803,7 +1803,7 @@
+         "type": "code",
+         "modid": "lotrnpcs",
+         "name": "LOTR NPCs",
+-        "version": "0.0.97",
++        "version": "0.0.98",
+         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
+                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Race models from "
+                        "LOTR Races and Classes by Dango Dango Dango, Shakgriig and Buggoi, used with their permission.",
+--- a/lotrnpcs/tools/tests/factions/Program.cs	2026-11-07 23:53:29.000000000 +0000
++++ b/lotrnpcs/tools/tests/factions/Program.cs	2026-11-08 19:24:32.630916164 +0000
+@@ -1072,6 +1072,18 @@
+             Check(bMin == BattleSpacing.MaxDuel - 0.2 && bMax == BattleSpacing.MaxDuel && band.DuelMin == BattleSpacing.MinDuel && band.DuelMax == BattleSpacing.MaxDuel
+                 && band.InDuelBand(1.0) && !new BattleSpacing().InDuelBand(0.9) && new BattleSpacing().InDuelBand(1.6) && !new BattleSpacing().InDuelBand(1.7),
+                 "the duel band is kept within 0.6 to 2.2 blocks, its top 0.2 past its bottom, and both ends count as inside");
++            // 0.0.98 staggered swings: hits on one target land at least HitGapMs apart (the game's hurt window is 500 ms).
++            var turns = new BattleSpacing(); const long HT = 77;
++            bool freeFirst = turns.HitWaitMs(HT, 1000) == 0;
++            turns.BookHit(HT, 1000, 100);
++            long w2 = turns.HitWaitMs(HT, 1000), w3 = turns.HitWaitMs(HT, 1000 + BattleSpacing.HitGapMs + 100);
++            turns.BookHit(HT, 900, 0); long kept = turns.HitWaitMs(HT, 1000);
++            turns.BookHit(HT, 2000, 0); long late = turns.HitWaitMs(HT, 2000);
++            Check(freeFirst && w2 == BattleSpacing.HitGapMs + 100 && w3 == 0 && kept == BattleSpacing.HitGapMs + 100 && late == BattleSpacing.HitGapMs
++                && BattleSpacing.HitGapMs > 500, "0.0.98: a second hit on a target waits out the first one's hurt window, an earlier booking never shortens the wait, a late hit moves it later");
++            turns.Forget(HT); bool forgot = turns.HitWaitMs(HT, 2000) == 0;
++            turns.BookHit(99, 3000, 0); turns.BookHit(88, 20000, 0);
++            Check(forgot && turns.TrackedHitTurns == 1 && turns.HitWaitMs(99, 3000) == 0, "0.0.98: a dead or unloaded target's turn is forgotten, and turns that passed are swept");
+             bs.Spacing = 1.5;
+ 
+             // Places: three NPCs coming from the same side walk to a third of a turn apart and stay there.
