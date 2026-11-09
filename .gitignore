@@ -1,0 +1,8 @@
+bin/
+obj/
+out/
+__pycache__/
+*.pyc
+/dist/
+/gen/
+*.zip

@@ -1,0 +1,90 @@
+{
+ "prices": {
+  "Men": {
+   "recruit": 5,
+   "warrior": 15,
+   "captain": 40,
+   "archer": 15
+  },
+  "Uruk": {
+   "recruit": 4,
+   "warrior": 15,
+   "captain": 41,
+   "archer": 16
+  },
+  "Levy": {
+   "recruit": 4,
+   "warrior": 12,
+   "captain": 35,
+   "archer": 11
+  },
+  "Orc": {
+   "recruit": 5,
+   "warrior": 12,
+   "captain": 29,
+   "archer": 12
+  },
+  "Goblin": {
+   "recruit": 3,
+   "warrior": 9,
+   "captain": 25,
+   "archer": 10
+  },
+  "Elf": {
+   "recruit": 6,
+   "warrior": 19,
+   "captain": 50,
+   "archer": 20
+  },
+  "Dwarf": {
+   "recruit": 6,
+   "warrior": 19,
+   "captain": 50,
+   "archer": 19
+  }
+ },
+ "check": {
+  "quarter Men": 0.475,
+  "quarter Uruk": 0.526,
+  "quarter Levy": 0.466,
+  "quarter Orc": 0.455,
+  "quarter Goblin": 0.51,
+  "quarter Elf": 0.497,
+  "quarter Dwarf": 0.571,
+  "half Men": 0.532,
+  "half Uruk": 0.546,
+  "half Levy": 0.513,
+  "half Orc": 0.519,
+  "half Goblin": 0.503,
+  "half Elf": 0.428,
+  "half Dwarf": 0.458,
+  "maxcap Men": 0.496,
+  "maxcap Uruk": 0.46,
+  "maxcap Levy": 0.545,
+  "maxcap Orc": 0.429,
+  "maxcap Goblin": 0.529,
+  "maxcap Elf": 0.503,
+  "maxcap Dwarf": 0.536,
+  "nocap Men": 0.46,
+  "nocap Uruk": 0.465,
+  "nocap Levy": 0.543,
+  "nocap Orc": 0.557,
+  "nocap Goblin": 0.484,
+  "nocap Elf": 0.449,
+  "nocap Dwarf": 0.542,
+  "recruits Men": 0.435,
+  "recruits Uruk": 0.21,
+  "recruits Levy": 0.382,
+  "recruits Orc": 0.738,
+  "recruits Goblin": 0.641,
+  "recruits Elf": 0.573,
+  "recruits Dwarf": 0.521,
+  "warriors Men": 0.391,
+  "warriors Uruk": 0.413,
+  "warriors Levy": 0.561,
+  "warriors Orc": 0.564,
+  "warriors Goblin": 0.58,
+  "warriors Elf": 0.522,
+  "warriors Dwarf": 0.469
+ }
+}

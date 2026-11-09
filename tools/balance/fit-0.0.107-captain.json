@@ -1,0 +1,37 @@
+{
+ "Men": {
+  "health": 48.0,
+  "damage": 7.0,
+  "average": 0.487
+ },
+ "Uruk": {
+  "health": 48.0,
+  "damage": 7.1,
+  "average": 0.552
+ },
+ "Levy": {
+  "health": 42.0,
+  "damage": 6.1,
+  "average": 0.48
+ },
+ "Orc": {
+  "health": 41.0,
+  "damage": 6.3,
+  "average": 0.509
+ },
+ "Goblin": {
+  "health": 34.0,
+  "damage": 4.85,
+  "average": 0.486
+ },
+ "Elf": {
+  "health": 50.0,
+  "damage": 9.6,
+  "average": 0.497
+ },
+ "Dwarf": {
+  "health": 61.0,
+  "damage": 7.8,
+  "average": 0.489
+ }
+}

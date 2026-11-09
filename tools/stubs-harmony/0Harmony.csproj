@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>0Harmony</AssemblyName>
+    <RootNamespace>HarmonyLib</RootNamespace>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+  </PropertyGroup>
+</Project>

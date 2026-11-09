@@ -1,0 +1,29 @@
+{
+ "name": "Shoulder carry (0.0.96)",
+ "code": "poleaxehold",
+ "quantityframes": 30,
+ "onActivityStopped": "EaseOut",
+ "onAnimationEnd": "Repeat",
+ "keyframes": [
+  {
+   "frame": 0,
+   "elements": {
+    "UpperArmR": {
+     "rotationX": 9.13,
+     "rotationY": -80.1,
+     "rotationZ": -23.53
+    },
+    "LowerArmR": {
+     "rotationX": -134.83,
+     "rotationY": -81.5,
+     "rotationZ": -20.49
+    },
+    "ItemAnchor": {
+     "rotationX": -36.1,
+     "rotationY": 141.08,
+     "rotationZ": -15.76
+    }
+   }
+  }
+ ]
+}

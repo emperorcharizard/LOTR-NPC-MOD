@@ -1,0 +1,27 @@
+start 0.843
+  Uruk recruit 4 0.675
+  Uruk archer 16 0.665
+  Levy captain 35 0.662
+  Levy archer 11 0.65
+  Orc warrior 12 0.552
+  Orc captain 33 0.497
+  Orc archer 14 0.49
+  Goblin archer 10 0.489
+  Elf captain 50 0.473
+  Dwarf captain 50 0.456
+sweep 0 0.456
+  Orc recruit 5 0.449
+  Orc captain 31 0.385
+  Orc archer 13 0.34
+  Elf archer 20 0.33
+sweep 1 0.33
+  Orc captain 29 0.292
+  Orc archer 12 0.278
+sweep 2 0.278
+quarter   Men 0.47  Uruk 0.53  Levy 0.47  Orc 0.46  Goblin 0.51  Elf 0.50  Dwarf 0.57
+half      Men 0.53  Uruk 0.55  Levy 0.51  Orc 0.52  Goblin 0.50  Elf 0.43  Dwarf 0.46
+maxcap    Men 0.50  Uruk 0.46  Levy 0.55  Orc 0.43  Goblin 0.53  Elf 0.50  Dwarf 0.54
+nocap     Men 0.46  Uruk 0.47  Levy 0.54  Orc 0.56  Goblin 0.48  Elf 0.45  Dwarf 0.54
+recruits  Men 0.44  Uruk 0.21  Levy 0.38  Orc 0.74  Goblin 0.64  Elf 0.57  Dwarf 0.52
+warriors  Men 0.39  Uruk 0.41  Levy 0.56  Orc 0.56  Goblin 0.58  Elf 0.52  Dwarf 0.47
+prices {'Men': {'recruit': 5, 'warrior': 15, 'captain': 40, 'archer': 15}, 'Uruk': {'recruit': 4, 'warrior': 15, 'captain': 41, 'archer': 16}, 'Levy': {'recruit': 4, 'warrior': 12, 'captain': 35, 'archer': 11}, 'Orc': {'recruit': 5, 'warrior': 12, 'captain': 29, 'archer': 12}, 'Goblin': {'recruit': 3, 'warrior': 9, 'captain': 25, 'archer': 10}, 'Elf': {'recruit': 6, 'warrior': 19, 'captain': 50, 'archer': 20}, 'Dwarf': {'recruit': 6, 'warrior': 19, 'captain': 50, 'archer': 19}}

@@ -1,0 +1,9 @@
+LOTR NPCs
+
+Race models, skins and textures for the NPCs come from LOTR Races and Classes
+by Dango Dango Dango, Shakgriig and Buggoi, and are used with their permission.
+They live in assets/lotrnpcs/config/customplayermodels, shapes/entity, shapes/seraphfaces, textures/entity and textures/icons.
+
+The Mordor and Misty Mountains orc weapon models in assets/lotrnpcs/shapes/item/orcweapon, and their textures in
+assets/lotrnpcs/textures/item/orcweapon, were provided by the server's owner. Parts without one of those
+textures use vanilla Vintage Story textures.

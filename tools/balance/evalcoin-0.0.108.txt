@@ -1,0 +1,6 @@
+quarter   Men 0.47  Uruk 0.54  Levy 0.48  Orc 0.45  Goblin 0.51  Elf 0.50  Dwarf 0.55
+half      Men 0.55  Uruk 0.55  Levy 0.50  Orc 0.52  Goblin 0.49  Elf 0.42  Dwarf 0.46
+maxcap    Men 0.49  Uruk 0.44  Levy 0.55  Orc 0.43  Goblin 0.53  Elf 0.51  Dwarf 0.55
+nocap     Men 0.45  Uruk 0.46  Levy 0.55  Orc 0.56  Goblin 0.49  Elf 0.46  Dwarf 0.53
+recruits  Men 0.46  Uruk 0.21  Levy 0.38  Orc 0.74  Goblin 0.66  Elf 0.55  Dwarf 0.51
+warriors  Men 0.37  Uruk 0.42  Levy 0.54  Orc 0.57  Goblin 0.59  Elf 0.53  Dwarf 0.48

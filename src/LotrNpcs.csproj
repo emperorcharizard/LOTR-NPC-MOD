@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- The game (1.22) runs on .NET 10. -->
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>lotrnpcs</AssemblyName>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <!-- Reference DLLs built from the open-source vsapi/vsessentialsmod 1.22.7 (see tools/refs/README.txt). -->
+    <RefsDir Condition="'$(RefsDir)' == ''">../tools/refs</RefsDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Compile-time references only: the game supplies the real DLLs, none are copied into the mod. -->
+    <Reference Include="VintagestoryAPI"><HintPath>$(RefsDir)/VintagestoryAPI.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="VSEssentials"><HintPath>$(RefsDir)/VSEssentials.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="0Harmony"><HintPath>$(RefsDir)/0Harmony.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Newtonsoft.Json"><HintPath>$(RefsDir)/Newtonsoft.Json.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="protobuf-net"><HintPath>$(RefsDir)/protobuf-net.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="cairo-sharp"><HintPath>$(RefsDir)/cairo-sharp.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,1430 @@
+{
+	"editor": {
+		"backDropShape": "",
+		"collapsedPaths": "",
+		"allAngles": false,
+		"entityTextureMode": false,
+		"singleTexture": false,
+		"vsFormatConverted": false
+	},
+	"textureWidth": 64,
+	"textureHeight": 64,
+	"textureSizes": {
+		"Morc Scimitar Texture.png": [64, 64]
+	},
+	"textures": {
+		"Morc Scimitar Texture.png": ""
+	},
+	"elements": [
+		{
+			"name": "morc_scimitar",
+			"from": [0, 0, 8],
+			"to": [0, 0, 8],
+			"rotationOrigin": [0, 0, 8],
+			"children": [
+				{
+					"name": "pommel",
+					"from": [0.4, 0, 0],
+					"to": [0.4, 0, 0],
+					"rotationOrigin": [0.4, 0, 0],
+					"children": [
+						{
+							"name": "forearm",
+							"from": [-2.6, -0.3, -0.9],
+							"to": [0, 1.6, 0.9],
+							"rotationOrigin": [-2.6, -0.3, -0.9],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [0, 21, 2.625, 22.875], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [24, 25, 25.75, 26.875], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [21, 0, 23.625, 1.875], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [3, 26, 4.75, 27.875], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [22, 4, 24.625, 5.75], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [22, 6, 24.625, 7.75], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "forearm round",
+							"from": [-2.4, -0.5, -0.7],
+							"to": [-0.2, 1.8, 0.7],
+							"rotationOrigin": [-2.4, -0.5, -0.7],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [9, 17, 11.25, 19.25], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [0, 27, 1.375, 29.25], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [0, 18, 2.25, 20.25], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [12, 27, 13.375, 29.25], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [27, 0, 29.25, 1.375], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [14, 27, 16.25, 28.375], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "wrist cuff",
+							"from": [-1.1, -0.55, -1.05],
+							"to": [-0.6, 1.85, 1.05],
+							"rotationOrigin": [-1.1, -0.55, -1.05],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [13, 30, 13.5, 32.375], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [12, 19, 14.125, 21.375], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [24, 30, 24.5, 32.375], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [19, 12, 21.125, 14.375], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [19, 32, 19.5, 34.125], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [20, 32, 20.5, 34.125], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "hand",
+							"from": [-4.6, -0.9, -1.1],
+							"to": [-2.4, 1.4, 1.1],
+							"rotationOrigin": [-4.6, -0.9, -1.1],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [18, 0, 20.25, 2.25], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [3, 18, 5.25, 20.25], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [6, 18, 8.25, 20.25], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [18, 16, 20.25, 18.25], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [19, 6, 21.25, 8.25], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [19, 9, 21.25, 11.25], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "hand round y",
+							"from": [-4.4, -1.1, -0.9],
+							"to": [-2.6, 1.6, 0.9],
+							"rotationOrigin": [-4.4, -1.1, -0.9],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [3, 21, 4.75, 23.75], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [5, 21, 6.75, 23.75], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [7, 21, 8.75, 23.75], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [21, 15, 22.75, 17.75], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [17, 27, 18.75, 28.75], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [19, 27, 20.75, 28.75], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "hand round x",
+							"from": [-4.8, -0.7, -0.9],
+							"to": [-2.5, 1.2, 0.9],
+							"rotationOrigin": [-4.8, -0.7, -0.9],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [11, 22, 13.25, 23.875], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [5, 26, 6.75, 27.875], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [22, 12, 24.25, 13.875], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [7, 26, 8.75, 27.875], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [0, 23, 2.25, 24.75], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [18, 23, 20.25, 24.75], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "knuckle",
+							"from": [-5.1, -1, -1],
+							"to": [-4.5, -0.45, 1],
+							"rotationOrigin": [-5.1, -1, -1],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 32, 36.625, 32.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [33, 7, 35, 7.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [33, 36, 33.625, 36.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [9, 33, 11, 33.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [9, 12, 9.625, 14], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [12, 14, 12.625, 16], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "knuckle 2",
+							"from": [-5.15, -0.4, -1],
+							"to": [-4.5, 0.15, 1],
+							"rotationOrigin": [-5.15, -0.4, -1],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [34, 36, 34.625, 36.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [11, 33, 13, 33.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [35, 36, 35.625, 36.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [33, 11, 35, 11.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [18, 6, 18.625, 8], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [11, 20, 11.625, 22], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "knuckle 3",
+							"from": [-5.15, 0.2, -1],
+							"to": [-4.5, 0.75, 1],
+							"rotationOrigin": [-5.15, 0.2, -1],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 35, 36.625, 35.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [33, 12, 35, 12.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 36, 36.625, 36.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [13, 33, 15, 33.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [19, 29, 19.625, 31], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [20, 29, 20.625, 31], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "knuckle 4",
+							"from": [-5.05, 0.8, -1],
+							"to": [-4.5, 1.3, 1],
+							"rotationOrigin": [-5.05, 0.8, -1],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [7, 37, 7.5, 37.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [15, 33, 17, 33.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [8, 37, 8.5, 37.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [17, 33, 19, 33.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [33, 23, 33.5, 25], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [24, 33, 24.5, 35], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "finger",
+							"from": [-4.7, -1, 0.85],
+							"to": [-3.3, -0.45, 1.25],
+							"rotationOrigin": [-4.7, -1, 0.85],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [0, 35, 1.375, 35.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [21, 37, 21.375, 37.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [35, 1, 36.375, 1.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [22, 37, 22.375, 37.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 14, 37.375, 14.375], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 17, 37.375, 17.375], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "finger 2",
+							"from": [-4.75, -0.4, 0.85],
+							"to": [-3.2, 0.15, 1.25],
+							"rotationOrigin": [-4.75, -0.4, 0.85],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [34, 24, 35.5, 24.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [37, 22, 37.375, 22.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [28, 34, 29.5, 34.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [23, 37, 23.375, 37.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [3, 36, 4.5, 36.375], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 4, 37.5, 4.375], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "finger 3",
+							"from": [-4.75, 0.2, 0.85],
+							"to": [-3.3, 0.75, 1.25],
+							"rotationOrigin": [-4.75, 0.2, 0.85],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [30, 34, 31.5, 34.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [24, 37, 24.375, 37.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [34, 30, 35.5, 30.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [37, 24, 37.375, 24.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 5, 37.5, 5.375], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 6, 37.5, 6.375], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "finger 4",
+							"from": [-4.65, 0.8, 0.85],
+							"to": [-3.5, 1.3, 1.25],
+							"rotationOrigin": [-4.65, 0.8, 0.85],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 7, 37.125, 7.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [37, 25, 37.375, 25.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 8, 37.125, 8.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [26, 37, 26.375, 37.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 20, 37.125, 20.375], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 21, 37.125, 21.375], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "thumb",
+							"from": [-3.9, -1.55, -0.3],
+							"to": [-2.5, -0.85, 1.1],
+							"rotationOrigin": [-2.5, -0.85, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [12, 24, 13.375, 24.75], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [0, 30, 1.375, 30.75], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [26, 32, 27.375, 32.75], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [32, 32, 33.375, 32.75], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [9, 28, 10.375, 29.375], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [28, 11, 29.375, 12.375], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -10,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "thumb tip",
+							"from": [-3.5, -1, 1.1],
+							"to": [-2.9, 0.3, 1.45],
+							"rotationOrigin": [-3.5, -1, 1.1],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [34, 22, 34.625, 23.25], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [31, 35, 31.375, 36.25], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [23, 34, 23.625, 35.25], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [5, 36, 5.375, 37.25], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [19, 37, 19.625, 37.375], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [20, 37, 20.625, 37.375], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						}
+					],
+					"stepParentName": ""
+				},
+				{
+					"name": "grip",
+					"from": [0, 0, 0],
+					"to": [0, 0, 0],
+					"rotationOrigin": [0, 0, 0],
+					"children": [
+						{
+							"name": "grip",
+							"from": [0.2, 0, -0.75],
+							"to": [5.3, 1.5, 0.75],
+							"rotationOrigin": [0.2, 0, -0.75],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [0, 6, 5.125, 7.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [27, 23, 28.5, 24.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [6, 0, 11.125, 1.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [26, 27, 27.5, 28.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [6, 2, 11.125, 3.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [6, 6, 11.125, 7.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "grip round",
+							"from": [0.2, 0.18, -0.93],
+							"to": [5.3, 1.32, 0.93],
+							"rotationOrigin": [0.2, 0.18, -0.93],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [12, 6, 17.125, 7.125], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [5, 28, 6.875, 29.125], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [13, 11, 18.125, 12.125], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [28, 6, 29.875, 7.125], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [0, 0, 5.125, 1.875], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [0, 2, 5.125, 3.875], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						}
+					],
+					"stepParentName": ""
+				},
+				{
+					"name": "binding",
+					"from": [0, 0, 0],
+					"to": [0, 0, 0],
+					"rotationOrigin": [0, 0, 0],
+					"children": [
+						{
+							"name": "wrap",
+							"from": [0.45, -0.15, -1.05],
+							"to": [0.85, 1.65, 1.05],
+							"rotationOrigin": [0.65, 0.75, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [35, 7, 35.375, 8.75], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [21, 23, 23.125, 24.75], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [35, 11, 35.375, 12.75], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [24, 0, 26.125, 1.75], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [34, 1, 34.375, 3.125], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [34, 4, 34.375, 6.125], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 22.5,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "wrap 2",
+							"from": [1.07, -0.15, -1.05],
+							"to": [1.47, 1.65, 1.05],
+							"rotationOrigin": [1.27, 0.75, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [35, 17, 35.375, 18.75], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [3, 24, 5.125, 25.75], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [19, 35, 19.375, 36.75], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [6, 24, 8.125, 25.75], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [7, 34, 7.375, 36.125], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [8, 34, 8.375, 36.125], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 22.5,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "wrap 3",
+							"from": [1.69, -0.15, -1.05],
+							"to": [2.09, 1.65, 1.05],
+							"rotationOrigin": [1.89, 0.75, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [35, 19, 35.375, 20.75], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [9, 24, 11.125, 25.75], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [20, 35, 20.375, 36.75], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [24, 23, 26.125, 24.75], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [9, 34, 9.375, 36.125], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [10, 34, 10.375, 36.125], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 22.5,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "wrap 4",
+							"from": [2.31, -0.15, -1.05],
+							"to": [2.71, 1.65, 1.05],
+							"rotationOrigin": [2.51, 0.75, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [21, 35, 21.375, 36.75], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [0, 25, 2.125, 26.75], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [35, 21, 35.375, 22.75], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [25, 4, 27.125, 5.75], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [11, 34, 11.375, 36.125], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [12, 34, 12.375, 36.125], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 22.5,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "wrap 5",
+							"from": [2.93, -0.15, -1.05],
+							"to": [3.33, 1.65, 1.05],
+							"rotationOrigin": [3.13, 0.75, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [24, 35, 24.375, 36.75], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [25, 6, 27.125, 7.75], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [26, 35, 26.375, 36.75], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [25, 8, 27.125, 9.75], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [13, 34, 13.375, 36.125], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [14, 34, 14.375, 36.125], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 22.5,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "wrap 6",
+							"from": [3.55, -0.15, -1.05],
+							"to": [3.95, 1.65, 1.05],
+							"rotationOrigin": [3.75, 0.75, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [35, 26, 35.375, 27.75], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [25, 10, 27.125, 11.75], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [27, 35, 27.375, 36.75], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [12, 25, 14.125, 26.75], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [15, 34, 15.375, 36.125], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [16, 34, 16.375, 36.125], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 22.5,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "wrap 7",
+							"from": [4.17, -0.15, -1.05],
+							"to": [4.57, 1.65, 1.05],
+							"rotationOrigin": [4.37, 0.75, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [28, 35, 28.375, 36.75], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [25, 12, 27.125, 13.75], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [35, 28, 35.375, 29.75], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [15, 25, 17.125, 26.75], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [17, 34, 17.375, 36.125], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [18, 34, 18.375, 36.125], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 22.5,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "wrap 8",
+							"from": [4.79, -0.15, -1.05],
+							"to": [5.19, 1.65, 1.05],
+							"rotationOrigin": [4.99, 0.75, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [29, 35, 29.375, 36.75], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [18, 25, 20.125, 26.75], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [30, 35, 30.375, 36.75], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [21, 25, 23.125, 26.75], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [34, 18, 34.375, 20.125], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [22, 34, 22.375, 36.125], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 22.5,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						}
+					],
+					"stepParentName": ""
+				},
+				{
+					"name": "guard",
+					"from": [0, 0, 0],
+					"to": [0, 0, 0],
+					"rotationOrigin": [0, 0, 0],
+					"children": [
+						{
+							"name": "guard",
+							"from": [5.25, -0.45, -1],
+							"to": [6.35, 2.05, 1],
+							"rotationOrigin": [5.25, -0.45, -1],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [21, 27, 22.125, 29.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [20, 3, 22, 5.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [23, 27, 24.125, 29.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [9, 20, 11, 22.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [3, 28, 4.125, 30], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [28, 4, 29.125, 6], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "guard round",
+							"from": [5.35, -0.25, -1.2],
+							"to": [6.25, 1.85, 1.2],
+							"rotationOrigin": [5.35, -0.25, -1.2],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [11, 28, 11.875, 30.125], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [15, 19, 17.375, 21.125], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [28, 27, 28.875, 29.125], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [18, 19, 20.375, 21.125], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [7, 28, 7.875, 30.375], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [8, 28, 8.875, 30.375], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "guard lug top",
+							"from": [5.45, 1.9, -0.7],
+							"to": [6.15, 2.4, 0.7],
+							"rotationOrigin": [5.45, 1.9, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [12, 30, 12.75, 30.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [2, 35, 3.375, 35.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 22, 36.75, 22.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [35, 2, 36.375, 2.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [33, 0, 33.75, 1.375], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [33, 3, 33.75, 4.375], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 20,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "guard lug bottom",
+							"from": [5.45, -0.8, -0.7],
+							"to": [6.15, -0.3, 0.7],
+							"rotationOrigin": [5.45, -0.3, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [23, 36, 23.75, 36.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [35, 3, 36.375, 3.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 24, 36.75, 24.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [4, 35, 5.375, 35.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [33, 5, 33.75, 6.375], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [6, 33, 6.75, 34.375], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -20,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "guard plate",
+							"from": [6.25, -0.6, -0.75],
+							"to": [6.45, 2.2, 0.75],
+							"rotationOrigin": [6.25, -0.6, -0.75],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [35, 4, 35.25, 6.75], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [14, 22, 15.5, 24.75], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [6, 35, 6.25, 37.75], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [16, 22, 17.5, 24.75], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [25, 36, 25.25, 37.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 26, 36.25, 27.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						}
+					],
+					"stepParentName": ""
+				},
+				{
+					"name": "blade",
+					"from": [0, 0, 0],
+					"to": [0, 0, 0],
+					"rotationOrigin": [0, 0, 0],
+					"children": [
+						{
+							"name": "ricasso",
+							"from": [6.35, -0.85, -0.25],
+							"to": [7.1, 2.45, 0.25],
+							"rotationOrigin": [6.35, -0.85, -0.25],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [2, 27, 2.75, 30.25], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [14, 29, 14.5, 32.25], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [25, 27, 25.75, 30.25], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [15, 29, 15.5, 32.25], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 28, 36.75, 28.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 29, 36.75, 29.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "blade",
+							"from": [7, -0.6, -0.25],
+							"to": [9.5, 1.9, 0.25],
+							"rotationOrigin": [7, -0.6, -0.25],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [0, 8, 2.5, 10.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [26, 29, 26.5, 31.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [3, 8, 5.5, 10.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [27, 29, 27.5, 31.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [3, 30, 5.5, 30.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [30, 3, 32.5, 3.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "blade 2",
+							"from": [9.5, -0.49, -0.25],
+							"to": [12, 1.9, 0.25],
+							"rotationOrigin": [9.5, -0.49, -0.25],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [10, 11, 12.5, 13.375], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [7, 31, 7.5, 33.375], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [0, 12, 2.5, 14.375], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [8, 31, 8.5, 33.375], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [30, 4, 32.5, 4.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [30, 5, 32.5, 5.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "blade 3",
+							"from": [12, -0.37, -0.25],
+							"to": [14.5, 1.95, 0.25],
+							"rotationOrigin": [12, -0.37, -0.25],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [12, 0, 14.5, 2.375], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [22, 31, 22.5, 33.375], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [3, 12, 5.5, 14.375], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [23, 31, 23.5, 33.375], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [30, 6, 32.5, 6.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [30, 7, 32.5, 7.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "blade 4",
+							"from": [14.5, -0.25, -0.25],
+							"to": [17, 2, 0.25],
+							"rotationOrigin": [14.5, -0.25, -0.25],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [6, 12, 8.5, 14.25], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [0, 32, 0.5, 34.25], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [13, 13, 15.5, 15.25], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [1, 32, 1.5, 34.25], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [30, 11, 32.5, 11.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [30, 12, 32.5, 12.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "blade 5",
+							"from": [17, -0.14, -0.25],
+							"to": [19.5, 2.1, 0.25],
+							"rotationOrigin": [17, -0.14, -0.25],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [9, 14, 11.5, 16.25], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [2, 32, 2.5, 34.25], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [0, 15, 2.5, 17.25], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [3, 32, 3.5, 34.25], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [16, 30, 18.5, 30.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [21, 30, 23.5, 30.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "blade 6",
+							"from": [19.5, -0.02, -0.25],
+							"to": [22, 2.25, 0.25],
+							"rotationOrigin": [19.5, -0.02, -0.25],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [15, 0, 17.5, 2.25], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [4, 32, 4.5, 34.25], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [3, 15, 5.5, 17.25], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [5, 32, 5.5, 34.25], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [28, 30, 30.5, 30.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [0, 31, 2.5, 31.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "blade 7",
+							"from": [22, 0, -0.25],
+							"to": [24.2, 2.35, 0.25],
+							"rotationOrigin": [22, 0, -0.25],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [12, 16, 14.25, 18.375], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [25, 31, 25.5, 33.375], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [16, 13, 18.25, 15.375], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [28, 31, 28.5, 33.375], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [31, 30, 33.25, 30.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [32, 8, 34.25, 8.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "blade 8",
+							"from": [24.2, 0, -0.25],
+							"to": [26.4, 2.45, 0.25],
+							"rotationOrigin": [24.2, 0, -0.25],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [6, 15, 8.25, 17.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [6, 30, 6.5, 32.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [16, 8, 18.25, 10.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [9, 30, 9.5, 32.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [10, 32, 12.25, 32.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [16, 32, 18.25, 32.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "edge",
+							"from": [7, 1.7, -0.12],
+							"to": [12.6, 2.35, 0.12],
+							"rotationOrigin": [7, 1.7, -0.12],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [23, 17, 28.625, 17.625], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [37, 27, 37.25, 27.625], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [25, 22, 30.625, 22.625], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [28, 37, 28.25, 37.625], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [29, 26, 34.625, 26.25], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [29, 27, 34.625, 27.25], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "edge 2",
+							"from": [12.5, 1.72, -0.12],
+							"to": [20.1, 2.37, 0.12],
+							"rotationOrigin": [12.5, 2.05, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [21, 21, 28.625, 21.625], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [37, 28, 37.25, 28.625], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [22, 3, 29.625, 3.625], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [29, 37, 29.25, 37.625], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [28, 9, 35.625, 9.25], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [28, 10, 35.625, 10.25], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 1.9,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "edge 3",
+							"from": [20, 1.95, -0.12],
+							"to": [26.5, 2.6, 0.12],
+							"rotationOrigin": [20, 2.27, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [22, 14, 28.5, 14.625], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [37, 29, 37.25, 29.625], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [18, 22, 24.5, 22.625], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [30, 37, 30.25, 37.625], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [28, 13, 34.5, 13.25], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [29, 14, 35.5, 14.25], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 2.2,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "spine",
+							"from": [6.35, -0.75, -0.28],
+							"to": [22.5, -0.45, 0.28],
+							"rotationOrigin": [6.35, -0.75, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [23, 15, 39.125, 15.25], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [33, 37, 33.5, 37.25], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [23, 16, 39.125, 16.25], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [34, 37, 34.5, 37.25], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [0, 4, 16.125, 4.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [0, 5, 16.125, 5.5], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 2.65,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "spine 2",
+							"from": [22.4, 0, -0.28],
+							"to": [26.4, 0.3, 0.28],
+							"rotationOrigin": [22.4, 0, -0.28],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [33, 25, 37, 25.25], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [35, 37, 35.5, 37.25], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [29, 33, 33, 33.25], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [37, 35, 37.5, 35.25], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [12, 3, 16, 3.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [28, 8, 32, 8.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "ridge",
+							"from": [7.2, 0.65, -0.3],
+							"to": [16.8, 1.15, 0.3],
+							"rotationOrigin": [7.2, 0.9, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [21, 2, 30.625, 2.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [0, 37, 0.625, 37.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [21, 18, 30.625, 18.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [1, 37, 1.625, 37.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [6, 8, 15.625, 8.625], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [6, 9, 15.625, 9.625], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 1.7,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "ridge 2",
+							"from": [16.8, 0.93, -0.3],
+							"to": [26.4, 1.43, 0.3],
+							"rotationOrigin": [16.8, 1.18, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [21, 19, 30.625, 19.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [37, 1, 37.625, 1.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [21, 20, 30.625, 20.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [2, 37, 2.625, 37.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [6, 10, 15.625, 10.625], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [0, 11, 9.625, 11.625], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 1.7,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "curve",
+							"from": [26.1, 0.13, -0.25],
+							"to": [28.6, 2.28, 0.25],
+							"rotationOrigin": [26.4, 1.43, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [15, 16, 17.5, 18.125], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [21, 32, 21.5, 34.125], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [17, 3, 19.5, 5.125], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [32, 23, 32.5, 25.125], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [31, 2, 33.5, 2.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [3, 31, 5.5, 31.5], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -12,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "curve edge",
+							"from": [26.1, 2.08, -0.12],
+							"to": [28.6, 2.73, 0.12],
+							"rotationOrigin": [26.4, 1.43, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [16, 29, 18.5, 29.625], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [37, 27, 37.25, 27.625], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [29, 17, 31.5, 17.625], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [28, 37, 28.25, 37.625], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [35, 13, 37.5, 13.25], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [35, 23, 37.5, 23.25], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -12,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "curve spine",
+							"from": [26.1, 0.13, -0.28],
+							"to": [28.6, 0.43, 0.28],
+							"rotationOrigin": [26.4, 1.43, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [35, 31, 37.5, 31.25], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 37, 36.5, 37.25], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [33, 35, 35.5, 35.25], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [37, 36, 37.5, 36.25], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [10, 31, 12.5, 31.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [16, 31, 18.5, 31.5], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -12,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "curve ridge",
+							"from": [26.1, 1.18, -0.3],
+							"to": [28.6, 1.68, 0.3],
+							"rotationOrigin": [26.4, 1.43, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [31, 18, 33.5, 18.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [37, 2, 37.625, 2.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [19, 31, 21.5, 31.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [3, 37, 3.625, 37.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [29, 21, 31.5, 21.625], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [29, 23, 31.5, 23.625], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -12,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "curve 2",
+							"from": [28.25, -0.18, -0.24],
+							"to": [30.6, 1.67, 0.24],
+							"rotationOrigin": [28.55, 0.97, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [22, 8, 24.375, 9.875], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [26, 33, 26.5, 34.875], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [22, 10, 24.375, 11.875], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [27, 33, 27.5, 34.875], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [31, 19, 33.375, 19.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [31, 20, 33.375, 20.5], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -24,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "curve edge 2",
+							"from": [28.25, 1.47, -0.12],
+							"to": [30.6, 2.12, 0.12],
+							"rotationOrigin": [28.55, 0.97, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [29, 24, 31.375, 24.625], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [37, 30, 37.25, 30.625], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [29, 25, 31.375, 25.625], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [31, 37, 31.25, 37.625], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [35, 33, 37.375, 33.25], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [35, 34, 37.375, 34.25], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -24,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "curve spine 2",
+							"from": [28.25, -0.18, -0.28],
+							"to": [30.6, 0.12, 0.28],
+							"rotationOrigin": [28.55, 0.97, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [0, 36, 2.375, 36.25], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [37, 37, 37.5, 37.25], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 0, 38.375, 0.25], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [0, 38, 0.5, 38.25], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [31, 22, 33.375, 22.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [29, 31, 31.375, 31.5], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -24,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "curve ridge 2",
+							"from": [28.25, 0.72, -0.29],
+							"to": [30.4, 1.22, 0.29],
+							"rotationOrigin": [28.55, 0.97, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [32, 17, 34.125, 17.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [37, 3, 37.625, 3.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [32, 21, 34.125, 21.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [4, 37, 4.625, 37.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [29, 28, 31.125, 28.625], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [29, 29, 31.125, 29.625], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -24,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "curve 3",
+							"from": [30.08, -0.79, -0.22],
+							"to": [32.25, 0.71, 0.22],
+							"rotationOrigin": [30.38, 0.16, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [9, 26, 11.125, 27.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [25, 34, 25.5, 35.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [26, 25, 28.125, 26.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [32, 34, 32.5, 35.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [32, 28, 34.125, 28.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [29, 32, 31.125, 32.5], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -36,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "curve edge 3",
+							"from": [30.08, 0.51, -0.11],
+							"to": [32.25, 1.11, 0.11],
+							"rotationOrigin": [30.38, 0.16, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [30, 0, 32.125, 0.625], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [32, 37, 32.25, 37.625], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [30, 1, 32.125, 1.625], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [37, 32, 37.25, 32.625], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 9, 38.125, 9.25], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 10, 38.125, 10.25], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -36,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "curve spine 3",
+							"from": [30.08, -0.79, -0.26],
+							"to": [32.25, -0.52, 0.26],
+							"rotationOrigin": [30.38, 0.16, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 11, 38.125, 11.25], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [1, 38, 1.5, 38.25], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 12, 38.125, 12.25], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [38, 1, 38.5, 1.25], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [32, 29, 34.125, 29.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [32, 31, 34.125, 31.5], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -36,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "curve 4",
+							"from": [31.54, -1.6, -0.18],
+							"to": [33.4, -0.6, 0.18],
+							"rotationOrigin": [31.84, -0.9, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [19, 15, 20.875, 16], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 30, 36.375, 31], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [9, 23, 10.875, 24], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [32, 36, 32.375, 37], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [34, 32, 35.875, 32.375], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [33, 34, 34.875, 34.375], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -48,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "curve edge 4",
+							"from": [31.54, -0.75, -0.1],
+							"to": [33.4, -0.2, 0.1],
+							"rotationOrigin": [31.84, -0.9, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [33, 33, 34.875, 33.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [2, 38, 2.25, 38.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [34, 0, 35.875, 0.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [38, 2, 38.25, 2.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 18, 37.875, 18.25], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [36, 19, 37.875, 19.25], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -48,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "tip",
+							"from": [32.6, -2.36, -0.14],
+							"to": [33.6, -1.66, 0.14],
+							"rotationOrigin": [32.84, -2.01, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [16, 3, 17, 3.75], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [37, 26, 37.25, 26.75], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [10, 30, 11, 30.75], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [27, 37, 27.25, 37.75], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [9, 37, 10, 37.25], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [10, 37, 11, 37.25], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -56,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "tip edge",
+							"from": [32.6, -1.8, -0.1],
+							"to": [33.65, -1.5, 0.1],
+							"rotationOrigin": [32.84, -2.01, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [11, 37, 12, 37.25], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [3, 38, 3.25, 38.25], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [12, 37, 13, 37.25], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [38, 3, 38.25, 3.25], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [13, 37, 14, 37.25], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [14, 37, 15, 37.25], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -62,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "tip spine",
+							"from": [32.6, -2.45, -0.12],
+							"to": [33.6, -2.2, 0.12],
+							"rotationOrigin": [32.84, -2.01, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Scimitar Texture.png", "uv": [15, 37, 16, 37.25], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Scimitar Texture.png", "uv": [4, 38, 4.25, 38.25], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Scimitar Texture.png", "uv": [16, 37, 17, 37.25], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Scimitar Texture.png", "uv": [38, 4, 38.25, 4.25], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Scimitar Texture.png", "uv": [17, 37, 18, 37.25], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Scimitar Texture.png", "uv": [18, 37, 19, 37.25], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -50,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						}
+					],
+					"stepParentName": ""
+				}
+			],
+			"stepParentName": ""
+		}
+	],
+	"animations": []
+}

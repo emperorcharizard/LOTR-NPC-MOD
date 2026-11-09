@@ -1,0 +1,917 @@
+{
+	"editor": {
+		"backDropShape": "",
+		"collapsedPaths": "",
+		"allAngles": false,
+		"entityTextureMode": false,
+		"singleTexture": false,
+		"vsFormatConverted": false
+	},
+	"textureWidth": 32,
+	"textureHeight": 32,
+	"textureSizes": {
+		"Morc Knife.png": [32, 32]
+	},
+	"textures": {
+		"Morc Knife.png": ""
+	},
+	"elements": [
+		{
+			"name": "morc_knife",
+			"from": [0, 0, 8],
+			"to": [0, 0, 8],
+			"rotationOrigin": [0, 0, 8],
+			"children": [
+				{
+					"name": "blade",
+					"from": [0, 0, 0],
+					"to": [0, 0, 0],
+					"rotationOrigin": [0, 0, 0],
+					"children": [
+						{
+							"name": "blade 1",
+							"from": [6, -2, -0.2],
+							"to": [7.4, 2.3, 0.2],
+							"rotationOrigin": [6, -2, -0.2],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [0, 10, 1.5, 14.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [20, 22, 20.5, 26.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [2, 10, 3.5, 14.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [22, 20, 22.5, 24.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [27, 24, 28.5, 24.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [4, 28, 5.5, 28.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "blade 2",
+							"from": [7.4, -2.67, -0.2],
+							"to": [8.8, 1.96, 0.2],
+							"rotationOrigin": [7.4, -2.67, -0.2],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [4, 10, 5.5, 14.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [21, 22, 21.5, 26.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [6, 10, 7.5, 14.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [0, 23, 0.5, 27.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [28, 4, 29.5, 4.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [8, 28, 9.5, 28.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "blade 3",
+							"from": [8.8, -3, -0.2],
+							"to": [10.2, 1.66, 0.2],
+							"rotationOrigin": [8.8, -3, -0.2],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [8, 10, 9.5, 14.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [23, 0, 23.5, 4.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [10, 10, 11.5, 14.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [1, 23, 1.5, 27.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [28, 8, 29.5, 8.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [28, 9, 29.5, 9.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "blade 4",
+							"from": [10.2, -3.24, -0.2],
+							"to": [11.6, 1.3, 0.2],
+							"rotationOrigin": [10.2, -3.24, -0.2],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [12, 10, 13.5, 14.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [2, 23, 2.5, 27.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [13, 0, 14.5, 4.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [3, 23, 3.5, 27.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [10, 28, 11.5, 28.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [28, 12, 29.5, 12.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "blade 5",
+							"from": [11.6, -3.25, -0.2],
+							"to": [13, 0.91, 0.2],
+							"rotationOrigin": [11.6, -3.25, -0.2],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [14, 5, 15.5, 9], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [8, 24, 8.5, 28], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [14, 9, 15.5, 13], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [9, 24, 9.5, 28], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [28, 13, 29.5, 13.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [28, 14, 29.5, 14.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "blade 6",
+							"from": [13, -2.9, -0.2],
+							"to": [14.2, 0.47, 0.2],
+							"rotationOrigin": [13, -2.9, -0.2],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [8, 20, 9, 23.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [12, 25, 12.5, 28.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [9, 20, 10, 23.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [13, 25, 13.5, 28.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [13, 5, 14, 5.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [15, 4, 16, 4.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "blade 7",
+							"from": [14.2, -2.38, -0.18],
+							"to": [15.3, 0, 0.18],
+							"rotationOrigin": [14.2, -2.38, -0.18],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [18, 22, 19, 24.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [7, 26, 7.5, 28.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [19, 22, 20, 24.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [22, 26, 22.5, 28.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [29, 3, 30, 3.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [10, 29, 11, 29.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "blade 8",
+							"from": [15.3, -1.92, -0.16],
+							"to": [16.3, -0.28, 0.16],
+							"rotationOrigin": [15.3, -1.92, -0.16],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [18, 25, 19, 26.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [6, 28, 6.5, 29.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [19, 25, 20, 26.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [28, 20, 28.5, 21.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [29, 10, 30, 10.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [11, 29, 12, 29.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "blade 9",
+							"from": [16.3, -1.57, -0.14],
+							"to": [16.7, -0.41, 0.14],
+							"rotationOrigin": [16.3, -1.27, -0.14],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [29, 11, 29.5, 12], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [12, 29, 12.5, 30], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [13, 29, 13.5, 30], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [14, 29, 14.5, 30], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [29, 17, 29.5, 17.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [18, 29, 18.5, 29.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "blade 10",
+							"from": [16.7, -1.17, -0.14],
+							"to": [17.2, -0.41, 0.14],
+							"rotationOrigin": [16.7, -1.27, -0.14],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [29, 11, 29.5, 12], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [12, 29, 12.5, 30], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [13, 29, 13.5, 30], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [14, 29, 14.5, 30], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [29, 17, 29.5, 17.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [18, 29, 18.5, 29.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "spine 1",
+							"from": [6.6, 1.98, -0.18],
+							"to": [12.6, 2.48, 0.18],
+							"rotationOrigin": [6.6, 2.48, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [20, 12, 26, 12.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [29, 18, 29.5, 18.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [20, 13, 26, 13.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [19, 29, 19.5, 29.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [20, 14, 26, 14.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [20, 15, 26, 15.5], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -13.7,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "spine 2",
+							"from": [12.4, 0.57, -0.17],
+							"to": [15.8, 1.07, 0.17],
+							"rotationOrigin": [12.4, 1.07, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [25, 10, 28.5, 10.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [29, 19, 29.5, 19.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [14, 25, 17.5, 25.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [20, 29, 20.5, 29.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [25, 18, 28.5, 18.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [25, 19, 28.5, 19.5], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -20,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "spine tip",
+							"from": [15.6, -0.49, -0.14],
+							"to": [18.05, -0.09, 0.14],
+							"rotationOrigin": [15.6, -0.09, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [26, 16, 28.5, 16.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [29, 20, 29.5, 20.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [26, 17, 28.5, 17.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [21, 29, 21.5, 29.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [26, 25, 28.5, 25.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [26, 26, 28.5, 26.5], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -11,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "edge 1",
+							"from": [5.2, -1.55, -0.1],
+							"to": [9.3, -1.15, 0.1],
+							"rotationOrigin": [5.2, -1.55, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [23, 11, 27, 11.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [29, 21, 29.5, 21.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [24, 4, 28, 4.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [22, 29, 22.5, 29.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [14, 24, 18, 24.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [23, 24, 27, 24.5], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -21.5,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "edge 2",
+							"from": [9, -3.05, -0.1],
+							"to": [11.85, -2.65, 0.1],
+							"rotationOrigin": [9, -3.05, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [25, 20, 28, 20.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [23, 29, 23.5, 29.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [25, 21, 28, 21.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [24, 29, 24.5, 29.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [22, 25, 25, 25.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [25, 22, 28, 22.5], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -6.5,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "edge 3",
+							"from": [11.8, -3.37, -0.1],
+							"to": [14.5, -2.97, 0.1],
+							"rotationOrigin": [11.8, -3.37, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [27, 0, 29.5, 0.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [29, 24, 29.5, 24.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [27, 1, 29.5, 1.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [29, 25, 29.5, 25.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [27, 2, 29.5, 2.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [27, 5, 29.5, 5.5], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 11.3,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "edge 4",
+							"from": [14.4, -2.85, -0.1],
+							"to": [16.65, -2.45, 0.1],
+							"rotationOrigin": [14.4, -2.85, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [23, 26, 25, 26.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [26, 29, 26.5, 29.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [4, 27, 6, 27.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [29, 26, 29.5, 26.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [27, 6, 29, 6.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [27, 7, 29, 7.5], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 26,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "edge tip",
+							"from": [16.4, -1.87, -0.08],
+							"to": [18.1, -1.47, 0.08],
+							"rotationOrigin": [16.4, -1.87, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [28, 15, 29.5, 15.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [27, 29, 27.5, 29.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [28, 22, 29.5, 22.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [29, 28, 29.5, 28.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [28, 23, 29.5, 23.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [28, 27, 29.5, 27.5], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 38,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "blade body",
+							"from": [7, -2.2, -0.28],
+							"to": [13, 0.8, 0.28],
+							"rotationOrigin": [7, -2.2, -0.28],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [0, 0, 6, 3], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [25, 25, 25.5, 28], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [0, 3, 6, 6], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [26, 0, 26.5, 3], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [20, 16, 26, 16.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [20, 17, 26, 17.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "blade body 2",
+							"from": [13, -1.8, -0.25],
+							"to": [16, -0.3, 0.25],
+							"rotationOrigin": [13, -1.8, -0.25],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [12, 15, 15, 16.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [25, 28, 25.5, 29.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [15, 15, 18, 16.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [28, 28, 28.5, 29.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [25, 23, 28, 23.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [26, 3, 29, 3.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "blade heel",
+							"from": [5.2, -1.5, -0.18],
+							"to": [6.2, 0.2, 0.18],
+							"rotationOrigin": [5.2, -1.5, -0.18],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [6, 26, 7, 27.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [4, 29, 4.5, 30.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [26, 6, 27, 7.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [5, 29, 5.5, 30.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [15, 29, 16, 29.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [16, 29, 17, 29.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						}
+					],
+					"stepParentName": ""
+				},
+				{
+					"name": "handle",
+					"from": [0, 0, 0],
+					"to": [0, 0, 0],
+					"rotationOrigin": [0, 0, 0],
+					"children": [
+						{
+							"name": "left arm",
+							"from": [0.2, 1.55, -0.7],
+							"to": [7, 2.95, 0.7],
+							"rotationOrigin": [0.2, 1.55, -0.7],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [0, 6, 7, 7.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [4, 23, 5.5, 24.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [6, 0, 13, 1.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [23, 5, 24.5, 6.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [6, 2, 13, 3.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [6, 4, 13, 5.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "left arm round",
+							"from": [0.2, 1.7, -0.85],
+							"to": [7, 2.8, 0.85],
+							"rotationOrigin": [0.2, 1.7, -0.85],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [7, 8, 14, 9], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [26, 8, 27.5, 9], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [7, 9, 14, 10], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [26, 9, 27.5, 10], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [7, 6, 14, 7.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [0, 8, 7, 9.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "right arm upper",
+							"from": [2.4, -1.05, -0.7],
+							"to": [6.4, 0.25, 0.7],
+							"rotationOrigin": [2.4, -1.05, -0.7],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [14, 13, 18, 14.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [6, 23, 7.5, 24.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [0, 15, 4, 16.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [23, 7, 24.5, 8.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [15, 0, 19, 1.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [15, 2, 19, 3.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "right arm upper round",
+							"from": [2.4, -0.9, -0.85],
+							"to": [6.4, 0.1, 0.85],
+							"rotationOrigin": [2.4, -0.9, -0.85],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [16, 12, 20, 13], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [26, 12, 27.5, 13], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [6, 17, 10, 18], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [26, 13, 27.5, 14], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [4, 15, 8, 16.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [8, 15, 12, 16.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "right arm lower",
+							"from": [0, -1.4, -0.7],
+							"to": [2.8, -0.05, 0.7],
+							"rotationOrigin": [2.8, -0.7, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [16, 4, 19, 5.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [23, 9, 24.5, 10.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [16, 6, 19, 7.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [10, 23, 11.5, 24.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [16, 8, 19, 9.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [16, 10, 19, 11.5], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 8,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "right arm lower round",
+							"from": [0, -1.25, -0.85],
+							"to": [2.8, -0.2, 0.85],
+							"rotationOrigin": [2.8, -0.7, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [20, 18, 23, 19], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [14, 26, 15.5, 27], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [20, 19, 23, 20], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [26, 14, 27.5, 15], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [0, 17, 3, 18.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [3, 17, 6, 18.5], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 8,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "loop corner left",
+							"from": [-1.65, 1.08, -0.7],
+							"to": [0.55, 2.48, 0.7],
+							"rotationOrigin": [-0.55, 1.78, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [20, 20, 22, 21.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [12, 23, 13.5, 24.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [0, 21, 2, 22.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [23, 18, 24.5, 19.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [21, 0, 23, 1.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [2, 21, 4, 22.5], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 30,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "loop corner right",
+							"from": [-1.85, -1.4, -0.7],
+							"to": [0.35, 0, 0.7],
+							"rotationOrigin": [-0.75, -0.7, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [21, 2, 23, 3.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [23, 20, 24.5, 21.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [4, 21, 6, 22.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [23, 22, 24.5, 23.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [21, 4, 23, 5.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [21, 6, 23, 7.5], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -28,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "loop bottom",
+							"from": [-2, -0.5, -0.7],
+							"to": [-0.6, 1.8, 0.7],
+							"rotationOrigin": [-2, -0.5, -0.7],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [14, 19, 15.5, 21.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [16, 19, 17.5, 21.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [18, 19, 19.5, 21.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [6, 20, 7.5, 22.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [24, 0, 25.5, 1.5], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [24, 2, 25.5, 3.5], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "loop bottom round",
+							"from": [-2.15, -0.35, -0.55],
+							"to": [-0.45, 1.65, 0.55],
+							"rotationOrigin": [-2.15, -0.35, -0.55],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [21, 8, 22.5, 10], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [4, 25, 5, 27], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [10, 21, 11.5, 23], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [5, 25, 6, 27], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [26, 15, 27.5, 16], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [16, 26, 17.5, 27], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						}
+					],
+					"stepParentName": ""
+				},
+				{
+					"name": "binding",
+					"from": [0, 0, 0],
+					"to": [0, 0, 0],
+					"rotationOrigin": [0, 0, 0],
+					"children": [
+						{
+							"name": "wrap junction",
+							"from": [5.4, 1.35, -0.9],
+							"to": [7.3, 3.15, 0.9],
+							"rotationOrigin": [6.35, 2.25, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [10, 17, 12, 19], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [12, 17, 14, 19], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [14, 17, 16, 19], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [16, 17, 18, 19], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [6, 18, 8, 20], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [8, 18, 10, 20], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -6,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "wrap junction fray",
+							"from": [3.6, 3, -0.6],
+							"to": [5.6, 3.2, 0.6],
+							"rotationOrigin": [5.6, 3.1, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [10, 27, 12, 27.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [29, 16, 30, 16.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [27, 11, 29, 11.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [17, 29, 18, 29.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [25, 5, 27, 6], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [6, 25, 8, 26], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -20,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "wrap right cross",
+							"from": [4.6, -1.25, -0.9],
+							"to": [5, 0.45, 0.9],
+							"rotationOrigin": [4.8, -0.4, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [29, 6, 29.5, 7.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [21, 10, 23, 11.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [7, 29, 7.5, 30.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [12, 21, 14, 22.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [14, 27, 14.5, 29], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [15, 27, 15.5, 29], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 22.5,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "wrap right cross 2",
+							"from": [5.1, -1.25, -0.9],
+							"to": [5.5, 0.45, 0.9],
+							"rotationOrigin": [5.3, -0.4, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [8, 29, 8.5, 30.5], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [14, 22, 16, 23.5], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [9, 29, 9.5, 30.5], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [16, 22, 18, 23.5], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [16, 27, 16.5, 29], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [17, 27, 17.5, 29], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -22.5,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "wrap left band",
+							"from": [2.4, 1.35, -0.9],
+							"to": [3.3, 3.15, 0.9],
+							"rotationOrigin": [2.85, 2.25, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [25, 6, 26, 8], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [18, 13, 20, 15], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [25, 8, 26, 10], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [18, 15, 20, 17], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [10, 25, 11, 27], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [11, 25, 12, 27], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 4,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "wrap left cross",
+							"from": [1.7, 1.3, -0.95],
+							"to": [2.1, 3.2, 0.95],
+							"rotationOrigin": [1.9, 2.25, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [18, 27, 18.5, 29], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [18, 17, 20, 19], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [19, 27, 19.5, 29], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [0, 19, 2, 21], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [20, 27, 20.5, 29], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [21, 27, 21.5, 29], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 22.5,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "wrap right lower band",
+							"from": [0.4, -1.95, -0.9],
+							"to": [1, -0.1, 0.9],
+							"rotationOrigin": [0.7, -1, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [23, 27, 23.5, 29], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [19, 0, 21, 2], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [24, 27, 24.5, 29], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [2, 19, 4, 21], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [26, 27, 26.5, 29], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [27, 27, 27.5, 29], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": 14,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "wrap bottom sleeve",
+							"from": [-2.2, -0.4, -0.9],
+							"to": [-0.4, 1.7, 0.9],
+							"rotationOrigin": [-2.2, -0.4, -0.9],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [19, 2, 21, 4], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [4, 19, 6, 21], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [19, 4, 21, 6], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [19, 6, 21, 8], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [19, 8, 21, 10], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [10, 19, 12, 21], "autoUv": false, "snapUv": false}
+							},
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						},
+						{
+							"name": "wrap bottom band",
+							"from": [-1, -1.65, -0.9],
+							"to": [-0.5, 0.25, 0.9],
+							"rotationOrigin": [-0.75, -0.7, 0],
+							"uv": [0, 0],
+							"shade": true,
+							"faces": {
+								"north": {"texture": "#Morc Knife.png", "uv": [0, 28, 0.5, 30], "autoUv": false, "snapUv": false},
+								"east": {"texture": "#Morc Knife.png", "uv": [19, 10, 21, 12], "autoUv": false, "snapUv": false},
+								"south": {"texture": "#Morc Knife.png", "uv": [1, 28, 1.5, 30], "autoUv": false, "snapUv": false},
+								"west": {"texture": "#Morc Knife.png", "uv": [12, 19, 14, 21], "autoUv": false, "snapUv": false},
+								"up": {"texture": "#Morc Knife.png", "uv": [2, 28, 2.5, 30], "autoUv": false, "snapUv": false},
+								"down": {"texture": "#Morc Knife.png", "uv": [3, 28, 3.5, 30], "autoUv": false, "snapUv": false}
+							},
+							"rotationZ": -28,
+							"stepParentName": "",
+							"climateColorMap": "",
+							"gradientShade": false,
+							"renderPass": 0,
+							"seasonColorMap": ""
+						}
+					],
+					"stepParentName": ""
+				}
+			],
+			"stepParentName": ""
+		}
+	],
+	"animations": []
+}

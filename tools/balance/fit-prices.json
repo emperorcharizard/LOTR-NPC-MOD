@@ -1,0 +1,128 @@
+{
+ "Men": {
+  "multiplier": 1.0,
+  "prices": {
+   "recruit": 5,
+   "warrior": 15,
+   "captain": 40,
+   "archer": 15
+  },
+  "average": 0.471,
+  "vs": {
+   "Uruk": 0.49,
+   "Levy": 0.56,
+   "Orc": 0.51,
+   "Goblin": 0.44,
+   "Elf": 0.43,
+   "Dwarf": 0.4
+  }
+ },
+ "Uruk": {
+  "multiplier": 1.03,
+  "prices": {
+   "recruit": 5,
+   "warrior": 15,
+   "captain": 41,
+   "archer": 15
+  },
+  "average": 0.459,
+  "vs": {
+   "Men": 0.51,
+   "Levy": 0.49,
+   "Orc": 0.5,
+   "Goblin": 0.49,
+   "Elf": 0.38,
+   "Dwarf": 0.39
+  }
+ },
+ "Levy": {
+  "multiplier": 0.83,
+  "prices": {
+   "recruit": 4,
+   "warrior": 12,
+   "captain": 33,
+   "archer": 12
+  },
+  "average": 0.465,
+  "vs": {
+   "Men": 0.44,
+   "Uruk": 0.51,
+   "Orc": 0.56,
+   "Goblin": 0.46,
+   "Elf": 0.4,
+   "Dwarf": 0.43
+  }
+ },
+ "Orc": {
+  "multiplier": 0.88,
+  "prices": {
+   "recruit": 4,
+   "warrior": 13,
+   "captain": 35,
+   "archer": 13
+  },
+  "average": 0.484,
+  "vs": {
+   "Men": 0.49,
+   "Uruk": 0.5,
+   "Levy": 0.44,
+   "Goblin": 0.49,
+   "Elf": 0.49,
+   "Dwarf": 0.5
+  }
+ },
+ "Goblin": {
+  "multiplier": 0.63,
+  "prices": {
+   "recruit": 3,
+   "warrior": 9,
+   "captain": 25,
+   "archer": 9
+  },
+  "average": 0.548,
+  "vs": {
+   "Men": 0.56,
+   "Uruk": 0.51,
+   "Levy": 0.54,
+   "Orc": 0.51,
+   "Elf": 0.59,
+   "Dwarf": 0.57
+  }
+ },
+ "Elf": {
+  "multiplier": 1.29,
+  "prices": {
+   "recruit": 6,
+   "warrior": 19,
+   "captain": 52,
+   "archer": 19
+  },
+  "average": 0.549,
+  "vs": {
+   "Men": 0.57,
+   "Uruk": 0.62,
+   "Levy": 0.6,
+   "Orc": 0.51,
+   "Goblin": 0.41,
+   "Dwarf": 0.57
+  }
+ },
+ "Dwarf": {
+  "multiplier": 1.29,
+  "prices": {
+   "recruit": 6,
+   "warrior": 19,
+   "captain": 52,
+   "archer": 19
+  },
+  "average": 0.523,
+  "vs": {
+   "Men": 0.6,
+   "Uruk": 0.61,
+   "Levy": 0.57,
+   "Orc": 0.5,
+   "Goblin": 0.43,
+   "Elf": 0.43
+  }
+ }
+}

@@ -1,0 +1,3074 @@
+{
+	"editor": {
+		"allAngles": true,
+		"entityTextureMode": false
+	},
+	"textureWidth": 16,
+	"textureHeight": 16,
+	"textures": {
+		"Morc_Short_Axe_Texture": "game:Morc_Short_Axe_Texture"
+	},
+	"elements": [
+		{
+			"name": "grip core",
+			"from": [
+				-1,
+				0,
+				7.25
+			],
+			"to": [
+				7.2,
+				1.5,
+				8.75
+			],
+			"rotationOrigin": [
+				-1,
+				0,
+				7.25
+			],
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3.5,
+						2.5,
+						5.5,
+						2.875
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7,
+						1,
+						7.375,
+						1.375
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0,
+						3.75,
+						2,
+						4.125
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7,
+						1.5,
+						7.375,
+						1.875
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						2,
+						3.75,
+						4,
+						4.125
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						4,
+						3,
+						6,
+						3.375
+					]
+				}
+			}
+		},
+		{
+			"name": "shaft upper",
+			"from": [
+				6.8,
+				-0.05,
+				7.2
+			],
+			"to": [
+				20.4,
+				1.55,
+				8.8
+			],
+			"rotationOrigin": [
+				7,
+				0.75,
+				8
+			],
+			"rotationZ": -8,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0,
+						1,
+						3.375,
+						1.375
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7,
+						2,
+						7.375,
+						2.375
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0,
+						1.5,
+						3.375,
+						1.875
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3.25,
+						7,
+						3.625,
+						7.375
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0,
+						2,
+						3.375,
+						2.375
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0,
+						2.5,
+						3.375,
+						2.875
+					]
+				}
+			}
+		},
+		{
+			"name": "shaft upper round",
+			"from": [
+				6.8,
+				0.15,
+				7
+			],
+			"to": [
+				20.4,
+				1.35,
+				9
+			],
+			"rotationOrigin": [
+				7,
+				0.75,
+				8
+			],
+			"rotationZ": -8,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3.5,
+						2,
+						6.875,
+						2.25
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3.25,
+						5.25,
+						3.75,
+						5.5
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3.5,
+						2.25,
+						6.875,
+						2.5
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.75,
+						5.75,
+						7.25,
+						6
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0,
+						0,
+						3.375,
+						0.5
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0,
+						0.5,
+						3.375,
+						1
+					]
+				}
+			}
+		},
+		{
+			"name": "butt",
+			"from": [
+				-3.6,
+				-0.05,
+				7.2
+			],
+			"to": [
+				-0.8,
+				1.55,
+				8.8
+			],
+			"rotationOrigin": [
+				-0.8,
+				0.75,
+				8
+			],
+			"rotationZ": 8,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						4,
+						6.25,
+						4.75,
+						6.625
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7,
+						4.25,
+						7.375,
+						4.625
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.25,
+						6,
+						7,
+						6.375
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7,
+						4.75,
+						7.375,
+						5.125
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.5,
+						0,
+						7.25,
+						0.375
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.5,
+						0.5,
+						7.25,
+						0.875
+					]
+				}
+			}
+		},
+		{
+			"name": "butt round",
+			"from": [
+				-3.6,
+				0.15,
+				7
+			],
+			"to": [
+				-0.8,
+				1.35,
+				9
+			],
+			"rotationOrigin": [
+				-0.8,
+				0.75,
+				8
+			],
+			"rotationZ": 8,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3.25,
+						6.75,
+						4,
+						7
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7,
+						5.25,
+						7.5,
+						5.5
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.75,
+						3.5,
+						7.5,
+						3.75
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7,
+						5.5,
+						7.5,
+						5.75
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						5.5,
+						1.5,
+						6.25,
+						2
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6,
+						4,
+						6.75,
+						4.5
+					]
+				}
+			}
+		},
+		{
+			"name": "butt knob",
+			"from": [
+				-3.9,
+				-0.2,
+				7.15
+			],
+			"to": [
+				-3.1,
+				1.7,
+				8.85
+			],
+			"rotationOrigin": [
+				-0.8,
+				0.75,
+				8
+			],
+			"rotationZ": 8,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						2.25,
+						5.5,
+						2.5,
+						6
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.75,
+						3.75,
+						7.125,
+						4.25
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						4.75,
+						5.5,
+						5,
+						6
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						4,
+						6.75,
+						4.375,
+						7.25
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.25,
+						0,
+						7.5,
+						0.375
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.25,
+						0.5,
+						7.5,
+						0.875
+					]
+				}
+			}
+		},
+		{
+			"name": "wrap sleeve",
+			"from": [
+				-1,
+				-0.2,
+				7.05
+			],
+			"to": [
+				6.9,
+				1.7,
+				8.95
+			],
+			"rotationOrigin": [
+				-1,
+				-0.2,
+				7.05
+			],
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3.5,
+						0,
+						5.5,
+						0.5
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						5.5,
+						2.5,
+						6,
+						3
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3.5,
+						0.5,
+						5.5,
+						1
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						1.75,
+						6.25,
+						2.25,
+						6.75
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3.5,
+						1,
+						5.5,
+						1.5
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3.5,
+						1.5,
+						5.5,
+						2
+					]
+				}
+			}
+		},
+		{
+			"name": "wrap sleeve round",
+			"from": [
+				-1,
+				0,
+				6.85
+			],
+			"to": [
+				6.9,
+				1.5,
+				9.15
+			],
+			"rotationOrigin": [
+				-1,
+				0,
+				6.85
+			],
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						4,
+						3.5,
+						6,
+						3.875
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.5,
+						6.5,
+						7.125,
+						6.875
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						4,
+						4,
+						6,
+						4.375
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						1.75,
+						6.75,
+						2.375,
+						7.125
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0,
+						3,
+						2,
+						3.625
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						2,
+						3,
+						4,
+						3.625
+					]
+				}
+			}
+		},
+		{
+			"name": "wrap band",
+			"from": [
+				-0.6,
+				-0.45,
+				6.8
+			],
+			"to": [
+				-0.2,
+				1.95,
+				9.2
+			],
+			"rotationOrigin": [
+				-0.4,
+				0.75,
+				8
+			],
+			"rotationZ": 25,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						1.75,
+						7.5,
+						1.875,
+						8.125
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						5,
+						4.5,
+						5.625,
+						5.125
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						2,
+						7.5,
+						2.125,
+						8.125
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						2.5,
+						5.25,
+						3.125,
+						5.875
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.5,
+						2,
+						7.625,
+						2.625
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.5,
+						2.75,
+						7.625,
+						3.375
+					]
+				}
+			}
+		},
+		{
+			"name": "wrap band 2",
+			"from": [
+				0.5,
+				-0.45,
+				6.8
+			],
+			"to": [
+				0.9,
+				1.95,
+				9.2
+			],
+			"rotationOrigin": [
+				0.7,
+				0.75,
+				8
+			],
+			"rotationZ": 20,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3,
+						7.5,
+						3.125,
+						8.125
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						5,
+						5.25,
+						5.625,
+						5.875
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3.25,
+						7.5,
+						3.375,
+						8.125
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0,
+						5.5,
+						0.625,
+						6.125
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3.5,
+						7.5,
+						3.625,
+						8.125
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.5,
+						4.25,
+						7.625,
+						4.875
+					]
+				}
+			}
+		},
+		{
+			"name": "wrap band 3",
+			"from": [
+				1.6,
+				-0.45,
+				6.8
+			],
+			"to": [
+				2.1,
+				1.95,
+				9.2
+			],
+			"rotationOrigin": [
+				1.85,
+				0.75,
+				8
+			],
+			"rotationZ": 25,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.5,
+						5,
+						7.625,
+						5.625
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						5.5,
+						0,
+						6.125,
+						0.625
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6,
+						7.5,
+						6.125,
+						8.125
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0.75,
+						5.5,
+						1.375,
+						6.125
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.25,
+						7.5,
+						6.375,
+						8.125
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.5,
+						7.5,
+						6.625,
+						8.125
+					]
+				}
+			}
+		},
+		{
+			"name": "wrap band 4",
+			"from": [
+				2.8,
+				-0.45,
+				6.8
+			],
+			"to": [
+				3.2,
+				1.95,
+				9.2
+			],
+			"rotationOrigin": [
+				3,
+				0.75,
+				8
+			],
+			"rotationZ": -18,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.5,
+						7,
+						7.625,
+						7.625
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						5.5,
+						0.75,
+						6.125,
+						1.375
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.25,
+						7.5,
+						7.375,
+						8.125
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						1.5,
+						5.5,
+						2.125,
+						6.125
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3,
+						7.5,
+						3.125,
+						8.125
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3.25,
+						7.5,
+						3.375,
+						8.125
+					]
+				}
+			}
+		},
+		{
+			"name": "wrap band 5",
+			"from": [
+				3.8,
+				-0.45,
+				6.8
+			],
+			"to": [
+				4.3,
+				1.95,
+				9.2
+			],
+			"rotationOrigin": [
+				4.05,
+				0.75,
+				8
+			],
+			"rotationZ": 22.5,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0,
+						7.75,
+						0.125,
+						8.375
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3.25,
+						5.5,
+						3.875,
+						6.125
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.75,
+						0,
+						7.875,
+						0.625
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						4,
+						5.5,
+						4.625,
+						6.125
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.5,
+						5,
+						7.625,
+						5.625
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6,
+						7.5,
+						6.125,
+						8.125
+					]
+				}
+			}
+		},
+		{
+			"name": "wrap band 6",
+			"from": [
+				5,
+				-0.45,
+				6.8
+			],
+			"to": [
+				5.4,
+				1.95,
+				9.2
+			],
+			"rotationOrigin": [
+				5.2,
+				0.75,
+				8
+			],
+			"rotationZ": 18,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0.25,
+						7.75,
+						0.375,
+						8.375
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						5.75,
+						4.5,
+						6.375,
+						5.125
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0.75,
+						7.75,
+						0.875,
+						8.375
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						5.75,
+						5.25,
+						6.375,
+						5.875
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.5,
+						7,
+						7.625,
+						7.625
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.25,
+						7.5,
+						7.375,
+						8.125
+					]
+				}
+			}
+		},
+		{
+			"name": "wrap top band",
+			"from": [
+				6.2,
+				-0.5,
+				6.75
+			],
+			"to": [
+				6.9,
+				2,
+				9.25
+			],
+			"rotationOrigin": [
+				6.55,
+				0.75,
+				8
+			],
+			"rotationZ": 5,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						1,
+						7.75,
+						1.125,
+						8.375
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						2.25,
+						6,
+						2.875,
+						6.625
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						1.25,
+						7.75,
+						1.375,
+						8.375
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6,
+						2.5,
+						6.625,
+						3.125
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						1.5,
+						7.75,
+						1.625,
+						8.375
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.75,
+						2,
+						7.875,
+						2.625
+					]
+				}
+			}
+		},
+		{
+			"name": "knot",
+			"from": [
+				-0.9,
+				-0.8,
+				7.3
+			],
+			"to": [
+				0.1,
+				0,
+				8.7
+			],
+			"rotationOrigin": [
+				-0.4,
+				-0.4,
+				8
+			],
+			"rotationZ": 30,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3.75,
+						4.25,
+						4,
+						4.5
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						1.75,
+						7.25,
+						2.125,
+						7.5
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.75,
+						4.25,
+						7,
+						4.5
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.25,
+						3.75,
+						7.625,
+						4
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						2.25,
+						7.25,
+						2.5,
+						7.625
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						4,
+						7.25,
+						4.25,
+						7.625
+					]
+				}
+			}
+		},
+		{
+			"name": "loop cord",
+			"from": [
+				-2.9,
+				-0.55,
+				7.85
+			],
+			"to": [
+				-0.3,
+				-0.25,
+				8.15
+			],
+			"rotationOrigin": [
+				-0.3,
+				-0.4,
+				8
+			],
+			"rotationZ": 16,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.5,
+						3.5,
+						8.125,
+						3.625
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.25,
+						8.25,
+						6.375,
+						8.375
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.75,
+						0.75,
+						8.375,
+						0.875
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.5,
+						8.25,
+						6.625,
+						8.375
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						2.25,
+						7.75,
+						2.875,
+						7.875
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.75,
+						2.75,
+						8.375,
+						2.875
+					]
+				}
+			}
+		},
+		{
+			"name": "loop cord 2",
+			"from": [
+				-3.1,
+				-0.85,
+				7.85
+			],
+			"to": [
+				-0.3,
+				-0.55,
+				8.15
+			],
+			"rotationOrigin": [
+				-0.3,
+				-0.7,
+				8
+			],
+			"rotationZ": 22,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.25,
+						4,
+						8,
+						4.125
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7,
+						8.25,
+						7.125,
+						8.375
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.25,
+						5.75,
+						8,
+						5.875
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.25,
+						8.25,
+						7.375,
+						8.375
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.25,
+						6,
+						8,
+						6.125
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.25,
+						6.25,
+						8,
+						6.375
+					]
+				}
+			}
+		},
+		{
+			"name": "loop end",
+			"from": [
+				-3.1,
+				-1.85,
+				7.85
+			],
+			"to": [
+				-2.7,
+				-1,
+				8.15
+			],
+			"rotationOrigin": [
+				-3.1,
+				-1.85,
+				7.85
+			],
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7,
+						8,
+						7.125,
+						8.25
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0.5,
+						8.25,
+						0.625,
+						8.5
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8.25,
+						1.75,
+						8.375,
+						2
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8.25,
+						2,
+						8.375,
+						2.25
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.5,
+						8.25,
+						7.625,
+						8.375
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.75,
+						8.25,
+						7.875,
+						8.375
+					]
+				}
+			}
+		},
+		{
+			"name": "socket",
+			"from": [
+				15.8,
+				-0.25,
+				7.05
+			],
+			"to": [
+				20.2,
+				1.75,
+				8.95
+			],
+			"rotationOrigin": [
+				7,
+				0.75,
+				8
+			],
+			"rotationZ": -8,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						2.5,
+						4.25,
+						3.625,
+						4.75
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.5,
+						1,
+						7,
+						1.5
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3.75,
+						4.5,
+						4.875,
+						5
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.5,
+						4.5,
+						7,
+						5
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						2.5,
+						4.75,
+						3.625,
+						5.25
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0,
+						5,
+						1.125,
+						5.5
+					]
+				}
+			}
+		},
+		{
+			"name": "socket round",
+			"from": [
+				15.8,
+				-0.05,
+				6.85
+			],
+			"to": [
+				20.2,
+				1.55,
+				9.15
+			],
+			"rotationOrigin": [
+				7,
+				0.75,
+				8
+			],
+			"rotationZ": -8,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						1.25,
+						5,
+						2.375,
+						5.375
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.75,
+						2.5,
+						7.375,
+						2.875
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3.75,
+						5,
+						4.875,
+						5.375
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.75,
+						3,
+						7.375,
+						3.375
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0,
+						4.25,
+						1.125,
+						4.875
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						1.25,
+						4.25,
+						2.375,
+						4.875
+					]
+				}
+			}
+		},
+		{
+			"name": "head band",
+			"from": [
+				15.9,
+				-1.8,
+				6.7
+			],
+			"to": [
+				16.7,
+				0.7,
+				9.3
+			],
+			"rotationOrigin": [
+				16.3,
+				-0.55,
+				8
+			],
+			"rotationZ": -8,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.75,
+						5,
+						7,
+						5.625
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6,
+						3.25,
+						6.625,
+						3.875
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6,
+						6.75,
+						6.25,
+						7.375
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						4.75,
+						6,
+						5.375,
+						6.625
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0,
+						7,
+						0.25,
+						7.625
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0.25,
+						7,
+						0.5,
+						7.625
+					]
+				}
+			}
+		},
+		{
+			"name": "head band 2",
+			"from": [
+				16.85,
+				-1.95,
+				6.7
+			],
+			"to": [
+				17.55,
+				0.6,
+				9.3
+			],
+			"rotationOrigin": [
+				17.2,
+				-0.67,
+				8
+			],
+			"rotationZ": 14,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						4,
+						7.75,
+						4.125,
+						8.375
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						5.5,
+						6,
+						6.125,
+						6.625
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						4.25,
+						7.75,
+						4.375,
+						8.375
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0,
+						6.25,
+						0.625,
+						6.875
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.75,
+						4.25,
+						7.875,
+						4.875
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.75,
+						5,
+						7.875,
+						5.625
+					]
+				}
+			}
+		},
+		{
+			"name": "strap knot",
+			"from": [
+				16.5,
+				0.5,
+				7.3
+			],
+			"to": [
+				17.3,
+				1.3,
+				8.7
+			],
+			"rotationOrigin": [
+				16.9,
+				0.9,
+				8
+			],
+			"rotationZ": 30,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8,
+						0.25,
+						8.25,
+						0.5
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.25,
+						6.5,
+						7.625,
+						6.75
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0.5,
+						8,
+						0.75,
+						8.25
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.25,
+						6.75,
+						7.625,
+						7
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						4.25,
+						7.25,
+						4.5,
+						7.625
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.25,
+						7,
+						7.5,
+						7.375
+					]
+				}
+			}
+		},
+		{
+			"name": "blade col",
+			"from": [
+				19,
+				-0.3,
+				7.8
+			],
+			"to": [
+				19.9,
+				3.7,
+				8.2
+			],
+			"rotationOrigin": [
+				19,
+				-0.3,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.5,
+						5,
+						6.75,
+						6
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0.5,
+						7,
+						0.625,
+						8
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.25,
+						6.5,
+						6.5,
+						7.5
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3.75,
+						7,
+						3.875,
+						8
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8.25,
+						2.25,
+						8.5,
+						2.375
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						2.5,
+						8.25,
+						2.75,
+						8.375
+					]
+				}
+			}
+		},
+		{
+			"name": "blade col 2",
+			"from": [
+				18,
+				-0.1,
+				7.8
+			],
+			"to": [
+				19,
+				5.3,
+				8.2
+			],
+			"rotationOrigin": [
+				18,
+				-0.1,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3,
+						6,
+						3.25,
+						7.375
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						4.5,
+						6.75,
+						4.625,
+						8.125
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.25,
+						0,
+						6.5,
+						1.375
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						4.75,
+						6.75,
+						4.875,
+						8.125
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						2.75,
+						8.25,
+						3,
+						8.375
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3,
+						8.25,
+						3.25,
+						8.375
+					]
+				}
+			}
+		},
+		{
+			"name": "blade col 3",
+			"from": [
+				17,
+				0.1,
+				7.8
+			],
+			"to": [
+				18,
+				5.75,
+				8.2
+			],
+			"rotationOrigin": [
+				17,
+				0.1,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0.75,
+						6.25,
+						1,
+						7.625
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						5,
+						6.75,
+						5.125,
+						8.125
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						1,
+						6.25,
+						1.25,
+						7.625
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						5.25,
+						6.75,
+						5.375,
+						8.125
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3.25,
+						8.25,
+						3.5,
+						8.375
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3.5,
+						8.25,
+						3.75,
+						8.375
+					]
+				}
+			}
+		},
+		{
+			"name": "blade col 4",
+			"from": [
+				16,
+				0.2,
+				7.8
+			],
+			"to": [
+				17,
+				5.75,
+				8.2
+			],
+			"rotationOrigin": [
+				16,
+				0.2,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						1.25,
+						6.25,
+						1.5,
+						7.625
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						5.5,
+						6.75,
+						5.625,
+						8.125
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						1.5,
+						6.25,
+						1.75,
+						7.625
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						5.75,
+						6.75,
+						5.875,
+						8.125
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8.25,
+						3.5,
+						8.5,
+						3.625
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						4.5,
+						8.25,
+						4.75,
+						8.375
+					]
+				}
+			}
+		},
+		{
+			"name": "blade col 5",
+			"from": [
+				15,
+				2.4,
+				7.8
+			],
+			"to": [
+				16,
+				5.7,
+				8.2
+			],
+			"rotationOrigin": [
+				15,
+				2.4,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						2.5,
+						6.75,
+						2.75,
+						7.625
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.75,
+						7,
+						6.875,
+						7.875
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						2.75,
+						6.75,
+						3,
+						7.625
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7,
+						7,
+						7.125,
+						7.875
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						4.75,
+						8.25,
+						5,
+						8.375
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						5,
+						8.25,
+						5.25,
+						8.375
+					]
+				}
+			}
+		},
+		{
+			"name": "blade col 6",
+			"from": [
+				14,
+				3.6,
+				7.8
+			],
+			"to": [
+				15,
+				5.65,
+				8.2
+			],
+			"rotationOrigin": [
+				14,
+				3.6,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7,
+						6,
+						7.25,
+						6.5
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8,
+						2,
+						8.125,
+						2.5
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.5,
+						7,
+						6.75,
+						7.5
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						2.25,
+						8,
+						2.375,
+						8.5
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						5.25,
+						8.25,
+						5.5,
+						8.375
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8.25,
+						5.25,
+						8.5,
+						5.375
+					]
+				}
+			}
+		},
+		{
+			"name": "blade col 7",
+			"from": [
+				13.2,
+				4.3,
+				7.8
+			],
+			"to": [
+				14,
+				5.55,
+				8.2
+			],
+			"rotationOrigin": [
+				13.2,
+				4.3,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.5,
+						0,
+						7.75,
+						0.375
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8,
+						5.75,
+						8.125,
+						6.125
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.5,
+						0.5,
+						7.75,
+						0.875
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.75,
+						8,
+						6.875,
+						8.375
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						5.5,
+						8.25,
+						5.75,
+						8.375
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8.25,
+						5.5,
+						8.5,
+						5.625
+					]
+				}
+			}
+		},
+		{
+			"name": "blade col 8",
+			"from": [
+				12.5,
+				4.8,
+				7.82
+			],
+			"to": [
+				13.2,
+				5.4,
+				8.18
+			],
+			"rotationOrigin": [
+				12.5,
+				4.8,
+				7.82
+			],
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8.25,
+						7.75,
+						8.375,
+						7.875
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8,
+						8.25,
+						8.125,
+						8.375
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8.25,
+						8.25,
+						8.375,
+						8.375
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0,
+						8.5,
+						0.125,
+						8.625
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0.25,
+						8.5,
+						0.375,
+						8.625
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0.5,
+						8.5,
+						0.625,
+						8.625
+					]
+				}
+			}
+		},
+		{
+			"name": "top corner",
+			"from": [
+				18.6,
+				4.9,
+				7.8
+			],
+			"to": [
+				21.2,
+				5.6,
+				8.2
+			],
+			"rotationOrigin": [
+				18.6,
+				5.6,
+				8
+			],
+			"rotationZ": -57,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.75,
+						3,
+						8.375,
+						3.125
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8.5,
+						0.5,
+						8.625,
+						0.625
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.75,
+						3.25,
+						8.375,
+						3.375
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						0.75,
+						8.5,
+						0.875,
+						8.625
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.75,
+						3.75,
+						8.375,
+						3.875
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.75,
+						6.5,
+						8.375,
+						6.625
+					]
+				}
+			}
+		},
+		{
+			"name": "inner curve",
+			"from": [
+				15,
+				3.1,
+				7.8
+			],
+			"to": [
+				17.95,
+				3.5,
+				8.2
+			],
+			"rotationOrigin": [
+				15,
+				3.1,
+				8
+			],
+			"rotationZ": -57,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.5,
+						1,
+						8.25,
+						1.125
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8.5,
+						0.75,
+						8.625,
+						0.875
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.5,
+						1.25,
+						8.25,
+						1.375
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						1,
+						8.5,
+						1.125,
+						8.625
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.5,
+						1.5,
+						8.25,
+						1.625
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.5,
+						1.75,
+						8.25,
+						1.875
+					]
+				}
+			}
+		},
+		{
+			"name": "inner curve 2",
+			"from": [
+				13.3,
+				4.5,
+				7.8
+			],
+			"to": [
+				15.5,
+				4.9,
+				8.2
+			],
+			"rotationOrigin": [
+				13.3,
+				4.5,
+				8
+			],
+			"rotationZ": -40,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8,
+						0.5,
+						8.5,
+						0.625
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						1.25,
+						8.5,
+						1.375,
+						8.625
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						2.5,
+						8,
+						3,
+						8.125
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						1.5,
+						8.5,
+						1.625,
+						8.625
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8,
+						2.5,
+						8.5,
+						2.625
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8,
+						4,
+						8.5,
+						4.125
+					]
+				}
+			}
+		},
+		{
+			"name": "inner curve 3",
+			"from": [
+				12.3,
+				5.05,
+				7.82
+			],
+			"to": [
+				13.4,
+				5.35,
+				8.18
+			],
+			"rotationOrigin": [
+				12,
+				5.05,
+				8
+			],
+			"rotationZ": -22.5,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						5.75,
+						8.25,
+						6,
+						8.375
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						1.75,
+						8.5,
+						1.875,
+						8.625
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8.25,
+						5.75,
+						8.5,
+						5.875
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8.5,
+						1.75,
+						8.625,
+						1.875
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6,
+						8.25,
+						6.25,
+						8.375
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8.25,
+						6,
+						8.5,
+						6.125
+					]
+				}
+			}
+		},
+		{
+			"name": "edge upper",
+			"from": [
+				16.4,
+				5.55,
+				7.9
+			],
+			"to": [
+				18.7,
+				5.95,
+				8.1
+			],
+			"rotationOrigin": [
+				16.4,
+				5.8,
+				8
+			],
+			"rotationZ": -10,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.75,
+						6.75,
+						8.375,
+						6.875
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						2,
+						8.5,
+						2.125,
+						8.625
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.75,
+						7,
+						8.375,
+						7.125
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8.5,
+						2,
+						8.625,
+						2.125
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.75,
+						7.25,
+						8.375,
+						7.375
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.5,
+						7.75,
+						8.125,
+						7.875
+					]
+				}
+			}
+		},
+		{
+			"name": "edge mid",
+			"from": [
+				14.4,
+				5.6,
+				7.9
+			],
+			"to": [
+				16.5,
+				5.95,
+				8.1
+			],
+			"rotationOrigin": [
+				14.4,
+				5.6,
+				7.9
+			],
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8,
+						4.25,
+						8.5,
+						4.375
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						2.25,
+						8.5,
+						2.375,
+						8.625
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8,
+						4.5,
+						8.5,
+						4.625
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8.5,
+						2.25,
+						8.625,
+						2.375
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8,
+						4.75,
+						8.5,
+						4.875
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8,
+						5,
+						8.5,
+						5.125
+					]
+				}
+			}
+		},
+		{
+			"name": "edge lower",
+			"from": [
+				12.8,
+				5.5,
+				7.9
+			],
+			"to": [
+				14.5,
+				5.8,
+				8.1
+			],
+			"rotationOrigin": [
+				14.5,
+				5.65,
+				8
+			],
+			"rotationZ": 10,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8,
+						6.25,
+						8.375,
+						6.375
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						2.5,
+						8.5,
+						2.625,
+						8.625
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.5,
+						8,
+						7.875,
+						8.125
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8.5,
+						2.5,
+						8.625,
+						2.625
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8,
+						8,
+						8.375,
+						8.125
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8.25,
+						0.25,
+						8.625,
+						0.375
+					]
+				}
+			}
+		},
+		{
+			"name": "edge hook tip",
+			"from": [
+				11.6,
+				5.1,
+				7.9
+			],
+			"to": [
+				12.9,
+				5.4,
+				8.1
+			],
+			"rotationOrigin": [
+				12.9,
+				5.3,
+				8
+			],
+			"rotationZ": 18,
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8.25,
+						1,
+						8.625,
+						1.125
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						2.75,
+						8.5,
+						2.875,
+						8.625
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8.25,
+						1.25,
+						8.625,
+						1.375
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8.5,
+						2.75,
+						8.625,
+						2.875
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8.25,
+						1.5,
+						8.625,
+						1.625
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						1.75,
+						8.25,
+						2.125,
+						8.375
+					]
+				}
+			}
+		},
+		{
+			"name": "rust cheek",
+			"from": [
+				16.8,
+				0.3,
+				7.75
+			],
+			"to": [
+				19.4,
+				2.4,
+				8.25
+			],
+			"rotationOrigin": [
+				16.8,
+				0.3,
+				7.75
+			],
+			"faces": {
+				"north": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						6.25,
+						1.5,
+						6.875,
+						2
+					]
+				},
+				"east": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3.75,
+						8,
+						3.875,
+						8.5
+					]
+				},
+				"south": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						3.25,
+						6.25,
+						3.875,
+						6.75
+					]
+				},
+				"west": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8,
+						5.25,
+						8.125,
+						5.75
+					]
+				},
+				"up": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						7.75,
+						7.5,
+						8.375,
+						7.625
+					]
+				},
+				"down": {
+					"texture": "#Morc_Short_Axe_Texture",
+					"uv": [
+						8,
+						0,
+						8.625,
+						0.125
+					]
+				}
+			}
+		}
+	]
+}

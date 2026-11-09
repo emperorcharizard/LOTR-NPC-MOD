@@ -1,0 +1,59 @@
+{
+ "name": "Greatsword guard (0.0.76 poleaxe hold, right hand higher)",
+ "code": "greatswordhold",
+ "quantityframes": 30,
+ "onActivityStopped": "EaseOut",
+ "onAnimationEnd": "Repeat",
+ "keyframes": [
+  {
+   "frame": 0,
+   "elements": {
+    "UpperArmR": {
+     "offsetX": 0.0,
+     "offsetY": -0.4,
+     "offsetZ": 0.4,
+     "rotationX": 20.05,
+     "rotationY": -8.17,
+     "rotationZ": -36.54
+    },
+    "LowerArmR": {
+     "offsetX": 0.4,
+     "offsetY": 0.6,
+     "offsetZ": 0.0,
+     "rotationX": -62.39,
+     "rotationY": 22.55,
+     "rotationZ": -58.11
+    },
+    "UpperArmL": {
+     "offsetX": 0.0,
+     "offsetY": -0.4,
+     "offsetZ": -0.2,
+     "rotationX": -4.0,
+     "rotationY": 0.0,
+     "rotationZ": -20.0
+    },
+    "LowerArmL": {
+     "offsetX": 0.4,
+     "offsetY": 0.6,
+     "offsetZ": 0.0,
+     "rotationX": 30.0,
+     "rotationY": -16.0,
+     "rotationZ": -60.0
+    },
+    "ItemAnchorL": {
+     "offsetX": 0.0,
+     "offsetY": 0.0,
+     "offsetZ": -2.0,
+     "rotationX": -45.0,
+     "rotationY": 0.0,
+     "rotationZ": 0.0
+    },
+    "ItemAnchor": {
+     "rotationX": 11.75,
+     "rotationY": -7.54,
+     "rotationZ": 16.97
+    }
+   }
+  }
+ ]
+}

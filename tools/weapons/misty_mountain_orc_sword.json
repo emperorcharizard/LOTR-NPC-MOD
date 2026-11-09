@@ -1,0 +1,4023 @@
+{
+	"editor": {
+		"allAngles": true,
+		"entityTextureMode": false
+	},
+	"textureWidth": 16,
+	"textureHeight": 16,
+	"textures": {
+		"Moria_Orc_Sword": "game:Moria_Orc_Sword"
+	},
+	"elements": [
+		{
+			"name": "blade",
+			"from": [
+				5.5,
+				-1.87,
+				7.9
+			],
+			"to": [
+				7.5,
+				-1.2,
+				8.1
+			],
+			"rotationOrigin": [
+				5.5,
+				-1.87,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6,
+						4,
+						7,
+						4.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						4.5,
+						7.5,
+						5,
+						8
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6,
+						4.5,
+						7,
+						5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9,
+						3,
+						9.5,
+						3.5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						5,
+						6,
+						6,
+						6.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6,
+						5,
+						7,
+						5.5
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 2",
+			"from": [
+				7.5,
+				-1.87,
+				7.9
+			],
+			"to": [
+				8.9,
+				-1.24,
+				8.1
+			],
+			"rotationOrigin": [
+				7.5,
+				-1.87,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9,
+						4,
+						9.5,
+						4.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10,
+						3,
+						10.5,
+						3.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10,
+						3.5,
+						10.5,
+						4
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						4,
+						10,
+						4.5,
+						10.5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10,
+						4,
+						10.5,
+						4.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						4.5,
+						10,
+						5,
+						10.5
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 3",
+			"from": [
+				8.9,
+				-1.85,
+				7.9
+			],
+			"to": [
+				10.8,
+				-1.15,
+				8.1
+			],
+			"rotationOrigin": [
+				8.9,
+				-1.85,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						4,
+						6.5,
+						5,
+						7
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10,
+						5,
+						10.5,
+						5.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						5,
+						6.5,
+						6,
+						7
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						5.5,
+						10,
+						6,
+						10.5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6,
+						6.5,
+						7,
+						7
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						0,
+						7,
+						1,
+						7.5
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 4",
+			"from": [
+				10.8,
+				-1.8,
+				7.9
+			],
+			"to": [
+				12.2,
+				-0.95,
+				8.1
+			],
+			"rotationOrigin": [
+				10.8,
+				-1.8,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10,
+						5.5,
+						10.5,
+						6
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6,
+						10,
+						6.5,
+						10.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10,
+						6,
+						10.5,
+						6.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6.5,
+						10,
+						7,
+						10.5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10,
+						6.5,
+						10.5,
+						7
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7,
+						10,
+						7.5,
+						10.5
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 5",
+			"from": [
+				12.2,
+				-0.88,
+				7.8
+			],
+			"to": [
+				14,
+				0.87,
+				8.2
+			],
+			"rotationOrigin": [
+				12.2,
+				-1.78,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3,
+						3,
+						4,
+						4
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6,
+						7,
+						6.5,
+						8
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						0,
+						3.5,
+						1,
+						4.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6.5,
+						7,
+						7,
+						8
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7,
+						6.5,
+						8,
+						7
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7,
+						7,
+						8,
+						7.5
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 6",
+			"from": [
+				14,
+				-1.72,
+				7.9
+			],
+			"to": [
+				15.6,
+				-0.8,
+				8.1
+			],
+			"rotationOrigin": [
+				14,
+				-1.72,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7.5,
+						1,
+						8.5,
+						1.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8.5,
+						10,
+						9,
+						10.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7.5,
+						1.5,
+						8.5,
+						2
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10,
+						8.5,
+						10.5,
+						9
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						2,
+						7.5,
+						3,
+						8
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7.5,
+						2,
+						8.5,
+						2.5
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 7",
+			"from": [
+				15.6,
+				-1.66,
+				7.9
+			],
+			"to": [
+				17,
+				-0.68,
+				8.1
+			],
+			"rotationOrigin": [
+				15.6,
+				-1.66,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10,
+						9,
+						10.5,
+						9.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9.5,
+						10,
+						10,
+						10.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10,
+						9.5,
+						10.5,
+						10
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10,
+						10,
+						10.5,
+						10.5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						0,
+						10.5,
+						0.5,
+						11
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10.5,
+						0,
+						11,
+						0.5
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 8",
+			"from": [
+				17,
+				-1.6,
+				7.9
+			],
+			"to": [
+				18.8,
+				-0.9,
+				8.1
+			],
+			"rotationOrigin": [
+				17,
+				-1.6,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7.5,
+						4.5,
+						8.5,
+						5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						2.5,
+						10.5,
+						3,
+						11
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7.5,
+						5,
+						8.5,
+						5.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3,
+						10.5,
+						3.5,
+						11
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7.5,
+						5.5,
+						8.5,
+						6
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7.5,
+						6,
+						8.5,
+						6.5
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 9",
+			"from": [
+				18.8,
+				-1.52,
+				7.9
+			],
+			"to": [
+				20.5,
+				-0.75,
+				8.1
+			],
+			"rotationOrigin": [
+				18.8,
+				-1.52,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8,
+						2.5,
+						9,
+						3
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10.5,
+						3.5,
+						11,
+						4
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8,
+						3,
+						9,
+						3.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						4,
+						10.5,
+						4.5,
+						11
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3.5,
+						8,
+						4.5,
+						8.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8,
+						4,
+						9,
+						4.5
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 10",
+			"from": [
+				20.5,
+				-1.42,
+				7.9
+			],
+			"to": [
+				22.2,
+				-0.88,
+				8.1
+			],
+			"rotationOrigin": [
+				20.5,
+				-1.42,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8,
+						7,
+						9,
+						7.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10.5,
+						4.5,
+						11,
+						5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7.5,
+						8,
+						8.5,
+						8.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						5,
+						10.5,
+						5.5,
+						11
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8,
+						7.5,
+						9,
+						8
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						0,
+						8.5,
+						1,
+						9
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 11",
+			"from": [
+				22.2,
+				-1.3,
+				7.9
+			],
+			"to": [
+				24,
+				-0.82,
+				8.1
+			],
+			"rotationOrigin": [
+				22.2,
+				-1.3,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8.5,
+						1.5,
+						9.5,
+						2
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10.5,
+						5.5,
+						11,
+						6
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						2,
+						8.5,
+						3,
+						9
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6,
+						10.5,
+						6.5,
+						11
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8.5,
+						2,
+						9.5,
+						2.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3,
+						8.5,
+						4,
+						9
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 12",
+			"from": [
+				24,
+				-1.2,
+				7.9
+			],
+			"to": [
+				25.8,
+				-0.84,
+				8.1
+			],
+			"rotationOrigin": [
+				24,
+				-1.2,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8.5,
+						5,
+						9.5,
+						5.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10.5,
+						6.5,
+						11,
+						7
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8.5,
+						5.5,
+						9.5,
+						6
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7,
+						10.5,
+						7.5,
+						11
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6,
+						8.5,
+						7,
+						9
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8.5,
+						6,
+						9.5,
+						6.5
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 13",
+			"from": [
+				25.8,
+				-1.02,
+				7.9
+			],
+			"to": [
+				27.2,
+				-0.7,
+				8.1
+			],
+			"rotationOrigin": [
+				25.8,
+				-1.02,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10.5,
+						7.5,
+						11,
+						8
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8,
+						10.5,
+						8.5,
+						11
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10.5,
+						8,
+						11,
+						8.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8.5,
+						10.5,
+						9,
+						11
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10.5,
+						8.5,
+						11,
+						9
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9,
+						10.5,
+						9.5,
+						11
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 14",
+			"from": [
+				27.2,
+				-0.85,
+				7.9
+			],
+			"to": [
+				28.3,
+				-0.54,
+				8.1
+			],
+			"rotationOrigin": [
+				27.2,
+				-0.85,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						0,
+						11,
+						0.5,
+						11.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						0,
+						11.5,
+						0.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						0.5,
+						11,
+						1,
+						11.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						0.5,
+						11.5,
+						1
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						1,
+						11,
+						1.5,
+						11.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						1,
+						11.5,
+						1.5
+					]
+				}
+			}
+		},
+		{
+			"name": "tip",
+			"from": [
+				28.2,
+				-0.75,
+				7.95
+			],
+			"to": [
+				29.4,
+				-0.45,
+				8.05
+			],
+			"rotationOrigin": [
+				28.2,
+				-0.75,
+				8
+			],
+			"rotationZ": 22.5,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3,
+						11,
+						3.5,
+						11.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						3,
+						11.5,
+						3.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3.5,
+						11,
+						4,
+						11.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						3.5,
+						11.5,
+						4
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						4,
+						11,
+						4.5,
+						11.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						4,
+						11.5,
+						4.5
+					]
+				}
+			}
+		},
+		{
+			"name": "tip top",
+			"from": [
+				28.2,
+				-0.45,
+				7.95
+			],
+			"to": [
+				29,
+				-0.14,
+				8.05
+			],
+			"rotationOrigin": [
+				28.2,
+				-0.45,
+				7.85
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						4.5,
+						11,
+						5,
+						11.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						4.5,
+						11.5,
+						5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						5,
+						11,
+						5.5,
+						11.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						5,
+						11.5,
+						5.5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						5.5,
+						11,
+						6,
+						11.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						5.5,
+						11.5,
+						6
+					]
+				}
+			}
+		},
+		{
+			"name": "spur",
+			"from": [
+				8.9,
+				0.4,
+				7.78
+			],
+			"to": [
+				9.7,
+				1.22,
+				8.22
+			],
+			"rotationOrigin": [
+				8.9,
+				0.8,
+				7.78
+			],
+			"rotationZ": 45,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6,
+						11,
+						6.5,
+						11.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						6,
+						11.5,
+						6.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6.5,
+						11,
+						7,
+						11.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						6.5,
+						11.5,
+						7
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7,
+						11,
+						7.5,
+						11.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						7,
+						11.5,
+						7.5
+					]
+				}
+			}
+		},
+		{
+			"name": "spur 2",
+			"from": [
+				16.8,
+				-0.1,
+				7.78
+			],
+			"to": [
+				17.5,
+				0.65,
+				8.22
+			],
+			"rotationOrigin": [
+				16.8,
+				0.3,
+				7.78
+			],
+			"rotationZ": 45,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7.5,
+						11,
+						8,
+						11.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						7.5,
+						11.5,
+						8
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8,
+						11,
+						8.5,
+						11.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						8,
+						11.5,
+						8.5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8.5,
+						11,
+						9,
+						11.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						8.5,
+						11.5,
+						9
+					]
+				}
+			}
+		},
+		{
+			"name": "frame",
+			"from": [
+				3,
+				-1.87,
+				7.75
+			],
+			"to": [
+				5.5,
+				-0.85,
+				8.25
+			],
+			"rotationOrigin": [
+				3,
+				-1.87,
+				7.75
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6,
+						2,
+						7.5,
+						2.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9,
+						11,
+						9.5,
+						11.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6,
+						2.5,
+						7.5,
+						3
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						9,
+						11.5,
+						9.5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6,
+						3,
+						7.5,
+						3.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6,
+						3.5,
+						7.5,
+						4
+					]
+				}
+			}
+		},
+		{
+			"name": "frame 2",
+			"from": [
+				0.8,
+				-1.72,
+				7.75
+			],
+			"to": [
+				3,
+				-0.85,
+				8.25
+			],
+			"rotationOrigin": [
+				0.8,
+				-1.72,
+				7.75
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						1,
+						9,
+						2,
+						9.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9.5,
+						11,
+						10,
+						11.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						2,
+						9,
+						3,
+						9.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						9.5,
+						11.5,
+						10
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9,
+						2.5,
+						10,
+						3
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3,
+						9,
+						4,
+						9.5
+					]
+				}
+			}
+		},
+		{
+			"name": "fillet top low",
+			"from": [
+				4.9,
+				-0.85,
+				7.75
+			],
+			"to": [
+				5.5,
+				-0.5,
+				8.25
+			],
+			"rotationOrigin": [
+				4.9,
+				-0.85,
+				7.75
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10,
+						11,
+						10.5,
+						11.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						10,
+						11.5,
+						10.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10.5,
+						11,
+						11,
+						11.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						10.5,
+						11.5,
+						11
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						11,
+						11.5,
+						11.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						0,
+						11.5,
+						0.5,
+						12
+					]
+				}
+			}
+		},
+		{
+			"name": "fillet high",
+			"from": [
+				1.2,
+				0,
+				7.75
+			],
+			"to": [
+				5.5,
+				0.3,
+				8.25
+			],
+			"rotationOrigin": [
+				1.2,
+				0,
+				7.75
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						4,
+						2,
+						6,
+						2.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						0,
+						12,
+						0.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						4,
+						2.5,
+						6,
+						3
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						0.5,
+						11.5,
+						1,
+						12
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3,
+						4,
+						5,
+						4.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						4,
+						3,
+						6,
+						3.5
+					]
+				}
+			}
+		},
+		{
+			"name": "fillet bottom low",
+			"from": [
+				1.2,
+				-0.85,
+				7.75
+			],
+			"to": [
+				1.7,
+				-0.55,
+				8.25
+			],
+			"rotationOrigin": [
+				1.2,
+				-0.85,
+				7.75
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						0.5,
+						12,
+						1
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						1,
+						11.5,
+						1.5,
+						12
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						1,
+						12,
+						1.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						1.5,
+						11.5,
+						2,
+						12
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						1.5,
+						12,
+						2
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						2,
+						11.5,
+						2.5,
+						12
+					]
+				}
+			}
+		},
+		{
+			"name": "grip core",
+			"from": [
+				0.8,
+				0.3,
+				7.5
+			],
+			"to": [
+				5.5,
+				1.5,
+				8.5
+			],
+			"rotationOrigin": [
+				0.8,
+				0.3,
+				7.5
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3,
+						0,
+						5.5,
+						0.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						2,
+						12,
+						2.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3,
+						0.5,
+						5.5,
+						1
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						2.5,
+						11.5,
+						3,
+						12
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3,
+						1,
+						5.5,
+						1.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3,
+						1.5,
+						5.5,
+						2
+					]
+				}
+			}
+		},
+		{
+			"name": "grip sleeve",
+			"from": [
+				1.8,
+				0.15,
+				7.35
+			],
+			"to": [
+				5.4,
+				1.65,
+				8.65
+			],
+			"rotationOrigin": [
+				1.8,
+				0.15,
+				7.35
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						0,
+						0,
+						2,
+						1
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						4,
+						9,
+						4.5,
+						10
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						0,
+						1,
+						2,
+						2
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						4.5,
+						9,
+						5,
+						10
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						4,
+						3.5,
+						6,
+						4
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						0,
+						4.5,
+						2,
+						5
+					]
+				}
+			}
+		},
+		{
+			"name": "cord",
+			"from": [
+				2,
+				0,
+				7.25
+			],
+			"to": [
+				2.3,
+				1.8,
+				8.75
+			],
+			"rotationOrigin": [
+				2.15,
+				0.9,
+				8
+			],
+			"rotationZ": 22.5,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						5,
+						9,
+						5.5,
+						10
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3,
+						4.5,
+						4,
+						5.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						5.5,
+						9,
+						6,
+						10
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						4,
+						4.5,
+						5,
+						5.5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6,
+						9,
+						6.5,
+						10
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6.5,
+						9,
+						7,
+						10
+					]
+				}
+			}
+		},
+		{
+			"name": "cord 2",
+			"from": [
+				2.6,
+				0,
+				7.25
+			],
+			"to": [
+				2.9,
+				1.8,
+				8.75
+			],
+			"rotationOrigin": [
+				2.75,
+				0.9,
+				8
+			],
+			"rotationZ": 22.5,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9,
+						6.5,
+						9.5,
+						7.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						0,
+						5,
+						1,
+						6
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7,
+						9,
+						7.5,
+						10
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						1,
+						5,
+						2,
+						6
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7.5,
+						9,
+						8,
+						10
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8,
+						9,
+						8.5,
+						10
+					]
+				}
+			}
+		},
+		{
+			"name": "cord 3",
+			"from": [
+				3.2,
+				0,
+				7.25
+			],
+			"to": [
+				3.5,
+				1.8,
+				8.75
+			],
+			"rotationOrigin": [
+				3.35,
+				0.9,
+				8
+			],
+			"rotationZ": 22.5,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8.5,
+						9,
+						9,
+						10
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						2,
+						5,
+						3,
+						6
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9,
+						8.5,
+						9.5,
+						9.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						5,
+						4,
+						6,
+						5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						0,
+						9.5,
+						0.5,
+						10.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9.5,
+						0,
+						10,
+						1
+					]
+				}
+			}
+		},
+		{
+			"name": "cord 4",
+			"from": [
+				3.8,
+				0,
+				7.25
+			],
+			"to": [
+				4.1,
+				1.8,
+				8.75
+			],
+			"rotationOrigin": [
+				3.95,
+				0.9,
+				8
+			],
+			"rotationZ": 22.5,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						0.5,
+						9.5,
+						1,
+						10.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						5,
+						5,
+						6,
+						6
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						1,
+						9.5,
+						1.5,
+						10.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						5.5,
+						0,
+						6.5,
+						1
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9.5,
+						1,
+						10,
+						2
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						1.5,
+						9.5,
+						2,
+						10.5
+					]
+				}
+			}
+		},
+		{
+			"name": "cord 5",
+			"from": [
+				4.4,
+				0,
+				7.25
+			],
+			"to": [
+				4.7,
+				1.8,
+				8.75
+			],
+			"rotationOrigin": [
+				4.55,
+				0.9,
+				8
+			],
+			"rotationZ": 22.5,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						2,
+						9.5,
+						2.5,
+						10.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						5.5,
+						1,
+						6.5,
+						2
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						2.5,
+						9.5,
+						3,
+						10.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3,
+						5.5,
+						4,
+						6.5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3,
+						9.5,
+						3.5,
+						10.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9.5,
+						3,
+						10,
+						4
+					]
+				}
+			}
+		},
+		{
+			"name": "cord 6",
+			"from": [
+				5,
+				0,
+				7.25
+			],
+			"to": [
+				5.3,
+				1.8,
+				8.75
+			],
+			"rotationOrigin": [
+				5.15,
+				0.9,
+				8
+			],
+			"rotationZ": 22.5,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3.5,
+						9.5,
+						4,
+						10.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						4,
+						5.5,
+						5,
+						6.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9.5,
+						4,
+						10,
+						5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						0,
+						6,
+						1,
+						7
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9.5,
+						5,
+						10,
+						6
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9.5,
+						6,
+						10,
+						7
+					]
+				}
+			}
+		},
+		{
+			"name": "pommel base",
+			"from": [
+				-0.4,
+				-1.3,
+				7.7
+			],
+			"to": [
+				1.2,
+				1.4,
+				8.3
+			],
+			"rotationOrigin": [
+				-0.4,
+				-1.3,
+				7.7
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						1,
+						2,
+						2,
+						3.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						2,
+						6,
+						2.5,
+						7.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						2,
+						1.5,
+						3,
+						3
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						2.5,
+						6,
+						3,
+						7.5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9,
+						7.5,
+						10,
+						8
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9.5,
+						2,
+						10.5,
+						2.5
+					]
+				}
+			}
+		},
+		{
+			"name": "pommel neck",
+			"from": [
+				-1.6,
+				-0.85,
+				7.7
+			],
+			"to": [
+				-0.4,
+				1.1,
+				8.3
+			],
+			"rotationOrigin": [
+				-1.6,
+				-0.85,
+				7.7
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9.5,
+						8,
+						10,
+						9
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9,
+						9.5,
+						9.5,
+						10.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9.5,
+						9,
+						10,
+						10
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10,
+						0,
+						10.5,
+						1
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						2.5,
+						12,
+						3
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3,
+						11.5,
+						3.5,
+						12
+					]
+				}
+			}
+		},
+		{
+			"name": "pommel neck 2",
+			"from": [
+				-2.8,
+				-0.6,
+				7.7
+			],
+			"to": [
+				-1.6,
+				0.75,
+				8.3
+			],
+			"rotationOrigin": [
+				-2.8,
+				-0.6,
+				7.7
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						3,
+						12,
+						3.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3.5,
+						11.5,
+						4,
+						12
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						3.5,
+						12,
+						4
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						4,
+						11.5,
+						4.5,
+						12
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						4,
+						12,
+						4.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						4.5,
+						11.5,
+						5,
+						12
+					]
+				}
+			}
+		},
+		{
+			"name": "pommel tail",
+			"from": [
+				-4.4,
+				-0.75,
+				7.7
+			],
+			"to": [
+				-2.4,
+				0.6,
+				8.3
+			],
+			"rotationOrigin": [
+				-2.6,
+				-0.05,
+				8
+			],
+			"rotationZ": 25,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9.5,
+						7,
+						10.5,
+						7.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						4.5,
+						12,
+						5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10,
+						1,
+						11,
+						1.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						5,
+						11.5,
+						5.5,
+						12
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10,
+						1.5,
+						11,
+						2
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10,
+						2.5,
+						11,
+						3
+					]
+				}
+			}
+		},
+		{
+			"name": "barb",
+			"from": [
+				-1.3,
+				-1.1,
+				7.75
+			],
+			"to": [
+				-0.8,
+				-0.6,
+				8.25
+			],
+			"rotationOrigin": [
+				-1.05,
+				-0.85,
+				8
+			],
+			"rotationZ": 45,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						5,
+						12,
+						5.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						5.5,
+						11.5,
+						6,
+						12
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						5.5,
+						12,
+						6
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6,
+						11.5,
+						6.5,
+						12
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						6,
+						12,
+						6.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6.5,
+						11.5,
+						7,
+						12
+					]
+				}
+			}
+		},
+		{
+			"name": "claw",
+			"from": [
+				-4.7,
+				-0.5,
+				7.75
+			],
+			"to": [
+				-4.1,
+				-0.2,
+				8.25
+			],
+			"rotationOrigin": [
+				-4.1,
+				-0.35,
+				8
+			],
+			"rotationZ": -20,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						6.5,
+						12,
+						7
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7,
+						11.5,
+						7.5,
+						12
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						7,
+						12,
+						7.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7.5,
+						11.5,
+						8,
+						12
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						7.5,
+						12,
+						8
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8,
+						11.5,
+						8.5,
+						12
+					]
+				}
+			}
+		},
+		{
+			"name": "claw 2",
+			"from": [
+				-4.5,
+				-1.1,
+				7.75
+			],
+			"to": [
+				-3.9,
+				-0.8,
+				8.25
+			],
+			"rotationOrigin": [
+				-3.9,
+				-0.95,
+				8
+			],
+			"rotationZ": 37,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						8,
+						12,
+						8.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						0,
+						12,
+						0.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8.5,
+						11.5,
+						9,
+						12
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						0.5,
+						11.5,
+						1,
+						12
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						8.5,
+						12,
+						9
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9,
+						11.5,
+						9.5,
+						12
+					]
+				}
+			}
+		},
+		{
+			"name": "claw 3",
+			"from": [
+				-4.3,
+				-1.6,
+				7.75
+			],
+			"to": [
+				-3.2,
+				-1.3,
+				8.25
+			],
+			"rotationOrigin": [
+				-3.8,
+				-1.45,
+				8
+			],
+			"rotationZ": 50,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						9,
+						12,
+						9.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9.5,
+						11.5,
+						10,
+						12
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						9.5,
+						12,
+						10
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10,
+						11.5,
+						10.5,
+						12
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						10,
+						12,
+						10.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10.5,
+						11.5,
+						11,
+						12
+					]
+				}
+			}
+		},
+		{
+			"name": "claw",
+			"from": [
+				-4.6,
+				-0.8,
+				7.75
+			],
+			"to": [
+				-4.1,
+				-0.5,
+				8.25
+			],
+			"rotationOrigin": [
+				-4.1,
+				-0.65,
+				8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						6.5,
+						12,
+						7
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7,
+						11.5,
+						7.5,
+						12
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						7,
+						12,
+						7.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7.5,
+						11.5,
+						8,
+						12
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11.5,
+						7.5,
+						12,
+						8
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8,
+						11.5,
+						8.5,
+						12
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 6",
+			"from": [
+				12.2,
+				-1.88,
+				7.9
+			],
+			"to": [
+				14,
+				-0.83,
+				8.1
+			],
+			"rotationOrigin": [
+				12.2,
+				-1.78,
+				7.9
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						0,
+						7.5,
+						1,
+						8
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8,
+						10,
+						8.5,
+						10.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7.5,
+						0,
+						8.5,
+						0.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10,
+						8,
+						10.5,
+						8.5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7.5,
+						0.5,
+						8.5,
+						1
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						1,
+						7.5,
+						2,
+						8
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 5",
+			"from": [
+				10.8,
+				-1,
+				7.8
+			],
+			"to": [
+				12.2,
+				0.95,
+				8.2
+			],
+			"rotationOrigin": [
+				10.8,
+				-1.8,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7,
+						4.5,
+						7.5,
+						5.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						5,
+						7,
+						5.5,
+						8
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						5.5,
+						7,
+						6,
+						8
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7,
+						5.5,
+						7.5,
+						6.5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7.5,
+						10,
+						8,
+						10.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10,
+						7.5,
+						10.5,
+						8
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 4",
+			"from": [
+				8.9,
+				-1.15,
+				7.8
+			],
+			"to": [
+				10.8,
+				1.05,
+				8.2
+			],
+			"rotationOrigin": [
+				8.9,
+				-1.85,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						2,
+						3,
+						3,
+						4
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7,
+						0,
+						7.5,
+						1
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3,
+						2,
+						4,
+						3
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7,
+						1,
+						7.5,
+						2
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						4,
+						7,
+						5,
+						7.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7,
+						4,
+						8,
+						4.5
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 3",
+			"from": [
+				7.5,
+				-1.27,
+				7.8
+			],
+			"to": [
+				8.9,
+				1.16,
+				8.2
+			],
+			"rotationOrigin": [
+				7.5,
+				-1.87,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6.5,
+						0,
+						7,
+						1
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6.5,
+						1,
+						7,
+						2
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3,
+						6.5,
+						3.5,
+						7.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3.5,
+						6.5,
+						4,
+						7.5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10,
+						4.5,
+						10.5,
+						5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						5,
+						10,
+						5.5,
+						10.5
+					]
+				}
+			}
+		},
+		{
+			"name": "blade",
+			"from": [
+				5.5,
+				-1.27,
+				7.8
+			],
+			"to": [
+				7.5,
+				1.3,
+				8.2
+			],
+			"rotationOrigin": [
+				5.5,
+				-1.87,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						0,
+						2,
+						1,
+						3.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						1,
+						6,
+						1.5,
+						7.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						2,
+						0,
+						3,
+						1.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						1.5,
+						6,
+						2,
+						7.5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6,
+						5.5,
+						7,
+						6
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6,
+						6,
+						7,
+						6.5
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 7",
+			"from": [
+				14,
+				-0.82,
+				7.8
+			],
+			"to": [
+				15.6,
+				0.8,
+				8.2
+			],
+			"rotationOrigin": [
+				14,
+				-1.72,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						1,
+						3.5,
+						2,
+						4.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7.5,
+						2.5,
+						8,
+						3.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						2,
+						4,
+						3,
+						5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3,
+						7.5,
+						3.5,
+						8.5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3.5,
+						7.5,
+						4.5,
+						8
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7.5,
+						3.5,
+						8.5,
+						4
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 8",
+			"from": [
+				15.6,
+				-0.76,
+				7.8
+			],
+			"to": [
+				17,
+				0.72,
+				8.2
+			],
+			"rotationOrigin": [
+				15.6,
+				-1.66,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						0.5,
+						10.5,
+						1,
+						11
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10.5,
+						0.5,
+						11,
+						1
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						1,
+						10.5,
+						1.5,
+						11
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						1.5,
+						10.5,
+						2,
+						11
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						2,
+						10.5,
+						2.5,
+						11
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10.5,
+						2,
+						11,
+						2.5
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 9",
+			"from": [
+				17,
+				-0.9,
+				7.8
+			],
+			"to": [
+				18.8,
+				0.5,
+				8.2
+			],
+			"rotationOrigin": [
+				17,
+				-1.6,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7,
+						7.5,
+						8,
+						8
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10.5,
+						3,
+						11,
+						3.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						0,
+						8,
+						1,
+						8.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						3.5,
+						10.5,
+						4,
+						11
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						1,
+						8,
+						2,
+						8.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						2,
+						8,
+						3,
+						8.5
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 10",
+			"from": [
+				18.8,
+				-0.82,
+				7.8
+			],
+			"to": [
+				20.5,
+				0.35,
+				8.2
+			],
+			"rotationOrigin": [
+				18.8,
+				-1.52,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						4.5,
+						8,
+						5.5,
+						8.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10.5,
+						4,
+						11,
+						4.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						5.5,
+						8,
+						6.5,
+						8.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						4.5,
+						10.5,
+						5,
+						11
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6.5,
+						8,
+						7.5,
+						8.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8,
+						6.5,
+						9,
+						7
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 11",
+			"from": [
+				20.5,
+				-0.92,
+				7.8
+			],
+			"to": [
+				22.2,
+				0.22,
+				8.2
+			],
+			"rotationOrigin": [
+				20.5,
+				-1.42,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8.5,
+						0,
+						9.5,
+						0.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10.5,
+						5,
+						11,
+						5.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8.5,
+						0.5,
+						9.5,
+						1
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						5.5,
+						10.5,
+						6,
+						11
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						1,
+						8.5,
+						2,
+						9
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8.5,
+						1,
+						9.5,
+						1.5
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 12",
+			"from": [
+				22.2,
+				-0.9,
+				7.8
+			],
+			"to": [
+				24,
+				0.08,
+				8.2
+			],
+			"rotationOrigin": [
+				22.2,
+				-1.3,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8.5,
+						3.5,
+						9.5,
+						4
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10.5,
+						6,
+						11,
+						6.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						4,
+						8.5,
+						5,
+						9
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						6.5,
+						10.5,
+						7,
+						11
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8.5,
+						4.5,
+						9.5,
+						5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						5,
+						8.5,
+						6,
+						9
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 13",
+			"from": [
+				24,
+				-0.9,
+				7.8
+			],
+			"to": [
+				25.8,
+				-0.04,
+				8.2
+			],
+			"rotationOrigin": [
+				24,
+				-1.2,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7,
+						8.5,
+						8,
+						9
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10.5,
+						7,
+						11,
+						7.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8,
+						8.5,
+						9,
+						9
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						7.5,
+						10.5,
+						8,
+						11
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						8.5,
+						8,
+						9.5,
+						8.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						0,
+						9,
+						1,
+						9.5
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 14",
+			"from": [
+				25.8,
+				-0.72,
+				7.8
+			],
+			"to": [
+				27.2,
+				-0.1,
+				8.2
+			],
+			"rotationOrigin": [
+				25.8,
+				-1.02,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10.5,
+						9,
+						11,
+						9.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						9.5,
+						10.5,
+						10,
+						11
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10.5,
+						9.5,
+						11,
+						10
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10,
+						10.5,
+						10.5,
+						11
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10.5,
+						10,
+						11,
+						10.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						10.5,
+						10.5,
+						11,
+						11
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 15",
+			"from": [
+				27.2,
+				-0.55,
+				7.8
+			],
+			"to": [
+				28.3,
+				-0.14,
+				8.2
+			],
+			"rotationOrigin": [
+				27.2,
+				-0.85,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						1.5,
+						11,
+						2,
+						11.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						1.5,
+						11.5,
+						2
+					]
+				},
+				"south": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						2,
+						11,
+						2.5,
+						11.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						2,
+						11.5,
+						2.5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						2.5,
+						11,
+						3,
+						11.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Orc_Sword",
+					"uv": [
+						11,
+						2.5,
+						11.5,
+						3
+					]
+				}
+			}
+		}
+	]
+}

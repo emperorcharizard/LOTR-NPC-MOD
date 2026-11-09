@@ -1,0 +1,814 @@
+# Vanilla clothing item codes (game domain) and their English names, from the Vintage Story wiki's clothing tables
+# (github.com/BlackberryMuffin/vs-wiki-table-generator, scripts/clothes/re_input/table.txt), fetched 2026-11-03 for game 1.22.
+clothes-head-bamboo-conehat-large	Bamboo cone hat (large)
+clothes-head-bamboo-conehat	Bamboo cone hat
+clothes-head-tophat	Top hat
+clothes-head-squire-hood	Squire hood
+clothes-head-silver-diadem	Silver diadem
+clothes-head-shepherds-cowl	Shepherd cowl
+clothes-head-roll-hat	Roll hat
+clothes-head-peasent-head-scarf	Peasant head scarf
+clothes-head-noble-fillet	Noble fillet
+clothes-head-minstrel-hat	Minstrel hat
+clothes-head-messengers-hat	Messenger hat
+clothes-head-merchant-hat	Merchant hat
+clothes-head-lackey-hat	Lackey hat
+clothes-head-jailors-hat	Jailors hat
+clothes-head-gold-coronet	Gold coronet
+clothes-head-gem-encrusted-fur-hat	Gem encrusted fur hat
+clothes-head-fortune-tellers-scarf	Fortune teller scarf
+clothes-head-fancy-head-dress	Fancy head dress
+clothes-head-embroidered-coif	Embroidered coif
+clothes-head-hunter-cape	Hunter hood
+clothes-head-straw-hat	Straw hat
+clothes-head-marketeer	Marketeer litham
+clothes-head-rotwalker	Rotwalker hood
+clothes-head-mianguan	Mianguan
+clothes-head-crown	Crown
+clothes-head-rottenking	Rotten king crown
+clothes-head-alchemist	Alchemist hat
+clothes-head-furhatwide-fox-red	Red fox fur trapper hat
+clothes-head-furhatwide-generic-gray	Raccoon fur trapper hat
+clothes-head-furhatwide-generic-white	Arctic fox fur trapper hat
+clothes-head-furhattail-fox-arctic	Arctic fox tail hat
+clothes-head-furhattail-fox-red	Red fox tail hat
+clothes-head-furhattail-raccoon-common	Raccoon tail hat
+clothes-nadiya-head-alchemist	Nadiyan alchemist hat
+clothes-nadiya-head-barber	Nadiyan barber hat
+clothes-nadiya-head-beekeeper	Nadiyan beekeeper hood
+clothes-nadiya-head-blacksmith	Nadiyan blacksmith hood
+clothes-nadiya-head-fisher	Nadiyan fisher hat
+clothes-nadiya-head-guard	Nadiyan guard helmet
+clothes-nadiya-head-hunter	Nadiyan hunter hat
+clothes-nadiya-head-innkeeper	Nadiyan innkeeper hat
+clothes-nadiya-head-miner	Nadiyan miner hat
+clothes-nadiya-head-musician	Nadiyan musician hat
+clothes-nadiya-head-peasantbeige	Beige Nadiyan peasant hat
+clothes-nadiya-head-peasantblue	Blue Nadiyan peasant hat
+clothes-nadiya-head-peasantbrown	Brown Nadiyan peasant hat
+clothes-nadiya-head-peasantred	Red Nadiyan peasant hat
+clothes-nadiya-head-peasanttan	Tan Nadiyan peasant hat
+clothes-nadiya-head-peasantwhite	White Nadiyan peasant hat
+clothes-nadiya-head-shepherd	Nadiyan shepherd hat
+clothes-nadiya-head-tailor	Nadiyan tailor hat
+clothes-nadiya-head-winter1	Brown Nadiyan fur-lined hat
+clothes-nadiya-head-winter2	Blue Nadiyan fur-lined hat
+clothes-head-crown-byzantine	Byzantine crown
+clothes-head-bucket	Bucket helm
+clothes-head-bycocket	Bycocket
+clothes-head-bycocketfeather	Feathered bycocket
+clothes-head-litham	Plain litham
+clothes-head-wimple	Wimple
+clothes-head-acrobat	Acrobat hairpin
+clothes-head-temptress	Temptress bycocket
+clothes-head-furbrim	Fur brim hat
+clothes-head-hide	Hide hat
+clothes-head-jester	Jester cowl
+clothes-head-liripipeblack	Black liripipe
+clothes-head-liripipeblue	Blue liripipe
+clothes-head-liripipebrown	Brown liripipe
+clothes-head-liripipegray	Gray liripipe
+clothes-head-liripipegreen	Green liripipe
+clothes-head-liripipeorange	Orange liripipe
+clothes-head-liripipepink	Pink liripipe
+clothes-head-liripipepurple	Purple liripipe
+clothes-head-liripipered	Red liripipe
+clothes-head-liripipewhite	White liripipe
+clothes-head-liripipeyellow	Yellow liripipe
+clothes-head-phrygian	Phrygian cap
+clothes-head-thrumcap	Thrum cap
+clothes-head-wreathflower	Flower wreath
+clothes-head-emeraldreindeerherder	Emerald reindeer herder hat
+clothes-head-capotain	Capotain
+clothes-head-broadbrim	Broadbrim hat
+clothes-head-ruralhunter	Rural hunter cap
+clothes-head-popinjay	Popinjay cap
+clothes-head-midsummer	Midsummer circlet
+clothes-shoulder-scarf	Scarf
+clothes-shoulder-woolen-scarf	Woolen scarf
+clothes-shoulder-stained-leather-poncho	Stained leather poncho
+clothes-shoulder-shortsleeve-pearl-moonrobe	Shortsleeve pearl moonrobe
+clothes-shoulder-royal-fur	Prince fur
+clothes-shoulder-peasent-kaftan	Peasant kaftan
+clothes-shoulder-noble-fur-collar	Noble fur collar
+clothes-shoulder-mooncloth-robe	Mooncloth robe
+clothes-shoulder-minstrel-coat	Minstrel coat
+clothes-shoulder-longsleeve-pearl-moonrobe	Longsleeve pearl moonrobe
+clothes-shoulder-hunter-poncho	Hunter poncho
+clothes-shoulder-jord-robe	Jord robe
+clothes-shoulder-hooded-cape	Hooded cape
+clothes-shoulder-embroidered-tartarean-scarf	Embroidered tartar scarf
+clothes-shoulder-embroidered-collar	Embroidered collar
+clothes-shoulder-blacksmith-apron	Blacksmith apron
+clothes-shoulder-artisans-scarf	Artisans scarf
+clothes-shoulder-aristocrat-mantle	Aristocrat mantle
+clothes-shoulder-squire-tunic	Squire tunic
+clothes-shoulder-clockmaker-apron	Clockmaker apron
+clothes-shoulder-forlorn-sash	Forlorn Hope sash
+clothes-shoulder-malefactor-cloak	Malefactor heavy cloak
+clothes-shoulder-marketeer	Marketeer cape
+clothes-shoulder-rotwalker	Rotwalker cape
+clothes-shoulder-surgeon	Barber surgeon mantle
+clothes-shoulder-miner	Miner cape
+clothes-shoulder-alchemist	Alchemist apron
+clothes-shoulder-survivor	Survivor cloak
+clothes-shoulder-scribe	Scribe hood
+clothes-nadiya-shoulder-alchemist	Nadiyan alchemist capelet
+clothes-nadiya-shoulder-barber	Nadiyan barber apron
+clothes-nadiya-shoulder-blacksmith	Nadiyan blacksmith apron
+clothes-nadiya-shoulder-fisher	Nadiyan fisher capelet
+clothes-nadiya-shoulder-guard	Nadiyan guard tabbard
+clothes-nadiya-shoulder-hunter	Nadiyan hunter cape
+clothes-nadiya-shoulder-innkeeper	Nadiyan innkeeper apron
+clothes-nadiya-shoulder-musician	Nadiyan musician hood
+clothes-nadiya-shoulder-peasant1	Blue Nadiyan peasant cape
+clothes-nadiya-shoulder-peasant2	Beige Nadiyan peasant cape
+clothes-nadiya-shoulder-peasant3	Brown Nadiyan peasant cape
+clothes-nadiya-shoulder-shepherd	Nadiyan shepherd cape
+clothes-nadiya-shoulder-winter1	Nadiyan fur capelet
+clothes-shoulder-furwrap	Fur wrap
+clothes-shoulder-acrobat	Acrobat capelet
+clothes-shoulder-midnightponcho	Midnight poncho
+clothes-shoulder-forestponcho	Forest poncho
+clothes-shoulder-owlponcho	Owl poncho
+clothes-shoulder-shawlmoth	Moth patterned shawl
+clothes-shoulder-shawlhawk	Hawk patterned shawl
+clothes-shoulder-apronyellow	Yellow apron
+clothes-shoulder-apronwhite	White apron
+clothes-shoulder-apronred	Red apron
+clothes-shoulder-apronpurple	Purple apron
+clothes-shoulder-apronplain	Plain apron
+clothes-shoulder-apronbrown	Brown apron
+clothes-shoulder-apronorange	Orange apron
+clothes-shoulder-aprongreen	Green apron
+clothes-shoulder-aprongray	Gray apron
+clothes-shoulder-apronpink	Pink apron
+clothes-shoulder-apronblue	Blue apron
+clothes-shoulder-apronblack	Black apron
+clothes-shoulder-emeraldreindeerherder	Emerald reindeer herder mantle
+clothes-shoulder-rawhidewrap	Rawhide wrap
+clothes-shoulder-popinjay	Popinjay cape
+clothes-shoulder-midsummer	Midsummer shawl
+clothes-shoulder-patchwork	Patchwork coat
+clothes-shoulder-wanderer	Wanderer furs
+clothes-shoulder-ruralhunter	Rural hunter coat
+clothes-upperbody-great-steppe-shirt	Great Steppe shirt
+clothes-upperbody-rawhidemantle	Rawhide mantle
+clothes-upperbody-woolen-shirt	Woolen shirt
+clothes-upperbody-temptress-velvet-shirt	Temptress velvet shirt
+clothes-upperbody-tattered-linen-shirt	Tattered linen shirt
+clothes-upperbody-tattered-crimson-tunic	Tattered crimson tunic
+clothes-upperbody-squire-shirt	Squire shirt
+clothes-upperbody-shepherd-tunic	Shepherd tunic
+clothes-upperbody-scarlet-ornate-linen-tunic	Scarlet ornate linen tunic
+clothes-upperbody-reindeer-herder-collared-shirt	Reindeer herder collared shirt
+clothes-upperbody-prince-tunic	Prince tunic
+clothes-upperbody-peasent-shirt	Peasant shirt
+clothes-upperbody-pearl-shirt	Pearl shirt
+clothes-upperbody-noble-shirt	Noble shirt
+clothes-upperbody-minstrel-shirt	Minstrel shirt
+clothes-upperbody-messenger-shirt	Messenger shirt
+clothes-upperbody-merchant-shirt	Merchant shirt
+clothes-upperbody-linen-tunic	Linen tunic
+clothes-upperbody-lackey-shirt	Lackey shirt
+clothes-upperbody-jailor-tunic	Jailor tunic
+clothes-upperbody-earth-toned-robe	Earth toned robe
+clothes-upperbody-cendre-shirt	Cendre shirt
+clothes-upperbody-hunter-shirt	Hunter shirt
+clothes-upperbody-azure-embroidered-shirt	Azure embroidered shirt
+clothes-upperbody-aristocrat-shirt	Aristocrat shirt
+clothes-upperbody-blackguard-shirt	Blackguard shirt
+clothes-upperbody-clockmaker-shirt	Clockmaker shirt
+clothes-upperbody-malefactor-shirt	Malefactor shirt
+clothes-upperbody-forlorn-tunic	Forlorn Hope tunic
+clothes-upperbody-commoner-shirt	Commoner shirt
+clothes-upperbody-tailor-blouse	Tailor blouse
+clothes-upperbody-homespun-shirt	Homespun shirt
+clothes-upperbody-pastoral-shirt	Pastoral shirt
+clothes-upperbody-chateau-blouse	Chateau blouse
+clothes-upperbody-marketeer	Marketeer shirt
+clothes-upperbody-rottenking	Rotten king blouse
+clothes-upperbody-king	King blouse
+clothes-upperbody-surgeon	Barber surgeon shirt
+clothes-upperbody-miner	Miner shirt
+clothes-upperbody-alchemist	Alchemist shirt
+clothes-upperbody-deep	Deep noble shirt
+clothes-upperbody-forgotten	Forgotten noble shirt
+clothes-upperbody-survivor	Survivor shirt
+clothes-upperbody-scribe	Scribe tunic
+clothes-nadiya-upperbody-alchemist	Nadiyan alchemist shirt
+clothes-nadiya-upperbody-barber	Nadiyan barber shirt
+clothes-nadiya-upperbody-beekeeper	Nadiyan beekeeper shirt
+clothes-nadiya-upperbody-blacksmith	Nadiyan blacksmith shirt
+clothes-nadiya-upperbody-fisher	Nadiyan fisher shirt
+clothes-nadiya-upperbody-guard	Nadiyan guard tunic
+clothes-nadiya-upperbody-hunter	Nadiyan hunter shirt
+clothes-nadiya-upperbody-innkeeper	Nadiyan innkeeper shirt
+clothes-nadiya-upperbody-miner-clean	Pristine Nadiyan miner tunic
+clothes-nadiya-upperbody-miner	Nadiyan miner tunic
+clothes-nadiya-upperbody-musician	Nadiyan musician shirt
+clothes-nadiya-upperbody-peasant1	White Nadiyan sleeveless peasant shirt
+clothes-nadiya-upperbody-peasant2	White Nadiyan peasant shirt
+clothes-nadiya-upperbody-peasant3	Beige Nadiyan sleeveless peasant shirt
+clothes-nadiya-upperbody-peasant4	Beige Nadiyan peasant shirt
+clothes-nadiya-upperbody-shepherd	Nadiyan shepherd tunic
+clothes-nadiya-upperbody-tailor	Nadiyan tailor shirt
+clothes-nadiya-upperbody-winter1	Brown Nadiyan fur-lined shirt
+clothes-nadiya-upperbody-winter2	Beige Nadiyan fur-lined shirt
+clothes-upperbody-hunters-green	Hunter's green shirt
+clothes-upperbody-jester	Jester shirt
+clothes-upperbody-acrobat	Acrobat bolero
+clothes-upperbody-kirtleyellow	Yellow kirtle top
+clothes-upperbody-kirtlewhite	White kirtle top
+clothes-upperbody-kirtlered	Red kirtle top
+clothes-upperbody-kirtlepurple	Purple kirtle top
+clothes-upperbody-kirtlepink	Pink kirtle top
+clothes-upperbody-kirtleorange	Orange kirtle top
+clothes-upperbody-kirtlegreen	Green kirtle top
+clothes-upperbody-kirtlegray	Gray kirtle top
+clothes-upperbody-kirtleblue	Blue kirtle top
+clothes-upperbody-kirtleblack	Black kirtle top
+clothes-upperbody-kirtlebrown	Brown kirtle top
+clothes-upperbody-classicaltunic	Classical tunic
+clothes-upperbody-chemisesleeveless	Sleeveless chemise top
+clothes-upperbody-chemiseshort	Short chemise top
+clothes-upperbody-chemisescoop	Scoop chemise top
+clothes-upperbody-chemiseshoulderlong	Off shoulder chemise top
+clothes-upperbody-chemiselong	Long chemise top
+clothes-upperbody-chemiseshouldershort	Off shoulder short chemise top
+clothes-upperbody-fortuneteller	Fortune teller shirt
+clothes-upperbody-grass	Grass shirt
+clothes-upperbody-emeraldreindeerherder	Emerald reindeer herder shirt
+clothes-upperbody-arcticfisher	Arctic fisher shirt
+clothes-upperbody-arctichunter	Arctic hunter shirt
+clothes-upperbody-embroideredfur	Embroidered fur shirt
+clothes-upperbody-farmhand	Farmhand shirt
+clothes-upperbody-popinjay	Popinjay blouse
+clothes-upperbody-centurion	Centurion tunic
+clothes-upperbody-midsummer	Midsummer blouse
+clothes-upperbody-ruralhunter	Rural hunter tunic
+clothes-upperbody-ruralfarmer	Rural farmer blouse
+clothes-upperbody-warrior	Warrior tunic
+clothes-upperbody-wanderer	Wanderer tunic
+clothes-upperbody-beggar	Beggar vest
+clothes-upperbodyover-fur-coat	Fur coat
+clothes-upperbodyover-warm-robe	Warm robe
+clothes-upperbodyover-travelers-earthrobe	Traveler's earthrobe
+clothes-upperbodyover-nomad-mantle	Nomad mantle
+clothes-upperbodyover-spice-merchants-coat	Spice merchants coat
+clothes-upperbodyover-reindeer-herder-fur-coat	Reindeer herder fur coat
+clothes-upperbodyover-cobalt-mantle	Cobalt mantle
+clothes-upperbodyover-huntsmans-tunic	Huntsmans tunic
+clothes-upperbodyover-dim-jasmine-coat	Dim jasmine coat
+clothes-upperbodyover-cerise-embroidered-reindeer-herder-coat	Cerise embroidered reindeer herder coat
+clothes-upperbodyover-great-steppe-mantle	Great Steppe mantle
+clothes-upperbodyover-clockmaker-tunic	Clockmaker tunic
+clothes-upperbodyover-hunter-coat	Hunter coat
+clothes-upperbodyover-malefactor-tunic	Malefactor leather tunic
+clothes-upperbodyover-commoner-coat	Commoner coat
+clothes-upperbodyover-tailor-jacket	Tailor jacket
+clothes-upperbodyover-marketeer	Marketeer tunic
+clothes-upperbodyover-rotwalker	Rotwalker coat
+clothes-upperbodyover-rottenking	Rotten king coat
+clothes-upperbodyover-king	King coat
+clothes-upperbodyover-surgeon	Barber surgeon apron
+clothes-upperbodyover-miner	Miner tunic
+clothes-upperbodyover-forgotten	Forgotten noble robe
+clothes-nadiya-upperbodyover-beekeeper	Nadiyan beekeeper tunic
+clothes-nadiya-upperbodyover-coat-long	Nadiyan coat
+clothes-nadiya-upperbodyover-coat-short	Nadiyan short coat
+clothes-nadiya-upperbodyover-coat-verylong	Nadiyan long coat
+clothes-nadiya-upperbodyover-miner-clean	Pristine Nadiyan miner bolero
+clothes-nadiya-upperbodyover-miner	Nadiyan miner bolero
+clothes-nadiya-upperbodyover-musician	Nadiyan musician jacket
+clothes-nadiya-upperbodyover-tailor	Nadiyan tailor vest
+clothes-nadiya-upperbodyover-winter1	Nadiyan fur-lined jacket
+clothes-nadiya-upperbodyover-winter2	Nadiyan fur jacket
+clothes-upperbodyover-hidetunic	Rawhide tunic
+clothes-upperbodyover-temptress	Temptress surcoat
+clothes-upperbodyover-fortuneteller	Fortune teller vest
+clothes-upperbodyover-quilteddoublet	Quilted doublet
+clothes-upperbodyover-quiltedcorsage	Quilted corsage
+clothes-upperbodyover-peliconpurple	Royal purple pelicon
+clothes-upperbodyover-peliconburgundy	Burgundy pelicon
+clothes-upperbodyover-emeraldreindeerherder	Emerald reindeer herder coat
+clothes-upperbodyover-arcticfisher	Arctic fisher parka
+clothes-upperbodyover-arctichunter	Arctic hunter parka
+clothes-upperbodyover-embroideredfur	Embroidered fur parka
+clothes-upperbodyover-furlinedvest	Fur lined vest
+clothes-lowerbody-commoner-skirt	Commoner skirt
+clothes-lowerbody-workmans-gown	Workmans pants
+clothes-lowerbody-woolen-leggings	Woolen leggings
+clothes-lowerbody-warm-woolen-pants	Warm woolen pants
+clothes-lowerbody-torn-riding-pants	Torn riding pants
+clothes-lowerbody-tattered-peasent-gown	Tattered peasant gown
+clothes-lowerbody-nomad-trousers	Nomad trousers
+clothes-lowerbody-squire-pants	Squire pants
+clothes-lowerbody-shepherd-pants	Shepherd pants
+clothes-lowerbody-raw-hide-trousers	Rawhide trousers
+clothes-lowerbody-reindeer-herder-trousers	Reindeer herder trousers
+clothes-lowerbody-prince-breeches	Prince breeches
+clothes-lowerbody-noble-pants	Noble pants
+clothes-lowerbody-minstrel-pants	Minstrel pants
+clothes-lowerbody-messenger-trousers	Messenger trousers
+clothes-lowerbody-merchant-pants	Merchant pants
+clothes-lowerbody-lackey-breeches	Lackey breeches
+clothes-lowerbody-jailor-pants	Jailor pants
+clothes-lowerbody-fine-trousers	Fine trousers
+clothes-lowerbody-dirty-linen-trousers	Dirty linen trousers
+clothes-lowerbody-aristocrat-leggings	Aristocrat leggings
+clothes-lowerbody-blackguard-leggings	Blackguard leggings
+clothes-lowerbody-clockmaker-pants	Clockmaker pants
+clothes-lowerbody-hunter-leggings	Hunter leggings
+clothes-lowerbody-malefactor-trousers	Malefactor trousers
+clothes-lowerbody-forlorn-pants	Forlorn Hope pants
+clothes-lowerbody-commoner-trousers	Commoner trousers
+clothes-lowerbody-tailor-trousers	Tailor trousers
+clothes-lowerbody-homespun-pants	Homespun pants
+clothes-lowerbody-pastoral-pants	Pastoral pants
+clothes-lowerbody-chateau-pants	Chateau pants
+clothes-lowerbody-marketeer	Marketeer pants
+clothes-lowerbody-rotwalker	Rotwalker leggings
+clothes-lowerbody-skirt	Skirt
+clothes-lowerbody-rottenking	Rotten king pants
+clothes-lowerbody-king	King pants
+clothes-lowerbody-surgeon	Barber surgeon pants
+clothes-lowerbody-miner	Miner pants
+clothes-lowerbody-alchemist	Alchemist pants
+clothes-lowerbody-deep	Deep noble leggings
+clothes-lowerbody-forgotten	Forgotten noble leggings
+clothes-lowerbody-survivor	Survivor pants
+clothes-lowerbody-scribe	Scribe pants
+clothes-nadiya-lowerbody-alchemist	Nadiyan alchemist pants
+clothes-nadiya-lowerbody-barber	Nadiyan barber pants
+clothes-nadiya-lowerbody-beekeeper	Nadiyan beekeeper pants
+clothes-nadiya-lowerbody-blacksmith	Nadiyan blacksmith pants
+clothes-nadiya-lowerbody-fisher	Nadiyan fisher pants
+clothes-nadiya-lowerbody-guard	Nadiyan guard pants
+clothes-nadiya-lowerbody-hunter	Nadiyan hunter pants
+clothes-nadiya-lowerbody-innkeeper	Nadiyan innkeeper pants
+clothes-nadiya-lowerbody-miner-clean	Pristine Nadiyan miner pants
+clothes-nadiya-lowerbody-miner	Nadiyan miner pants
+clothes-nadiya-lowerbody-musician	Nadiyan musician pants
+clothes-nadiya-lowerbody-peasant-skirt1	Nadiyan brown peasant skirt
+clothes-nadiya-lowerbody-peasant-skirt2	Nadiyan tan peasant skirt
+clothes-nadiya-lowerbody-peasant-skirt3	Nadiyan white peasant skirt
+clothes-nadiya-lowerbody-peasant1	Tan Nadiyan peasant pants
+clothes-nadiya-lowerbody-peasant2	White Nadiyan peasant pants
+clothes-nadiya-lowerbody-peasant3	Brown Nadiyan peasant pants
+clothes-nadiya-lowerbody-shepherd	Nadiyan shepherd pants
+clothes-nadiya-lowerbody-tailor	Nadiyan tailor pants
+clothes-nadiya-lowerbody-winter1	Beige Nadiyan fur-lined pants
+clothes-nadiya-lowerbody-winter2	Brown Nadiyan fur-lined pants
+clothes-lowerbody-jester	Jester hose
+clothes-lowerbody-acrobat	Acrobat pants
+clothes-lowerbody-hoseyellowblack	Black and yellow hose
+clothes-lowerbody-hosewhiteorange	Orange and white hose
+clothes-lowerbody-hoseredwhite	White and red hose
+clothes-lowerbody-hosepurplepink	Pink and purple hose
+clothes-lowerbody-hoseorangeblue	Blue and orange hose
+clothes-lowerbody-hosegreenyellow	Yellow and green hose
+clothes-lowerbody-hosegraypurple	Purple and gray hose
+clothes-lowerbody-hosebrowngray	Gray and brown hose
+clothes-lowerbody-hosebluepink	Pink and blue hose
+clothes-lowerbody-hoseblackred	Red and black hose
+clothes-lowerbody-braiesplain	Plain braies
+clothes-lowerbody-braiesgray	Gray braies
+clothes-lowerbody-braiesbrown	Brown braies
+clothes-lowerbody-braiesblue	Blue braies
+clothes-lowerbody-embroideredpantaloons	Embroidered pantaloons
+clothes-lowerbody-emeraldreindeerherder	Emerald reindeer herder leggings
+clothes-lowerbody-arctichunter	Arctic hunter pants
+clothes-lowerbody-arcticfisher	Arctic fisher pants
+clothes-lowerbody-embroideredfur	Embroidered fur pants
+clothes-lowerbody-grass	Grass pants
+clothes-lowerbody-farmhand	Farmhand pants
+clothes-lowerbody-popinjay	Popinjay trousers
+clothes-lowerbody-centurion	Centurion shorts
+clothes-lowerbody-warrior	Warrior pants
+clothes-lowerbody-wanderer	Wanderer pants
+clothes-lowerbody-beggar	Beggar shorts
+clothes-foot-leather	Leather shoes
+clothes-foot-worn-leather-boots	Worn leather boots
+clothes-foot-wool-lined-knee-high-boots	Wool lined knee-high boots
+clothes-foot-tigh-high-boots	Thigh-high boots
+clothes-foot-temptress-velvet-shoes	Temptress velvet shoes
+clothes-foot-nomad-boots	Nomad boots
+clothes-foot-squire-boots	Squire boots
+clothes-foot-soldier-boots	Soldier boots
+clothes-foot-shepherd-sandals	Shepherd sandals
+clothes-foot-prisoner-binds	Prisoner binds
+clothes-foot-prince-boots	Prince boots
+clothes-foot-peasent-slippers	Peasant slippers
+clothes-foot-noble-shoes	Noble shoes
+clothes-foot-minstrel-boots	Minstrel boots
+clothes-foot-metalcap-boots	Metalcap boots
+clothes-foot-messenger-shoes	Messenger shoes
+clothes-foot-merchant-shoes	Merchant shoes
+clothes-foot-lackey-shoes	Lackey shoes
+clothes-foot-knee-high-fur-boots	Knee-high fur boots
+clothes-foot-jailor-boots	Jailor boots
+clothes-foot-high-leather-boots	High leather boots
+clothes-foot-fur-lined-reindeer-herder-shoes	Fur lined reindeer herder shoes
+clothes-foot-great-steppe-boots	Great Steppe boots
+clothes-foot-aristocrat-shoes	Aristocrat shoes
+clothes-foot-blackguard-shoes	Blackguard shoes
+clothes-foot-clockmaker-shoes	Clockmaker felt shoes
+clothes-foot-hunter-boots	Hunter boots
+clothes-foot-malefactor-boots	Malefactor wrapped boots
+clothes-foot-forlorn-shoes	Forlorn Hope shoes
+clothes-foot-commoner-boots	Commoner boots
+clothes-foot-tailor-shoes	Tailor shoes
+clothes-foot-marketeer	Marketeer shoes
+clothes-foot-rotwalker	Rotwalker boots
+clothes-foot-rottenking	Rotten king shoes
+clothes-foot-king	King shoes
+clothes-foot-surgeon	Barber surgeon shoes
+clothes-foot-miner	Miner boots
+clothes-foot-alchemist	Alchemist boots
+clothes-foot-forgotten	Forgotten noble shoes
+clothes-foot-survivor	Survivor boots
+clothes-foot-scribe	Scribe shoes
+clothes-nadiya-foot-alchemist	Nadiyan alchemist sandals
+clothes-nadiya-foot-barber	Nadiyan barber shoes
+clothes-nadiya-foot-beekeeper	Nadiyan beekeeper boots
+clothes-nadiya-foot-blacksmith	Nadiyan blacksmith boots
+clothes-nadiya-foot-fisher	Nadiyan fisher boots
+clothes-nadiya-foot-guard	Nadiyan guard boots
+clothes-nadiya-foot-hunter	Nadiyan hunter boots
+clothes-nadiya-foot-innkeeper	Nadiyan innkeeper shoes
+clothes-nadiya-foot-miner-clean	Pristine Nadiyan miner boots
+clothes-nadiya-foot-miner	Nadiyan miner boots
+clothes-nadiya-foot-musician	Nadiyan musician shoes
+clothes-nadiya-foot-peasantbeige	Beige Nadiyan peasant shoes
+clothes-nadiya-foot-peasantblue	Blue Nadiyan peasant shoes
+clothes-nadiya-foot-peasantbrown	Brown Nadiyan peasant shoes
+clothes-nadiya-foot-peasantwhite	White Nadiyan peasant shoes
+clothes-nadiya-foot-shepherd	Nadiyan shepherd boots
+clothes-nadiya-foot-tailor	Nadiyan tailor boots
+clothes-nadiya-foot-winter1	Brown Nadiyan fur-lined boots
+clothes-nadiya-foot-winter2	Blue Nadiyan fur-lined boots
+clothes-foot-rusty-ankle-manacles	Rusty manacles
+clothes-foot-embroideredfur	Embroidered fur mukluks
+clothes-foot-strawsandals	Straw sandals
+clothes-foot-emeraldreindeerherder	Emerald reindeer herder boots
+clothes-foot-jester	Jester wraps
+clothes-foot-arcticfisher	Arctic fisher snowshoes
+clothes-foot-hobnailboots	Hobnail boots
+clothes-foot-arctichunter	Arctic hunter boots
+clothes-foot-acrobat	Acrobat anklets
+clothes-foot-fortuneteller	Fortune teller anklet
+clothes-foot-farmhand	Farmhand shoes
+clothes-foot-popinjay	Popinjay shoes
+clothes-foot-centurion	Centurion sandals
+clothes-foot-midsummer	Midsummer sandals
+clothes-foot-ruralhunter	Rural hunter boots
+clothes-foot-ruralfarmer	Rural farmer boots
+clothes-foot-wanderer	Wanderer shoes
+clothes-foot-warrior	Warrior shoes
+clothes-foot-beggar	Beggar footwraps
+clothes-face-leather-reinforced-mask	Leather reinforced mask
+clothes-face-hunter-mask	Hunter face mask
+clothes-face-malefactor-mask	Malefactor whitewood mask
+clothes-face-forlorn-veil	Forlorn Hope veil
+clothes-face-tailor-mask	Tailor mask
+clothes-face-sheepskull	Sheep skull mask
+clothes-face-crow	Crow mask
+clothes-face-hummingbird	Hummingbird mask
+clothes-face-corroded	Corroded helmet
+clothes-face-cat	Cat mask
+clothes-face-festivecat	Festive cat mask
+clothes-face-marketeer	Marketeer mask
+clothes-face-rotwalker	Rotwalker mask
+clothes-face-funeralmask1	Golden funeral mask
+clothes-face-funeralmask2	Silver funeral mask
+clothes-face-funeralmask3	Black bronze funeral mask
+clothes-face-funeralmask4	Ceramic funeral mask
+clothes-face-funeralmask5	Green marble skull funeral mask
+clothes-face-funeralmask6	Bone funeral mask
+clothes-face-funeralmask7	Gear funeral mask
+clothes-face-funeralmask8	Lead funeral mask
+clothes-face-snow-goggles	Snow goggles
+clothes-face-glasses	Plain glasses
+clothes-face-rottenking	Rotten king mask
+clothes-face-surgeon	Barber surgeon mask
+clothes-face-surgeonhood	Barber surgeon mask with hood
+clothes-face-miner	Miner mask
+clothes-face-forgotten	Forgotten noble mask
+clothes-face-survivor	Survivor mask
+clothes-nadiya-face-alchemist	Nadiyan alchemist hood
+clothes-nadiya-face-barber	Nadiyan barber hood
+clothes-nadiya-face-blacksmith	Nadiyan blacksmith goggles
+clothes-nadiya-face-grain	Piece of straw
+clothes-nadiya-face-hunter	Nadiyan hunter mask
+clothes-nadiya-face-miner	Nadiyan miner mask
+clothes-face-glasses-clockmaker	Clockmaker glasses
+clothes-face-blindfold	Blindfold
+clothes-face-arctic	Arctic mask
+clothes-face-bandageeyes	Eye bandages
+clothes-face-bandageleft	Left eye bandage
+clothes-face-bandageright	Right eye bandage
+clothes-face-eyepatchleatherleft	Left eye patch
+clothes-face-eyepatchleatherright	Right eye patch
+clothes-face-eyepatchstuddedleft	Studded left eye patch
+clothes-face-eyepatchstuddedright	Studded right eye patch
+clothes-face-headbandfabric	Linen headband
+clothes-face-headbandseashells	Seashell headband
+clothes-face-headbandteeth	Beartooth headband
+clothes-face-headbandvine	Vine headband
+clothes-face-acrobat	Acrobat mask
+clothes-face-linenveil	Linen veil
+clothes-hand-prince-gloves	Prince gloves
+clothes-hand-noble-riding-gloves	Noble riding gloves
+clothes-hand-minstrel-gloves	Minstrel gloves
+clothes-hand-lackey-gloves	Lackey gloves
+clothes-hand-laced-handsome-gloves	Laced handsome gloves
+clothes-hand-heavy-leather-gloves	Heavy leather gloves
+clothes-hand-fur-gloves	Fur gloves
+clothes-hand-clockmaker-wristguard	Clockmaker wristguard
+clothes-hand-hunter-gloves	Hunter gloves
+clothes-hand-malefactor-gloves	Malefactor wrapped gloves
+clothes-hand-forlorn-bracer	Forlorn Hope bracer
+clothes-hand-commoner-gloves	Commoner gloves
+clothes-hand-tailor-gloves	Tailor gloves
+clothes-hand-rottenking	Rotten king gloves
+clothes-hand-king	King gloves
+clothes-hand-surgeon	Barber surgeon hand wraps
+clothes-hand-miner	Miner gloves
+clothes-hand-deep	Deep noble gloves
+clothes-hand-forgotten	Forgotten noble gloves
+clothes-hand-survivor	Survivor gloves
+clothes-hand-scribe	Scribe gloves
+clothes-nadiya-hand-alchemist	Nadiyan alchemist gloves
+clothes-nadiya-hand-barber	Nadiyan barber gloves
+clothes-nadiya-hand-beekeeper	Nadiyan beekeeper gloves
+clothes-nadiya-hand-blacksmith	Nadiyan blacksmith gloves
+clothes-nadiya-hand-fisher	Nadiyan fisher gloves
+clothes-nadiya-hand-gloves	Nadiyan gloves
+clothes-nadiya-hand-hunter	Nadiyan hunter gloves
+clothes-nadiya-hand-miner-clean	Pristine Nadiyan miner gloves
+clothes-nadiya-hand-miner	Nadiyan miner gloves
+clothes-nadiya-hand-peasant1	Brown Nadiyan peasant gloves
+clothes-nadiya-hand-peasant2	Beige Nadiyan peasant gloves
+clothes-nadiya-hand-shepherd	Nadiyan shepherd gloves
+clothes-nadiya-hand-winter1	Brown Nadiyan mittens
+clothes-nadiya-hand-winter2	Blue Nadiyan mittens
+clothes-hand-embroideredfur	Embroidered fur mittens
+clothes-hand-emeraldreindeerherder	Emerald reindeer herder mittens
+clothes-hand-arcticfisher	Arctic fisher mittens
+clothes-hand-arctichunter	Arctic hunter mittens
+clothes-hand-cuffsyellow	Yellow cuffs
+clothes-hand-cuffswhite	White cuffs
+clothes-hand-cuffsred	Red cuffs
+clothes-hand-cuffspurple	Purple cuffs
+clothes-hand-cuffsplain	Cuffs
+clothes-hand-cuffspink	Pink cuffs
+clothes-hand-cuffsorange	Orange cuffs
+clothes-hand-cuffsgreen	Green cuffs
+clothes-hand-cuffsgray	Gray cuffs
+clothes-hand-cuffsbrown	Brown cuffs
+clothes-hand-cuffsblack	Black cuffs
+clothes-hand-beggar	Beggar hand wraps
+clothes-hand-cuffsblue	Blue cuffs
+clothes-waist-sturdy-leather-belt	Sturdy leather belt
+clothes-waist-sturdy-belt	Sturdy belt
+clothes-waist-squire-belt	Squire belt
+clothes-waist-reindeer-herder-waistband	Reindeer herder waistband
+clothes-waist-prince-waistband	Prince waistband
+clothes-waist-peasant-strap	Peasant strap
+clothes-waist-noble-sash	Noble sash
+clothes-waist-moss-embroidered-belt	Moss embroidered belt
+clothes-waist-messenger-belt	Messenger belt
+clothes-waist-merchant-belt	Merchant belt
+clothes-waist-linen-rope	Linen rope
+clothes-waist-jailor-belt	Jailor belt
+clothes-waist-heavy-tool-belt	Heavy tool belt
+clothes-waist-heavy-belt	Heavy belt
+clothes-waist-gold-waist-chain	Gold waist chain
+clothes-waist-fortune-teller-hip-scarf	Fortune teller hip scarf
+clothes-waist-fancy-royal-belt	Fancy royal belt
+clothes-waist-cerise-embroidered-reindeer-herder-waistband	Cerise embroidered reindeer herder waistband
+clothes-waist-aristocrat-belt	Aristocrat sash
+clothes-waist-blackguard-belt	Blackguard belt
+clothes-waist-clockmaker-belt	Clockmaker toolbelt
+clothes-waist-malefactor-sash	Malefactor sash
+clothes-waist-forlorn-belt	Forlorn Hope belt
+clothes-waist-tailor-belt	Tailor belt
+clothes-waist-marketeer	Marketeer belt
+clothes-waist-rottenking	Rotten king belt
+clothes-waist-king	King belt
+clothes-waist-miner	Miner belt
+clothes-waist-alchemist	Alchemist belt
+clothes-waist-scribe	Scribe belt
+clothes-nadiya-waist-alchemist	Nadiyan alchemist belt
+clothes-nadiya-waist-barber	Nadiyan barber belt
+clothes-nadiya-waist-beekeeper	Nadiyan beekeeper belt
+clothes-nadiya-waist-fisher	Nadiyan fisher belt
+clothes-nadiya-waist-guard	Nadiyan guard belt
+clothes-nadiya-waist-hunter	Nadiyan hunter belt
+clothes-nadiya-waist-innkeeper-accessories	Nadiyan innkeeper belt and tab
+clothes-nadiya-waist-innkeeper	Nadiyan innkeeper belt
+clothes-nadiya-waist-miner-accessories	Nadiyan miner belt and lantern
+clothes-nadiya-waist-miner	Nadiyan miner belt
+clothes-nadiya-waist-musician	Nadiyan musician belt
+clothes-nadiya-waist-peasant1	Brown Nadiyan peasant belt
+clothes-nadiya-waist-peasant2	Red Nadiyan peasant belt
+clothes-nadiya-waist-shepherd	Nadiyan shepherd rope
+clothes-nadiya-waist-tailor	Nadiyan tailor sash
+clothes-nadiya-waist-winter1	Nadiyan heavy belt
+clothes-nadiya-waist-winter2	Nadiyan fur belt
+clothes-waist-jambiya-belt	Jambiya belt
+clothes-waist-regalwrap	Regal wrap
+clothes-waist-peasantapron	Peasant apron
+clothes-waist-bronzebelt	Bronze belt
+clothes-waist-farmhand	Farmhand belt
+clothes-waist-popinjay	Popinjay sash
+clothes-waist-centurion	Centurion belt
+clothes-waist-midsummer	Midsummer sash
+clothes-waist-ruralfarmer	Rural farmer belt
+clothes-waist-ruralhunter	Rural hunter sash
+clothes-waist-warrior	Warrior belt
+clothes-waist-wanderer	Wanderer belt
+clothes-waist-beggar	Beggar rope
+clothes-arm-squire-bracers	Squire bracers
+clothes-arm-silver-chain	Silver chain
+clothes-arm-silver-bracelet	Silver bracelet
+clothes-arm-rosary	Rosary
+clothes-arm-prisoner-binds	Prisoner binds
+clothes-arm-merchant-bracelet	Merchant bracelet
+clothes-arm-leather-bracers	Leather bracers
+clothes-arm-copper-bracelet	Copper bracelet
+clothes-arm-bronze-bracelet	Bronze bracelet
+clothes-arm-bronze-armlet	Bronze armlet
+clothes-arm-tailor-needlepuff	Tailor needle puff
+clothes-nadiya-arm-armlet-teeth	Nadiyan wolftooth armlet
+clothes-nadiya-arm-barber-pouch	Nadiyan barber pouch
+clothes-nadiya-arm-bronze-lapis-bracelet	Nadiyan bronze lapis bracelet
+clothes-nadiya-arm-copper-armlet	Nadiyan copper armlet
+clothes-nadiya-arm-copper-lapis-bracelet	Nadiyan copper lapis bracelet
+clothes-nadiya-arm-coral-bracelet	Nadiyan coral bracelet
+clothes-nadiya-arm-guard-bracers	Nadiyan guard bracers
+clothes-nadiya-arm-musician-bangles	Nadiyan musician bangles
+clothes-nadiya-arm-peasant-bracersbrown	Brown Nadiyan peasant bracers
+clothes-nadiya-arm-peasant-bracerswhite	White Nadiyan peasant bracers
+clothes-nadiya-arm-seashell-bracelet	Nadiyan seashell bracelet
+clothes-arm-gem-studded-bracelet	Gem studded bracelet
+clothes-arm-long-gem-studded-bracelet	Long gem studded bracelet
+clothes-arm-large-silver-bracelets	Large silver bracelets
+clothes-arm-japamala	Japamala
+clothes-arm-rusty-wrist-manacles	Rusty wrist manacles
+clothes-arm-acacia	Acacia seed bracelet
+clothes-arm-bamboo	Bamboo sapling bracelet
+clothes-arm-birch	Birch seed bracelet
+clothes-arm-cattail	Cattail root bracelet
+clothes-arm-coral	Coral bracelet
+clothes-arm-cypress	Cypress seed bracelet
+clothes-arm-ebony	Ebony seed bracelet
+clothes-arm-feather	Feather bracelet
+clothes-arm-flint	Flint bracelet
+clothes-arm-kapok	Kapok seed bracelet
+clothes-arm-larch	Larch seed bracelet
+clothes-arm-maple	Maple seed bracelet
+clothes-arm-maplered	Crimson maple seed bracelet
+clothes-arm-papyrus	Papyrus root bracelet
+clothes-arm-tule	Tule root bracelet
+clothes-arm-walnut	Walnut seed bracelet
+clothes-arm-hornedbracelet	Horned bracelet
+clothes-arm-acrobat	Acrobat bracelet
+clothes-arm-fortuneteller	Fortune teller bracelet
+clothes-arm-oak	Acorn bracelet
+clothes-arm-pine	Pinecone bracelet
+clothes-arm-purpleheart	Purpleheart seed bracelet
+clothes-arm-redwood	Redwood seed bracelet
+clothes-arm-ruralfarmer	Rural farmer bracelets
+clothes-arm-midsummer	Midsummer bracelets
+clothes-emblem-silverpin	Emblem (Silverpin)
+clothes-emblem-squire-emblem	Squire emblem
+clothes-emblem-silver-star	Silver star
+clothes-emblem-silver-pin	Silver pin
+clothes-emblem-royal-pin	Prince emblem
+clothes-emblem-messenger-pin	Messenger pin
+clothes-emblem-brass-ruby-brooch	Brass ruby brooch
+clothes-emblem-blue-seal	Blue seal
+clothes-emblem-blackguard-pin	Blackguard pin
+clothes-emblem-falcon	Falcon emblem
+clothes-emblem-silver-brooch	Silver brooch
+clothes-emblem-lily	Lily emblem
+clothes-emblem-fibula	Fibula
+clothes-emblem-cursedgemstone	Cursed gemstone
+clothes-emblem-flyingfishfigurine	Flying fish figurine
+clothes-emblem-starburst	Starlight emblem
+clothes-emblem-cloak-clasp	Black bronze clasp
+clothes-emblem-cloak-clasp-chain	Blass clasp
+clothes-emblem-cloak-clasp-beads	Beaded clasp
+clothes-emblem-midsummer	Midsummer brooch
+clothes-butterflypin-acadianhairstreak	Butterfly pin (Acadian hairstreak)
+clothes-butterflypin-alchemical	Butterfly pin (Alchemical)
+clothes-butterflypin-bandedpeacock	Butterfly pin (Banded peacock)
+clothes-butterflypin-bluekallima	Butterfly pin (Blue kallima)
+clothes-butterflypin-bluemorpho	Butterfly pin (Blue morpho)
+clothes-butterflypin-bluepansy	Butterfly pin (Blue pansy)
+clothes-butterflypin-bogcopper	Butterfly pin (Bog copper)
+clothes-butterflypin-bronzecopper	Butterfly pin (Bronze copper)
+clothes-butterflypin-cabbagewhite	Butterfly pin (Cabbage white)
+clothes-butterflypin-clipper	Butterfly pin (Clipper)
+clothes-butterflypin-coloradohairstreak	Butterfly pin (Colorado hairstreak)
+clothes-butterflypin-comma	Butterfly pin (Comma)
+clothes-butterflypin-commonbrimstone	Butterfly pin (Common brimstone)
+clothes-butterflypin-darkbluepansy	Butterfly pin (Dark bluepansy)
+clothes-butterflypin-desertorangetip	Butterfly pin (Desert orange tip)
+clothes-butterflypin-easterntigerswallowtail	Butterfly pin (Eastern tiger swallowtail)
+clothes-butterflypin-godartsnumberwing	Butterfly pin (Godarts numberwing)
+clothes-butterflypin-goldbandedforester	Butterfly pin (Gold banded forester)
+clothes-butterflypin-greatpurplehairstreak	Butterfly pin (Great purple hairstreak)
+clothes-butterflypin-greencharaxes	Butterfly pin (Green charaxes)
+clothes-butterflypin-largewhite	Butterfly pin (Large white)
+clothes-butterflypin-littlemetalmark	Butterfly pin (Little metalmark)
+clothes-butterflypin-littlewoodsatyr	Butterfly pin (Little wood satyr)
+clothes-butterflypin-malachite	Butterfly pin (Malachite)
+clothes-butterflypin-marbledwhite	Butterfly pin (Marbled white)
+clothes-butterflypin-milbertstortoiseshell	Butterfly pin (Milberts tortoiseshell)
+clothes-butterflypin-mourningcloak	Butterfly pin (Mourning cloak)
+clothes-butterflypin-oakblue	Butterfly pin (Oakblue)
+clothes-butterflypin-paintedbeauty	Butterfly pin (Painted beauty)
+clothes-butterflypin-pallidnawab	Butterfly pin (Pallid nawab)
+clothes-butterflypin-peacock	Butterfly pin (Peacock)
+clothes-butterflypin-pipevineswallowtail	Butterfly pin (Pipevine swallowtail)
+clothes-butterflypin-purpleemperor	Butterfly pin (Purple emperor)
+clothes-butterflypin-redadmiral	Butterfly pin (Red admiral)
+clothes-butterflypin-redglider	Butterfly pin (Red glider)
+clothes-butterflypin-redpostman	Butterfly pin (Red postman)
+clothes-butterflypin-resplendantforester	Butterfly pin (Resplendent forester)
+clothes-butterflypin-ringlet	Butterfly pin (Ringlet)
+clothes-butterflypin-rot	Butterfly pin (Rot)
+clothes-butterflypin-rust	Butterfly pin (Rust)
+clothes-butterflypin-rustytippedpage	Butterfly pin (Rusty-tipped page)
+clothes-butterflypin-silveryblue	Butterfly pin (Silvery blue)
+clothes-butterflypin-smallheath	Butterfly pin (Small heath)
+clothes-butterflypin-speckledwood	Butterfly pin (Speckled wood)
+clothes-butterflypin-temporal	Butterfly pin (Temporal)
+clothes-butterflypin-whiteadmiral	Butterfly pin (White admiral)
+clothes-butterflypin-whitepeacock	Butterfly pin (White peacock)
+clothes-butterflypin-zebraheliconan	Butterfly pin (Zebra heliconan)
+clothes-butterflypin-zebraswallowtail	Butterfly pin (Zebra swallowtail)
+clothes-butterflypin-zeredaskipper	Butterfly pin (Zereda skipper)
+clothes-neck-pearl-necklace	Pearl necklace
+clothes-neck-noble-necklace	Noble necklace
+clothes-neck-merchant-amulet	Merchant amulet
+clothes-neck-golden-necklace	Golden necklace
+clothes-neck-fancy-royal-collar	Fancy royal collar
+clothes-neck-copper-torc	Copper torc
+clothes-neck-bronze-gem-necklace	Bronze gem necklace
+clothes-neck-forlorn-talisman	Forlorn Hope talisman
+clothes-neck-walnut-amulet	Walnut amulet
+clothes-neck-redwood-amulet	Redwood amulet
+clothes-neck-pinecone-amulet	Pinecone amulet
+clothes-neck-larch-seed-amulet	Larch seed amulet
+clothes-neck-cypress-seed-amulet	Cypress seed amulet
+clothes-neck-acorn-amulet	Acorn amulet
+clothes-neck-marketeer	Marketeer undermask
+clothes-neck-malefactor-pendant	Malefactor bloody pendant
+clothes-neck-rottenking	Rotten king collar
+clothes-neck-king	King collar
+clothes-neck-deep	Deep noble amulet
+clothes-neck-forgotten	Forgotten noble amulet
+clothes-nadiya-neck-acacia-amulet	Acacia amulet
+clothes-nadiya-neck-bamboo-seed-amulet	Bamboo shoot amulet
+clothes-nadiya-neck-birch-amulet	Birch amulet
+clothes-nadiya-neck-cattail-root-amulet	Cattail root amulet
+clothes-nadiya-neck-copper-lapis-necklace	Nadiyan copper lapis necklace
+clothes-nadiya-neck-ebony-amulet	Ebony amulet
+clothes-nadiya-neck-feather-amulet	Nadiyan feather amulet
+clothes-nadiya-neck-flint-amulet	Nadiyan flint amulet
+clothes-nadiya-neck-fur-shawl	Nadiyan fur collar
+clothes-nadiya-neck-kapok-amulet	Kapok amulet
+clothes-nadiya-neck-lapis-necklace	Nadiyan lapis necklace
+clothes-nadiya-neck-maple-amulet	Maple amulet
+clothes-nadiya-neck-maple-red-amulet	Red maple amulet
+clothes-nadiya-neck-necklace-coral	Nadiyan coral necklace
+clothes-nadiya-neck-necklace-musician	Nadiyan musician necklace
+clothes-nadiya-neck-necklace-seashells	Nadiyan seashell necklace
+clothes-nadiya-neck-necklace-teeth	Nadiyan wolftooth necklace
+clothes-nadiya-neck-papyrus-root-amulet	Papyrus root amulet
+clothes-nadiya-neck-purpleheart-amulet	Purpleheart amulet
+clothes-nadiya-neck-tule-root-amulet	Tule root amulet
+clothes-neck-pillory	Pillory
+clothes-neck-nazar3	Nazar
+clothes-neck-nazar2	Nazar
+clothes-neck-nazar1	Nazar
+clothes-neck-japamala	Japamala
+clothes-neck-jade-amulet	Jade amulet
+clothes-neck-gorget-vulture	Vulture gorget
+clothes-neck-gorget	Gold gorget
+clothes-neck-gear-amulet-temporal	Temporal gear amulet
+clothes-neck-gear-amulet-gold	Gold gear amulet
+clothes-neck-gear-amulet-rusty	Rusty gear amulet
+clothes-neck-fancy-cross	Ornamental cross
+clothes-neck-simple-cross	Simple cross
+clothes-neck-teardrop-amulet	Teardrop amulet
+clothes-neck-necklace-seashell1	Seashell necklace
+clothes-neck-lunula	Lunula
+clothes-neck-pomander	Pomander
+clothes-neck-bronzeamulet	Bronze amulet
+clothes-neck-ruralfarmer	Rural farmer gorget
+clothes-neck-midsummer	Midsummer necklace

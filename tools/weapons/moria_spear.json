@@ -1,0 +1,2323 @@
+{
+	"editor": {
+		"allAngles": true,
+		"entityTextureMode": false
+	},
+	"textureWidth": 16,
+	"textureHeight": 16,
+	"textures": {
+		"Moria_Spear": "game:Moria_Spear"
+	},
+	"elements": [
+		{
+			"name": "butt",
+			"from": [
+				-30.4,
+				0.3,
+				7.45
+			],
+			"to": [
+				-30,
+				1.2,
+				8.55
+			],
+			"rotationOrigin": [
+				-30.4,
+				0.3,
+				7.45
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						4.25,
+						5.75,
+						4.375,
+						6
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						4,
+						5.25,
+						4.25,
+						5.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5.75,
+						6,
+						5.875,
+						6.25
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0.5,
+						5.5,
+						0.75,
+						5.75
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6,
+						6,
+						6.125,
+						6.25
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0,
+						6.25,
+						0.125,
+						6.5
+					]
+				}
+			}
+		},
+		{
+			"name": "handle 3",
+			"from": [
+				-30,
+				0.1,
+				7.35
+			],
+			"to": [
+				18.2,
+				1.4,
+				8.65
+			],
+			"rotationOrigin": [
+				-30,
+				0.1,
+				7.35
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0,
+						0,
+						12,
+						0.375
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2,
+						4.75,
+						2.375,
+						5.125
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0,
+						0.5,
+						12,
+						0.875
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2.5,
+						4.75,
+						2.875,
+						5.125
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0,
+						1,
+						12,
+						1.375
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0,
+						1.5,
+						12,
+						1.875
+					]
+				}
+			}
+		},
+		{
+			"name": "handle 3 round",
+			"from": [
+				-30,
+				0.25,
+				7.2
+			],
+			"to": [
+				18.2,
+				1.25,
+				8.8
+			],
+			"rotationOrigin": [
+				-30,
+				0.25,
+				7.2
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0,
+						3,
+						12,
+						3.25
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0,
+						5.25,
+						0.375,
+						5.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0,
+						3.25,
+						12,
+						3.5
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0.5,
+						5.25,
+						0.875,
+						5.5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0,
+						2,
+						12,
+						2.375
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0,
+						2.5,
+						12,
+						2.875
+					]
+				}
+			}
+		},
+		{
+			"name": "socket",
+			"from": [
+				18.2,
+				0.15,
+				7.3
+			],
+			"to": [
+				23.3,
+				1.35,
+				8.7
+			],
+			"rotationOrigin": [
+				18.2,
+				0.15,
+				7.3
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0,
+						4,
+						1.25,
+						4.25
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1,
+						5.25,
+						1.375,
+						5.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1.25,
+						4,
+						2.5,
+						4.25
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1.5,
+						5.25,
+						1.875,
+						5.5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0,
+						3.5,
+						1.25,
+						3.875
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1.25,
+						3.5,
+						2.5,
+						3.875
+					]
+				}
+			}
+		},
+		{
+			"name": "socket round",
+			"from": [
+				18.2,
+				0.3,
+				7.15
+			],
+			"to": [
+				23.3,
+				1.2,
+				8.85
+			],
+			"rotationOrigin": [
+				18.2,
+				0.3,
+				7.15
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2.5,
+						4,
+						3.75,
+						4.25
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2,
+						5.25,
+						2.375,
+						5.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3.75,
+						4,
+						5,
+						4.25
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2.5,
+						5.25,
+						2.875,
+						5.5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2.5,
+						3.5,
+						3.75,
+						3.875
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3.75,
+						3.5,
+						5,
+						3.875
+					]
+				}
+			}
+		},
+		{
+			"name": "collar",
+			"from": [
+				23.3,
+				0.05,
+				7.45
+			],
+			"to": [
+				23.9,
+				1.45,
+				8.55
+			],
+			"rotationOrigin": [
+				23.3,
+				0.05,
+				7.45
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3.75,
+						5.75,
+						3.875,
+						6.125
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3,
+						5.25,
+						3.25,
+						5.625
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						4,
+						5.75,
+						4.125,
+						6.125
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3.25,
+						5.25,
+						3.5,
+						5.625
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0.25,
+						6.25,
+						0.375,
+						6.5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0.5,
+						6.25,
+						0.625,
+						6.5
+					]
+				}
+			}
+		},
+		{
+			"name": "blade",
+			"from": [
+				23.9,
+				0.2,
+				7.8
+			],
+			"to": [
+				25.3,
+				1.3,
+				8.2
+			],
+			"rotationOrigin": [
+				23.9,
+				0.2,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3.5,
+						5.25,
+						3.875,
+						5.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0.75,
+						6.25,
+						0.875,
+						6.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5.25,
+						5,
+						5.625,
+						5.25
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1,
+						6.25,
+						1.125,
+						6.5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5.75,
+						4.25,
+						6.125,
+						4.375
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5.75,
+						4.5,
+						6.125,
+						4.625
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 2",
+			"from": [
+				25.3,
+				0.3,
+				7.8
+			],
+			"to": [
+				26.7,
+				1.2,
+				8.2
+			],
+			"rotationOrigin": [
+				25.3,
+				0.3,
+				7.8
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5.25,
+						5.25,
+						5.625,
+						5.5
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1.25,
+						6.25,
+						1.375,
+						6.5
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0,
+						5.5,
+						0.375,
+						5.75
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1.5,
+						6.25,
+						1.625,
+						6.5
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5.75,
+						4.75,
+						6.125,
+						4.875
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5.75,
+						5,
+						6.125,
+						5.125
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 3",
+			"from": [
+				26.7,
+				0.4,
+				7.82
+			],
+			"to": [
+				28,
+				1.1,
+				8.18
+			],
+			"rotationOrigin": [
+				26.7,
+				0.4,
+				7.82
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5.75,
+						5.25,
+						6.125,
+						5.375
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2,
+						6.5,
+						2.125,
+						6.625
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5.75,
+						5.5,
+						6.125,
+						5.625
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2.25,
+						6.5,
+						2.375,
+						6.625
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5.75,
+						5.75,
+						6.125,
+						5.875
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2.75,
+						6,
+						3.125,
+						6.125
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 4",
+			"from": [
+				28,
+				0.5,
+				7.84
+			],
+			"to": [
+				29,
+				1,
+				8.16
+			],
+			"rotationOrigin": [
+				28,
+				0.5,
+				7.84
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1.75,
+						6.25,
+						2,
+						6.375
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2.5,
+						6.5,
+						2.625,
+						6.625
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2,
+						6.25,
+						2.25,
+						6.375
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2.75,
+						6.5,
+						2.875,
+						6.625
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2.25,
+						6.25,
+						2.5,
+						6.375
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2.5,
+						6.25,
+						2.75,
+						6.375
+					]
+				}
+			}
+		},
+		{
+			"name": "blade 5",
+			"from": [
+				29,
+				0.6,
+				7.86
+			],
+			"to": [
+				29.6,
+				0.9,
+				8.14
+			],
+			"rotationOrigin": [
+				29,
+				0.6,
+				7.86
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3,
+						6.5,
+						3.125,
+						6.625
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3.25,
+						6.5,
+						3.375,
+						6.625
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3.5,
+						6.5,
+						3.625,
+						6.625
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.5,
+						3.5,
+						6.625,
+						3.625
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3.75,
+						6.5,
+						3.875,
+						6.625
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.5,
+						3.75,
+						6.625,
+						3.875
+					]
+				}
+			}
+		},
+		{
+			"name": "blade tip",
+			"from": [
+				29.6,
+				0.68,
+				7.9
+			],
+			"to": [
+				30,
+				0.82,
+				8.1
+			],
+			"rotationOrigin": [
+				29.6,
+				0.68,
+				7.9
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						4,
+						6.5,
+						4.125,
+						6.625
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.5,
+						4,
+						6.625,
+						4.125
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						4.25,
+						6.5,
+						4.375,
+						6.625
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.5,
+						4.25,
+						6.625,
+						4.375
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						4.5,
+						6.5,
+						4.625,
+						6.625
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.5,
+						4.5,
+						6.625,
+						4.625
+					]
+				}
+			}
+		},
+		{
+			"name": "ridge",
+			"from": [
+				23.9,
+				0.62,
+				7.75
+			],
+			"to": [
+				28.6,
+				0.88,
+				8.25
+			],
+			"rotationOrigin": [
+				23.9,
+				0.62,
+				7.75
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3,
+						4.75,
+						4.125,
+						4.875
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						4.75,
+						6.5,
+						4.875,
+						6.625
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						4.25,
+						4.75,
+						5.375,
+						4.875
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.5,
+						4.75,
+						6.625,
+						4.875
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3,
+						5,
+						4.125,
+						5.125
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5,
+						3.5,
+						6.125,
+						3.625
+					]
+				}
+			}
+		},
+		{
+			"name": "tip up",
+			"from": [
+				28.5,
+				0.9,
+				7.88
+			],
+			"to": [
+				29.7,
+				1.05,
+				8.12
+			],
+			"rotationOrigin": [
+				28.5,
+				1.05,
+				7.88
+			],
+			"rotationZ": -15,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2.75,
+						6.25,
+						3,
+						6.375
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5,
+						6.5,
+						5.125,
+						6.625
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3,
+						6.25,
+						3.25,
+						6.375
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.5,
+						5,
+						6.625,
+						5.125
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3.25,
+						6.25,
+						3.5,
+						6.375
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3.5,
+						6.25,
+						3.75,
+						6.375
+					]
+				}
+			}
+		},
+		{
+			"name": "tip down",
+			"from": [
+				28.5,
+				0.45,
+				7.88
+			],
+			"to": [
+				29.7,
+				0.6,
+				8.12
+			],
+			"rotationOrigin": [
+				28.5,
+				0.45,
+				7.88
+			],
+			"rotationZ": 15,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.25,
+						3.5,
+						6.5,
+						3.625
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5.25,
+						6.5,
+						5.375,
+						6.625
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3.75,
+						6.25,
+						4,
+						6.375
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.5,
+						5.25,
+						6.625,
+						5.375
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						4,
+						6.25,
+						4.25,
+						6.375
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						4.25,
+						6.25,
+						4.5,
+						6.375
+					]
+				}
+			}
+		},
+		{
+			"name": "barb up",
+			"from": [
+				22.2,
+				1,
+				7.82
+			],
+			"to": [
+				24,
+				1.6,
+				8.18
+			],
+			"rotationOrigin": [
+				24,
+				1.3,
+				8
+			],
+			"rotationZ": -22,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0.75,
+						5.5,
+						1.25,
+						5.625
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5.5,
+						6.5,
+						5.625,
+						6.625
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1.25,
+						5.5,
+						1.75,
+						5.625
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.5,
+						5.5,
+						6.625,
+						5.625
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1.75,
+						5.5,
+						2.25,
+						5.625
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2.25,
+						5.5,
+						2.75,
+						5.625
+					]
+				}
+			}
+		},
+		{
+			"name": "barb up 2",
+			"from": [
+				21.2,
+				1.08,
+				7.85
+			],
+			"to": [
+				22.2,
+				1.52,
+				8.15
+			],
+			"rotationOrigin": [
+				24,
+				1.3,
+				8
+			],
+			"rotationZ": -22,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.25,
+						4.25,
+						6.5,
+						4.375
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5.75,
+						6.5,
+						5.875,
+						6.625
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						4.5,
+						6.25,
+						4.75,
+						6.375
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.5,
+						5.75,
+						6.625,
+						5.875
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.25,
+						4.5,
+						6.5,
+						4.625
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.25,
+						4.75,
+						6.5,
+						4.875
+					]
+				}
+			}
+		},
+		{
+			"name": "barb up tip",
+			"from": [
+				20.6,
+				1.2,
+				7.88
+			],
+			"to": [
+				21.2,
+				1.4,
+				8.12
+			],
+			"rotationOrigin": [
+				24,
+				1.3,
+				8
+			],
+			"rotationZ": -22,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6,
+						6.5,
+						6.125,
+						6.625
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.5,
+						6,
+						6.625,
+						6.125
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.25,
+						6.5,
+						6.375,
+						6.625
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.5,
+						6.25,
+						6.625,
+						6.375
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.5,
+						6.5,
+						6.625,
+						6.625
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0,
+						6.75,
+						0.125,
+						6.875
+					]
+				}
+			}
+		},
+		{
+			"name": "barb down",
+			"from": [
+				21.8,
+				-0.1,
+				7.82
+			],
+			"to": [
+				24,
+				0.5,
+				8.18
+			],
+			"rotationOrigin": [
+				24,
+				0.2,
+				8
+			],
+			"rotationZ": 18,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3.5,
+						5.5,
+						4,
+						5.625
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0.25,
+						6.75,
+						0.375,
+						6.875
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5.5,
+						3.75,
+						6,
+						3.875
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0.5,
+						6.75,
+						0.625,
+						6.875
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						4,
+						5.5,
+						4.5,
+						5.625
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5.5,
+						4,
+						6,
+						4.125
+					]
+				}
+			}
+		},
+		{
+			"name": "barb down 2",
+			"from": [
+				20.4,
+				-0.02,
+				7.85
+			],
+			"to": [
+				21.8,
+				0.42,
+				8.15
+			],
+			"rotationOrigin": [
+				24,
+				0.2,
+				8
+			],
+			"rotationZ": 18,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3.25,
+						6,
+						3.625,
+						6.125
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0.75,
+						6.75,
+						0.875,
+						6.875
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6,
+						3.75,
+						6.375,
+						3.875
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1,
+						6.75,
+						1.125,
+						6.875
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6,
+						4,
+						6.375,
+						4.125
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						4.25,
+						6,
+						4.625,
+						6.125
+					]
+				}
+			}
+		},
+		{
+			"name": "barb down tip",
+			"from": [
+				19.6,
+				0.1,
+				7.88
+			],
+			"to": [
+				20.4,
+				0.3,
+				8.12
+			],
+			"rotationOrigin": [
+				24,
+				0.2,
+				8
+			],
+			"rotationZ": 18,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.25,
+						5,
+						6.5,
+						5.125
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1.25,
+						6.75,
+						1.375,
+						6.875
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.25,
+						5.25,
+						6.5,
+						5.375
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1.5,
+						6.75,
+						1.625,
+						6.875
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.25,
+						5.5,
+						6.5,
+						5.625
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5.75,
+						6.25,
+						6,
+						6.375
+					]
+				}
+			}
+		},
+		{
+			"name": "binding sleeve",
+			"from": [
+				15.8,
+				-0.05,
+				7.15
+			],
+			"to": [
+				17.8,
+				1.55,
+				8.85
+			],
+			"rotationOrigin": [
+				15.8,
+				-0.05,
+				7.15
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0,
+						4.75,
+						0.5,
+						5.125
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5,
+						3.75,
+						5.375,
+						4.125
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0.5,
+						4.75,
+						1,
+						5.125
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						4.25,
+						5,
+						4.625,
+						5.375
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1,
+						4.75,
+						1.5,
+						5.125
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1.5,
+						4.75,
+						2,
+						5.125
+					]
+				}
+			}
+		},
+		{
+			"name": "string",
+			"from": [
+				15.9,
+				-0.25,
+				6.95
+			],
+			"to": [
+				16.3,
+				1.75,
+				9.05
+			],
+			"rotationOrigin": [
+				16.1,
+				0.75,
+				8
+			],
+			"rotationZ": 22.5,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2.75,
+						5.5,
+						2.875,
+						6
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0,
+						4.25,
+						0.5,
+						4.75
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5.5,
+						4.25,
+						5.625,
+						4.75
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0.5,
+						4.25,
+						1,
+						4.75
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						4.5,
+						5.5,
+						4.625,
+						6
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						4.75,
+						5.5,
+						4.875,
+						6
+					]
+				}
+			}
+		},
+		{
+			"name": "string 2",
+			"from": [
+				16.3,
+				-0.25,
+				6.95
+			],
+			"to": [
+				16.7,
+				1.75,
+				9.05
+			],
+			"rotationOrigin": [
+				16.5,
+				0.75,
+				8
+			],
+			"rotationZ": -22.5,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5,
+						5.5,
+						5.125,
+						6
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1,
+						4.25,
+						1.5,
+						4.75
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5.25,
+						5.5,
+						5.375,
+						6
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1.5,
+						4.25,
+						2,
+						4.75
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5.5,
+						5.5,
+						5.625,
+						6
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0,
+						5.75,
+						0.125,
+						6.25
+					]
+				}
+			}
+		},
+		{
+			"name": "string 3",
+			"from": [
+				16.7,
+				-0.25,
+				6.95
+			],
+			"to": [
+				17.1,
+				1.75,
+				9.05
+			],
+			"rotationOrigin": [
+				16.9,
+				0.75,
+				8
+			],
+			"rotationZ": 22.5,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0.25,
+						5.75,
+						0.375,
+						6.25
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2,
+						4.25,
+						2.5,
+						4.75
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0.5,
+						5.75,
+						0.625,
+						6.25
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2.5,
+						4.25,
+						3,
+						4.75
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0.75,
+						5.75,
+						0.875,
+						6.25
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1,
+						5.75,
+						1.125,
+						6.25
+					]
+				}
+			}
+		},
+		{
+			"name": "string 4",
+			"from": [
+				17.1,
+				-0.25,
+				6.95
+			],
+			"to": [
+				17.5,
+				1.75,
+				9.05
+			],
+			"rotationOrigin": [
+				17.3,
+				0.75,
+				8
+			],
+			"rotationZ": -22.5,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1.25,
+						5.75,
+						1.375,
+						6.25
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3,
+						4.25,
+						3.5,
+						4.75
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1.5,
+						5.75,
+						1.625,
+						6.25
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3.5,
+						4.25,
+						4,
+						4.75
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1.75,
+						5.75,
+						1.875,
+						6.25
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2,
+						5.75,
+						2.125,
+						6.25
+					]
+				}
+			}
+		},
+		{
+			"name": "string 5",
+			"from": [
+				17.4,
+				-0.2,
+				7
+			],
+			"to": [
+				17.8,
+				1.7,
+				9
+			],
+			"rotationOrigin": [
+				17.6,
+				0.75,
+				8
+			],
+			"rotationZ": 22.5,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2.25,
+						5.75,
+						2.375,
+						6.25
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						4,
+						4.25,
+						4.5,
+						4.75
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2.5,
+						5.75,
+						2.625,
+						6.25
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						4.5,
+						4.25,
+						5,
+						4.75
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0.25,
+						5.75,
+						0.375,
+						6.25
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0.5,
+						5.75,
+						0.625,
+						6.25
+					]
+				}
+			}
+		},
+		{
+			"name": "fringe",
+			"from": [
+				15,
+				-0.45,
+				7.3
+			],
+			"to": [
+				15.9,
+				0.15,
+				8.1
+			],
+			"rotationOrigin": [
+				15.9,
+				0.15,
+				7.3
+			],
+			"rotationZ": 30,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.25,
+						5.75,
+						6.5,
+						5.875
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6,
+						6.25,
+						6.25,
+						6.375
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.25,
+						6,
+						6.5,
+						6.125
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						6.25,
+						6.25,
+						6.5,
+						6.375
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5.5,
+						4.75,
+						5.75,
+						5
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3,
+						5.75,
+						3.25,
+						6
+					]
+				}
+			}
+		},
+		{
+			"name": "fringe 2",
+			"from": [
+				15.1,
+				-0.35,
+				7.9
+			],
+			"to": [
+				15.9,
+				0.15,
+				8.7
+			],
+			"rotationOrigin": [
+				15.9,
+				0.15,
+				7.9
+			],
+			"rotationZ": 38,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0,
+						6.5,
+						0.25,
+						6.625
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0.25,
+						6.5,
+						0.5,
+						6.625
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0.5,
+						6.5,
+						0.75,
+						6.625
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						0.75,
+						6.5,
+						1,
+						6.625
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3.25,
+						5.75,
+						3.5,
+						6
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						3.5,
+						5.75,
+						3.75,
+						6
+					]
+				}
+			}
+		},
+		{
+			"name": "fringe 3",
+			"from": [
+				15.2,
+				1.3,
+				7.6
+			],
+			"to": [
+				15.9,
+				1.75,
+				8.5
+			],
+			"rotationOrigin": [
+				15.9,
+				1.3,
+				7.6
+			],
+			"rotationZ": -25,
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1.75,
+						6.75,
+						1.875,
+						6.875
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1,
+						6.5,
+						1.25,
+						6.625
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						2,
+						6.75,
+						2.125,
+						6.875
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1.25,
+						6.5,
+						1.5,
+						6.625
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1.5,
+						6.5,
+						1.625,
+						6.75
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						1.75,
+						6.5,
+						1.875,
+						6.75
+					]
+				}
+			}
+		},
+		{
+			"name": "tuft top",
+			"from": [
+				17.8,
+				0.05,
+				7.3
+			],
+			"to": [
+				18.2,
+				1.45,
+				8.7
+			],
+			"rotationOrigin": [
+				17.8,
+				0.05,
+				7.3
+			],
+			"faces": {
+				"north": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						4.75,
+						6,
+						4.875,
+						6.375
+					]
+				},
+				"east": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5,
+						4.25,
+						5.375,
+						4.625
+					]
+				},
+				"south": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5,
+						6,
+						5.125,
+						6.375
+					]
+				},
+				"west": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						4.75,
+						5,
+						5.125,
+						5.375
+					]
+				},
+				"up": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5.25,
+						6,
+						5.375,
+						6.375
+					]
+				},
+				"down": {
+					"texture": "#Moria_Spear",
+					"uv": [
+						5.5,
+						6,
+						5.625,
+						6.375
+					]
+				}
+			}
+		}
+	]
+}
