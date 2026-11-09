@@ -340,6 +340,7 @@ namespace LotrNpcs
             velocity = Archery.Scatter(velocity, (entity.World.Rand.NextDouble() * 2 - 1) * spread, (entity.World.Rand.NextDouble() * 2 - 1) * spread);
 
             projectile.FiredBy = entity;
+            factions?.Log.Attacked(entity, entity.World.ElapsedMilliseconds);
             // 0.0.91: the faction's archer damage, varied by DamageSpread, read at each shot (the tier stays).
             FactionConfig config = factions?.Config;
             projectile.Damage = FactionTiers.Spread(config?.DamageFor(faction, rank) ?? damage, config?.Spread ?? 0, entity.World.Rand.NextDouble());
@@ -392,6 +393,19 @@ namespace LotrNpcs
         }
 
         protected override bool DealDamage(Entity target)
+        {
+            // 0.0.109: like melee, an arrow skips the hurt window of anything but a player with NpcHitsIgnoreHurtWindow
+            // on, and the battle log hears how it went.
+            if (target != null && !(target is EntityPlayer)) IgnoreInvFrames = factions?.Config.NpcHitsIgnoreHurtWindow == true;
+            bool alive = target?.Alive == true;
+            bool window = target?.IsActivityRunning("invulnerable") == true && !IgnoreInvFrames;
+            bool received = Hit(target);
+            if (factions?.Log.On == true && FiredBy != null && target != null)
+                factions.Log.Attack(FiredBy, target, true, Damage, BattleLog.Classify(received, alive, window), alive && !target.Alive, target.World.ElapsedMilliseconds);
+            return received;
+        }
+
+        bool Hit(Entity target)
         {
             if (!(target is EntityPlayer) || !ChestHitDamage.Available) return base.DealDamage(target);
             float amount = Damage;

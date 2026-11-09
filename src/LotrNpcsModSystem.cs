@@ -179,9 +179,12 @@ namespace LotrNpcs
             // after another NPC's hit would be thrown away, so this NPC waits its turn. It looks again when the turn is
             // due (at least TurnRetryMs later), not every tick, so waiting costs no extra target searches.
             long now = entity.World.ElapsedMilliseconds;
+            // 0.0.109: with NpcHitsIgnoreHurtWindow on, a hit on anything but a player lands anyway, so no turn is kept.
+            if (IgnoresWindow(targetEntity)) return true;
             long wait = factions.Spacing.HitWaitMs(targetEntity.EntityId, now + damagePlayerAtMs);
             if (wait > 0)
             {
+                factions.Log.TurnWait(entity);
                 // The vanilla check waits attackDurationMs after lastCheckOrAttackMs.
                 lastCheckOrAttackMs = now - attackDurationMs + Math.Min(Math.Max(wait, TurnRetryMs), attackDurationMs);
                 targetEntity = null;
@@ -202,6 +205,7 @@ namespace LotrNpcs
                 if (!(targetEntity is EntityPlayer))
                     factions.Spacing.Swing(entity.EntityId, targetEntity.EntityId, Math.Atan2(entity.Pos.X - targetEntity.Pos.X, entity.Pos.Z - targetEntity.Pos.Z), now);
                 entity.GetBehavior<EntityBehaviorFactionMember>()?.MarkFighting(now);
+                factions.Log.Attacked(entity, now);
                 factions.Spacing.BookHit(targetEntity.EntityId, lastCheckOrAttackMs + damagePlayerAtMs, entity.World.Rand.Next(BattleSpacing.HitJitterMs + 1));
             }
             // 0.0.91: the faction's damage for this rank, read at each swing so /recruits faction reload applies at
@@ -251,22 +255,36 @@ namespace LotrNpcs
         // An enemy NPC that already has its share of attackers is left to them (battle spacing, 0.0.53).
         bool Crowded(Entity e) => factions.Spacing.Crowded(entity.EntityId, e.EntityId, e is EntityPlayer, entity.World.ElapsedMilliseconds);
 
+        /// <summary>0.0.109: whether this NPC's hits on target skip its hurt window (config NpcHitsIgnoreHurtWindow;
+        /// never on players).</summary>
+        bool IgnoresWindow(Entity target) => target != null && !(target is EntityPlayer) && factions?.Config.NpcHitsIgnoreHurtWindow == true;
+
         protected override void attackTarget()
         {
             // 0.0.98: the hit lands now, which is later than booked if the NPC was still turning to face its target.
             if (factions != null && targetEntity != null) factions.Spacing.BookHit(targetEntity.EntityId, entity.World.ElapsedMilliseconds, 0);
-            if (!(targetEntity is EntityPlayer) || !ChestHitDamage.Available)
-            {
-                base.attackTarget();
-                return;
-            }
             if (!hasDirectContact(targetEntity, minDist, minVerDist)) return;
-
-            DamageSource source = ChestHitDamage.Create(damageType, damageTier);
+            // 0.0.109: vanilla's attackTarget, done here so the hit can skip the hurt window (IgnoresWindow) and the
+            // battle log learns how it went. A player is struck in the chest under Combat Overhaul (0.0.14).
+            Entity target = targetEntity;
+            bool chest = target is EntityPlayer && ChestHitDamage.Available;
+            DamageSource source = chest ? ChestHitDamage.Create(damageType, damageTier) : new DamageSource { Type = damageType, DamageTier = damageTier };
             source.Source = EnumDamageSource.Entity;
             source.SourceEntity = entity;
             source.KnockbackStrength = knockbackStrength;
-            targetEntity.ReceiveDamage(source, damage * GlobalConstants.CreatureDamageModifier);
+            source.IgnoreInvFrames = IgnoresWindow(target);
+            bool alive = target.Alive;
+            bool window = target.IsActivityRunning("invulnerable");
+            float amount = damage * GlobalConstants.CreatureDamageModifier;
+            bool received = target.ReceiveDamage(source, amount);
+            if (entity is IMeleeAttackListener listener) listener.DidAttack(target);
+            bool killed = alive && !target.Alive;
+            if (killed)
+            {
+                if (!(target is EntityPlayer)) entity.WatchedAttributes.SetDouble("lastMealEatenTotalHours", entity.World.Calendar.TotalHours);
+                bhEmo?.TryTriggerState("saturated", target.EntityId);
+            }
+            factions?.Log.Attack(entity, target, false, amount, BattleLog.Classify(received, alive, window && !source.IgnoreInvFrames), killed, entity.World.ElapsedMilliseconds);
         }
     }
 

@@ -292,6 +292,10 @@ namespace LotrNpcs
         // start to surround them"; chose "Yes, and turn lines on by default"): on by default again; version 26 turns an
         // old false on once.
         public bool BattleLines = true;
+        // 0.0.109 (owner chose "Yes, as a config switch"): NPC hits on anything but a player land even inside the
+        // target's 0.5 s hurt window, so crowds and arrows count in full; NPCs then don't wait for a hit turn on such a
+        // target. Players keep the window. Off by default (the 0.0.98 staggered swings).
+        public bool NpcHitsIgnoreHurtWindow = false;
         public double DuelDistanceMin = BattleSpacing.DefaultDuelMin;
         public double DuelDistanceMax = BattleSpacing.DefaultDuelMax;
         public double LineHoldRange = 6;
@@ -448,6 +452,7 @@ namespace LotrNpcs
             "CombatSpacing: how far apart, in blocks, fighting NPCs of the same side keep from each other, and the gap between neighbours in a battle line (0.8 to 4, 1.5 by default). Enemies only keep DuelDistanceMin apart. As many attackers as fit round an enemy this far apart (5 by default) fight it; the others take another enemy with room first, or else wait in a second ring one CombatSpacing farther out and step in when a place opens.",
             "DuelDistanceMin and DuelDistanceMax: how far from the center of the NPC it fights an attacker stands (1.0 to 1.6 blocks by default): it closes in when farther, steps back when closer, and stands and fights in between. Players are approached the vanilla way.",
             "BattleLines (true by default): groups of NPCs line up when they meet another faction's NPCs, waiting in their places until an enemy comes near: wild NPCs, and recruits following in any formation but Loose. The front rank has one place per enemy; when the lines meet each front NPC fights the enemy facing it from its place in the line. NPCs past that (the side outnumbers the enemy) wait one step behind until the lines meet, then go round to surround, up to MaxAttackersPerTarget on one enemy. Wild NPCs and aggressive or raid recruits march to meet the enemy; defensive recruits hold their line until an enemy is within LineHoldRange blocks. Loose followers, guards, archers, and fights with players or monsters don't make lines. false lets NPCs fight as they find enemies.",
+            "NpcHitsIgnoreHurtWindow (false by default): true lets NPC hits on NPCs and creatures land even within half a second of another hit (the game's hurt window, which otherwise throws such hits away), so every attacker and every arrow counts, and NPCs stop waiting for a turn to hit such a target. Players always keep the hurt window.",
             "HelmetChance: the chance (0 to 1) that a newly spawned NPC that may go bare-headed wears its outfit's helmet. Which units may go bare-headed is set by the mod for each unit (all orcs and Uruk-hai, and the units of other factions marked so); the others always spawn with theirs. A helmet it doesn't wear is kept, and its owner can put it on or take any helmet off from the recruit's menu. Helmets are only for looks: NPC protection comes from rank. CaptainsAlwaysHelmeted: true makes every captain always wear theirs (false by default since 0.0.82).",
             "ShieldChance: the chance (0 to 1) that a newly spawned Mordor orc carries a shield. Shields are only for looks, are never carried with the poleaxe, and the owner can take one off or put it on from the recruit's menu.",
             "HealthRegenSpeed: how fast NPCs heal out of combat, as a multiple of vanilla's creature healing (1 = vanilla, 0.01 health a second; 30 = 0.3 a second). RegenDelaySeconds: how long after its last hit an NPC starts healing at that speed.",
@@ -843,6 +848,8 @@ namespace LotrNpcs
         public FactionConfig Config { get; private set; } = new FactionConfig();
         /// <summary>Who is fighting whom, to spread battles out (0.0.53, Battle.cs).</summary>
         public readonly BattleSpacing Spacing = new BattleSpacing();
+        /// <summary>The 0.0.109 battle log (BattleLog.cs), off until an admin turns it on.</summary>
+        public readonly BattleLog Log = new BattleLog();
         BattleLineSystem lines;
         /// <summary>Battle lines (0.0.82, BattleLines.cs).</summary>
         public BattleLineSystem Lines => lines ??= new BattleLineSystem(this);
@@ -905,8 +912,17 @@ namespace LotrNpcs
             api.Event.GameWorldSave += SaveAssigned;
             api.Event.PlayerDisconnect += player => ForgetSide(player.PlayerUID);
             api.Event.RegisterGameTickListener(dt => Lines.Update(api.World, api.World.ElapsedMilliseconds), (int)BattleLineSystem.UpdateMs);
+            api.Event.RegisterGameTickListener(dt => Log.Flush(), 5000);
+            api.Event.ServerRunPhase(EnumServerRunPhase.Shutdown, () => Log.Stop());
             CommandArgumentParsers parsers = api.ChatCommands.Parsers;
             // 0.0.89: was /recruits faction; now a branch of the mod's one command (ModCommands).
+            ModCommands.RootOf(api)
+                .BeginSubCommand("battlelog")
+                .WithDescription("Admins: battle log for testing. on starts it (a CSV file in the Logs folder), off stops it, no argument shows the totals so far")
+                .RequiresPrivilege(Privilege.controlserver)
+                .WithArgs(parsers.OptionalWord("on|off"))
+                .HandleWith(ModCommands.AdminOnly(args => TextCommandResult.Success(BattleLogCommand(args[0] as string))))
+                .EndSubCommand();
             ModCommands.RootOf(api)
                 .BeginSubCommand("faction")
                 .WithDescription("Admins: LOTR NPC factions, who they treat as friends and enemies")
@@ -940,6 +956,27 @@ namespace LotrNpcs
                     .HandleWith(ModCommands.AdminOnly(args => { LoadConfig(); int synced = AfterReload(); return TextCommandResult.Success("Reloaded " + ConfigFile + ". " + synced + " loaded NPCs took their new health.\n" + DescribeFactions()); }))
                 .EndSubCommand()
                 .EndSubCommand();
+        }
+
+        string BattleLogCommand(string arg)
+        {
+            long now = sapi.World.ElapsedMilliseconds;
+            switch (arg?.Trim().ToLowerInvariant())
+            {
+                case "on":
+                    string folder = null;
+                    try { folder = sapi.GetOrCreateDataPath("Logs"); } catch (Exception) { }
+                    Log.Start(folder, now);
+                    return "Battle log on" + (Log.FilePath != null ? ", writing " + Log.FilePath : " (no file could be opened; totals only)") + ". NPC hits ignore the hurt window: " + (Config.NpcHitsIgnoreHurtWindow ? "yes" : "no") + ".";
+                case "off":
+                    Log.Stop();
+                    return Log.Describe(now);
+                case null:
+                case "":
+                    return Log.Describe(now);
+                default:
+                    return "Use /recruits battlelog on, off, or no argument for the totals.";
+            }
         }
 
         public void LoadConfig()
@@ -1666,6 +1703,7 @@ namespace LotrNpcs
             sinceRegenCheck += deltaTime;
             if (sinceRegenCheck < 1) return;
             sinceRegenCheck = 0;
+            if (factions.Log.On) factions.Log.Tick(entity, Fighting(entity.World.ElapsedMilliseconds), 1, entity.World.ElapsedMilliseconds);
             float speed = RegenSpeed(factions.Config, entity.World.ElapsedMilliseconds - lastHurtMs);
             if (entity.WatchedAttributes.GetFloat("regenSpeed", 1) != speed) entity.WatchedAttributes.SetFloat("regenSpeed", speed);
         }
@@ -1794,6 +1832,7 @@ namespace LotrNpcs
         {
             // Recruits that hit it in the last 10 seconds earn XP (0.0.76).
             if (factions != null) entity.Api.ModLoader.GetModSystem<PromotionSystem>()?.OnDeath(entity);
+            factions?.Log.Death(entity, damageSourceForDeath?.GetCauseEntity(), entity.World.ElapsedMilliseconds);
             factions?.Spacing.Forget(entity.EntityId);
             factions?.Lines.Forget(entity.EntityId);
             base.OnEntityDeath(damageSourceForDeath);

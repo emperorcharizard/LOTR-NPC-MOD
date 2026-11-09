@@ -2538,6 +2538,43 @@ public static class Program {
                 "hiring and promotion are paid in rusty gears; a version 22 file's planchets become rusty gears, a coin the admin chose stays");
         }
 
+        // ---- 0.0.109: the battle log and the hurt-window switch (owner: test tools before the in-game pass) ----
+        {
+            var c109 = FactionConfig.FromFile(null, out _);
+            string j109 = Newtonsoft.Json.JsonConvert.SerializeObject(c109, Newtonsoft.Json.Formatting.Indented);
+            Check(!c109.NpcHitsIgnoreHurtWindow && j109.Contains("\"NpcHitsIgnoreHurtWindow\": false") && FactionConfig.InstructionText.Any(l => l.StartsWith("NpcHitsIgnoreHurtWindow") && l.Contains("Players always keep")),
+                "0.0.109: NpcHitsIgnoreHurtWindow is in the file, off by default, and explained in #Instructions");
+            Check(BattleLog.Classify(true, true, true) == BattleLog.Result.Landed && BattleLog.Classify(false, true, true) == BattleLog.Result.LostWindow
+                && BattleLog.Classify(false, false, true) == BattleLog.Result.LostOther && BattleLog.Classify(false, true, false) == BattleLog.Result.LostOther,
+                "0.0.109: a hit is landed, lost to the hurt window (target alive and in its window), or lost otherwise");
+            var log = new BattleLog();
+            var lorc = Npc("test-mordororc-recruit"); lorc.EntityId = 9101;
+            var man = Npc("test-gondor-recruit"); man.EntityId = 9102;
+            var arch = Npc("test-gondor-archer"); arch.EntityId = 9103;
+            log.Attack(lorc, man, false, 3, BattleLog.Result.Landed, false, 100);
+            bool offIgnored = log.ByFaction.Count == 0;
+            string dir = Path.Combine(Path.GetTempPath(), "lotrnpcs-battlelog-test-" + Environment.ProcessId);
+            log.Start(dir, 1000);
+            log.Attack(lorc, man, false, 3, BattleLog.Result.Landed, false, 1500);
+            log.Attack(lorc, man, false, 3, BattleLog.Result.LostWindow, false, 4500);
+            log.Attack(arch, lorc, true, 2, BattleLog.Result.LostWindow, false, 4600);
+            log.Attack(arch, lorc, true, 2, BattleLog.Result.Landed, true, 7600);
+            log.Death(lorc, arch, 7600);
+            log.TurnWait(man);
+            for (long t = 2000; t <= 9000; t += 1000) log.Tick(man, true, 1, t);
+            log.Tick(arch, false, 1, 9000);
+            var mordor = log.ByFaction["mordor"]; var gondor = log.ByFaction["gondor"];
+            string ltext = log.Describe(10000);
+            log.Stop();
+            string[] lines = File.ReadAllLines(log.FilePath);
+            Check(offIgnored && mordor.Swings == 2 && mordor.SwingsLanded == 1 && mordor.SwingsLostWindow == 1 && mordor.DamageDealt == 3 && mordor.Deaths == 1
+                && gondor.Arrows == 2 && gondor.ArrowsLanded == 1 && gondor.ArrowsLostWindow == 1 && gondor.Kills == 1 && gondor.TurnWaits == 1 && gondor.Npcs.Count == 2
+                && gondor.IdleSeconds == 3 && ltext.Contains("gondor: 2 NPCs; arrows") && ltext.Contains("mordor: 1 NPCs; melee 1/2 landed (1 lost to hurt window)") && ltext.Contains("arrows 1/2 landed")
+                && lines.Length == 6 && lines[0].StartsWith("ms,event,attacker") && lines[1].StartsWith("500,melee,9101,mordor,recruit,9102,gondor,recruit,3,landed") && lines[4].Contains(",kill,") && lines[5].StartsWith("6600,death,9103,gondor,archer,9101,mordor"),
+                "0.0.109 battle log: counts nothing while off; per faction melee and arrows landed or lost to the hurt window, damage, kills, deaths, turn waits, and seconds a fighting NPC went 5 s without attacking (" + ltext.Replace("\n", " | ") + ")");
+            try { Directory.Delete(dir, true); } catch (Exception) { }
+        }
+
         Console.WriteLine(fails == 0 ? "ALL PASSED" : fails + " FAILED");
         return fails;
     }

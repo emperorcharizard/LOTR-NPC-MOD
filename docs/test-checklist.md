@@ -311,3 +311,24 @@ Install `lotrnpcs_0.0.97-test.zip` (instead of 0.0.96); restart fully. Job scrip
 - [ ] 97.2 Haradrim recruits with a shield carry the light shield; warriors and captains the heavy wicker shield. Both stand along the forearm, face out, strap side toward the elbow, resting on the sleeve. Archers carry none.
 - [ ] 97.3 The heavy shield (1.3 blocks tall; offline its lowest point stays 1.1 px above the ground while walking) doesn't drag on the ground. Say if it should be smaller.
 - [ ] 97.4 Shields go with every Haradrim weapon (all three are one-handed): check the spear and a shield together look right.
+
+## 98-109. Combat, battles, balance and the battle log (0.0.98 to 0.0.109)
+
+Install `lotrnpcs_0.0.109-test.zip` (instead of any older lotrnpcs zip); restart fully. Spawn fresh NPCs. Before the battle steps, as admin run `/recruits battlelog on`; afterwards `/recruits battlelog off` prints the totals and the CSV is in the game's `Logs` folder. Send the totals, the CSV and server-main.log.
+
+- [ ] 98.1 Three of your recruits on one enemy NPC don't all swing at the same moment, and each blow shows damage (0.0.98 hit turns).
+- [ ] 99.1 Each weapon's blow lands when the swing visibly connects, also right after the NPC turns to face its target (axe and hammer slower to land, knife and spear quicker).
+- [ ] 100.1 Kite, Easterling and Gondor shields touch the hand with no gap.
+- [ ] 101.1 Gondor/Arnor NPCs carry a steel spear or falx, Rohan/Dale iron spear or falx with a wood-and-metal shield, Dunlendings clubs, flint spears, ruined axes and the crude shield; Uruks iron falx, spear or ruined battle axe. Nobody is empty-handed. Say if a game shield shows the wrong texture.
+- [ ] 102.1 With two players on enemy factions, one player's aggressive recruits attack the other player and their recruits on sight. A player with no faction is left alone.
+- [ ] 102.2 No more than 4 NPCs attack one NPC at once; the rest find another enemy or wait.
+- [ ] 104.1 A marching column of your recruits doesn't walk through each other, and NPCs walking past a standing group steer round it.
+- [ ] 104.2 Two groups of wild NPCs meeting form lines and fight one-on-one along the front; the side with more then wraps round the enemy.
+- [ ] 104.3 Hiring or promoting past the captain limit (Men 2, orcs and goblins 3, elves and dwarves 1, Uruks and Dunlendings 2) is refused with a message.
+- [ ] 105.1 An archer on a wall more than 2 blocks above its target keeps shooting instead of jumping down into melee.
+- [ ] 106.1 In a follow formation, captains stand front-middle, then warriors, then recruits; archers at the back or the ends.
+- [ ] 107.1 Mordor/Angmar/Gundabad orcs follow up to 6 at a time.
+- [ ] 108.1 Melee NPCs swing about every 2.6 to 3 s. Fighting a group of 3 or more: say if it now feels too fast or too slow.
+- [ ] 108.2 Hire prices match the new table (for example Mordor 5/12/29/12, Elves 6/19/50/20); promotion costs the new rank's price minus 3 (captain minus 4).
+- [ ] 109.1 The big one: 100 Mordor orcs against 50 Haradrim (a shared zone or creative spawns), battle log on. Send the totals. Then set `NpcHitsIgnoreHurtWindow` to true in lotrnpcs-factions.json, `/recruits faction reload`, and repeat with the log on again.
+- [ ] 109.2 During that fight, note the server's lag (any "Server overloaded" lines in server-main.log) and whether many NPCs stand around not fighting; the log's "idle while fighting" counts those.
