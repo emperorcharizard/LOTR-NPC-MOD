@@ -1,8 +1,8 @@
-# LOTR NPCs in-game test pass (0.0.76)
+# LOTR NPCs in-game test pass (0.0.112)
 
-Updated 2026-11-04 for 0.0.72 from the Claude Doc "LOTR NPCs in-game test pass (0.0.69)" (that doc's link only opens on the account that made it).
+Updated 2026-11-09 for 0.0.112.
 
-Everything built since 0.0.44 that nobody has seen in game yet, in one play session. Install **lotrnpcs 0.0.76** (only one lotrnpcs zip in Mods, full game restart) and **gundabad-bone-armor 0.2.0**. Spawn fresh NPCs from the LOTR NPCs creative tab: older ones keep their old weapon, hair and looks. For anything wrong, note the step number and send a screenshot plus client-main.log and server-main.log.
+Everything built since 0.0.44 that nobody has seen in game yet, in one play session. Install **lotrnpcs 0.0.112** (only one lotrnpcs zip in Mods, full game restart) and **gundabad-bone-armor 0.3.0**. Spawn fresh NPCs from the LOTR NPCs creative tab: older ones keep their old weapon, hair and looks. For anything wrong, note the step number and send a screenshot plus client-main.log and server-main.log.
 
 ## 1. Weapons and animations (0.0.65 to 0.0.68)
 

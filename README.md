@@ -2,7 +2,7 @@
 
 LOTR NPC factions for Vintage Story 1.22.7: wild faction NPCs in admin spawn zones, hiring, orders and formations, battle lines, per-faction balance tiers.
 
-Current version: 0.0.111 (see `tools/gen_testnpcs.py` and `docs/test-checklist.md`, sections 98-111). 0.0.109 was tested in game on 2026-11-09 (results in `docs/notes/lotrnpcs-0109.md`).
+Current version: 0.0.112 (see `tools/gen_testnpcs.py` and `docs/test-checklist.md`, sections 98-112). Last in-game test: 0.0.109 on 2026-11-09 (results in `docs/notes/lotrnpcs-0109.md`).
 
 ## Layout
 
@@ -15,7 +15,7 @@ Current version: 0.0.111 (see `tools/gen_testnpcs.py` and `docs/test-checklist.m
 
 ## Build inputs
 
-`build-inputs/` holds the asset zips the build reads: LRC 0.4.1 (bundled with the authors' permission, credits in `tools/CREDITS.txt`; this repo is private), FA Races 1.3.3 (reference only: the build writes its own seraph-faceless body, never copy this one over it), and the owner's haradrim-armor 0.1.3 and gundabad-bone-armor 0.3.0 with their original files.
+`build-inputs/` holds the asset zips the build reads: LRC 0.4.1 (bundled with the authors' permission, credits in `tools/CREDITS.txt`), FA Races 1.3.3 (reference only: the build writes its own seraph-faceless body, never copy this one over it), and the owner's haradrim-armor 0.1.3 and gundabad-bone-armor 0.3.0 with their original files.
 
 ## Test builds
 
