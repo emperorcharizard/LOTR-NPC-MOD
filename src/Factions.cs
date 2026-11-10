@@ -1703,7 +1703,7 @@ namespace LotrNpcs
             sinceRegenCheck += deltaTime;
             if (sinceRegenCheck < 1) return;
             sinceRegenCheck = 0;
-            if (factions.Log.On) factions.Log.Tick(entity, Fighting(entity.World.ElapsedMilliseconds), 1, entity.World.ElapsedMilliseconds);
+            if (factions.Log.On) factions.Log.Tick(entity, Fighting(entity.World.ElapsedMilliseconds), 1, entity.World.ElapsedMilliseconds, factions.Lines);
             float speed = RegenSpeed(factions.Config, entity.World.ElapsedMilliseconds - lastHurtMs);
             if (entity.WatchedAttributes.GetFloat("regenSpeed", 1) != speed) entity.WatchedAttributes.SetFloat("regenSpeed", speed);
         }

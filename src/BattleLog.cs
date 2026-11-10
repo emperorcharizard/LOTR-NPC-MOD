@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
+using Vintagestory.GameContent;
 
 namespace LotrNpcs
 {
@@ -29,6 +30,8 @@ namespace LotrNpcs
             public double DamageDealt;
             public int Kills, Deaths, TurnWaits;
             public double IdleSeconds;
+            /// <summary>0.0.111: idle seconds by what the NPC was doing (IdleReason).</summary>
+            public readonly Dictionary<string, double> IdleBy = new Dictionary<string, double>();
         }
 
         public bool On { get; private set; }
@@ -137,14 +140,43 @@ namespace LotrNpcs
         }
 
         /// <summary>Called once a second for each faction NPC: a fighting NPC that hasn't attacked for IdleAfterMs adds
-        /// the second to its faction's idle time.</summary>
-        public void Tick(Entity npc, bool fighting, double seconds, long now)
+        /// the second to its faction's idle time. 0.0.111 (owner chose "Swing duty fix": NPCs swung half as often as they
+        /// could, the time lost in 6 s pauses between targets): each idle second is also written as an "idle" row with
+        /// why (IdleReason in the result column), its target and the distance to it (in the damage column).</summary>
+        public void Tick(Entity npc, bool fighting, double seconds, long now, BattleLineSystem lines = null)
         {
             if (!On || npc == null || !fighting) return;
             Totals t = Of(FactionSystem.FactionOf(npc));
             t.Npcs.Add(npc.EntityId);
             if (!lastAttackMs.TryGetValue(npc.EntityId, out long last)) lastAttackMs[npc.EntityId] = last = now;
-            if (now - last >= IdleAfterMs) t.IdleSeconds += seconds;
+            if (now - last < IdleAfterMs) return;
+            t.IdleSeconds += seconds;
+            string reason = IdleReason(npc, lines, out Entity target);
+            t.IdleBy[reason] = (t.IdleBy.TryGetValue(reason, out double s) ? s : 0) + seconds;
+            float dist = target == null ? -1 : (float)Math.Sqrt(npc.Pos.SquareDistanceTo(target.Pos));
+            Write(now, "idle", npc, target, dist, reason);
+        }
+
+        /// <summary>What an idle NPC is doing: its running AI tasks ("FactionSeek", "FactionHide", "Wander" ...; "none"),
+        /// plus, in a battle line, whether the lines have met and whether it is in the front or an extra. The target is
+        /// the first running task's target.</summary>
+        public static string IdleReason(Entity npc, BattleLineSystem lines, out Entity target)
+        {
+            target = null;
+            var parts = new List<string>();
+            // Entities outside a world (as in the tests) have no AI running.
+            IAiTask[] active = npc.World == null ? null : npc.GetBehavior<EntityBehaviorTaskAI>()?.TaskManager?.ActiveTasksBySlot;
+            if (active != null)
+                foreach (IAiTask task in active)
+                {
+                    if (task == null) continue;
+                    string name = task.GetType().Name;
+                    parts.Add(name.StartsWith("AiTask", StringComparison.Ordinal) ? name.Substring(6) : name);
+                    if (target == null && task is AiTaskBaseTargetable bt && bt.TargetEntity != null && bt.TargetEntity.Alive) target = bt.TargetEntity;
+                }
+            BattleLine line = lines?.LineOf(npc.EntityId);
+            if (line != null) parts.Add((line.Contact ? "line-met-" : "line-forming-") + (line.Members.IndexOf(npc.EntityId) < line.Front ? "front" : "extra"));
+            return parts.Count == 0 ? "none" : string.Join("+", parts);
         }
 
         void Write(long now, string kind, Entity attacker, Entity target, float damage, string result)
@@ -191,6 +223,9 @@ namespace LotrNpcs
                 sb.Append("; damage ").Append(t.DamageDealt.ToString("0", CultureInfo.InvariantCulture))
                     .Append("; kills ").Append(t.Kills).Append(", deaths ").Append(t.Deaths)
                     .Append("; idle while fighting ").Append(t.IdleSeconds.ToString("0", CultureInfo.InvariantCulture)).Append(" NPC-seconds");
+                if (t.IdleSeconds > 0)
+                    sb.Append(" (").Append(string.Join(", ", t.IdleBy.OrderByDescending(k => k.Value).Take(3)
+                        .Select(k => k.Key + " " + (k.Value / t.IdleSeconds * 100).ToString("0", CultureInfo.InvariantCulture) + "%"))).Append(')');
                 if (t.TurnWaits > 0) sb.Append("; waited for a turn ").Append(t.TurnWaits).Append(" times");
             }
             return sb.ToString();

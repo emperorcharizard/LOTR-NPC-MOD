@@ -2573,7 +2573,8 @@ public static class Program {
             Check(offIgnored && mordor.Swings == 2 && mordor.SwingsLanded == 1 && mordor.SwingsLostWindow == 1 && mordor.DamageDealt == 3 && mordor.Deaths == 1
                 && gondor.Arrows == 2 && gondor.ArrowsLanded == 1 && gondor.ArrowsLostWindow == 1 && gondor.Kills == 1 && gondor.TurnWaits == 1 && gondor.Npcs.Count == 2
                 && gondor.IdleSeconds == 3 && ltext.Contains("gondor: 2 NPCs; arrows") && ltext.Contains("mordor: 1 NPCs; melee 1/2 landed (1 lost to hurt window)") && ltext.Contains("arrows 1/2 landed")
-                && lines.Length == 6 && lines[0].StartsWith("ms,event,attacker") && lines[1].StartsWith("500,melee,9101,mordor,recruit,9102,gondor,recruit,3,landed") && lines[4].Contains(",kill,") && lines[5].StartsWith("6600,death,9103,gondor,archer,9101,mordor"),
+                && lines.Length == 9 && lines[0].StartsWith("ms,event,attacker") && lines[1].StartsWith("500,melee,9101,mordor,recruit,9102,gondor,recruit,3,landed") && lines[4].Contains(",kill,") && lines[5].StartsWith("6600,death,9103,gondor,archer,9101,mordor")
+                && lines[6].StartsWith("6000,idle,9102,gondor,recruit,,,,-1,none") && lines[8].StartsWith("8000,idle,9102") && gondor.IdleBy["none"] == 3 && ltext.Contains("NPC-seconds (none 100%)"),
                 "0.0.109 battle log: counts nothing while off; per faction melee and arrows landed or lost to the hurt window, damage, kills, deaths, turn waits, and seconds a fighting NPC went 5 s without attacking (" + ltext.Replace("\n", " | ") + ")");
             try { Directory.Delete(dir, true); } catch (Exception) { }
         }

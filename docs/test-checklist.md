@@ -336,3 +336,7 @@ Install `lotrnpcs_0.0.109-test.zip` (instead of any older lotrnpcs zip); restart
 ## 110. Extras on the flanks (0.0.110)
 
 - [ ] 110.1 Rerun 38 Misty Mountains orc warriors against 26 Dunlending warriors with the battle log on. Before contact the orcs form one long rank (no rank behind), wider than the Dunlendings' line at both ends. At contact the middle pairs off one-on-one and the extra orcs wrap round the Dunlendings' end men instead of swarming the middle. Send the CSV: the win margin should be closer than 26 to 2.
+
+## 111. Why NPCs stand idle (0.0.111)
+
+- [ ] 111.1 Same fight as 110.1 (38 orc warriors v 26 Dunlending warriors, log on). The chat totals now say what idle NPCs were doing, e.g. "idle while fighting 477 NPC-seconds (FactionSeek 60%, none 25%, ...)". Send the CSV: its new "idle" rows show each idle second with the NPC's running tasks, target and distance, so the next build can fix the biggest cause.
