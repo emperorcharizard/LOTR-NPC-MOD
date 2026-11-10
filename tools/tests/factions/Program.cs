@@ -1870,16 +1870,19 @@ public static class Program {
                 "0.0.104: the front rank holds one per enemy; the members past that are the extras");
             LineMath.SlotOffset(0, 5, 3, 1.5, out double r0, out double b0); LineMath.SlotOffset(2, 5, 3, 1.5, out double r2, out double b2);
             LineMath.SlotOffset(3, 5, 3, 1.5, out double r3, out double b3); LineMath.SlotOffset(4, 5, 3, 1.5, out double r4, out double b4);
-            Check(r0 == -1.5 && r2 == 1.5 && b0 == 0 && b2 == 0 && r3 == -0.75 && r4 == 0.75 && b3 == 1.5 && b4 == 1.5,
-                "front slots are 1.5 apart around the center, the rear rank 1.5 behind, centered too");
+            LineMath.SlotOffset(5, 7, 3, 1.5, out double r5, out _); LineMath.SlotOffset(6, 7, 3, 1.5, out double r6, out _);
+            LineMath.SlotOffset(3, 7, 3, 1.5, out double r3b, out _);
+            Check(r0 == -1.5 && r2 == 1.5 && b0 == 0 && b2 == 0 && r3 == -3 && r4 == 3 && b3 == 0 && b4 == 0 && r3b == -4.5 && r5 == 3 && r6 == 4.5,
+                "0.0.110: front slots are 1.5 apart around the center; the extras extend the same rank, the left half past its left end, the rest past its right");
             LineMath.SlotAt(10, 10, 1, 0, 1.5, 0, out double sax, out double saz); LineMath.SlotAt(10, 10, 1, 0, 0, 1.5, out double sbx, out double sbz);
             Check(Math.Abs(sax - 10) < 1e-9 && Math.Abs(saz - 8.5) < 1e-9 && Math.Abs(sbx - 8.5) < 1e-9 && Math.Abs(sbz - 10) < 1e-9,
                 "facing +x, right is -z and behind is -x");
-            // Five NPCs in a loose huddle facing +x: the three farthest forward make the front, each rank left to right.
+            // Five NPCs in a loose huddle facing +x (right is -z): the middle three across the line hold the front, the
+            // leftmost and rightmost take the flanks.
             var hx = new List<double> { 0.0, 1.0, 0.5, -1.0, 0.8 }; var hz = new List<double> { 0.0, 1.0, -1.0, 0.5, 0.2 };
             int[] arr = LineMath.Arrange(hx, hz, 0, 0, 1, 0, 3);
-            Check(arr.Take(3).OrderBy(i => i).SequenceEqual(new[] { 1, 2, 4 }) && arr.Take(3).SequenceEqual(new[] { 1, 4, 2 }) && arr.Skip(3).SequenceEqual(new[] { 3, 0 }),
-                "the members nearest the enemy take the front, and each rank is ordered left to right so nobody crosses (" + string.Join(",", arr) + ")");
+            Check(arr.SequenceEqual(new[] { 3, 4, 0, 1, 2 }),
+                "0.0.110: the middle members across the line take the front left to right, then the left flank, then the right, so nobody crosses (" + string.Join(",", arr) + ")");
             Check(LineMath.Advance(10, 3, 0.6, 0.5, 1.5) == 0.6 && LineMath.Advance(3.4, 3, 0.6, 0.5, 1.5) - 0.4 < 1e-9 && LineMath.Advance(2, 3, 0.6, 0.5, 1.5) == 0 && LineMath.Advance(10, 3, 0.6, 2, 1.5) == 0,
                 "a line marches 0.6 blocks an update, stops 3 blocks from the enemy, and waits while its members lag behind");
             double bx = 1, bz = 0; LineMath.Blend(ref bx, ref bz, 0, 1, 0.2);
@@ -2071,7 +2074,7 @@ public static class Program {
             bool noHoldBefore = !lsC.HoldsFront(frontNpc, out _, out _);
             lineC.Contact = true;
             Check(lineC.Front == 1 && extraWaits && noHoldBefore && !lsC.HoldSlot(extra, en, out _, out _) && lsC.HoldsFront(frontNpc, out double hfx, out double hfz) && Math.Abs(hfx * hfx + hfz * hfz - 1) < 1e-6 && !lsC.HoldsFront(extra, out _, out _),
-                "two orcs against one man: one in front, the extra waits behind; once the lines meet the front orc keeps its side of the man and the extra goes round to surround");
+                "two orcs against one man: one in front, the extra waits on the flank; once the lines meet the front orc keeps its side of the man and the extra goes round to surround");
 
             var v25 = Newtonsoft.Json.Linq.JObject.FromObject(FactionConfig.FromFile(null, out _)); v25["Version"] = 25; v25["BattleLines"] = false; v25.Remove("RosterPerCaptain");
             var m25 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v25.ToString()), out bool store25);

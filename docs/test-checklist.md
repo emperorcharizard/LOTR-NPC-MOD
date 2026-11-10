@@ -332,3 +332,7 @@ Install `lotrnpcs_0.0.109-test.zip` (instead of any older lotrnpcs zip); restart
 - [ ] 108.2 Hire prices match the new table (for example Mordor 5/12/29/12, Elves 6/19/50/20); promotion costs the new rank's price minus 3 (captain minus 4).
 - [ ] 109.1 The big one: 100 Mordor orcs against 50 Haradrim (a shared zone or creative spawns), battle log on. Send the totals. Then set `NpcHitsIgnoreHurtWindow` to true in lotrnpcs-factions.json, `/recruits faction reload`, and repeat with the log on again.
 - [ ] 109.2 During that fight, note the server's lag (any "Server overloaded" lines in server-main.log) and whether many NPCs stand around not fighting; the log's "idle while fighting" counts those.
+
+## 110. Extras on the flanks (0.0.110)
+
+- [ ] 110.1 Rerun 38 Misty Mountains orc warriors against 26 Dunlending warriors with the battle log on. Before contact the orcs form one long rank (no rank behind), wider than the Dunlendings' line at both ends. At contact the middle pairs off one-on-one and the extra orcs wrap round the Dunlendings' end men instead of swarming the middle. Send the CSV: the win margin should be closer than 26 to 2.

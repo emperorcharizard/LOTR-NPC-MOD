@@ -45,4 +45,4 @@
 - [lotrnpcs-0103-0104](lotrnpcs-0103-0104.md) — 0.0.103 orc stats; 0.0.104 push always + look-ahead, holding lines on by default, captain limit 1 per 8 roster places
 - [lotrnpcs-0108](lotrnpcs-0108.md) — 0.0.108: melee 0.25 s faster, refit, per-rank equal-coin prices, full-following costs, config v28
 - [lotrnpcs-review-answers](lotrnpcs-review-answers.md) — 2026-11-09 design review doc + user answers: feature freeze until in-game test, battle log + hurt-window switch first, post-test build list
-- [lotrnpcs-0109](lotrnpcs-0109.md) — 0.0.109: battle log + NpcHitsIgnoreHurtWindow switch; test checklist 98-109
+- [lotrnpcs-0109](lotrnpcs-0109.md) — 0.0.109 battle log + hurt-window switch, the 2026-11-09 in-game test results, and 0.0.110 extras on the flanks

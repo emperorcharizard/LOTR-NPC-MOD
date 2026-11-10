@@ -8,12 +8,12 @@ namespace LotrNpcs
     /// <summary>
     /// The geometry of a battle line (0.0.82), kept apart from the game so it can be tested offline. A line has a center
     /// P and a unit direction D toward the enemy; its right is (D.z, -D.x). Slots are numbered front rank first, left to
-    /// right, then the rear rank one Gap behind.
+    /// right, then the extras on the flanks (0.0.110; before, a rear rank one Gap behind).
     /// </summary>
     public static class LineMath
     {
         /// <summary>How many members stand in the front rank: perEnemy for each enemy (0.0.82: 2, owner: extras "wrap the
-        /// flanks", "never more than 2" on one enemy), at least one, at most every member; the rest are the rear rank.
+        /// flanks", "never more than 2" on one enemy), at least one, at most every member; the rest are the extras.
         /// 0.0.85 (owner: "remove the limit for how many npcs can target 1 npc"): perEnemy is MaxAttackersPerTarget, 0 by
         /// default, and 0 puts every member in the front rank.
         /// 0.0.104 (owner, 2026-11-09: lines "stay in that line until they outnumber the enemy where they start to
@@ -22,18 +22,17 @@ namespace LotrNpcs
         public static int FrontCount(int members, int enemies, int perEnemy = LinesPerEnemy) =>
             members <= 0 ? 0 : perEnemy <= 0 ? members : Math.Clamp(perEnemy * Math.Max(1, enemies), 1, members);
 
-        /// <summary>A slot's place across the line (right of the center, in blocks) and behind it (0 for the front rank).</summary>
+        /// <summary>A slot's place across the line (right of the center, in blocks) and behind it (always 0).
+        /// 0.0.110 (owner, after the 0.0.109 test: "extend flanks"): the extras no longer wait in a rear rank behind the
+        /// middle, from where they swarmed the enemies their own front was fighting; they lengthen the line, the left
+        /// half of them past its left end and the rest past its right, so at contact they wrap the enemy's end men.</summary>
         public static void SlotOffset(int index, int members, int front, double gap, out double right, out double back)
         {
-            if (index < front)
-            {
-                right = (index - (front - 1) / 2.0) * gap;
-                back = 0;
-                return;
-            }
-            int rear = members - front, j = index - front;
-            right = (j - (rear - 1) / 2.0) * gap;
-            back = gap;
+            back = 0;
+            double half = (front - 1) / 2.0;
+            if (index < front) { right = (index - half) * gap; return; }
+            int j = index - front, left = (members - front) / 2;
+            right = j < left ? -(half + left - j) * gap : (half + 1 + j - left) * gap;
         }
 
         /// <summary>The point right and back of (px, pz) for direction (dx, dz).</summary>
@@ -44,32 +43,27 @@ namespace LotrNpcs
         }
 
         /// <summary>
-        /// The order members take the slots in: the `front` members nearest the enemy (farthest along D) make the front
-        /// rank, the others the rear; each rank left to right by where they stand across the line, so nobody walks
-        /// through a neighbour to reach their slot. Returns indices into xs/zs.
+        /// The order members take the slots in (0.0.110, one rank): everyone left to right by where they stand across
+        /// the line, so nobody walks through a neighbour to reach their slot; the `front` in the middle come first, then
+        /// the left flank's extras, then the right's (the order SlotOffset numbers them in). Returns indices into xs/zs.
         /// </summary>
         public static int[] Arrange(IReadOnlyList<double> xs, IReadOnlyList<double> zs, double px, double pz, double dx, double dz, int front)
         {
             int n = xs.Count;
-            int[] byForward = new int[n];
-            for (int i = 0; i < n; i++) byForward[i] = i;
-            Array.Sort(byForward, (a, b) =>
-            {
-                double fa = (xs[a] - px) * dx + (zs[a] - pz) * dz, fb = (xs[b] - px) * dx + (zs[b] - pz) * dz;
-                int c = fb.CompareTo(fa);
-                return c != 0 ? c : a.CompareTo(b);
-            });
-            front = Math.Clamp(front, 0, n);
-            int[] order = new int[n];
-            Array.Copy(byForward, order, n);
-            Comparison<int> byRight = (a, b) =>
+            int[] byRight = new int[n];
+            for (int i = 0; i < n; i++) byRight[i] = i;
+            Array.Sort(byRight, (a, b) =>
             {
                 double ra = (xs[a] - px) * dz - (zs[a] - pz) * dx, rb = (xs[b] - px) * dz - (zs[b] - pz) * dx;
                 int c = ra.CompareTo(rb);
                 return c != 0 ? c : a.CompareTo(b);
-            };
-            Array.Sort(order, 0, front, Comparer<int>.Create(byRight));
-            Array.Sort(order, front, n - front, Comparer<int>.Create(byRight));
+            });
+            front = Math.Clamp(front, 0, n);
+            int left = (n - front) / 2;
+            int[] order = new int[n];
+            Array.Copy(byRight, left, order, 0, front);
+            Array.Copy(byRight, 0, order, front, left);
+            Array.Copy(byRight, left + front, order, front + left, n - front - left);
             return order;
         }
 
@@ -139,10 +133,10 @@ namespace LotrNpcs
     /// enemy NPC, or starts one there facing that enemy. Twice a second each line: drops members that died, left or
     /// stopped fighting; finds the enemy from its members' targets; for its first FormingMs takes its members' middle as
     /// its center, then marches that center toward the enemy (LineMath.Advance) until ContactDistance; gives the front
-    /// rank two slots per enemy and puts the rest in a rear rank. A front member stands in its slot until an enemy is
+    /// rank one slot per enemy and puts the rest on its flanks (0.0.110; before, in a rear rank). A front member stands in its slot until an enemy is
     /// within EngageRange (holding lines: LineHoldRange) or the lines have met, then fights as usual (it takes a free
-    /// enemy first, see AiTaskFactionSeek). A rear member stays in its slot unless an enemy comes within RearStrikeRange;
-    /// when a front member falls, the rear member nearest its place steps up at the next arrangement.
+    /// enemy first, see AiTaskFactionSeek). An extra stays in its slot unless an enemy comes within RearStrikeRange;
+    /// when a front member falls, the line closes up at the next arrangement.
     /// Server main thread only.
     /// </summary>
     public sealed class BattleLineSystem
@@ -255,7 +249,7 @@ namespace LotrNpcs
 
         /// <summary>
         /// Where this member should stand instead of fighting, or false when it should fight (not in a line, front rank
-        /// in reach of an enemy or the lines have met, rear rank with an enemy right on it).
+        /// in reach of an enemy or the lines have met, an extra with an enemy right on it).
         /// </summary>
         public bool HoldSlot(Entity npc, Entity target, out double x, out double z)
         {
@@ -268,7 +262,8 @@ namespace LotrNpcs
             {
                 if (line.Contact || td <= (line.Advances ? EngageRange : HoldRange)) return false;
             }
-            // 0.0.104: once the lines have met, the extras (the side outnumbers the enemy) go round to surround.
+            // 0.0.104: once the lines have met, the extras (the side outnumbers the enemy) go round to surround;
+            // 0.0.110: from the flanks, so the nearest enemies with room are the end men.
             else if (line.Contact || td <= RearStrikeRange) return false;
             LineMath.SlotOffset(i, line.Members.Count, line.Front, Gap, out double right, out double back);
             LineMath.SlotAt(line.Px, line.Pz, line.Dx, line.Dz, right, back, out x, out z);
