@@ -24,6 +24,8 @@ namespace LotrNpcs
             api.RegisterEntityBehaviorClass("lotrnpcs:edgeguard", typeof(EntityBehaviorEdgeGuard));
             api.RegisterEntityBehaviorClass("lotrnpcs:rankarmor", typeof(EntityBehaviorRankArmor));
             api.RegisterEntityBehaviorClass("lotrnpcs:factionmember", typeof(EntityBehaviorFactionMember));
+            // 0.0.112: what a dead NPC's harvestable body holds, from the config (BodyLoot.cs).
+            api.RegisterEntityBehaviorClass("lotrnpcs:bodyloot", typeof(EntityBehaviorBodyLoot));
             // Cosmetic weapons in the hand, with their own swings (0.0.45, Weapons.cs).
             api.RegisterEntityBehaviorClass("lotrnpcs:heldweapon", typeof(EntityBehaviorHeldWeapon));
             AiTaskRegistry.Register<AiTaskChestMeleeAttack>("lotrnpcs:meleeattack");
@@ -36,6 +38,8 @@ namespace LotrNpcs
             api.RegisterEntityBehaviorClass("lotrnpcs:hireable", typeof(EntityBehaviorHireable));
             api.RegisterEntityBehaviorClass("lotrnpcs:recruitowner", typeof(EntityBehaviorRecruitOwner));
             AiTaskRegistry.Register<AiTaskFollowOwner>("lotrnpcs:followowner");
+            // 0.0.112: wild groups walk their zone's patrol points (ZonePatrol.cs).
+            AiTaskRegistry.Register<AiTaskZonePatrol>("lotrnpcs:zonepatrol");
             // Spawn items drawn as head-and-shoulders portraits (0.0.38).
             api.RegisterCollectibleBehaviorClass("lotrnpcs:npcportrait", typeof(CollectibleBehaviorNpcPortrait));
             ChestHitDamage.FindCombatOverhaul();

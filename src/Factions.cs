@@ -17,6 +17,13 @@ namespace LotrNpcs
 {
     public enum FactionRelation { Neutral, Ally, Enemy }
 
+    /// <summary>0.0.112: one item in a body's loot (FactionConfig.WildBodyLoot, HiredBodyLoot).</summary>
+    public class BodyLoot
+    {
+        public string Code;
+        public int Min, Max;
+    }
+
     /// <summary>One NPC faction in ModConfig/lotrnpcs-factions.json.</summary>
     public class FactionDef
     {
@@ -236,9 +243,9 @@ namespace LotrNpcs
         [JsonProperty("#Instructions")]
         public List<string> Instructions;
         // Format of the file. 0 = written by 0.0.31, 1 = by 0.0.32, 2 = by 0.0.33, 3 = by 0.0.34, 4 = by 0.0.35 to
-        // 0.0.38, 5 = by 0.0.39 and 0.0.40, 6 = by 0.0.41 to 0.0.43, 7 = by 0.0.44 to 0.0.47, 8 = by 0.0.48 to 0.0.50, 9 = by 0.0.51 and 0.0.52, 10 = by 0.0.53, 11 = by 0.0.54, 12 = by 0.0.55 to 0.0.58, 13 = by 0.0.59 to 0.0.61, 14 = by 0.0.62 to 0.0.73, 15 = by 0.0.74 and 0.0.75, 16 = by 0.0.76 to 0.0.81, 17 = by 0.0.82 to 0.0.84, 18 = by 0.0.85 to 0.0.89, 19 = by 0.0.90, 20 = by 0.0.91, 21 = by 0.0.92, 22 = by 0.0.93, 23 = by 0.0.94 to 0.0.101, 24 = by 0.0.102, 25 = by 0.0.103, 26 = by 0.0.104 to 0.0.106, 27 = by 0.0.107, 28 = by 0.0.108;
+        // 0.0.38, 5 = by 0.0.39 and 0.0.40, 6 = by 0.0.41 to 0.0.43, 7 = by 0.0.44 to 0.0.47, 8 = by 0.0.48 to 0.0.50, 9 = by 0.0.51 and 0.0.52, 10 = by 0.0.53, 11 = by 0.0.54, 12 = by 0.0.55 to 0.0.58, 13 = by 0.0.59 to 0.0.61, 14 = by 0.0.62 to 0.0.73, 15 = by 0.0.74 and 0.0.75, 16 = by 0.0.76 to 0.0.81, 17 = by 0.0.82 to 0.0.84, 18 = by 0.0.85 to 0.0.89, 19 = by 0.0.90, 20 = by 0.0.91, 21 = by 0.0.92, 22 = by 0.0.93, 23 = by 0.0.94 to 0.0.101, 24 = by 0.0.102, 25 = by 0.0.103, 26 = by 0.0.104 to 0.0.106, 27 = by 0.0.107, 28 = by 0.0.108 to 0.0.111, 29 = by 0.0.112;
         // Migrate() updates older files once and then stores them.
-        public const int CurrentVersion = 28;
+        public const int CurrentVersion = 29;
         public int Version;
         public Dictionary<string, FactionDef> Factions;
         public List<FactionRelationDef> Relations;
@@ -248,13 +255,8 @@ namespace LotrNpcs
         // Most NPCs one player may have hired at once, and how many of them may follow at a time (user, 2026-11-03:
         // hire more at a time, but only 5 may follow at once; hire cap 15, was 5 for both).
         // 0.0.51 (user, 2026-11-03): the hire cap is 16.
-        public const int OldMaxRecruits = 5, OldMaxRecruits048 = 15, DefaultMaxRecruits = 16, DefaultMaxFollowers = 5;
+        public const int DefaultMaxRecruits = 16, DefaultMaxFollowers = 5;
         public int MaxRecruits = DefaultMaxRecruits;
-        // 0.0.74 (user, 2026-11-04: "no mention of the word hirelings in this mod"): files up to version 14 call the cap
-        // MaxHirelings. Read it once into MaxRecruits; it is never written back.
-        [JsonProperty("MaxHirelings")]
-        public int? OldCapField;
-        public bool ShouldSerializeOldCapField() => false;
         public int MaxFollowers = DefaultMaxFollowers;
         // 0.0.104 (owner, 2026-11-09: "limit the ranks of units per cap. Like 1-2 captains only"; chose "1 captain per 8
         // roster places"): one captain per RosterPerCaptain places of a faction's roster, rounded so that 13 places
@@ -265,7 +267,7 @@ namespace LotrNpcs
         // multiple of vanilla's creature regeneration of 0.01 health a second: 30 heals a recruit (22 health since
         // 0.0.43) in about 1.2 minutes and a captain (48) in about 2.7. In a fight, and for RegenDelaySeconds after the
         // last hit, vanilla speed applies.
-        public const float OldHealthRegenSpeed = 20, DefaultHealthRegenSpeed = 30;
+        public const float DefaultHealthRegenSpeed = 30;
         public float HealthRegenSpeed = DefaultHealthRegenSpeed;
         public int RegenDelaySeconds = 10;
         // Guard here (design doc, 2026-10-30: "16 blocks by default, set in the config"): how far around their post
@@ -274,6 +276,15 @@ namespace LotrNpcs
         public int GuardRadius = DefaultGuardRadius;
 
         public static int ClampGuardRadius(int radius) => GameMath.Clamp(radius, MinGuardRadius, MaxGuardRadius);
+        // 0.0.112 (owner, 2026-11-09 review Q8: "no-guard radius around world spawn: guards never attack players on
+        // sight there, still fight back"): within this many blocks (across) of the world spawn no recruit starts a fight
+        // with a player. 0 turns it off.
+        public int SpawnSafeRadius = 64;
+        // 0.0.112 (owner, review Q10: a drifter-style body to harvest with a knife, rusty gears by rank and a little
+        // cloth or leather, no armor or weapons; hired NPCs too, configured apart, same defaults): by rank, what a
+        // wild NPC's body and a recruit's body hold. Rankless NPCs use the recruit list.
+        public Dictionary<string, List<BodyLoot>> WildBodyLoot;
+        public Dictionary<string, List<BodyLoot>> HiredBodyLoot;
         // Battle spacing (0.0.53, user, 2026-11-03: "maybe put a minimum distance npcs have to one another when
         // fighting"): most NPCs that go for one NPC at once (0 = no limit, 4 by default since 0.0.102; players are never limited), and how far
         // apart fighting NPCs keep (BattleSpacing.MinSpacing to MaxSpacing blocks).
@@ -295,7 +306,8 @@ namespace LotrNpcs
         // 0.0.109 (owner chose "Yes, as a config switch"): NPC hits on anything but a player land even inside the
         // target's 0.5 s hurt window, so crowds and arrows count in full; NPCs then don't wait for a hit turn on such a
         // target. Players keep the window. Off by default (the 0.0.98 staggered swings).
-        public bool NpcHitsIgnoreHurtWindow = false;
+        // 0.0.112 (owner: "keep the i-frames off for now"): on by default; version 29 turns an old false on once.
+        public bool NpcHitsIgnoreHurtWindow = true;
         public double DuelDistanceMin = BattleSpacing.DefaultDuelMin;
         public double DuelDistanceMax = BattleSpacing.DefaultDuelMax;
         public double LineHoldRange = 6;
@@ -318,6 +330,8 @@ namespace LotrNpcs
             // 0.0.76 (user, 2026-11-04: "No factions should be allies by default"): only the example entry, which
             // allies nobody.
             Relations = Relations ?? new List<FactionRelationDef> { ExampleRelation() };
+            WildBodyLoot = WildBodyLoot ?? DefaultBodyLoot();
+            HiredBodyLoot = HiredBodyLoot ?? DefaultBodyLoot();
             MonsterCodes = MonsterCodes ?? new List<string> { "game:drifter-*", "game:bowtorn-*", "game:shiver-*", "game:bell-*", "game:locust-*" };
             foreach (KeyValuePair<string, FactionDef> kv in Factions)
             {
@@ -423,10 +437,37 @@ namespace LotrNpcs
         // this one line.
         public const string DefaultHireCoin = "game:gear-rusty";
         public const string PlanchetHireCoin = "coinage:planchet-silver-lg";
-        public const string OldDefaultHireCoin = "coinage:coin-silver-lg";
         // 0.0.55: archers, a unit of their own without ranks (user), cost a warrior's price.
         /// <summary>The promotion prices 0.0.76 to 0.0.89 shipped for every faction (the version 19 migration compares
         /// with them). Today's defaults come from the hire prices (FactionTiers.PromoteFor).</summary>
+        public static Dictionary<string, List<BodyLoot>> DefaultBodyLoot()
+        {
+            BodyLoot Gears(int min, int max) => new BodyLoot { Code = "game:gear-rusty", Min = min, Max = max };
+            BodyLoot Leather() => new BodyLoot { Code = "game:leather-normal-plain", Min = 0, Max = 1 };
+            return new Dictionary<string, List<BodyLoot>>
+            {
+                ["recruit"] = new List<BodyLoot> { Gears(0, 1), new BodyLoot { Code = "game:cloth-plain", Min = 0, Max = 1 } },
+                ["warrior"] = new List<BodyLoot> { Gears(1, 2), Leather() },
+                ["archer"] = new List<BodyLoot> { Gears(1, 2), Leather() },
+                ["captain"] = new List<BodyLoot> { Gears(3, 5), Leather() },
+            };
+        }
+
+        /// <summary>What one body holds: each entry's item, Min to Max of it (both included), zeros left out.</summary>
+        public List<(string code, int count)> RollBodyLoot(string rank, bool hired, Random rand)
+        {
+            var table = hired ? HiredBodyLoot : WildBodyLoot;
+            var rolled = new List<(string, int)>();
+            if (table == null || (!table.TryGetValue(rank ?? "recruit", out var list) && !table.TryGetValue("recruit", out list)) || list == null) return rolled;
+            foreach (BodyLoot loot in list)
+            {
+                if (string.IsNullOrEmpty(loot?.Code) || loot.Max <= 0) continue;
+                int n = rand.Next(Math.Max(0, Math.Min(loot.Min, loot.Max)), loot.Max + 1);
+                if (n > 0) rolled.Add((loot.Code, n));
+            }
+            return rolled;
+        }
+
         public static Dictionary<string, int> DefaultPromotePrices() => new Dictionary<string, int> { ["warrior"] = 10, ["archer"] = 10, ["captain"] = 30 };
         public static Dictionary<string, int> DefaultHirePrices() => new Dictionary<string, int> { ["recruit"] = 5, ["warrior"] = 15, ["captain"] = 40, ["archer"] = 15 };
 
@@ -443,6 +484,8 @@ namespace LotrNpcs
             "MaxFollowers and MaxRecruits (in each faction): how many of the faction's recruits can follow a player at once, and how many a player can have. Each recruit uses a share: 1/MaxFollowers of the following and 1/MaxRecruits of the roster, and a player's shares must add up to no more than 1, so factions can be mixed (3 Gondor men and 2 Mordor orcs use 3/5 + 2/7 of the following). Past the following, a new recruit guards where it was hired and the rest hold or guard. A player over the limits when they join (after an admin lowers them) loses the most recently hired recruits until they fit. The MaxFollowers and MaxRecruits at the top of the file are the baseline (the Men's, 5 and 16) and count for a faction without its own.",
             "Health and Damage (in each faction, by rank: recruit, warrior, captain, archer): the health and the damage of one hit of the faction's NPCs of that rank, in place of their unit's own (health is a whole number; an archer's damage is its arrow's, and its shove). The shipped tables were fitted so that at each rank a full band of each faction wins about half its fights against the others (the Uruk-hai a little more): for example Mordor orc recruits 19 health and 2.7 damage, Gondor recruits 22 and 3.15, elf captains 51 and 9.7. Damage tiers don't change. Wild groups grow with MaxFollowers too (see the spawning file).",
             "DamageSpread: every NPC hit, melee and arrows, deals its damage times a random 1 - DamageSpread to 1 + DamageSpread (0.2 = 80% to 120%), so fights aren't decided by whole numbers of hits. 0 turns it off; at most 0.9.",
+            "WildBodyLoot and HiredBodyLoot (by rank: recruit, warrior, captain, archer): what a dead wild NPC's body and a dead recruit's body hold for a player with a knife, as a list of { Code, Min, Max } (item code, and a random count from Min to Max). By default rusty gears (recruit 0-1, warrior and archer 1-2, captain 3-5) and up to one piece of cloth (recruits) or leather (the rest); armor and weapons are never dropped. Rankless NPCs use the recruit list; an empty list leaves an empty body. Bodies rot away after 3 in-game hours.",
+            "SpawnSafeRadius (64 by default, 0 = off): within this many blocks of the world spawn, recruits (guards, aggressive and raiding ones alike) never attack a player on sight. They still fight back against a player who attacks them, their owner or their group.",
             "GuardRadius: how many blocks around their post recruits told to Guard here patrol (4 to 64). On the aggressive and raid stances they attack any player there who isn't their owner, the owner's group mate, a member of a faction allied to the owner's, or on the owner's whitelist (/recruits whitelist add <player>), even while the owner is offline.",
             "Relations: how two factions treat each other. Relation is \"ally\", \"enemy\" or \"neutral\", and two factions without an entry are enemies. No factions are allies by default. Allies never fight and come to help each other; neutral factions leave each other's NPCs alone.",
             "ShareFriends (allies only): true makes each faction's members safe from the other's NPCs too, and lets them hire the other's NPCs. Otherwise a player is safe only from their own factions and hires only from them.",
@@ -452,7 +495,7 @@ namespace LotrNpcs
             "CombatSpacing: how far apart, in blocks, fighting NPCs of the same side keep from each other, and the gap between neighbours in a battle line (0.8 to 4, 1.5 by default). Enemies only keep DuelDistanceMin apart. As many attackers as fit round an enemy this far apart (5 by default) fight it; the others take another enemy with room first, or else wait in a second ring one CombatSpacing farther out and step in when a place opens.",
             "DuelDistanceMin and DuelDistanceMax: how far from the center of the NPC it fights an attacker stands (1.0 to 1.6 blocks by default): it closes in when farther, steps back when closer, and stands and fights in between. Players are approached the vanilla way.",
             "BattleLines (true by default): groups of NPCs line up when they meet another faction's NPCs, waiting in their places until an enemy comes near: wild NPCs, and recruits following in any formation but Loose. The front rank has one place per enemy; when the lines meet each front NPC fights the enemy facing it from its place in the line. NPCs past that (the side outnumbers the enemy) lengthen the line at both ends and, when the lines meet, wrap round the enemy's flanks, up to MaxAttackersPerTarget on one enemy. Wild NPCs and aggressive or raid recruits march to meet the enemy; defensive recruits hold their line until an enemy is within LineHoldRange blocks. Loose followers, guards, archers, and fights with players or monsters don't make lines. false lets NPCs fight as they find enemies.",
-            "NpcHitsIgnoreHurtWindow (false by default): true lets NPC hits on NPCs and creatures land even within half a second of another hit (the game's hurt window, which otherwise throws such hits away), so every attacker and every arrow counts, and NPCs stop waiting for a turn to hit such a target. Players always keep the hurt window.",
+            "NpcHitsIgnoreHurtWindow (true by default since 0.0.112): true lets NPC hits on NPCs and creatures land even within half a second of another hit (the game's hurt window, which otherwise throws such hits away), so every attacker and every arrow counts, and NPCs stop waiting for a turn to hit such a target. Players always keep the hurt window.",
             "HelmetChance: the chance (0 to 1) that a newly spawned NPC that may go bare-headed wears its outfit's helmet. Which units may go bare-headed is set by the mod for each unit (all orcs and Uruk-hai, and the units of other factions marked so); the others always spawn with theirs. A helmet it doesn't wear is kept, and its owner can put it on or take any helmet off from the recruit's menu. Helmets are only for looks: NPC protection comes from rank. CaptainsAlwaysHelmeted: true makes every captain always wear theirs (false by default since 0.0.82).",
             "ShieldChance: the chance (0 to 1) that a newly spawned Mordor orc carries a shield. Shields are only for looks, are never carried with the poleaxe, and the owner can take one off or put it on from the recruit's menu.",
             "HealthRegenSpeed: how fast NPCs heal out of combat, as a multiple of vanilla's creature healing (1 = vanilla, 0.01 health a second; 30 = 0.3 a second). RegenDelaySeconds: how long after its last hit an NPC starts healing at that speed.",
@@ -461,15 +504,6 @@ namespace LotrNpcs
 
         // Every pair without an entry is enemies anyway; the entry is there so admins see the format and the switches.
         static FactionRelationDef ExampleRelation() => new FactionRelationDef { A = "gondor", B = "rohan", Relation = "enemy", ShareFriends = false };
-        // The user asked for this alliance as an example entry (2026-11-02). Unlike the Gondor/Rohan one it is real:
-        // Mordor and Isengard NPCs don't fight each other until an admin changes it.
-        static FactionRelationDef MordorIsengard() => new FactionRelationDef { A = "mordor", B = "isengard", Relation = "ally", ShareFriends = false };
-        // Orc race codes 0.0.31 and 0.0.32 listed for Mordor. Orc players join through groups only (user, 2026-11-02).
-        static readonly string[] OldOrcRaces = { "lrc:orc", "lrc:uruk", "faraces:orc", "faraces:goblin" };
-        // Factions added in 0.0.35.
-        static readonly string[] NewIn0035 = { "dale", "arnor", "haradrim", "blacknumenoreans", "wickeddwarves", "elves", "tormentedelves" };
-        // Race codes 0.0.31 to 0.0.34 listed for Gondor and Rohan.
-        static readonly string[] OldMenRaces = { "lrc:freepeople", "faraces:numenorean", "faraces:northman" };
 
         /// <summary>The config to use for what LoadModConfig returned (null: no file yet), with defaults filled in
         /// and older formats updated. store: write it back to the file.</summary>
@@ -488,125 +522,8 @@ namespace LotrNpcs
         public bool Migrate()
         {
             if (Version >= CurrentVersion) return false;
-            // Version 15 (0.0.74): MaxHirelings is now MaxRecruits. Copied first, so the cap migrations below see it.
-            if (OldCapField is int oldCap) MaxRecruits = oldCap;
-            OldCapField = null;
-            if (Version < 1)
-            {
-                // 0.0.32 (user, 2026-11-02): every faction except the Shire attacks non-members on sight. Only the
-                // factions 0.0.31 made defensive change; admin edits to other fields stay.
-                string[] nowAggressive = { "gondor", "rohan", "dwarves", "dunlendings" };
-                foreach (KeyValuePair<string, FactionDef> kv in Factions)
-                {
-                    if (kv.Value != null && nowAggressive.Contains(kv.Key.ToLowerInvariant()) && string.Equals(kv.Value.Stance, "defensive", StringComparison.OrdinalIgnoreCase)) kv.Value.Stance = "aggressive";
-                }
-            }
-            if (Version < 2)
-            {
-                // 0.0.33 (user, 2026-11-02): orc players join through groups only, and sides (blocs) no longer make
-                // factions allies, so the orc factions fight each other unless Relations allies them.
-                foreach (KeyValuePair<string, FactionDef> kv in Factions)
-                {
-                    if (kv.Value?.FriendlyRaces != null && kv.Key.ToLowerInvariant() == "mordor")
-                        kv.Value.FriendlyRaces.RemoveAll(r => r != null && OldOrcRaces.Contains(r.ToLowerInvariant()));
-                }
-                // 0.0.32's example entry allied Gondor and Rohan, which was a no-op while sides allied them but would
-                // now be a real alliance nobody chose. Swap it for the new no-op example.
-                Relations.RemoveAll(r => r != null && SamePair(r, "gondor", "rohan") && string.Equals(r.Relation, "ally", StringComparison.OrdinalIgnoreCase) && !r.ShareFriends);
-                if (!Relations.Any(r => r != null && SamePair(r, "gondor", "rohan"))) Relations.Add(ExampleRelation());
-            }
-            if (Version < 3)
-            {
-                // 0.0.34: the user's Mordor/Isengard alliance example, unless the admin already set that pair.
-                if (!Relations.Any(r => r != null && SamePair(r, "mordor", "isengard"))) Relations.Add(MordorIsengard());
-            }
-            if (Version < 4)
-            {
-                // 0.0.35 (user, 2026-11-02): the new factions join with their defaults. Factions the admin already
-                // has stay as they are, and older ones the admin removed stay removed.
-                Dictionary<string, FactionDef> defaults = DefaultFactions();
-                foreach (string id in NewIn0035)
-                {
-                    if (!Factions.Keys.Any(k => k.ToLowerInvariant() == id)) Factions[id] = defaults[id];
-                }
-                // One Men of the West race (lrc:freepeople, and Fourth Age's numenorean and northman) now fits Gondor,
-                // Rohan, Dale and Arnor alike, so those players join through groups, as orc players do.
-                foreach (KeyValuePair<string, FactionDef> kv in Factions)
-                {
-                    if (kv.Value?.FriendlyRaces != null && (kv.Key.ToLowerInvariant() == "gondor" || kv.Key.ToLowerInvariant() == "rohan"))
-                        kv.Value.FriendlyRaces.RemoveAll(r => r != null && OldMenRaces.Contains(r.ToLowerInvariant()));
-                }
-                FillDefaults();
-            }
-            // Version 5 (0.0.39) adds HealthRegenSpeed and RegenDelaySeconds; their defaults apply, and storing the file
-            // shows them to the admin.
-            if (Version == 5 && HealthRegenSpeed == OldHealthRegenSpeed)
-            {
-                // 0.0.41 (user, 2026-11-03: "regen should be just a bit faster"): the old default 20 becomes the new
-                // one. A speed the admin chose stays.
-                HealthRegenSpeed = DefaultHealthRegenSpeed;
-            }
-            // Version 7 (0.0.44) adds GuardRadius; its default applies, and storing the file shows it to the admin.
-            // 0.0.48 (user, 2026-11-03): the old hire cap default 5 becomes 15, with MaxFollowers 5. A cap the admin
-            // chose stays.
-            if (Version < 8 && MaxRecruits == OldMaxRecruits) MaxRecruits = DefaultMaxRecruits;
-            // 0.0.51: 15 becomes 16 too.
-            if (Version < 9 && MaxRecruits == OldMaxRecruits048) MaxRecruits = DefaultMaxRecruits;
-            // Version 10 (0.0.53) adds MaxAttackersPerTarget and CombatSpacing, version 11 (0.0.54) HelmetChance and
-            // CaptainsAlwaysHelmeted; their defaults apply, and storing the file shows them to the admin.
-            // 0.0.55: the old CombatSpacing default 1.5 becomes 2.0 (a spacing the admin chose stays), and version 12
-            // adds ShieldChance.
-            if (Version < 12 && Version >= 10 && CombatSpacing == BattleSpacing.Spacing053) CombatSpacing = BattleSpacing.Spacing055;
-            // 0.0.59 (version 13): factions still on the old default coin, which doesn't exist, take the new one. A coin
-            // the admin chose stays.
-            if (Version < 13)
-            {
-                foreach (FactionDef def in Factions.Values)
-                {
-                    if (def != null && string.Equals(def.HireCoin, OldDefaultHireCoin, StringComparison.OrdinalIgnoreCase)) def.HireCoin = DefaultHireCoin;
-                }
-            }
-            // 0.0.62 (version 14): the Gundabad faction joins with its defaults, unless the admin already has it.
-            if (Version < 14 && !Factions.Keys.Any(k => k.ToLowerInvariant() == "gundabad"))
-            {
-                Factions["gundabad"] = DefaultFactions()["gundabad"];
-                FillDefaults();
-            }
-            // 0.0.76 (version 16, user: "No factions should be allies by default"): the Mordor and Isengard alliance
-            // shipped since 0.0.34 goes, if it is still exactly as shipped. One the admin changed or added stays.
-            if (Version < 16)
-                Relations.RemoveAll(r => r != null && SamePair(r, "mordor", "isengard") && string.Equals(r.Relation, "ally", StringComparison.OrdinalIgnoreCase) && !r.ShareFriends);
-            // 0.0.82 (version 17, owner's combat answers and loadout list): the old defaults move to the new ones once
-            // (MaxAttackersPerTarget 3 to 2, CombatSpacing 2.0 to 1.5, CaptainsAlwaysHelmeted true to false, since the
-            // loadouts now say which units may spawn bare-headed); values the admin chose stay. BattleLines,
-            // DuelDistanceMin/Max and LineHoldRange come in with their defaults.
-            if (Version < 17 && Version > 0)
-            {
-                if (MaxAttackersPerTarget == BattleSpacing.OldDefaultMaxAttackers) MaxAttackersPerTarget = BattleSpacing.DefaultMaxAttackers;
-                if (CombatSpacing == BattleSpacing.Spacing055) CombatSpacing = BattleSpacing.DefaultSpacing;
-                CaptainsAlwaysHelmeted = false;
-            }
-            // 0.0.85 (version 18, owner: "remove the limit for how many npcs can target 1 npc"): an unchanged 2 becomes no
-            // limit. A limit the admin chose stays.
-            if (Version < 18 && Version > 0 && MaxAttackersPerTarget == BattleSpacing.Default082MaxAttackers) MaxAttackersPerTarget = BattleSpacing.DefaultMaxAttackers;
-            // ... and battle lines go off (owner: "fight first, then maintain formation second"); version 17 files had them
-            // on by default, so their true is taken as unchanged.
-            if (Version == 17) BattleLines = false;
-            // 0.0.90 (version 19, owner: factions "unequally equal"): every faction takes its tier's follow limit, roster
-            // and multipliers. Files before 19 can't have them, so they are set afresh here, after the baseline
-            // migrations above (FillDefaults ran with the file's older baseline). Prices still exactly as shipped (the
-            // old 5/15/40/15 and 10/10/30 for every faction) take the tier's; prices the admin chose stay.
-            if (Version < 19)
-            {
-                foreach (KeyValuePair<string, FactionDef> kv in Factions)
-                {
-                    if (kv.Value == null) continue;
-                    FactionTier tier = FactionTiers.Of(kv.Key);
-                    FillLimits(kv.Value, tier, true);
-                    if (SamePrices(kv.Value.HirePrices, DefaultHirePrices())) kv.Value.HirePrices = new Dictionary<string, int>(tier.Hire);
-                    if (SamePrices(kv.Value.PromotePrices, DefaultPromotePrices())) kv.Value.PromotePrices = FactionTiers.PromoteFor(kv.Value.HirePrices);
-                }
-            }
+            // 0.0.112 (owner: both servers run 0.0.108 or later): files older than version 19 (0.0.90) are no longer
+            // converted step by step; they keep their own values and take the steps below.
             // 0.0.91 (version 20, owner: per-rank numbers, "B"): a version 19 file's HealthMultiplier and DamageMultiplier
             // become per-rank tables. Multipliers still as 0.0.90 shipped them take the fitted table; ones the admin
             // changed become the unit's own values times theirs, so their change carries over. DamageSpread comes in
@@ -692,6 +609,8 @@ namespace LotrNpcs
             // 0.0.104 (version 26, owner chose "Yes, and turn lines on by default"): lines go on once. RosterPerCaptain
             // comes in with its default.
             if (Version < 26 && Version > 0) BattleLines = true;
+            // 0.0.112 (version 29, owner: "keep the i-frames off for now"): NPC hits on NPCs skip the hurt window, once.
+            if (Version < 29 && Version > 0) NpcHitsIgnoreHurtWindow = true;
             // 0.0.103 (version 25, owner chose "Narrow orcs to ~0.78 of a Man"): orc-tier factions (Mordor, Angmar,
             // Gundabad, and any with the orc tables) whose health or damage table is still exactly 0.0.91's take the new
             // one; a table the admin changed stays.
@@ -1334,6 +1253,8 @@ namespace LotrNpcs
             if (Hiring != null && Hiring.HasTeamGrudge(ownerUid, target.EntityId)) return true;
             if (HiringSystem.IsTargetingTeam(target, ownerUid)) return true;
             if (stance == Recruit.Defensive) return false;
+            // 0.0.112: no fights started with players near the world spawn (fighting back is above).
+            if (target is EntityPlayer && NearWorldSpawn(target)) return false;
             bool guarding = Recruit.OrderOf(recruit) == Recruit.Guard;
             if (guarding && !InGuardArea(recruit, target)) return false;
             if (stance == Recruit.Raid) return RaidTarget(recruit, ownerUid, target);
@@ -1400,6 +1321,15 @@ namespace LotrNpcs
 
         /// <summary>How far around their post guards patrol, from the config.</summary>
         public double GuardRadius => FactionConfig.ClampGuardRadius(Config.GuardRadius);
+
+        /// <summary>0.0.112: is this entity within SpawnSafeRadius blocks (across) of the world spawn?</summary>
+        public bool NearWorldSpawn(Entity e)
+        {
+            EntityPos spawn = sapi?.World.DefaultSpawnPosition;
+            return spawn != null && e != null && WithinRadius(e.Pos.X - spawn.X, e.Pos.Z - spawn.Z, Config.SpawnSafeRadius);
+        }
+
+        public static bool WithinRadius(double dx, double dz, int radius) => radius > 0 && dx * dx + dz * dz <= (double)radius * radius;
 
         /// <summary>Is the target inside the area this guard watches over (extra: blocks of leeway past its edge)? The
         /// area reaches as far up and down as across.</summary>

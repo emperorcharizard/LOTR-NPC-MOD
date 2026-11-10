@@ -15,18 +15,22 @@ Current version: 0.0.111 (see `tools/gen_testnpcs.py` and `docs/test-checklist.m
 
 ## Build inputs
 
-`build-inputs/` holds the asset zips the build reads: LRC 0.4.1 (bundled with the authors' permission, credits in `tools/CREDITS.txt`; this repo is private), FA Races 1.3.3 (seraph-faceless shape for the tests), and the owner's haradrim-armor 0.1.3 and gundabad-bone-armor 0.3.0 with their original files.
+`build-inputs/` holds the asset zips the build reads: LRC 0.4.1 (bundled with the authors' permission, credits in `tools/CREDITS.txt`; this repo is private), FA Races 1.3.3 (reference only: the build writes its own seraph-faceless body, never copy this one over it), and the owner's haradrim-armor 0.1.3 and gundabad-bone-armor 0.3.0 with their original files.
 
 ## Test builds
 
-`releases/` holds the latest test zip (now 0.0.111). Older zips stay in the Claude project files.
+Test zips are GitHub Releases (`v<version>`), built into `releases/` locally (ignored by git since 0.0.112; zips up to 0.0.111 are in git history).
 
 ## Notes and decisions
 
 See `docs/README.md` for where everything is: decisions and their reasons (`docs/notes/`), the design review, balance results, per-version history and the test checklist.
 
-## Packaging
+## Building
 
-1. `python3 -I tools/gen_testnpcs.py <gen>` then `python3 -I tools/bundle_lrc.py <lrc>/assets/lrc <gen>/assets/lotrnpcs`.
-2. Copy `src/out/lotrnpcs.dll` and `tools/CREDITS.txt` next to `<gen>/modinfo.json`.
-3. Zip `modinfo.json lotrnpcs.dll CREDITS.txt assets`.
+Needs the .NET 10 SDK and Python 3 with Pillow (`pip install pillow`).
+
+- `python tools/build.py` builds the DLL, generates and bundles the assets into `build/`, runs both offline test suites and writes `releases/lotrnpcs_<version>-test.zip`.
+- `--no-zip` stops after the tests (what GitHub Actions runs on every push, `.github/workflows/test.yml`).
+- `--publish` also uploads the zip as GitHub release `v<version>` (run `gh auth login` once first).
+
+Use plain `python`, not `python -I` (it hides user site-packages, where Pillow may be). The version is in `tools/gen_testnpcs.py` (`"version"` in modinfo).

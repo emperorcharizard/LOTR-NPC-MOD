@@ -5,6 +5,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
+using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
 
@@ -19,6 +20,9 @@ namespace LotrNpcs
         public int Id;
         public int MinX, MinZ, MaxX, MaxZ;
         public List<string> Factions = new List<string>();
+        // 0.0.112: patrol points, x and z pairs (absolute block coordinates). With 2 or more, groups spawned here walk them.
+        public List<int> Patrol = new List<int>();
+        public bool Patrols => Patrol != null && Patrol.Count >= 4;
 
         public bool Contains(double x, double z) => x >= MinX && x < MaxX + 1 && z >= MinZ && z < MaxZ + 1;
     }
@@ -216,6 +220,16 @@ namespace LotrNpcs
                     .WithDescription("Remove a faction from a zone")
                     .WithArgs(parsers.Int("zone"), parsers.WordRange("faction", Factions))
                     .HandleWith(ModCommands.AdminOnly(OnRemoveFaction))
+                .EndSubCommand()
+                .BeginSubCommand("patrol")
+                    .WithDescription("Add where you stand as the zone's next patrol point; with 2 or more, its groups walk between them in order")
+                    .WithArgs(parsers.Int("zone"))
+                    .HandleWith(ModCommands.AdminOnly(OnPatrol))
+                .EndSubCommand()
+                .BeginSubCommand("patrolclear")
+                    .WithDescription("Remove a zone's patrol points (groups spawned after that wander again)")
+                    .WithArgs(parsers.Int("zone"))
+                    .HandleWith(ModCommands.AdminOnly(OnPatrolClear))
                 .EndSubCommand()
                 .BeginSubCommand("spawnnow")
                     .WithDescription("Spawn a group near you right away, as the zone timer would (for testing)")
@@ -479,6 +493,9 @@ namespace LotrNpcs
         void SpawnGroup(string faction, List<string> ranks, BlockPos leaderFeet)
         {
             long herdId = sapi.WorldManager.GetNextUniqueId();
+            // 0.0.112: in a zone of this faction with a patrol, the whole group starts for the point nearest the leader.
+            SpawnZone patrol = zones.FirstOrDefault(z => z.Patrols && z.Factions.Contains(faction) && z.Contains(leaderFeet.X + 0.5, leaderFeet.Z + 0.5));
+            int start = patrol == null ? 0 : NearestPoint(patrol.Patrol, leaderFeet.X, leaderFeet.Z);
             for (int i = 0; i < ranks.Count; i++)
             {
                 BlockPos feet = leaderFeet;
@@ -495,6 +512,11 @@ namespace LotrNpcs
                 entity.Pos.SetYaw((float)rand.NextDouble() * GameMath.TWOPI);
                 entity.PositionBeforeFalling.Set(entity.Pos.X, entity.Pos.Y, entity.Pos.Z);
                 entity.Attributes.SetString(OriginAttr, "zone");
+                if (patrol != null)
+                {
+                    entity.Attributes[AiTaskZonePatrol.RouteAttr] = new IntArrayAttribute(patrol.Patrol.ToArray());
+                    entity.Attributes.SetInt(AiTaskZonePatrol.NextAttr, start);
+                }
                 if (entity is EntityAgent agent) agent.HerdId = herdId;
                 sapi.World.SpawnEntity(entity);
             }
@@ -637,10 +659,47 @@ namespace LotrNpcs
             if (!add) factions.Remove(faction);
             if (factions.Count == 0) return TextCommandResult.Error("A zone needs at least one faction. Remove the zone instead.");
 
-            SpawnZone changed = new SpawnZone { Id = zone.Id, MinX = zone.MinX, MinZ = zone.MinZ, MaxX = zone.MaxX, MaxZ = zone.MaxZ, Factions = factions };
-            zones = zones.Select(z => z.Id == id ? changed : z).ToArray();
+            return Replace(zone, factions, zone.Patrol);
+        }
+
+        // Zones are replaced whole (see zones), never changed in place.
+        TextCommandResult Replace(SpawnZone zone, List<string> factions, List<int> patrol)
+        {
+            SpawnZone changed = new SpawnZone { Id = zone.Id, MinX = zone.MinX, MinZ = zone.MinZ, MaxX = zone.MaxX, MaxZ = zone.MaxZ, Factions = factions, Patrol = patrol };
+            zones = zones.Select(z => z.Id == zone.Id ? changed : z).ToArray();
             SaveZones();
             return TextCommandResult.Success("Now " + Describe(changed));
+        }
+
+        TextCommandResult OnPatrol(TextCommandCallingArgs args)
+        {
+            int id = (int)args[0];
+            SpawnZone zone = zones.FirstOrDefault(z => z.Id == id);
+            if (zone == null) return TextCommandResult.Error("There is no zone " + id + ". See /recruits zone list.");
+            Vec3d pos = args.Caller.Pos;
+            if (pos == null) return TextCommandResult.Error("This command needs a position.");
+            return Replace(zone, zone.Factions, new List<int>(zone.Patrol) { (int)Math.Floor(pos.X), (int)Math.Floor(pos.Z) });
+        }
+
+        TextCommandResult OnPatrolClear(TextCommandCallingArgs args)
+        {
+            int id = (int)args[0];
+            SpawnZone zone = zones.FirstOrDefault(z => z.Id == id);
+            if (zone == null) return TextCommandResult.Error("There is no zone " + id + ". See /recruits zone list.");
+            return Replace(zone, zone.Factions, new List<int>());
+        }
+
+        /// <summary>The index of the patrol point (x, z pairs) nearest to x, z.</summary>
+        public static int NearestPoint(List<int> patrol, double x, double z)
+        {
+            int best = 0;
+            double bestD = double.MaxValue;
+            for (int i = 0; i + 1 < patrol.Count; i += 2)
+            {
+                double d = (patrol[i] - x) * (patrol[i] - x) + (patrol[i + 1] - z) * (patrol[i + 1] - z);
+                if (d < bestD) { bestD = d; best = i / 2; }
+            }
+            return best;
         }
 
         // Coordinates as the player sees them on screen: relative to the map middle, like /tp takes them.
@@ -649,7 +708,9 @@ namespace LotrNpcs
             Vec3d middle = sapi.World.DefaultSpawnPosition.XYZ;
             int ox = (int)middle.X, oz = (int)middle.Z;
             return "zone " + zone.Id + ": " + string.Join(", ", zone.Factions) + ", from " + (zone.MinX - ox) + " " + (zone.MinZ - oz)
-                + " to " + (zone.MaxX - ox) + " " + (zone.MaxZ - oz) + " (" + (zone.MaxX - zone.MinX + 1) + " x " + (zone.MaxZ - zone.MinZ + 1) + " blocks)";
+                + " to " + (zone.MaxX - ox) + " " + (zone.MaxZ - oz) + " (" + (zone.MaxX - zone.MinX + 1) + " x " + (zone.MaxZ - zone.MinZ + 1) + " blocks)"
+                + (zone.Patrol.Count >= 2 ? ", patrol " + string.Join(" > ", Enumerable.Range(0, zone.Patrol.Count / 2).Select(i => (zone.Patrol[2 * i] - ox) + " " + (zone.Patrol[2 * i + 1] - oz)))
+                    + (zone.Patrols ? "" : " (add a second point to start it)") : "");
         }
 
         void LoadZones()
@@ -689,6 +750,8 @@ namespace LotrNpcs
                     MinX = Math.Min(zone.MinX, zone.MaxX), MaxX = Math.Max(zone.MinX, zone.MaxX),
                     MinZ = Math.Min(zone.MinZ, zone.MaxZ), MaxZ = Math.Max(zone.MinZ, zone.MaxZ),
                     Factions = factions,
+                    // A damaged save's odd number keeps only whole pairs.
+                    Patrol = (zone.Patrol ?? new List<int>()).Take((zone.Patrol?.Count ?? 0) / 2 * 2).ToList(),
                 });
             }
             return clean.ToArray();

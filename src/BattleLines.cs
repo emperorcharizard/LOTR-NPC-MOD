@@ -25,10 +25,19 @@ namespace LotrNpcs
         /// <summary>A slot's place across the line (right of the center, in blocks) and behind it (always 0).
         /// 0.0.110 (owner, after the 0.0.109 test: "extend flanks"): the extras no longer wait in a rear rank behind the
         /// middle, from where they swarmed the enemies their own front was fighting; they lengthen the line, the left
-        /// half of them past its left end and the rest past its right, so at contact they wrap the enemy's end men.</summary>
-        public static void SlotOffset(int index, int members, int front, double gap, out double right, out double back)
+        /// half of them past its left end and the rest past its right, so at contact they wrap the enemy's end men.
+        /// 0.0.112 (owner, review Q13: captains "held back as reserve"): the last `reserve` members (the captains) stand one
+        /// gap behind the middle of the line, side by side, until the lines meet.</summary>
+        public static void SlotOffset(int index, int members, int front, double gap, out double right, out double back, int reserve = 0)
         {
             back = 0;
+            if (reserve > 0 && index >= members - reserve)
+            {
+                right = (index - (members - reserve) - (reserve - 1) / 2.0) * gap;
+                back = gap;
+                return;
+            }
+            members -= reserve;
             double half = (front - 1) / 2.0;
             if (index < front) { right = (index - half) * gap; return; }
             int j = index - front, left = (members - front) / 2;
@@ -114,6 +123,8 @@ namespace LotrNpcs
         /// <summary>Entity ids in slot order: front rank first.</summary>
         public readonly List<long> Members = new List<long>();
         public int Front;
+        /// <summary>0.0.112: captains held back behind the line until contact (the last Reserve members).</summary>
+        public int Reserve;
         /// <summary>The lines have met: the front rank fights wherever it is.</summary>
         public bool Contact;
         public long CreatedMs, LastEnemyMs;
@@ -239,6 +250,8 @@ namespace LotrNpcs
             if (line.Members.Count == 0) lines.Remove(line);
         }
 
+        static bool IsCaptain(Entity e) => e != null && NpcTypeInfo.Of(e)?.Rank == "captain";
+
         /// <summary>An entity died or left.</summary>
         public void Forget(long id)
         {
@@ -265,7 +278,7 @@ namespace LotrNpcs
             // 0.0.104: once the lines have met, the extras (the side outnumbers the enemy) go round to surround;
             // 0.0.110: from the flanks, so the nearest enemies with room are the end men.
             else if (line.Contact || td <= RearStrikeRange) return false;
-            LineMath.SlotOffset(i, line.Members.Count, line.Front, Gap, out double right, out double back);
+            LineMath.SlotOffset(i, line.Members.Count, line.Front, Gap, out double right, out double back, line.Reserve);
             LineMath.SlotAt(line.Px, line.Pz, line.Dx, line.Dz, right, back, out x, out z);
             return true;
         }
@@ -374,19 +387,31 @@ namespace LotrNpcs
             line.Py = my;
 
             // Ranks.
-            int front = LineMath.FrontCount(n, line.Enemies);
-            if (front != line.Front) { line.Front = front; line.Dirty = true; }
+            // 0.0.112: captains are the reserve, unless the line is nothing but captains.
+            int reserve = 0;
+            foreach (long id in line.Members) if (IsCaptain(world.GetEntityById(id))) reserve++;
+            if (reserve == n) reserve = 0;
+            int front = LineMath.FrontCount(n - reserve, line.Enemies);
+            if (front != line.Front || reserve != line.Reserve) { line.Front = front; line.Reserve = reserve; line.Dirty = true; }
             if (line.Dirty)
             {
+                // The line arranged first, then the reserve behind it, each left to right.
                 xs.Clear(); zs.Clear(); ids.Clear();
-                foreach (long id in line.Members)
+                foreach (bool captains in new[] { false, true })
                 {
-                    Entity e = world.GetEntityById(id);
-                    xs.Add(e.Pos.X); zs.Add(e.Pos.Z); ids.Add(id);
+                    foreach (long id in line.Members)
+                    {
+                        Entity e = world.GetEntityById(id);
+                        if ((reserve > 0 && IsCaptain(e)) != captains) continue;
+                        xs.Add(e.Pos.X); zs.Add(e.Pos.Z); ids.Add(id);
+                    }
                 }
-                int[] order = LineMath.Arrange(xs, zs, line.Px, line.Pz, line.Dx, line.Dz, front);
+                int lineCount = n - reserve;
+                int[] order = LineMath.Arrange(xs.GetRange(0, lineCount), zs.GetRange(0, lineCount), line.Px, line.Pz, line.Dx, line.Dz, front);
+                int[] rear = LineMath.Arrange(xs.GetRange(lineCount, reserve), zs.GetRange(lineCount, reserve), line.Px, line.Pz, line.Dx, line.Dz, reserve);
                 line.Members.Clear();
                 foreach (int k in order) line.Members.Add(ids[k]);
+                foreach (int k in rear) line.Members.Add(ids[lineCount + k]);
                 line.Dirty = false;
             }
 
@@ -416,7 +441,7 @@ namespace LotrNpcs
                 for (int i = 0; i < n; i++)
                 {
                     Entity e = world.GetEntityById(line.Members[i]);
-                    LineMath.SlotOffset(i, n, line.Front, Gap, out double right, out double back);
+                    LineMath.SlotOffset(i, n, line.Front, Gap, out double right, out double back, line.Reserve);
                     LineMath.SlotAt(line.Px, line.Pz, line.Dx, line.Dz, right, back, out double sx, out double sz);
                     lag += Math.Sqrt((e.Pos.X - sx) * (e.Pos.X - sx) + (e.Pos.Z - sz) * (e.Pos.Z - sz));
                 }

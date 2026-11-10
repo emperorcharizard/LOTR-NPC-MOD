@@ -375,6 +375,26 @@ public static class Program {
             keep.Die(EnumDespawnReason.Removed); hired.Die(EnumDespawnReason.Removed); placed.Die(EnumDespawnReason.Removed);
         }
 
+        // ---- 0.0.112: zone patrols ----
+        {
+            int[] route = { 0, 0, 100, 0 };
+            int next = 0;
+            bool walk = AiTaskZonePatrol.Step(route, ref next, 50.5, 0.5, 0, 0, out double gx, out double gz);
+            Check(walk && next == 0 && Math.Abs(gx - 30.5) < 1e-9 && Math.Abs(gz - 0.5) < 1e-9, "0.0.112: a far patrol point is walked toward one 20-block leg at a time");
+            walk = AiTaskZonePatrol.Step(route, ref next, 1.5, 0.5, 0, 0, out _, out _);
+            int after = next;
+            bool walk2 = AiTaskZonePatrol.Step(route, ref next, 101, 0.5, 0, 0, out _, out _);
+            Check(!walk && after == 1 && !walk2 && next == 0, "0.0.112: a reached point pauses the NPC and moves it on to the next, round to the first again");
+            int bad = 7;
+            AiTaskZonePatrol.Step(route, ref bad, 0, 0, 0, 0, out _, out _);
+            Check(bad == 0 || bad == 1, "0.0.112: an out-of-range saved index wraps onto the route");
+            Check(SpawnZoneSystem.NearestPoint(new List<int> { 0, 0, 100, 0, 50, 50 }, 60, 40) == 2, "0.0.112: a group starts for the patrol point nearest its leader");
+            Check(new SpawnZone { Patrol = new List<int> { 1, 2 } }.Patrols == false && new SpawnZone { Patrol = new List<int> { 1, 2, 3, 4 } }.Patrols && !new SpawnZone().Patrols,
+                "0.0.112: a zone patrols only with 2 or more points");
+            Check(Directory.GetFiles(argv[0], "*.json").Select(f => JObject.Parse(File.ReadAllText(f))).All(j => j["server"]["behaviors"].First(b => (string)b["code"] == "taskai")["aitasks"].Any(t => (string)t["code"] == "lotrnpcs:zonepatrol")),
+                "0.0.112: every NPC type has the zone patrol task");
+        }
+
         Console.WriteLine(fails == 0 ? "ALL PASSED" : fails + " FAILED");
         return fails;
     }

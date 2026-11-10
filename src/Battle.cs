@@ -32,11 +32,11 @@ namespace LotrNpcs
         // how many npcs can target 1 npc as that seems to be causing the issue"): no limit by default (config version 18
         // moves an unchanged 2; 17 moves an unchanged 3 straight to no limit). 0.0.102 (owner, 2026-11-09: "Implement it
         // again, do 4 per though"): 4 by default (config version 24 moves an unchanged 0).
-        public const int OldDefaultMaxAttackers = 3, Default082MaxAttackers = 2, Default085MaxAttackers = 0, DefaultMaxAttackers = 4;
+        public const int Default085MaxAttackers = 0, DefaultMaxAttackers = 4;
         // 0.0.55 (user, 2026-11-03: "make npcs inclined to spread out when fighting as a big group just a bit more"):
         // 1.5 became 2.0. 0.0.82 (owner: 1.5 blocks between neighbours in a line): back to 1.5, now only between NPCs of
         // the same side (config version 17 moves an unchanged 2.0).
-        public const double Spacing053 = 1.5, Spacing055 = 2.0, DefaultSpacing = 1.5, MinSpacing = 0.8, MaxSpacing = 4;
+        public const double DefaultSpacing = 1.5, MinSpacing = 0.8, MaxSpacing = 4;
         // 0.0.82 (owner: "1.0 to 1.6 blocks"): how far from its target's center an attacker stands. Melee reaches 2 blocks
         // from the attacker's front to the target's body (0.3 each for our NPCs), so 1.6 is well in reach.
         public const double DefaultDuelMin = 1.0, DefaultDuelMax = 1.6, MinDuel = 0.6, MaxDuel = 2.2;

@@ -165,54 +165,10 @@ public static class Program {
 
         // migrating older files
         var freshCfg = FactionConfig.FromFile(null, out bool storeFresh);
-        Check(storeFresh && freshCfg.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 28 && json.Contains("\"Version\": 28") && json.Contains("\"RosterPerCaptain\": 8") && !json.Contains("MaxHirelings") && json.Contains("\"ShieldChance\": 0.5") && json.Contains("\"HelmetChance\": 0.6") && json.Contains("\"CaptainsAlwaysHelmeted\": false") && json.Contains("\"MaxAttackersPerTarget\": 4") && json.Contains("\"CombatSpacing\": 1.5") && json.Contains("\"BattleLines\": true") && json.Contains("\"DuelDistanceMin\": 1.0") && json.Contains("\"DuelDistanceMax\": 1.6") && json.Contains("\"LineHoldRange\": 6.0") && json.Contains("\"MaxRecruits\": 16") && json.Contains("\"MaxFollowers\": 5") && json.Contains("\"GuardRadius\": 16") && json.Contains("\"HealthRegenSpeed\": 30.0") && json.Contains("\"ShareFriends\": false") && json.Contains("\"Relation\": \"enemy\"") && !freshCfg.Relations.Any(r => r.Relation == "ally") && freshCfg.Relations.Count == 1, "a new file is written with version 28 (no MaxHirelings, no alliance), the example entry, the battle spacing, helmet and shield settings, the regen settings, the guard radius and the hire and follow caps");
+        Check(storeFresh && freshCfg.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 29 && json.Contains("\"Version\": 29") && json.Contains("\"RosterPerCaptain\": 8") && !json.Contains("MaxHirelings") && json.Contains("\"ShieldChance\": 0.5") && json.Contains("\"HelmetChance\": 0.6") && json.Contains("\"CaptainsAlwaysHelmeted\": false") && json.Contains("\"MaxAttackersPerTarget\": 4") && json.Contains("\"CombatSpacing\": 1.5") && json.Contains("\"BattleLines\": true") && json.Contains("\"DuelDistanceMin\": 1.0") && json.Contains("\"DuelDistanceMax\": 1.6") && json.Contains("\"LineHoldRange\": 6.0") && json.Contains("\"MaxRecruits\": 16") && json.Contains("\"MaxFollowers\": 5") && json.Contains("\"GuardRadius\": 16") && json.Contains("\"HealthRegenSpeed\": 30.0") && json.Contains("\"ShareFriends\": false") && json.Contains("\"Relation\": \"enemy\"") && !freshCfg.Relations.Any(r => r.Relation == "ally") && freshCfg.Relations.Count == 1, "a new file is written with version 29 (no MaxHirelings, no alliance), the example entry, the battle spacing, helmet and shield settings, the regen settings, the guard radius and the hire and follow caps");
         var current = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(json.Replace("\"Stance\": \"aggressive\"", "\"Stance\": \"defensive\"")), out bool storeCurrent);
         Check(!storeCurrent && current.Factions["gondor"].Stance == "defensive", "a current file is left alone, even with defensive factions");
-        string oldJson = @"{
-  ""Factions"": {
-    ""Gondor"": { ""Bloc"": ""freepeoples"", ""Stance"": ""defensive"", ""FriendlyRaces"": [ ""lrc:freepeople"" ], ""FriendlyGroups"": [ ""minas tirith"" ] },
-    ""rohan"": { ""Bloc"": ""freepeoples"", ""Stance"": ""defensive"", ""FriendlyRaces"": [], ""FriendlyGroups"": [] },
-    ""dwarves"": { ""Bloc"": ""freepeoples"", ""Stance"": ""Defensive"", ""FriendlyRaces"": [], ""FriendlyGroups"": [] },
-    ""shire"": { ""Bloc"": ""freepeoples"", ""Stance"": ""defensive"", ""FriendlyRaces"": [ ""faraces:hobbit"" ], ""FriendlyGroups"": [] },
-    ""dunlendings"": { ""Bloc"": """", ""Stance"": ""defensive"", ""FriendlyRaces"": [], ""FriendlyGroups"": [] },
-    ""mordor"": { ""Bloc"": ""shadow"", ""Stance"": ""aggressive"", ""FriendlyRaces"": [ ""lrc:uruk"", ""LRC:Orc"", ""lrc:wickeddwarf"" ], ""FriendlyGroups"": [] },
-    ""angmar"": { ""Bloc"": ""shadow"", ""Stance"": ""aggressive"", ""FriendlyRaces"": [], ""FriendlyGroups"": [] }
-  },
-  ""Relations"": [ { ""A"": ""dunlendings"", ""B"": ""rohan"", ""Relation"": ""enemy"" } ],
-  ""MonsterCodes"": [ ""game:drifter-*"" ],
-  ""GrudgeSeconds"": 45,
-  ""CallForHelpRange"": 16
-}";
-        var migrated = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(oldJson), out bool storeOld);
-        Check(storeOld && migrated.Version == FactionConfig.CurrentVersion, "a 0.0.31 file is updated and written back");
-        Check(new[] { "Gondor", "rohan", "dwarves", "dunlendings" }.All(f => migrated.Factions[f].Stance == "aggressive") && migrated.Factions["shire"].Stance == "defensive", "...Gondor, Rohan, Dwarves and Dunlendings become aggressive, the Shire stays defensive");
-        Check(migrated.Factions["mordor"].FriendlyRaces.SequenceEqual(new[] { "lrc:wickeddwarf" }), "...the old default orc races leave Mordor's list, races the admin added stay");
-        Check(migrated.Factions.Count == 15 && migrated.Factions.ContainsKey("gundabad") && migrated.Factions["Gondor"].FriendlyGroups.SequenceEqual(new[] { "minas tirith" }) && migrated.GrudgeSeconds == 45 && migrated.MonsterCodes.Count == 1, "...and the admin's other edits stay");
-        Check(!migrated.Factions.ContainsKey("isengard") && !migrated.Factions.ContainsKey("mistymountains") && migrated.Factions.ContainsKey("elves") && migrated.Factions["Gondor"].FriendlyRaces.Count == 0, "...the 0.0.35 factions join, older ones the file lacks stay out, and Gondor loses the shared Men of the West race");
-        Check(migrated.Relations.Count == 2 && migrated.Relations.Any(r => r.A == "dunlendings" && r.Relation == "enemy") && migrated.Relations.Any(r => r.A == "gondor" && r.B == "rohan" && r.Relation == "enemy" && !r.ShareFriends) && !migrated.Relations.Any(r => r.A == "mordor" && r.B == "isengard"), "...the example entry is added next to the admin's relations, and the Mordor/Isengard alliance it got in 0.0.34 goes again (0.0.76)");
-        SetLegacy(fs, migrated);
-        Check(fs.Relation("mordor", "angmar") == FactionRelation.Enemy && fs.WantsToAttack("angmar", Npc("test-mordororc-recruit")), "...and its old sides no longer make Mordor and Angmar allies");
-        var reread = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(Newtonsoft.Json.JsonConvert.SerializeObject(migrated).Replace("\"Stance\":\"aggressive\"", "\"Stance\":\"defensive\"")), out bool storeAgain);
-        Check(!storeAgain && reread.Factions["gondor"].Stance == "defensive" && reread.Relations.Count == 2, "it runs once: an admin can make Gondor defensive again afterwards");
-
-        // a file written by 0.0.32 (version 1)
-        var v1 = new FactionConfig(); v1.FillDefaults(); v1.Version = 1;
-        v1.Factions["mordor"].FriendlyRaces = new List<string> { "lrc:orc", "lrc:uruk", "faraces:orc", "faraces:goblin" };
-        v1.Relations = new List<FactionRelationDef> { new FactionRelationDef { A = "dunlendings", B = "rohan", Relation = "enemy" }, new FactionRelationDef { A = "gondor", B = "rohan", Relation = "ally" }, new FactionRelationDef { A = "dwarves", B = "shire", Relation = "ally", ShareFriends = true } };
-        v1.Factions["gondor"].Stance = "defensive";
-        var m1 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(Newtonsoft.Json.JsonConvert.SerializeObject(v1)), out bool store1);
-        Check(store1 && m1.Version == FactionConfig.CurrentVersion && m1.Factions["mordor"].FriendlyRaces.Count == 0 && m1.Factions["gondor"].Stance == "defensive", "a 0.0.32 file loses the orc races and keeps its stances");
-        Check(m1.Relations.Count == 3 && m1.Relations.Any(r => r.A == "gondor" && r.B == "rohan" && r.Relation == "enemy") && !m1.Relations.Any(r => r.Relation == "ally" && r.A == "gondor") && m1.Relations.Any(r => r.A == "dwarves" && r.ShareFriends), "...0.0.32's Gondor/Rohan ally example becomes the no-op example, alliances the admin set up stay");
-
-        // a file written by 0.0.33 (version 2)
-        var v2 = new FactionConfig(); v2.FillDefaults(); v2.Version = 2;
-        v2.Relations = new List<FactionRelationDef> { new FactionRelationDef { A = "gondor", B = "rohan", Relation = "enemy" } };
-        var m2 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(Newtonsoft.Json.JsonConvert.SerializeObject(v2)), out bool store2);
-        Check(store2 && m2.Version == FactionConfig.CurrentVersion && m2.Relations.Count == 1 && !m2.Relations.Any(r => r.A == "mordor" && r.B == "isengard"), "a 0.0.33 file gets the Mordor/Isengard ally entry (0.0.34) and loses it again (0.0.76)");
-        var v2b = new FactionConfig(); v2b.FillDefaults(); v2b.Version = 2;
-        v2b.Relations = new List<FactionRelationDef> { new FactionRelationDef { A = "Isengard", B = "Mordor", Relation = "enemy" } };
-        var m2b = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(Newtonsoft.Json.JsonConvert.SerializeObject(v2b)), out _);
-        Check(m2b.Relations.Count == 1 && m2b.Relations[0].Relation == "enemy", "...unless the admin already set that pair");
+        // 0.0.112: files before version 19 are no longer converted step by step (both servers run 0.0.108 or later).
 
         // ---- 0.0.35: the factions the user listed, admin-set factions, hire prices, instructions ----
         cfg = new FactionConfig(); SetLegacy(fs, cfg);
@@ -261,30 +217,6 @@ public static class Program {
         FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(text), out bool storeSame);
         Check(!storeSame, "a current file with current instructions is left alone");
         File.WriteAllText("factions-default.json", text);
-        // a file written by 0.0.34 (version 3)
-        string v3 = @"{
-  ""Version"": 3,
-  ""Factions"": {
-    ""gondor"": { ""Stance"": ""aggressive"", ""FriendlyRaces"": [ ""lrc:freepeople"", ""faraces:numenorean"", ""faraces:elf"" ], ""FriendlyGroups"": [ ""minas tirith"" ] },
-    ""rohan"": { ""Stance"": ""aggressive"", ""FriendlyRaces"": [ ""faraces:northman"" ], ""FriendlyGroups"": [] },
-    ""dwarves"": { ""Stance"": ""aggressive"", ""FriendlyRaces"": [ ""lrc:longbeard"" ], ""FriendlyGroups"": [] },
-    ""shire"": { ""Stance"": ""defensive"", ""FriendlyRaces"": [ ""faraces:hobbit"" ], ""FriendlyGroups"": [] },
-    ""mordor"": { ""Stance"": ""aggressive"", ""FriendlyRaces"": [], ""FriendlyGroups"": [ ""barad-dur"" ] },
-    ""angmar"": { ""Stance"": ""aggressive"", ""FriendlyRaces"": [], ""FriendlyGroups"": [] },
-    ""mistymountains"": { ""Stance"": ""aggressive"", ""FriendlyRaces"": [], ""FriendlyGroups"": [] },
-    ""isengard"": { ""Stance"": ""aggressive"", ""FriendlyRaces"": [], ""FriendlyGroups"": [] },
-    ""easterlings"": { ""Stance"": ""defensive"", ""FriendlyRaces"": [ ""lrc:easterling"" ], ""FriendlyGroups"": [] }
-  },
-  ""Relations"": [ { ""A"": ""gondor"", ""B"": ""rohan"", ""Relation"": ""ally"", ""ShareFriends"": true }, { ""A"": ""mordor"", ""B"": ""isengard"", ""Relation"": ""ally"", ""ShareFriends"": false } ],
-  ""GrudgeSeconds"": 30
-}";
-        var m3 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v3), out bool store3);
-        Check(store3 && m3.Version == FactionConfig.CurrentVersion && m3.Factions.Count == 17 && m3.Factions.ContainsKey("gundabad") && new[] { "dale", "arnor", "haradrim", "blacknumenoreans", "wickeddwarves", "elves", "tormentedelves" }.All(m3.Factions.ContainsKey) && !m3.Factions.ContainsKey("dunlendings"), "a 0.0.34 file gets the 7 new factions; Dunland, which the admin removed, stays out");
-        Check(m3.Factions["gondor"].FriendlyRaces.SequenceEqual(new[] { "faraces:elf" }) && m3.Factions["rohan"].FriendlyRaces.Count == 0 && m3.Factions["gondor"].FriendlyGroups.SequenceEqual(new[] { "minas tirith" }), "...Gondor and Rohan lose the Men of the West races, the admin's own race and group stay");
-        Check(m3.Factions["easterlings"].Stance == "defensive" && m3.Factions["dwarves"].FriendlyRaces.SequenceEqual(new[] { "lrc:longbeard" }) && m3.Relations.Count == 1 && m3.Relations[0].ShareFriends, "...stances, other races and the admin's own relations stay (the shipped Mordor/Isengard alliance goes, 0.0.76)");
-        Check(m3.Factions.All(kv => kv.Value.HireCoin == "game:gear-rusty" && kv.Value.HirePrices["captain"] == FactionTiers.Of(kv.Key).Hire["captain"]) && m3.Instructions.Count == FactionConfig.InstructionText.Count, "...every faction gets its tier's hire prices, and the file gets #Instructions");
-        var m3again = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(Newtonsoft.Json.JsonConvert.SerializeObject(m3).Replace("\"FriendlyRaces\":[\"faraces:elf\"]", "\"FriendlyRaces\":[\"lrc:freepeople\"]")), out bool store3again);
-        Check(!store3again && m3again.Factions["gondor"].FriendlyRaces.SequenceEqual(new[] { "lrc:freepeople" }), "it runs once: an admin can give Gondor the Men of the West race back");
 
         // ---- hiring (0.0.37) ----
         Check(types.Count == 71, "every NPC has the recruit behavior on both sides and the follow task (checked per file above)");
@@ -301,43 +233,6 @@ public static class Program {
         Check(lang.Properties().All(p => !((string)p.Value).Contains("{") || System.Text.RegularExpressions.Regex.IsMatch((string)p.Value, @"^([^{}]|\{[0-7]\})*$")), "lang placeholders are only {0} to {7} (6: the 0.0.90 room line, 7: the 0.0.91 roster line)");
 
         Check(new FactionConfig().MaxRecruits == 16 && new FactionConfig().MaxFollowers == 5 && FactionConfig.InstructionText.Any(l => l.Contains("MaxRecruits") && l.Contains("MaxFollowers")) && !FactionConfig.InstructionText.Any(l => l.Contains("isn't built")), "players may hire 16 and lead 5 at a time by default, and #Instructions explain both");
-        // 0.0.48 (user, 2026-11-03): the old default cap 5 becomes 15; a cap the admin chose stays.
-        var v7 = new FactionConfig(); v7.FillDefaults(); v7.Version = 7; v7.MaxRecruits = 5;
-        var m7 = FactionConfig.FromFile(v7, out bool store7);
-        var v7b = new FactionConfig(); v7b.FillDefaults(); v7b.Version = 7; v7b.MaxRecruits = 8;
-        var m7b = FactionConfig.FromFile(v7b, out _);
-        Check(store7 && m7.Version == FactionConfig.CurrentVersion && m7.MaxRecruits == 16 && m7.MaxFollowers == 5 && m7b.MaxRecruits == 8, "a 0.0.47 file with the old cap 5 gets 16 and MaxFollowers 5; a cap the admin chose stays");
-        // 0.0.59: one hire coin for every faction (user: "Set the hiring coin id mordor uses to be standard for all races").
-        var v12 = Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(@"{ ""Version"": 12, ""Factions"": {
-            ""mordor"": { ""Stance"": ""aggressive"", ""HireCoin"": ""coinage:planchet-silver-lg"" },
-            ""gondor"": { ""Stance"": ""aggressive"", ""HireCoin"": ""coinage:coin-silver-lg"" },
-            ""rohan"": { ""Stance"": ""aggressive"", ""HireCoin"": ""game:gear-rusty"" },
-            ""dale"": { ""Stance"": ""aggressive"" } } }");
-        var m12 = FactionConfig.FromFile(v12, out bool store12);
-        Check(store12 && m12.Version == FactionConfig.CurrentVersion && m12.Factions["gondor"].HireCoin == "game:gear-rusty" && m12.Factions["mordor"].HireCoin == "game:gear-rusty"
-            && m12.Factions["dale"].HireCoin == "game:gear-rusty" && m12.Factions["rohan"].HireCoin == "game:gear-rusty",
-            "a 0.0.58 file: factions on the old coin (which doesn't exist), the planchet or none end on the rusty gear (0.0.94)");
-        // 0.0.62: the Gundabad faction (work in progress) joins old files once; a file that already has it keeps its settings.
-        var v13 = Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(@"{ ""Version"": 13, ""Factions"": {
-            ""mordor"": { ""Stance"": ""defensive"", ""HireCoin"": ""game:gear-rusty"" } } }");
-        var m13 = FactionConfig.FromFile(v13, out bool store13);
-        var v13b = Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(@"{ ""Version"": 13, ""Factions"": { ""Gundabad"": { ""Stance"": ""defensive"" } } }");
-        var m13b = FactionConfig.FromFile(v13b, out _);
-        Check(store13 && m13.Version == FactionConfig.CurrentVersion && m13.Factions.Count == 2 && m13.Factions["gundabad"].Stance == "aggressive" && m13.Factions["gundabad"].HireCoin == "game:gear-rusty"
-            && m13.Factions["gundabad"].HirePrices["captain"] == 29 && m13.Factions["gundabad"].FriendlyRaces.Count == 0 && m13.Factions["mordor"].Stance == "defensive" && m13.Factions["mordor"].HireCoin == "game:gear-rusty"
-            && m13b.Factions.Count == 1 && m13b.Factions["Gundabad"].Stance == "defensive",
-            "a 0.0.61 file gains Gundabad (aggressive, joined by group only, planchet prices) and keeps the rest; a file that has it already keeps it");
-        // 0.0.74: MaxHirelings became MaxRecruits. An old file's cap carries over (and the old cap migrations still see
-        // it), the file is written back with MaxRecruits only, and a version 15 file is left alone.
-        var v14 = Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(@"{ ""Version"": 14, ""MaxHirelings"": 9, ""Factions"": { ""mordor"": { ""Stance"": ""aggressive"" } } }");
-        var m14 = FactionConfig.FromFile(v14, out bool store14);
-        string json14 = Newtonsoft.Json.JsonConvert.SerializeObject(m14, Newtonsoft.Json.Formatting.Indented);
-        var v8old = Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(@"{ ""Version"": 8, ""MaxHirelings"": 15, ""Factions"": { ""mordor"": { ""Stance"": ""aggressive"" } } }");
-        var m8old = FactionConfig.FromFile(v8old, out _);
-        var v14none = Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(@"{ ""Version"": 14, ""Factions"": { ""mordor"": { ""Stance"": ""aggressive"" } } }");
-        var m14none = FactionConfig.FromFile(v14none, out _);
-        Check(store14 && m14.Version == FactionConfig.CurrentVersion && m14.MaxRecruits == 9 && json14.Contains("\"MaxRecruits\": 9") && !json14.Contains("Hireling") && m8old.MaxRecruits == 16 && m14none.MaxRecruits == 16,
-            "a version 14 file's MaxHirelings 9 becomes MaxRecruits 9 and the old name is not written back; an old cap of 15 still becomes 16; a file without it gets 16");
         Check(!FactionConfig.InstructionText.Any(l => l.ToLowerInvariant().Contains("hireling")), "#Instructions never say hireling");
         Check(FactionConfig.InstructionText.Any(l => l.Contains("game:gear-rusty")) && !FactionConfig.InstructionText.Any(l => l.Contains("coinage:coin-")),
             "the #Instructions name the planchet, not a coin that doesn't exist");
@@ -507,9 +402,6 @@ public static class Program {
         Recruit.SetGuardSpot(postGuard, new Vec3d(1, 60, 1)); Recruit.SetOrder(postGuard, Recruit.Follow);
         Check(!Recruit.HasGuardSpot(postGuard), "following drops the guard place");
         // 0.0.51: hire cap 16; formation spots carry a facing
-        var v8 = new FactionConfig(); v8.FillDefaults(); v8.Version = 8; v8.MaxRecruits = 15;
-        var m8 = FactionConfig.FromFile(v8, out bool store8);
-        Check(store8 && m8.MaxRecruits == 16, "a 0.0.50 file with cap 15 gets 16");
         Recruit.SetGuardAt(postGuard, new Vec3d(5, 60, 5)); Recruit.SetGuardSpot(postGuard, new Vec3d(6, 60, 6)); Recruit.SetFacing(postGuard, 1, 0);
         Check(Recruit.HasFacing(postGuard) && Math.Abs(Recruit.FacingYaw(postGuard) - Math.PI / 2) < 1e-4, "a guard in formation faces the formation's way (east is yaw pi/2)");
         Recruit.SetGuardAt(postGuard, new Vec3d(5, 60, 5));
@@ -567,7 +459,8 @@ public static class Program {
                 string[] gWarlord = { "norc:armor-body-tierfiveplate-norcarmorheavier-norcarmorheavier-none", "norc:armor-legs-tierfiveplate-norcleggingsheavier-norcleggingsheavier-none" };
                 var want = r == "recruit" ? new[] { gBone } : r == "warrior" ? new[] { gWarrior.Prepend(gHelm).ToArray(), gWarrior.Prepend(gTusk).ToArray() }
                     : new[] { gWarlord.Prepend(gWarlordHead).ToArray(), gWarlord.Prepend(gTusk).ToArray(), gWarlord.Prepend(gOwner).ToArray() };
-                string[] helms = r == "warrior" ? new[] { gHelm, gTusk } : new[] { gWarlordHead, gTusk, gOwner, gHelm };
+                // 0.0.112: orcs offer only their own unit's helmets (no lower ranks').
+                string[] helms = r == "warrior" ? new[] { gHelm, gTusk } : new[] { gWarlordHead, gTusk, gOwner };
                 return sets.Count() == want.Length && want.Select((w, i) => sets[i].Select(c => (string)c).SequenceEqual(w)).All(b => b) && fallback.All(c => !c.Contains("armor-head-")) && fallback.Any()
                     && (r == "recruit" ? g["attributes"]["lotrnpcsHelmets"] == null : g["attributes"]["lotrnpcsHelmets"].Select(c => (string)c).SequenceEqual(helms))
                     && (string)g["attributes"]["lotrnpcsFaction"] == "gundabad" && (string)g["attributes"]["lotrnpcsRank"] == r
@@ -590,15 +483,7 @@ public static class Program {
         Check(EntityBehaviorFactionMember.RegenSpeed(regenCfg, 0) == 1 && EntityBehaviorFactionMember.RegenSpeed(regenCfg, 9999) == 1 && EntityBehaviorFactionMember.RegenSpeed(regenCfg, 10000) == 30
             && EntityBehaviorFactionMember.RegenSpeed(regenCfg, long.MaxValue / 4) == 30, "NPCs heal at vanilla speed in a fight and 30 times faster from 10 seconds after their last hit (0.0.41: was 20)");
         Check(22 / (0.01 * 30) / 60 < 1.5 && 48 / (0.01 * 30) / 60 < 3, "...so a hurt recruit is whole again in under 1.5 minutes and a captain in under 3");
-        var v4 = new FactionConfig(); v4.FillDefaults(); v4.Version = 4; v4.HealthRegenSpeed = 7;
-        var m4 = FactionConfig.FromFile(v4, out bool store4);
-        Check(store4 && m4.Version == FactionConfig.CurrentVersion && m4.HealthRegenSpeed == 7 && m4.RegenDelaySeconds == 10 && FactionConfig.InstructionText.Any(l => l.StartsWith("HealthRegenSpeed")), "a 0.0.38 file is written back with the regen settings, keeping any value already set");
         // ---- 0.0.41: the user's outfits, gear slots, faster regen, creative menu, portrait framing ----
-        var v5 = new FactionConfig(); v5.FillDefaults(); v5.Version = 5; v5.HealthRegenSpeed = 20;
-        var m5 = FactionConfig.FromFile(v5, out bool store5);
-        var v5b = new FactionConfig(); v5b.FillDefaults(); v5b.Version = 5; v5b.HealthRegenSpeed = 12;
-        var m5b = FactionConfig.FromFile(v5b, out _);
-        Check(store5 && m5.Version == FactionConfig.CurrentVersion && m5.HealthRegenSpeed == 30 && m5b.HealthRegenSpeed == 12, "a 0.0.40 file with the old default regen 20 gets 30; a speed the admin chose stays");
         var vanilla = new HashSet<string>(File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "..", "vanilla-armor-codes.txt")).Where(l => l.Length > 0 && !l.StartsWith("#")).Select(l => "game:" + l.Trim()));
         var clothes = File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "..", "vanilla-clothes-codes.txt")).Where(l => l.Length > 0 && !l.StartsWith("#")).Select(l => l.Split('\t')).ToDictionary(p => "game:" + p[0], p => p[1]);
         foreach (string c in clothes.Keys) vanilla.Add(c);
@@ -932,9 +817,6 @@ public static class Program {
         Check(new[] { "whitelist-unknown", "whitelist-self", "whitelist-already", "whitelist-added", "whitelist-notlisted", "whitelist-removed", "whitelist-empty", "whitelist-list" }.All(k => lang[k] != null)
             && lang.Properties().Where(p => p.Name.StartsWith("whitelist-") || p.Name.StartsWith("cmd-")).All(p => !((string)p.Value).Contains("<")), "every whitelist reply is in the lang file, with no angle brackets (chat reads them as markup)");
         Check(FactionConfig.InstructionText.Any(l => l.StartsWith("GuardRadius") && l.Contains("whitelist")), "#Instructions explain GuardRadius and the whitelist");
-        var v6 = new FactionConfig(); v6.FillDefaults(); v6.Version = 6; v6.HealthRegenSpeed = 25; v6.MaxRecruits = 3;
-        var m6 = FactionConfig.FromFile(v6, out bool store6);
-        Check(store6 && m6.Version == FactionConfig.CurrentVersion && m6.GuardRadius == 16 && m6.HealthRegenSpeed == 25 && m6.MaxRecruits == 3, "a 0.0.43 file is written back with GuardRadius, keeping every value the admin set");
 
         // ---- 0.0.45: Mordor orcs carry cosmetic weapons; every NPC attacks 0.25 s more often ----
         string assets = Path.Combine(argv[0], "..");
@@ -1164,13 +1046,6 @@ public static class Program {
             BattleSpacing.AddPush(ref sx1, ref sz1, 0, 0, 1.5, 7); BattleSpacing.AddPush(ref sx2, ref sz2, 0, 0, 1.5, 8);
             Check(Math.Abs(sx1) + Math.Abs(sz1) > 0.99 && Math.Abs(Math.Atan2(sx1, sz1) - Math.Atan2(sx2, sz2)) > 0.5, "two NPCs in exactly the same spot split in different directions");
 
-            // Config: a 0.0.52 file (version 9) gets the defaults, and the faction system passes them on.
-            var v9 = FactionConfig.FromFile(null, out _);
-            var v9tree = Newtonsoft.Json.Linq.JObject.FromObject(v9);
-            v9tree["Version"] = 9; v9tree.Remove("MaxAttackersPerTarget"); v9tree.Remove("CombatSpacing");
-            string v9json = v9tree.ToString();
-            var m9 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v9json), out bool store9);
-            Check(v9tree["CombatSpacing"] == null && store9 && m9.Version == FactionConfig.CurrentVersion && m9.MaxAttackersPerTarget == 4 && m9.CombatSpacing == 1.5, "a version 9 file gains MaxAttackersPerTarget 4 (0.0.102) and CombatSpacing 1.5 (0.0.82) and is written back");
             var fsys = new FactionSystem();
             var cfgS = FactionConfig.FromFile(null, out _); cfgS.MaxAttackersPerTarget = 5; cfgS.CombatSpacing = 9;
             SetLegacy(fsys, cfgS);
@@ -1230,9 +1105,17 @@ public static class Program {
             string[] mordRecruit = TypeHelmets("test-mordororc-recruit");
             Check(mordRecruit.Length == 3 && mordRecruit.Any(c => c.Contains("servanthelmetorcmedium")) && mordRecruit.Any(c => c.Contains("angmarhelmetmedium")) && mordRecruit.Any(c => c.Contains("servanthelmetorcheavy")),
                 "0.0.82: a Mordor recruit may choose the Mordor raider and warrior helmets and the Angmar orc helmet (" + string.Join(", ", mordRecruit) + ")");
-            Check(TypeHelmets("test-mordororc-captain")[0].Contains("maskred") && TypeHelmets("test-mordororc-recruit").All(TypeHelmets("test-mordororc-captain").Contains) && TypeHelmets("test-mordororc-warrior").All(TypeHelmets("test-mordororc-captain").Contains)
-                && TypeHelmets("test-mordororc-recruit").All(TypeHelmets("test-mordororc-warrior").Contains) && !TypeHelmets("test-mordororc-recruit").Any(c => c.Contains("maskred")) && !TypeHelmets("test-mordororc-warrior").Any(c => c.Contains("maskred")),
-                "a Mordor captain's own red-masked helmet comes first, and each rank may choose the helmets of the ranks beneath it too, never those above (0.0.76)");
+            // 0.0.112 (owner: "make sure they have the correct helmets whitelisted", "specifically orcs"): orcs and Uruk-hai
+            // offer only their own unit's helmets from the 0.0.82 list; other factions keep the lower ranks' too (0.0.76).
+            string[] OwnHelmets(string code) => ((JArray)entityFiles[code]["server"]["behaviors"].First(b => (string)b["code"] == "lotrnpcs:startinggear")["sets"])
+                .SelectMany(st => st.Select(c => (string)c)).Where(c => c.Contains("armor-head-") && !c.Contains('@')).Distinct().ToArray();
+            var orcUnits = entityFiles.Keys.Where(c => new[] { "mordororc", "angmarorc", "goblin", "uruk", "gundabadorc" }.Any(f => c.StartsWith("test-" + f + "-"))).ToArray();
+            Check(orcUnits.Length >= 15 && orcUnits.All(c => TypeHelmets(c).SequenceEqual(OwnHelmets(c)))
+                && TypeHelmets("test-mordororc-captain").SequenceEqual(new[] { "mord:armor-head-tierfourplate-servanthelmethumanheavy-servanthelmethumanheavy-maskred" })
+                && TypeHelmets("test-mordororc-warrior").SequenceEqual(new[] { "mord:armor-head-tierfourplate-servanthelmetorcheavy-servanthelmetorcheavy-none" })
+                && TypeHelmets("test-uruk-captain").All(c => c.Contains("urukhaihelmetgeneral")) && TypeHelmets("test-uruk-warrior").All(c => !c.Contains("scout") && !c.Contains("general"))
+                && TypeHelmets("test-gondor-recruit").All(TypeHelmets("test-gondor-captain").Contains),
+                "0.0.112: each orc and Uruk unit may choose only its own helmets (a Mordor captain the red mask, a Black Uruk the Orc Warrior helmet, Uruk captains the General helmets); other factions' ranks still choose the helmets beneath them (0.0.76)");
             Check(TypeHelmets("test-easterling-captain").All(c => !c.Contains('@')) && TypeHelmets("test-easterling-captain").Any(c => c.Contains("woodlandhelmetmedium")),
                 "the Easterling captain's face coif isn't offered as a helmet");
             Check(TypeHelmets("test-hobbit").Length == 0, "hobbits have no helmets to choose (their hats aren't helmets)");
@@ -1267,23 +1150,11 @@ public static class Program {
             Check(types["test-mordororc-recruit"].Attributes["lotrnpcsNames"].AsArray<string>().SequenceEqual(types["test-angmarorc-captain"].Attributes["lotrnpcsNames"].AsArray<string>())
                 && !types["test-mordororc-recruit"].Attributes["lotrnpcsNames"].AsArray<string>().SequenceEqual(types["test-uruk-recruit"].Attributes["lotrnpcsNames"].AsArray<string>()), "orcs of Mordor and Angmar share a list, Uruk-hai have their own");
 
-            var v10 = Newtonsoft.Json.Linq.JObject.FromObject(FactionConfig.FromFile(null, out _));
-            v10["Version"] = 10; v10.Remove("HelmetChance"); v10.Remove("CaptainsAlwaysHelmeted");
-            var m10 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v10.ToString()), out bool store10);
-            Check(store10 && m10.Version == FactionConfig.CurrentVersion && m10.HelmetChance == 0.6 && !m10.CaptainsAlwaysHelmeted, "a version 10 file gains HelmetChance 0.6 and CaptainsAlwaysHelmeted (false since 0.0.82) and is written back");
             Check(FactionConfig.InstructionText.Any(l => l.Contains("HelmetChance") && l.Contains("CaptainsAlwaysHelmeted")), "#Instructions explain the helmet settings");
         }
 
         // ---- 0.0.55: wider battle spacing, shared orc helmets, the Mordor shield, archers, hobbit clothes ----
         {
-            // Battle spacing: the old default 1.5 becomes 2, a value the admin chose stays; three attackers still reach.
-            var c11 = Newtonsoft.Json.Linq.JObject.FromObject(FactionConfig.FromFile(null, out _));
-            c11["Version"] = 11; c11["CombatSpacing"] = 1.5; c11.Remove("ShieldChance");
-            var n11 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(c11.ToString()), out bool store11);
-            c11["CombatSpacing"] = 1.8;
-            var n11b = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(c11.ToString()), out _);
-            Check(BattleSpacing.DefaultSpacing == 1.5 && store11 && n11.Version == FactionConfig.CurrentVersion && n11.CombatSpacing == 1.5 && n11b.CombatSpacing == 1.8 && n11.ShieldChance == 0.5,
-                "a 0.0.54 file with the old CombatSpacing 1.5 went to 2 in 0.0.55 and to 1.5 in 0.0.82, a spacing the admin chose stays, and ShieldChance 0.5 is added");
             var reachSpacing = new BattleSpacing();
             // Melee reaches 2 blocks from the attacker's front (0.3 ahead of its middle) to the target's body (0.3 wide).
             Check(reachSpacing.DuelMax - 0.3 - 0.3 < 2.0, "attackers at the far end of the duel band (1.6 blocks from their target's middle) are still inside melee reach");
@@ -1314,13 +1185,13 @@ public static class Program {
             // The Mordor shield.
             var mw = HeldWeapon(entityFiles["test-mordororc-warrior"], "server");
             string ShieldOf(string c) => entityFiles[c]["server"]["behaviors"].Any(b => (string)b["code"] == "lotrnpcs:heldweapon") && HeldWeapon(entityFiles[c], "server")["shields"] is JArray sh ? string.Join("|", sh.Select(x => (string)x)) : null;
-            string ShieldsWanted(string c) => c.EndsWith("-archer") ? null : c.StartsWith("test-mordororc-") ? "lotrnpcs:orcweapon-shield" : c.StartsWith("test-goblin-") ? "lotrnpcs:orcweapon-mmshield"
-                : c.StartsWith("test-blacknumenorean-") ? "lotrnpcs:orcweapon-kiteshield" : c.StartsWith("test-dwarf-") ? "lotrnpcs:orcweapon-dwtowershield|lotrnpcs:orcweapon-dwshield" : c.StartsWith("test-easterling-") ? "lotrnpcs:orcweapon-eastshield"
+            string ShieldsWanted(string c) => c.EndsWith("-archer") ? null : c.StartsWith("test-mordororc-") ? "lotrnpcs:orcweapon-shield|lotrnpcs:orcweapon-bnshield" : c.StartsWith("test-goblin-") ? "lotrnpcs:orcweapon-mmshield"
+                : c.StartsWith("test-blacknumenorean-") ? "lotrnpcs:orcweapon-bnshield" : c.StartsWith("test-arnor-") ? "lotrnpcs:orcweapon-kiteshield" : c.StartsWith("test-dwarf-") ? "lotrnpcs:orcweapon-dwtowershield|lotrnpcs:orcweapon-dwshield" : c.StartsWith("test-easterling-") ? "lotrnpcs:orcweapon-eastshield"
                 : c.StartsWith("test-gondor-") ? "lotrnpcs:orcweapon-gondorshield|lotrnpcs:orcweapon-boromirshield" : c.StartsWith("test-elf-") ? "lotrnpcs:orcweapon-elfshield"
                 : c == "test-haradrim-recruit" ? "lotrnpcs:orcweapon-hdlightshield" : c == "test-haradrim-warrior" || c == "test-haradrim-captain" ? "lotrnpcs:orcweapon-hdheavyshield"
                 : c.StartsWith("test-rohan-") || c.StartsWith("test-dale-") ? "game:shield-woodmetal" : c.StartsWith("test-dunlending-") ? "game:shield-crude" : null;
-            Check(ShieldOf("test-mordororc-warrior") == "lotrnpcs:orcweapon-shield" && entityFiles.Keys.All(c => ShieldOf(c) == ShieldsWanted(c)),
-                "Mordor orcs (not archers) may carry the Mordor shield, Misty Mountains orcs (0.0.71) theirs, Black Numenoreans the kite shield dwarves one of their two (0.0.76), Easterlings theirs (0.0.77), Gondor one of its two and elves theirs (0.0.94), Haradrim recruits the light and warriors and captains the heavy shield (0.0.97), Rohan and Dale the game's wood-and-metal and Dunlendings its crude shield (0.0.101); nobody else has one");
+            Check(ShieldOf("test-mordororc-warrior") == "lotrnpcs:orcweapon-shield|lotrnpcs:orcweapon-bnshield" && entityFiles.Keys.All(c => ShieldOf(c) == ShieldsWanted(c)),
+                "Mordor orcs (not archers) may carry the Mordor shield or (0.0.112) the Black Numenorean one, Misty Mountains orcs (0.0.71) theirs, Black Numenoreans their own (0.0.112; the kite shield went to Arnor), dwarves one of their two (0.0.76), Easterlings theirs (0.0.77), Gondor one of its two and elves theirs (0.0.94), Haradrim recruits the light and warriors and captains the heavy shield (0.0.97), Rohan and Dale the game's wood-and-metal and Dunlendings its crude shield (0.0.101); nobody else has one");
             var mmItem = JObject.Parse(File.ReadAllText(Path.Combine(assets, "itemtypes", "orcweapon-mmshield.json")));
             var mmShape = JObject.Parse(File.ReadAllText(Path.Combine(assets, "shapes", "item", "orcweapon", "mmshield.json")));
             Check((string)mmItem["shape"]["base"] == "lotrnpcs:item/orcweapon/mmshield" && mmItem["tpOffHandTransform"] != null && lang["item-orcweapon-mmshield"] != null
@@ -1525,6 +1396,13 @@ public static class Program {
             Check(new (string item, double x, double y, double z)[] { ("kiteshield", 8.0, 21.9, 12.8 - 1.4 + 1.0), ("eastshield", 6.25, 16.0, 7.38 - 1.4 + 1.0), ("gondorshield", 7.5, 16.68, 7.3 - 1.4 + 1.75), ("dwtowershield", 5.25, 18.0, 7.3 - 1.4 + 1.0), ("dwshield", 7.0, 17.85, 4.9 - 1.4 + 1.0) }
                     .All(g => Gap(HandPoint(OffTf(g.item), g.x, g.y, g.z), mordorGrip) < 0.002 && Math.Abs((double)OffTf(g.item)["rotation"]["z"] - ((double)OffTf("shield")["rotation"]["z"] - 90)) < 0.01),
                 "the new shields are held like the Mordor shield, turned a quarter to stand along the forearm, each by its handle slid 1.4 px out so it clears the arm (the dwarven ones 1 px back in since 0.0.96, owner: \"a little bit closer\"; 0.0.100: the kite and Easterling 1 px and the Gondorian 1.75 px in, so the hand meets the handle)");
+            // 0.0.112: the owner's new swords, spears, Easterling axe and steel hammers, each held by its grip; the Black
+            // Numenorean shield (no handle) where the kite shield's grip is, 0.1 px behind its rim.
+            Check(new (string item, double x, double y, double z)[] { ("gdsword", 2.5, 0, 8), ("gdsteelsword", 2.5, 0, 8), ("rhsword", 2.5, 0, 8), ("bnsteelsword", 2.5, 0, 8), ("morgulblade", 2.5, 0, 8),
+                    ("elflongsword", 14.5, 0, 8.3), ("bnspear", -6.8, 0, 8), ("rhspear", -1.2, 0.75, 8), ("eastaxe", 27, 0.75, 8), ("dwwarhammersteel", -28, 2.05, 8.05), ("dwshorthammersteel", 4, 1.05, 8.05) }
+                    .All(g => Gap(HandPoint(Tf(g.item), g.x, g.y, g.z), new double[] { 0, 0, 0 }) < 0.002)
+                && Gap(HandPoint(OffTf("bnshield"), 8.0, 16.0, 9.96), mordorGrip) < 0.002,
+                "0.0.112: the new swords, spears, Easterling axe and steel hammers are each held by their grip, and the Black Numenorean shield where the kite shield's grip is");
             var converted = new[] { "elfspear", "kiteshield", "dwaxe", "dwbattleaxe", "dwtowershield", "dwshield", "dwdagger" };
             Check(converted.All(n => {
                     var shp = JObject.Parse(File.ReadAllText(Path.Combine(assets, "shapes", "item", "orcweapon", n + ".json")));
@@ -1657,14 +1535,6 @@ public static class Program {
 
         // ---- 0.0.76: promotion and XP, no default allies, shield choice, the owner's new weapons ----
         {
-            // Config version 16.
-            var v15 = Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(@"{ ""Version"": 15, ""Factions"": { ""mordor"": {}, ""isengard"": {} },
-                ""Relations"": [ { ""A"": ""mordor"", ""B"": ""isengard"", ""Relation"": ""ally"", ""ShareFriends"": false }, { ""A"": ""gondor"", ""B"": ""rohan"", ""Relation"": ""ally"", ""ShareFriends"": true } ] }");
-            var m15 = FactionConfig.FromFile(v15, out bool store15);
-            var v15b = Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(@"{ ""Version"": 15, ""Factions"": { ""mordor"": {} }, ""Relations"": [ { ""A"": ""Mordor"", ""B"": ""Isengard"", ""Relation"": ""ally"", ""ShareFriends"": true } ] }");
-            var m15b = FactionConfig.FromFile(v15b, out _);
-            Check(store15 && m15.Version == FactionConfig.CurrentVersion && m15.Relations.Count == 1 && m15.Relations[0].A == "gondor" && m15b.Relations.Count == 1 && m15b.Relations[0].ShareFriends,
-                "a version 15 file loses the Mordor/Isengard alliance only if it is exactly as shipped; alliances the admin made or changed stay");
             var d16 = new FactionConfig(); d16.FillDefaults();
             Check(d16.Factions.All(kv => kv.Value.PromotePrices.All(p => FactionTiers.Of(kv.Key).Promote[p.Key] == p.Value)) && d16.Factions["gondor"].PromotePrices["warrior"] == 12 && d16.Factions["gondor"].PromotePrices["captain"] == 36
                 && FactionConfig.InstructionText.Any(l => l.StartsWith("PromotePrices")) && FactionConfig.InstructionText.Any(l => l.Contains("No factions are allies by default")),
@@ -1723,11 +1593,12 @@ public static class Program {
 
             // Weapons by faction.
             string[] Items(string code) => HeldWeapon(entityFiles[code], "server")["weapons"].Select(w => (string)w["item"]).ToArray();
-            Check(Items("test-dwarf-captain").OrderBy(x => x).SequenceEqual(new[] { "lotrnpcs:orcweapon-dwaxe", "lotrnpcs:orcweapon-dwbattleaxe", "lotrnpcs:orcweapon-dwdagger", "lotrnpcs:orcweapon-dwspear", "lotrnpcs:orcweapon-dwwarhammer", "lotrnpcs:orcweapon-dwshorthammer" }.OrderBy(x => x))
+            Check(Items("test-dwarf-captain").OrderBy(x => x).SequenceEqual(new[] { "lotrnpcs:orcweapon-dwaxe", "lotrnpcs:orcweapon-dwbattleaxe", "lotrnpcs:orcweapon-dwdagger", "lotrnpcs:orcweapon-dwspear", "lotrnpcs:orcweapon-dwwarhammersteel", "lotrnpcs:orcweapon-dwshorthammersteel" }.OrderBy(x => x))
+                && new[] { "recruit", "warrior" }.All(k => Items("test-dwarf-" + k).Contains("lotrnpcs:orcweapon-dwwarhammer") && !Items("test-dwarf-" + k).Any(i => i.Contains("steel")))
                 && Items("test-elf-recruit").Contains("lotrnpcs:orcweapon-elfspear")
                 && Items("test-angmarorc-warrior").Take(2).SequenceEqual(new[] { "lotrnpcs:orcweapon-dagger", "lotrnpcs:orcweapon-axe" }) && Items("test-gundabadorc-captain").Take(2).SequenceEqual(new[] { "lotrnpcs:orcweapon-dagger", "lotrnpcs:orcweapon-axe" })
                 && Items("test-mordororc-recruit").Length == 6 && Items("test-goblin-warrior").Length == 4,
-                "dwarves carry the six dwarven weapons (0.0.95: the owner's warhammer and shorthammer replace the war pick stand-in), elves the elven spear, Angmar and Gundabad the orc dagger and axe, Mordor its six, Misty Mountains its four");
+                "dwarves carry the six dwarven weapons (0.0.95: the owner's warhammer and shorthammer replace the war pick stand-in; 0.0.112: captains the steel hammers, nobody else), elves the elven spear, Angmar and Gundabad the orc dagger and axe, Mordor its six, Misty Mountains its four");
             // 0.0.96 (owner, 2026-11-07: "remove the not only spears expansion dependancy, as it wont be implemented into
             // the server"): no NPC names a Spear Expansion item or animation; factions carry the owner's models and the game's
             // falx; the Haradrim still carry no falx (0.0.86); wicked dwarves like the dwarves.
@@ -1739,18 +1610,19 @@ public static class Program {
                 && armedRaces.All(r => new[] { "recruit", "warrior", "captain" }.All(k => Items("test-" + r + "-" + k).Length >= 1 && Items("test-" + r + "-" + k).All(i => i.StartsWith("lotrnpcs:") || gameStandIns.Contains(i))))
                 && new[] { "recruit", "warrior", "captain" }.All(k => Items("test-haradrim-" + k).SequenceEqual(new[] { "lotrnpcs:orcweapon-hdspear", "lotrnpcs:orcweapon-hdsword", "lotrnpcs:orcweapon-hdcurvedsword" }))
                 && new (string race, string[] items)[] {
-                    ("rohan", new[] { "game:spear-generic-iron", "game:blade-falx-iron" }), ("dale", new[] { "game:spear-generic-iron", "game:blade-falx-iron" }),
+                    ("rohan", new[] { "lotrnpcs:orcweapon-rhspear", "lotrnpcs:orcweapon-rhsword" }), ("dale", new[] { "game:spear-generic-iron", "game:blade-falx-iron" }),
                     ("arnor", new[] { "game:spear-generic-steel", "game:blade-falx-steel" }),
                     ("dunlending", new[] { "game:club-generic-wood", "game:spear-generic-flint", "game:axe-bearded-ruined" }),
-                    ("blacknumenorean", new[] { "game:blade-blackguard-iron", "game:club-flanged-ruined", "game:spear-generic-blackbronze" }),
-                    ("easterling", new[] { "game:spear-generic-blackbronze", "game:blade-forlorn-iron", "game:axe-bardiche-ruined" }),
+                    ("easterling", new[] { "game:spear-generic-blackbronze", "game:blade-forlorn-iron", "lotrnpcs:orcweapon-eastaxe" }),
                     ("uruk", new[] { "game:blade-falx-iron", "game:spear-generic-iron", "game:axe-battle-ruined" }),
                     ("tormentedelf", new[] { "game:blade-sabre-ruined", "game:blade-gladius-ruined", "game:spear-generic-ornatesilver" }),
                     ("angmarorc", new[] { "lotrnpcs:orcweapon-dagger", "lotrnpcs:orcweapon-axe", "game:spear-scrap-scrap", "game:club-scrapmace-scrap" }) }
                     .All(x => new[] { "recruit", "warrior", "captain" }.All(k => Items("test-" + x.race + "-" + k).SequenceEqual(x.items)))
-                && HeldWeapon(entityFiles["test-easterling-warrior"], "server")["weapons"].First(w => (string)w["item"] == "game:axe-bardiche-ruined")["twoHanded"]?.Value<bool>() == true
+                && new[] { "recruit", "warrior" }.All(k => Items("test-blacknumenorean-" + k).SequenceEqual(new[] { "game:blade-blackguard-iron", "game:club-flanged-ruined", "lotrnpcs:orcweapon-bnspear" }))
+                && Items("test-blacknumenorean-captain").SequenceEqual(new[] { "lotrnpcs:orcweapon-bnsteelsword", "lotrnpcs:orcweapon-morgulblade", "lotrnpcs:orcweapon-bnspear" })
+                && HeldWeapon(entityFiles["test-easterling-warrior"], "server")["weapons"].First(w => (string)w["item"] == "lotrnpcs:orcweapon-eastaxe")["twoHanded"]?.Value<bool>() == true
                 && Items("test-wickeddwarf-warrior").OrderBy(x => x).SequenceEqual(Items("test-dwarf-warrior").OrderBy(x => x)),
-                "no Spear Expansion items or animations left; every armed rank carries at least one weapon, all ours or the game's stand-ins; the Haradrim their spear, sword or curved sword (0.0.97; no falx); Men, Uruks, tormented elves and Angmar the game's stand-ins until their models come (0.0.101; the bardiche two-handed, so no shield); wicked dwarves like the dwarves");
+                "no Spear Expansion items or animations left; every armed rank carries at least one weapon, all ours or the game's stand-ins; the Haradrim their spear, sword or curved sword (0.0.97; no falx); Men, Uruks, tormented elves and Angmar the game's stand-ins until their models come (0.0.101), the owner's models where they have come (0.0.112: Rohan's spear and sword, the Black Numenorean spear, captains the steel sword and Morgul blade, the Easterling axe two-handed, so no shield); wicked dwarves like the dwarves");
             // 0.0.97 (owner's Haradrim sword, curved sword, light and heavy shields): the swords are one-handed and
             // slash; recruits carry the light shield, warriors and captains the heavy one, archers none.
             string[] ShieldsOf(string code) => HeldWeapon(entityFiles[code], "server")["shields"]?.Select(t => (string)t).ToArray() ?? new string[0];
@@ -1775,11 +1647,11 @@ public static class Program {
                 "Gundabad orcs carry the orc dagger, the orc axe, the Moria spear (thrust and held as the Misty Mountains orcs do) or the game's scrap mace (0.0.101)");
             // 0.0.82 (owner's loadout list, "prefer spears" and the like): weights stay where there is more than one model.
             int WeightOf(string code, string item) => HeldWeapon(entityFiles[code], "server")["weapons"].Where(w => (string)w["item"] == item).Select(w => (int?)w["weight"] ?? 1).DefaultIfEmpty(0).First();
-            Check(WeightOf("test-dwarf-recruit", "lotrnpcs:orcweapon-dwaxe") == 3 && WeightOf("test-dwarf-recruit", "lotrnpcs:orcweapon-dwwarhammer") == 3 && WeightOf("test-dwarf-recruit", "lotrnpcs:orcweapon-dwshorthammer") == 3 && WeightOf("test-dwarf-captain", "lotrnpcs:orcweapon-dwwarhammer") == 3 && WeightOf("test-dwarf-captain", "lotrnpcs:orcweapon-dwshorthammer") == 3 && WeightOf("test-dwarf-captain", "lotrnpcs:orcweapon-dwaxe") == 1
-                && WeightOf("test-wickeddwarf-captain", "lotrnpcs:orcweapon-dwwarhammer") == 3
-                && Items("test-gondor-captain").SequenceEqual(new[] { "lotrnpcs:orcweapon-gdcaptsword" })
-                && Items("test-gondor-warrior").SequenceEqual(new[] { "game:spear-generic-steel", "game:blade-falx-steel" }) && WeightOf("test-gondor-recruit", "game:spear-generic-steel") == 3 && WeightOf("test-arnor-captain", "game:spear-generic-steel") == 3 && Items("test-elf-warrior").SequenceEqual(new[] { "lotrnpcs:orcweapon-elfspear", "game:blade-falx-iron" }),
-                "dwarven axes and hammers come up three times as often as the others; Gondor captains carry the captain's sword, Gondor recruits and warriors the game's steel spear (three times as often, as for Arnor) or steel falx (0.0.101), elves the elven spear or the falx");
+            Check(WeightOf("test-dwarf-recruit", "lotrnpcs:orcweapon-dwaxe") == 3 && WeightOf("test-dwarf-recruit", "lotrnpcs:orcweapon-dwwarhammer") == 3 && WeightOf("test-dwarf-recruit", "lotrnpcs:orcweapon-dwshorthammer") == 3 && WeightOf("test-dwarf-captain", "lotrnpcs:orcweapon-dwwarhammersteel") == 3 && WeightOf("test-dwarf-captain", "lotrnpcs:orcweapon-dwshorthammersteel") == 3 && WeightOf("test-dwarf-captain", "lotrnpcs:orcweapon-dwaxe") == 1
+                && WeightOf("test-wickeddwarf-captain", "lotrnpcs:orcweapon-dwwarhammersteel") == 3
+                && Items("test-gondor-captain").SequenceEqual(new[] { "lotrnpcs:orcweapon-gdcaptsword", "lotrnpcs:orcweapon-gdsteelsword" })
+                && Items("test-gondor-warrior").SequenceEqual(new[] { "game:spear-generic-steel", "lotrnpcs:orcweapon-gdsword" }) && WeightOf("test-gondor-recruit", "game:spear-generic-steel") == 3 && WeightOf("test-arnor-captain", "game:spear-generic-steel") == 3 && Items("test-elf-warrior").SequenceEqual(new[] { "lotrnpcs:orcweapon-elfspear", "lotrnpcs:orcweapon-elflongsword" }),
+                "dwarven axes and hammers come up three times as often as the others; Gondor captains carry the captain's sword or (0.0.112) the steel sword, Gondor recruits and warriors the game's steel spear (three times as often, as for Arnor) or the owner's iron sword (0.0.112), elves the elven spear or (0.0.112) the longsword");
             var wrand = new Random(11); int spears = 0;
             var wlist = new[] { new NpcWeapon { Item = "a:spear", Weight = 3 }, new NpcWeapon { Item = "a:sword", Weight = 1 } };
             for (int i = 0; i < 4000; i++) if (EntityBehaviorHeldWeapon.PickWeapon(null, wlist, wrand) == "a:spear") spears++;
@@ -1874,6 +1746,11 @@ public static class Program {
             LineMath.SlotOffset(3, 7, 3, 1.5, out double r3b, out _);
             Check(r0 == -1.5 && r2 == 1.5 && b0 == 0 && b2 == 0 && r3 == -3 && r4 == 3 && b3 == 0 && b4 == 0 && r3b == -4.5 && r5 == 3 && r6 == 4.5,
                 "0.0.110: front slots are 1.5 apart around the center; the extras extend the same rank, the left half past its left end, the rest past its right");
+            // 0.0.112: 7 members, 3 in front, 2 captains in reserve: the 2 extras flank the front, the captains stand one gap behind the middle.
+            LineMath.SlotOffset(3, 7, 3, 1.5, out double q3, out double qb3, 2); LineMath.SlotOffset(4, 7, 3, 1.5, out double q4, out _, 2);
+            LineMath.SlotOffset(5, 7, 3, 1.5, out double q5, out double qb5, 2); LineMath.SlotOffset(6, 7, 3, 1.5, out double q6, out double qb6, 2);
+            Check(q3 == -3 && q4 == 3 && qb3 == 0 && q5 == -0.75 && q6 == 0.75 && qb5 == 1.5 && qb6 == 1.5,
+                "0.0.112: the reserve stands side by side one gap behind the middle; the rest of the line is laid out as if it were not there");
             LineMath.SlotAt(10, 10, 1, 0, 1.5, 0, out double sax, out double saz); LineMath.SlotAt(10, 10, 1, 0, 0, 1.5, out double sbx, out double sbz);
             Check(Math.Abs(sax - 10) < 1e-9 && Math.Abs(saz - 8.5) < 1e-9 && Math.Abs(sbx - 8.5) < 1e-9 && Math.Abs(sbz - 10) < 1e-9,
                 "facing +x, right is -z and behind is -x");
@@ -1965,30 +1842,6 @@ public static class Program {
             Check(types.Where(kv => kv.Value.Attributes?["lotrnpcsHelmets"].Exists == true).All(kv => kv.Value.Attributes["lotrnpcsHelmets"].AsArray<string>().Length > 0)
                 && FactionConfig.InstructionText.Any(l => l.StartsWith("HelmetChance") && l.Contains("bare-headed")),
                 "every unit with helmets still has them to choose from in the looks menu (No helmet stays for all)");
-
-            // Config version 17.
-            var v16 = Newtonsoft.Json.Linq.JObject.FromObject(FactionConfig.FromFile(null, out _));
-            v16["Version"] = 16; v16["MaxAttackersPerTarget"] = 3; v16["CombatSpacing"] = 2.0; v16["CaptainsAlwaysHelmeted"] = true;
-            v16.Remove("BattleLines"); v16.Remove("DuelDistanceMin"); v16.Remove("DuelDistanceMax"); v16.Remove("LineHoldRange");
-            var m16 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v16.ToString()), out bool store16);
-            v16["MaxAttackersPerTarget"] = 5; v16["CombatSpacing"] = 1.8;
-            var m16b = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v16.ToString()), out _);
-            Check(store16 && m16.Version == FactionConfig.CurrentVersion && m16.MaxAttackersPerTarget == 4 && m16.CombatSpacing == 1.5 && !m16.CaptainsAlwaysHelmeted && m16.BattleLines && m16.DuelDistanceMin == 1.0 && m16.DuelDistanceMax == 1.6 && m16.LineHoldRange == 6
-                && m16b.MaxAttackersPerTarget == 5 && m16b.CombatSpacing == 1.8,
-                "a version 16 file moves the old defaults to the attacker limit 4 (0.0.102), 1.5 spacing and no forced captain helmets, gains the line and duel settings, and keeps values the admin chose");
-        }
-
-        {
-            var v17 = Newtonsoft.Json.Linq.JObject.FromObject(FactionConfig.FromFile(null, out _));
-            v17["Version"] = 17; v17["MaxAttackersPerTarget"] = 2;
-            var m17 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v17.ToString()), out bool store17);
-            v17["MaxAttackersPerTarget"] = 5;
-            var m17b = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v17.ToString()), out _);
-            Check(store17 && m17.Version == FactionConfig.CurrentVersion && m17.MaxAttackersPerTarget == 4 && m17b.MaxAttackersPerTarget == 5 && !new BattleSpacing().Crowded(1, 2, false, 0)
-                && FactionConfig.InstructionText.Any(l => l.StartsWith("MaxAttackersPerTarget") && l.Contains("4 by default; 0 means no limit")),
-                "0.0.85 (owner: \"remove the limit for how many npcs can target 1 npc\"): a version 17 file's unchanged 2 ends at 4 since 0.0.102, a limit the admin chose stays, and a new battle starts uncrowded");
-            Check(m17.BattleLines && new FactionConfig().BattleLines,
-                "0.0.104 (owner chose \"Yes, and turn lines on by default\"): battle lines are on by default again, and old files (0.0.85 turned them off) turn them on once");
         }
 
         // ---- 0.0.106 (owner: captains "in the front middle, then warriors, then recruits", archers "at the back or ends") ----
@@ -2109,7 +1962,7 @@ public static class Program {
             }
             v27["Factions"]["angmar"]["HirePrices"]["captain"] = 30; v27["Factions"]["isengard"]["PromotePrices"]["warrior"] = 20; v27["Factions"]["elves"]["Damage"]["captain"] = 12;
             var m27 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v27.ToString()), out bool store27);
-            Check(store27 && m27.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 28
+            Check(store27 && m27.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 29
                 && H4(m27.Factions["mordor"].HirePrices) == "5/12/29/12" && P3(m27.Factions["mordor"].PromotePrices) == "9/9/25" && T4(m27.Factions["mordor"].Health) == "19/30/40/30"
                 && H4(m27.Factions["angmar"].HirePrices) == "4/11/30/11" && P3(m27.Factions["angmar"].PromotePrices) == "8/8/25" && T4(m27.Factions["angmar"].Damage) == "2.7/3.35/6.2/2.65"
                 && H4(m27.Factions["isengard"].HirePrices) == "4/15/41/16" && P3(m27.Factions["isengard"].PromotePrices) == "20/14/40"
@@ -2204,6 +2057,11 @@ public static class Program {
                 "the edge guard stops a step into a deep pit, onto lava, or down more than 4 blocks, but allows flat ground, a 3-block step down, water below and a wall ahead");
             Check(entityFiles.Values.All(j => { var b = j["server"]["behaviors"].Select(x => (string)x["code"]).ToList(); return b.IndexOf("lotrnpcs:edgeguard") == b.IndexOf("taskai") + 1; }),
                 "every NPC type has the edge guard right after its AI, so it sees each step the AI sets before the game moves the NPC");
+            // 0.0.112: harvestable bodies.
+            Check(entityFiles.Values.All(j => { var sb = j["server"]["behaviors"].Select(x => (string)x["code"]).ToList(); var cb = j["client"]["behaviors"].Select(x => (string)x["code"]).ToList();
+                    return sb.Contains("harvestable") && sb.Contains("lotrnpcs:bodyloot") && sb.Contains("deaddecay") && cb.Contains("harvestable")
+                        && j["server"]["behaviors"].First(x => (string)x["code"] == "harvestable")["drops"] is JArray d && d.Count == 0; }),
+                "0.0.112: every NPC type leaves a knife-harvestable body that rots; its vanilla drops list is empty, the config fills it");
         }
 
         // ---- 0.0.90: factions "unequally equal" (follow shares, tiers, config v19; prompts/0.0.90-faction-balance.md) ----
@@ -2227,31 +2085,6 @@ public static class Program {
                 && P(D("mordor").HirePrices, H) == "5/12/29/12" && P(D("mistymountains").HirePrices, H) == "3/9/25/10" && P(D("elves").HirePrices, H) == "6/19/50/20" && P(D("dwarves").HirePrices, H) == "6/19/50/19"
                 && P(D("gondor").PromotePrices, Pr) == "12/12/36" && P(D("isengard").PromotePrices, Pr) == "12/13/37" && P(D("mordor").PromotePrices, Pr) == "9/9/25" && P(D("mistymountains").PromotePrices, Pr) == "6/7/21" && P(D("elves").PromotePrices, Pr) == "16/17/46",
                 "tier prices fitted for equal coin (0.0.108): per rank (0.0.108): Men 5/15/40/15, Uruks 4/15/41/16, Dunlendings 4/12/35/11, orcs 5/12/29/12, goblins 3/9/25/10, elves 6/19/50/20, dwarves 6/19/50/19");
-            // Version 18 to 19.
-            var o18 = Newtonsoft.Json.Linq.JObject.FromObject(c90); o18["Version"] = 18;
-            foreach (var f in ((Newtonsoft.Json.Linq.JObject)o18["Factions"]).Properties())
-            {
-                var fo = (Newtonsoft.Json.Linq.JObject)f.Value;
-                foreach (string k in new[] { "MaxFollowers", "MaxRecruits", "Health", "Damage" }) fo.Remove(k);
-                fo["HirePrices"] = Newtonsoft.Json.Linq.JObject.FromObject(FactionConfig.DefaultHirePrices());
-                fo["PromotePrices"] = Newtonsoft.Json.Linq.JObject.FromObject(FactionConfig.DefaultPromotePrices());
-            }
-            o18["Factions"]["mordor"]["HirePrices"]["recruit"] = 2;
-            o18["Factions"]["elves"]["PromotePrices"]["captain"] = 99;
-            var m18 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(o18.ToString()), out bool store18);
-            Check(store18 && m18.Version == FactionConfig.CurrentVersion && m18.Factions["mordor"].MaxFollowers == 6 && RT(m18.Factions["mordor"].Health) == "19/30/40/30" && m18.Factions["mistymountains"].MaxRecruits == 26
-                && P(m18.Factions["dwarves"].HirePrices, H) == "6/19/50/19" && P(m18.Factions["gondor"].HirePrices, H) == "5/15/40/15"
-                && m18.Factions["mordor"].HirePrices["recruit"] == 2 && m18.Factions["mordor"].HirePrices["warrior"] == 15 && P(m18.Factions["mordor"].PromotePrices, Pr) == "12/12/36"
-                && m18.Factions["elves"].PromotePrices["captain"] == 99 && P(m18.Factions["elves"].HirePrices, H) == "6/19/50/20",
-                "a version 18 file gets the tiers; prices still exactly as shipped take the tier's, prices the admin changed stay as they are");
-            var o18b = Newtonsoft.Json.Linq.JObject.Parse(o18.ToString()); o18b["MaxFollowers"] = 10; o18b["MaxRecruits"] = 32;
-            var m18b = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(o18b.ToString()), out _);
-            Check(m18b.Factions["gondor"].MaxFollowers == 10 && m18b.Factions["gondor"].MaxRecruits == 32 && m18b.Factions["mordor"].MaxFollowers == 12 && m18b.Factions["mordor"].MaxRecruits == 44 && m18b.Factions["elves"].MaxFollowers == 8,
-                "an admin who raised the old caps to 10 and 32 keeps the proportions: Men 10/32, orcs 12/44, elves 8");
-            var oldCap = Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(@"{ ""Version"": 7, ""MaxHirelings"": 5, ""Factions"": { ""mordor"": {}, ""gondor"": {} } }");
-            var mOld = FactionConfig.FromFile(oldCap, out _);
-            Check(mOld.MaxRecruits == 16 && mOld.Factions["mordor"].MaxRecruits == 22 && mOld.Factions["gondor"].MaxRecruits == 16,
-                "an old file's cap migrations run first, so a 0.0.47-era cap of 5 still ends with the Men's 16 and the orcs' 22");
             var mine = Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(@"{ ""Version"": 20, ""DamageSpread"": 7, ""Factions"": { ""rivendell"": { ""Stance"": ""aggressive"" }, ""mordor"": { ""MaxFollowers"": 99, ""Health"": { ""Recruit"": 0, ""warrior"": 26.4 }, ""Damage"": { ""captain"": 6.5 } } } }");
             var mMine = FactionConfig.FromFile(mine, out _);
             Check(mMine.Factions["rivendell"].MaxFollowers == 5 && mMine.Factions["rivendell"].MaxRecruits == 16 && RT(mMine.Factions["rivendell"].Health) == "22/34/48/35" && P(mMine.Factions["rivendell"].HirePrices, H) == "5/15/40/15"
@@ -2545,8 +2378,14 @@ public static class Program {
         {
             var c109 = FactionConfig.FromFile(null, out _);
             string j109 = Newtonsoft.Json.JsonConvert.SerializeObject(c109, Newtonsoft.Json.Formatting.Indented);
-            Check(!c109.NpcHitsIgnoreHurtWindow && j109.Contains("\"NpcHitsIgnoreHurtWindow\": false") && FactionConfig.InstructionText.Any(l => l.StartsWith("NpcHitsIgnoreHurtWindow") && l.Contains("Players always keep")),
-                "0.0.109: NpcHitsIgnoreHurtWindow is in the file, off by default, and explained in #Instructions");
+            Check(c109.NpcHitsIgnoreHurtWindow && j109.Contains("\"NpcHitsIgnoreHurtWindow\": true") && FactionConfig.InstructionText.Any(l => l.StartsWith("NpcHitsIgnoreHurtWindow") && l.Contains("Players always keep")),
+                "0.0.109: NpcHitsIgnoreHurtWindow is in the file, on by default since 0.0.112, and explained in #Instructions");
+            var v28 = Newtonsoft.Json.Linq.JObject.FromObject(c109); v28["Version"] = 28; v28["NpcHitsIgnoreHurtWindow"] = false;
+            var m28 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v28.ToString()), out bool store28);
+            v28["Version"] = 29;
+            var m29 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v28.ToString()), out _);
+            Check(store28 && m28.NpcHitsIgnoreHurtWindow && m28.Version == 29 && !m29.NpcHitsIgnoreHurtWindow,
+                "0.0.112 (owner: \"keep the i-frames off for now\"): a version 28 file's false turns on once; an admin's false in a version 29 file stays");
             Check(BattleLog.Classify(true, true, true) == BattleLog.Result.Landed && BattleLog.Classify(false, true, true) == BattleLog.Result.LostWindow
                 && BattleLog.Classify(false, false, true) == BattleLog.Result.LostOther && BattleLog.Classify(false, true, false) == BattleLog.Result.LostOther,
                 "0.0.109: a hit is landed, lost to the hurt window (target alive and in its window), or lost otherwise");
@@ -2578,6 +2417,28 @@ public static class Program {
                 "0.0.109 battle log: counts nothing while off; per faction melee and arrows landed or lost to the hurt window, damage, kills, deaths, turn waits, and seconds a fighting NPC went 5 s without attacking (" + ltext.Replace("\n", " | ") + ")");
             try { Directory.Delete(dir, true); } catch (Exception) { }
         }
+
+        // ---- 0.0.112: body loot ----
+        {
+            var bc = new FactionConfig(); bc.FillDefaults(); var br = new Random(5);
+            int Gears(string rank, bool hired) => bc.RollBodyLoot(rank, hired, br).Where(x => x.code == "game:gear-rusty").Sum(x => x.count);
+            var cap = Enumerable.Range(0, 300).Select(_ => Gears("captain", false)).ToList(); var rec = Enumerable.Range(0, 300).Select(_ => Gears("recruit", true)).ToList();
+            var war = Enumerable.Range(0, 300).Select(_ => Gears("warrior", false)).ToList(); var rankless = Enumerable.Range(0, 300).Select(_ => Gears(null, false)).ToList();
+            Check(cap.Min() == 3 && cap.Max() == 5 && war.Min() == 1 && war.Max() == 2 && rec.Min() == 0 && rec.Max() == 1 && rankless.Max() == 1,
+                "0.0.112: bodies hold rusty gears by rank (captain 3-5, warrior 1-2, recruit 0-1, rankless as a recruit), wild and hired alike by default");
+            Check(Enumerable.Range(0, 100).All(_ => bc.RollBodyLoot("captain", false, br).All(x => x.count > 0 && (x.code == "game:gear-rusty" || x.code == "game:leather-normal-plain"))),
+                "0.0.112: no zero stacks; a captain's body holds only gears and leather (no armor or weapons)");
+            bc.HiredBodyLoot["captain"] = new List<BodyLoot>();
+            Check(bc.RollBodyLoot("captain", true, br).Count == 0 && bc.RollBodyLoot("captain", false, br).Count > 0, "0.0.112: hired and wild loot are set apart; an empty list leaves an empty body");
+            var loaded = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>("{\"Version\": 28, \"WildBodyLoot\": {\"recruit\": [{\"Code\": \"game:bone\", \"Min\": 2, \"Max\": 2}]}}"), out _);
+            Check(loaded.RollBodyLoot("captain", false, br).SequenceEqual(new[] { ("game:bone", 2) }) && loaded.HiredBodyLoot.Count == 4 && FactionConfig.InstructionText.Any(t => t.StartsWith("WildBodyLoot")),
+                "0.0.112: a file's own loot table is kept (a missing rank uses the recruit list), a missing one gets the defaults, and #Instructions explain it");
+        }
+
+        // ---- 0.0.112: spawn-safe radius ----
+        Check(new FactionConfig().SpawnSafeRadius == 64 && FactionConfig.InstructionText.Any(t => t.StartsWith("SpawnSafeRadius")), "0.0.112: SpawnSafeRadius defaults to 64 and is explained in #Instructions");
+        Check(FactionSystem.WithinRadius(30, 50, 64) && FactionSystem.WithinRadius(64, 0, 64) && !FactionSystem.WithinRadius(50, 50, 64) && !FactionSystem.WithinRadius(0, 0, 0),
+            "0.0.112: within the radius across (a circle, edge included); 0 turns it off");
 
         Console.WriteLine(fails == 0 ? "ALL PASSED" : fails + " FAILED");
         return fails;

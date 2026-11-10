@@ -1616,7 +1616,7 @@ namespace LotrNpcs
         // never start a fight, not even to strike back.
         bool AllowTask(IAiTask task)
         {
-            if (task is AiTaskWander) return Recruit.OwnerUidOf(entity) == null && entity.World.ElapsedMilliseconds > talkingUntilMs;
+            if (task is AiTaskWander || task is AiTaskZonePatrol) return Recruit.OwnerUidOf(entity) == null && entity.World.ElapsedMilliseconds > talkingUntilMs;
             // Recruits standing in a formation face its way instead of looking about.
             if (task is AiTaskLookAround) return !(Recruit.OwnerUidOf(entity) != null && Recruit.HasFacing(entity));
             if (task is AiTaskSeekEntity || task is AiTaskMeleeAttack) return Recruit.OwnerUidOf(entity) == null || Recruit.StanceOf(entity) != Recruit.Passive;

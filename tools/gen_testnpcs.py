@@ -78,6 +78,8 @@ AI_TASKS = [
     # blocks behind, back to walking within 3.
     {"code": "lotrnpcs:followowner", "priority": 2.0, "walkSpeed": 0.027, "runSpeed": 0.055, "runAnimationSpeed": 0.75,
      "followDistance": 4, "holdDistance": 2},
+    # 0.0.112: wild groups from a zone with patrol points walk them (ZonePatrol.cs); above wander, below everything else.
+    {"code": "lotrnpcs:zonepatrol", "priority": 1.5, "movespeed": 0.02, "animation": "walk"},
     {"code": "wander", "priority": 1.0, "movespeed": 0.012, "animation": "walk", "wanderChance": 0.02},
     {"code": "lookaround", "priority": 0.5},
 ]
@@ -227,6 +229,41 @@ DWARF_WEAPONS = {
     "dwshorthammer": {"source": "dwarven_shorthammer_iron.bbmodel", "name": "Dwarven shorthammer", "grip": (4.0, 1.05, 8.05),
                       "rotation": {"x": 90}, "attack": "hammerhit", "impact": 17},
 }
+# 0.0.112 (owner, 2026-11-09: the steel warhammer and shorthammer, "let the steel variants only be used by captains"):
+# the same geometry as the iron ones (checked: same boxes), so the same holds; captains carry these instead of iron.
+DWARF_WEAPONS |= {
+    "dwwarhammersteel": dict(DWARF_WEAPONS["dwwarhammer"], source="dwarven_warhammer_steel.bbmodel", name="Dwarven steel warhammer"),
+    "dwshorthammersteel": dict(DWARF_WEAPONS["dwshorthammer"], source="dwarven_shorthammer_steel.bbmodel", name="Dwarven steel shorthammer"),
+}
+# 0.0.112 (owner, 2026-11-09, sent with the steel hammers): one-handed swords and spears for Gondor, Rohan, the Black
+# Numenoreans and elves, and the Easterling axe, each replacing its faction's game stand-in (owner chose "replace
+# stand-ins"). Measured on the converted models (offline render and boxes):
+# - The swords (Gondor iron and steel, Rohan, Black Numenorean steel, Morgul blade) lie along +X with the blade and
+#   crossguard flat in X/Z, so rolled x 90 into X/Y like the Haradrim swords; straight and double-edged. Held at the
+#   middle of the handle (x 0 to 5, y and z centred on 0 and 8). 38 to 45 units (1.4 to 1.7 blocks), normal scale.
+# - The elven longsword's handle runs from x 1 to 17 and its curved blade from 18 to 38, so it is two-handed, held like
+#   the Captain's sword: right hand by the guard (x 14.5), the left 0.25 blocks lower on the handle. Its convex (edge)
+#   side is +Z, so x 90 puts the edge on -Y, where the Haradrim swords' edges lead after their own roll.
+# - The spears lie along +X with the head wide in Y already (no roll), held 43% up from the butt like the Moria spear:
+#   Numenorean 58 units, Rohan 65 units.
+# - The Easterling axe is 68 units (2.6 blocks) with a spear tip and a hook, its blade toward +Y already (no roll): a
+#   halberd, so two-handed with the battleaxe's hold and chop, both hands on the red wrap (x 20.8 to 27.6).
+_SWORD = {"rotation": {"x": 90}, "attack": "falx", "impact": 12.5}
+NEW_WEAPONS = {
+    "gdsword": {"source": "gondor_iron_sword.bbmodel", "name": "Gondorian sword", "grip": (2.5, 0.0, 8.0)} | _SWORD,
+    "gdsteelsword": {"source": "gondor_steel_sword.bbmodel", "name": "Gondorian steel sword", "grip": (2.5, 0.0, 8.0)} | _SWORD,
+    "rhsword": {"source": "rohan_sword.bbmodel", "name": "Rohirric sword", "grip": (2.5, 0.0, 8.0)} | _SWORD,
+    "bnsteelsword": {"source": "black_numenorean_steel_sword.bbmodel", "name": "Black Numenorean steel sword", "grip": (2.5, 0.0, 8.0)} | _SWORD,
+    "morgulblade": {"source": "morgul_blade.bbmodel", "name": "Morgul blade", "grip": (2.5, 0.0, 8.0)} | _SWORD,
+    "elflongsword": {"source": "elven_longsword.bbmodel", "name": "Elven longsword", "grip": (14.5, 0.0, 8.3),
+                     "rotation": {"x": 90}, "attack": "poleaxechop", "impact": 14, "hold": "greatswordhold", "twoHanded": True},
+    "bnspear": {"source": "numenorean_spear.bbmodel", "name": "Numenorean spear", "grip": (-6.8, 0.0, 8.0),
+                "rotation": {}, "attack": "spearhit", "impact": 10} | SPEAR_HOLD,
+    "rhspear": {"source": "rohan_spear.bbmodel", "name": "Rohirric spear", "grip": (-1.2, 0.75, 8.0),
+                "rotation": {}, "attack": "spearhit", "impact": 10} | SPEAR_HOLD,
+    "eastaxe": {"source": "easterling_axe.bbmodel", "name": "Easterling axe", "grip": (27.0, 0.75, 8.0),
+                "rotation": {}, "attack": "poleaxechop", "impact": 14, "hold": "poleaxehold", "twoHanded": True} | CARRY,
+}
 # 0.0.94 (owner, 2026-11-06: Haradrim_Spear.bbmodel "for haradrim only"; "replace the default option they have now for
 # spear / pike"): kept as tools/weapons/source/haradrim_spear.bbmodel and converted at build time. It lies along +Z,
 # blade at the far end and wide in X, so turned y 90 (along +X, blade forward) and x 90 (blade wide in Y, like the
@@ -309,24 +346,27 @@ WEAPONS_OF = {"mordororc": WEAPONS, "goblin": {**MM_WEAPONS, **ORC_SHARED}, "ang
 # tormented elves). The weapons each faction still needs are in docs/model-checklist.md, with the owner's preferences
 # from the 0.0.82 loadout list ("prefer spears" and the like), so they can be weighted again when the models come.
 # NPCs already holding a Spear Expansion item pick again when they load (it is no longer in their list).
-ALL_WEAPONS = {**WEAPONS, **MM_WEAPONS, **ELF_WEAPONS, **DWARF_WEAPONS, **HARADRIM_WEAPONS, **GONDOR_WEAPONS, **FALX, **GAME_WEAPONS}
+ALL_WEAPONS = {**WEAPONS, **MM_WEAPONS, **ELF_WEAPONS, **DWARF_WEAPONS, **HARADRIM_WEAPONS, **GONDOR_WEAPONS, **NEW_WEAPONS, **FALX, **GAME_WEAPONS}
 # Weapons by rank, with weights (0.0.82, owner's list: "Prefer spears" and the like). "Prefer" = weight 3 against 1
 # for the faction's other weapons (my default). Races and ranks not listed carry WEAPONS_OF's list, all weight 1.
 PREFER = 3
 _DWARF_RANKS = {"recruit": {"dwaxe": PREFER, "dwbattleaxe": PREFER, "dwwarhammer": PREFER, "dwshorthammer": PREFER, "dwdagger": 1, "dwspear": 1},
                 "warrior": {"dwaxe": PREFER, "dwbattleaxe": PREFER, "dwwarhammer": PREFER, "dwshorthammer": PREFER, "dwdagger": 1, "dwspear": 1},
-                "captain": {"dwwarhammer": PREFER, "dwshorthammer": PREFER, "dwaxe": 1, "dwbattleaxe": 1, "dwdagger": 1, "dwspear": 1}}
+                # 0.0.112: captains carry the steel hammers instead of the iron ones (owner: steel for captains only).
+                "captain": {"dwwarhammersteel": PREFER, "dwshorthammersteel": PREFER, "dwaxe": 1, "dwbattleaxe": 1, "dwdagger": 1, "dwspear": 1}}
 # 0.0.101 game stand-ins by faction (owner: "build it that way"), every rank alike; PREFER marks the owner's 0.0.82
 # preferences (Gondor, Arnor: spears). Replaced by the owner's models as they come (docs/model-checklist.md).
 _RANKS = ("recruit", "warrior", "captain")
 GAME_LOADOUTS = {
-    "gondor": {"steelspear": PREFER, "steelfalx": 1},
+    # 0.0.112: the owner's models replace Gondor's falx, Rohan's spear and sword, the Black Numenorean spear and the
+    # Easterlings' bardiche (NEW_WEAPONS).
+    "gondor": {"steelspear": PREFER, "gdsword": 1},
     "arnor": {"steelspear": PREFER, "steelfalx": 1},
-    "rohan": {"ironspear": 1, "falx": 1},
+    "rohan": {"rhspear": 1, "rhsword": 1},
     "dale": {"ironspear": 1, "falx": 1},
     "dunlending": {"woodclub": 1, "flintspear": 1, "ruinedbeardedaxe": 1},
-    "blacknumenorean": {"blackguard": 1, "ruinedmace": 1, "bbronzespear": 1},
-    "easterling": {"bbronzespear": 1, "forlorn": 1, "ruinedbardiche": 1},
+    "blacknumenorean": {"blackguard": 1, "ruinedmace": 1, "bnspear": 1},
+    "easterling": {"bbronzespear": 1, "forlorn": 1, "eastaxe": 1},
     "uruk": {"falx": 1, "ironspear": 1, "ruinedbattleaxe": 1},
     "tormentedelf": {"ruinedsabre": 1, "ruinedgladius": 1, "silverspear": 1},
     "angmarorc": {"dagger": 1, "axe": 1, "scrapspear": 1, "scrapmace": 1},
@@ -334,12 +374,18 @@ GAME_LOADOUTS = {
 }
 WEAPON_PREFS = {
     **{f: {r: dict(w) for r in _RANKS} for f, w in GAME_LOADOUTS.items()},
-    # Gondor captains: the owner's captain's sword (0.0.95). Recruits and warriors: the game stand-ins (0.0.101).
-    "gondor": {"recruit": dict(GAME_LOADOUTS["gondor"]), "warrior": dict(GAME_LOADOUTS["gondor"]), "captain": {"gdcaptsword": 1}},
+    # Gondor captains: the owner's captain's sword (0.0.95) and, 0.0.112, the steel sword (steel for captains only).
+    # Recruits and warriors: the game's steel spear and the owner's iron sword.
+    "gondor": {"recruit": dict(GAME_LOADOUTS["gondor"]), "warrior": dict(GAME_LOADOUTS["gondor"]),
+               "captain": {"gdcaptsword": 1, "gdsteelsword": 1}},
+    # Black Numenorean captains (0.0.112): the owner's steel sword and Morgul blade, and their spear; the game's
+    # Blackguard blade and ruined mace stay with recruits and warriors.
+    "blacknumenorean": {"recruit": dict(GAME_LOADOUTS["blacknumenorean"]), "warrior": dict(GAME_LOADOUTS["blacknumenorean"]),
+                        "captain": {"bnsteelsword": 1, "morgulblade": 1, "bnspear": 1}},
     # Haradrim (owner, 0.0.86: no falx): the owner's spear (0.0.94), sword and curved sword (0.0.97), evenly.
     "haradrim": {r: {"hdspear": 1, "hdsword": 1, "hdcurvedsword": 1} for r in ("recruit", "warrior", "captain")},
-    # Elves: the owner's elven spear, plus the falx as their sword.
-    "elf": {r: {"elfspear": 1, "falx": 1} for r in ("recruit", "warrior", "captain")},
+    # Elves: the owner's elven spear and, 0.0.112, longsword (was the game's falx).
+    "elf": {r: {"elfspear": 1, "elflongsword": 1} for r in ("recruit", "warrior", "captain")},
     # Dwarves: "Prefer axes and warhammers"; Lords "Prefer warhammers" (0.0.95: the owner's warhammer and shorthammer).
     "dwarf": _DWARF_RANKS,
     # Wicked dwarves: the dwarves' rules and models.
@@ -453,7 +499,16 @@ HD_LIGHT_SHIELD = {"source": "haradrim_light_shield.bbmodel", "name": "Haradrim 
 HD_HEAVY_SHIELD = {"source": "haradrim_heavy_shield.bbmodel", "name": "Haradrim heavy shield",
                    "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (16.0, 0.75, 5.55 + 0.5),
                                       dict(SHIELD["hand"]["rotation"], z=SHIELD["hand"]["rotation"]["z"] + 90))}
-SHIELDS = {"shield": SHIELD, "mmshield": MM_SHIELD, "kiteshield": KITE_SHIELD, "dwtowershield": DW_TOWER_SHIELD,
+# 0.0.112 (owner, 2026-11-09: "replace the black numenorean shield with the new one"; black nemenorian shield.bbmodel):
+# a flat plate with a rim and a red emblem on its +Y face, point toward +Z, and no strap or handle. Held as the kite
+# shield: first turned x 90 (face +Y to the kite's +Z, point +Z to its -Y), folded into one rotation (solved offline,
+# hold @ Rx(90) = Rx(x) Ry(y - 180) Rz(z)); the grip on the centreline the kite's share of the length below the top
+# (z 9.96), 0.1 behind the rim's back (y 16.0) as the kite's grip is behind its straps. Checked offline against the
+# human body over idle, walk, sprint and attack poses (shieldfit): at most 0.34 px into a 1 px torso / 0.5 px arm armor
+# margin (the kite shield: 0.55).
+BN_SHIELD = {"source": "black_numenorean_shield.bbmodel", "name": "Black Numenorean shield",
+             "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (8.0, 16.0, 9.96), {"x": -62.55, "y": 267.67, "z": 154.53})}
+SHIELDS = {"shield": SHIELD, "mmshield": MM_SHIELD, "kiteshield": KITE_SHIELD, "bnshield": BN_SHIELD, "dwtowershield": DW_TOWER_SHIELD,
            "dwshield": DW_IRON_SHIELD, "eastshield": EASTERLING_SHIELD, "gondorshield": GONDOR_SHIELD,
            "boromirshield": BOROMIR_SHIELD, "elfshield": ELF_SHIELD, "hdlightshield": HD_LIGHT_SHIELD,
            "hdheavyshield": HD_HEAVY_SHIELD}
@@ -462,7 +517,10 @@ SHIELDS = {"shield": SHIELD, "mmshield": MM_SHIELD, "kiteshield": KITE_SHIELD, "
 # 0.0.101: a full "domain:code" is a game shield (stand-ins: Rohan and Dale the wood-and-metal shield, Dunlendings the
 # crude one), drawn as the game draws it.
 SHIELD_OF = {"rohan": ["game:shield-woodmetal"], "dale": ["game:shield-woodmetal"], "dunlending": ["game:shield-crude"],
-             "mordororc": ["shield"], "goblin": ["mmshield"], "blacknumenorean": ["kiteshield"],
+             # 0.0.112 (owner): Black Numenoreans carry their new shield, which Mordor orcs may also carry beside their
+             # own ("the black numenorean shield can be used by orcs"; chose Mordor), and the Numenorean kite shield
+             # goes to Arnor (owner's choice).
+             "mordororc": ["shield", "bnshield"], "goblin": ["mmshield"], "blacknumenorean": ["bnshield"], "arnor": ["kiteshield"],
              "dwarf": ["dwtowershield", "dwshield"], "easterling": ["eastshield"],
              # 0.0.94: Gondor (owner: "gondor only"; both shields at random, "A") and elves (owner: "elves only").
              "gondor": ["gondorshield", "boromirshield"], "elf": ["elfshield"],
@@ -860,6 +918,8 @@ def entity(code, name, extra_attributes, skin_client, skin_server, health=25, ar
                 {"code": "lotrnpcs:hireable"},
                 {"code": "controlledphysics"},
                 {"code": "interpolateposition"},
+                # 0.0.112: the dead body opens to a knife, like a drifter's (BodyLoot.cs).
+                {"code": "harvestable", "duration": 2},
             ] + skin_client,
             "animations": ANIMS,
         },
@@ -878,6 +938,12 @@ def entity(code, name, extra_attributes, skin_client, skin_server, health=25, ar
                 # 0.0.88 (owner: NPCs "will fling themselves off the edge" of deep pits): right after the AI, so it can
                 # stop a step the AI just set (EdgeGuard.cs).
                 {"code": "lotrnpcs:edgeguard"},
+                # 0.0.112 (owner, review Q10): a drifter-style body. The drops list stays empty: lotrnpcs:bodyloot fills it
+                # from the config (WildBodyLoot, HiredBodyLoot), so admins can change it without new assets.
+                {"code": "harvestable", "duration": 2, "fixedweight": True, "drops": []},
+                {"code": "lotrnpcs:bodyloot"},
+                {"code": "deaddecay", "hoursToDecay": 3},
+                {"code": "floatupwhenstuck", "onlyWhenDead": True},
             ] + skin_server,
         },
         "sounds": {"hurt": "game:player/hurt", "death": "game:player/death", "swim": "game:player/swim"},
@@ -1453,7 +1519,10 @@ for code, name, model, skin_texture, gear in TEST_NPCS:
     # an @slot (the Easterling captain's coif on the face) aren't helmets.
     # 0.0.76 (user: "Each rank of a faction should have access to the helmets of the ranks beneath it as well as its
     # own rank"): its own first, then the lower ranks'. Archers are promoted recruits and wear recruit sets already.
-    lower = {"warrior": ["recruit"], "captain": ["recruit", "warrior"]}.get(rank, [])
+    # 0.0.112 (owner, 2026-11-09: "follow the prompt for armors to make sure they have the correct helmets whitelisted",
+    # "specifically orcs"): orcs and Uruk-hai offer only the helmets the 0.0.82 loadout list gives their own unit (a
+    # Black Uruk no longer picks the Raider helmets, an Uruk captain only the General helmets).
+    lower = [] if faction in ORC_RACES else {"warrior": ["recruit"], "captain": ["recruit", "warrior"]}.get(rank, [])
     all_sets = sets + [st for r in lower for st in FACTION_SETS.get(faction, {}).get(r, [])]
     helmets = list(dict.fromkeys(c for s in all_sets for c in s if "armor-head-" in c and "@" not in c))
     if helmets:
@@ -1875,7 +1944,7 @@ with open(os.path.join(out, "modinfo.json"), "w") as f:
         "type": "code",
         "modid": "lotrnpcs",
         "name": "LOTR NPCs",
-        "version": "0.0.111",
+        "version": "0.0.112",
         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Race models from "
                        "LOTR Races and Classes by Dango Dango Dango, Shakgriig and Buggoi, used with their permission.",

@@ -17,12 +17,12 @@ model is in the mod.
 | Faction | Model needed | One- or two-handed | Stand-in until then (0.0.101) |
 | --- | --- | --- | --- |
 | Gondor | [ ] spear ★ (Men-at-Arms, Fountain Guard) | one | game steel spear |
-| Gondor | [ ] sword ★ (Fountain Guard) | one | game steel falx |
+| Gondor | [x] sword ★ (Fountain Guard): iron sword, steel sword for captains (0.0.112) | one | |
 | Gondor | [ ] dagger | one | none |
 | Gondor | [ ] halberd | two | none |
 | Gondor | [ ] Ranger bow | | game longbow |
-| Rohan | [ ] spear | one | game iron spear |
-| Rohan | [ ] sword | one | game iron falx |
+| Rohan | [x] spear (0.0.112) | one | |
+| Rohan | [x] sword (0.0.112) | one | |
 | Rohan | [ ] axe | one | none |
 | Rohan | [ ] dagger | one | none |
 | Rohan | [ ] bow | | game longbow |
@@ -43,7 +43,7 @@ model is in the mod.
 | Haradrim | [ ] bow | | game recurve bow |
 | Easterlings | [ ] spear ★ (clansmen) | one | game black bronze spear |
 | Easterlings | [ ] saber ★ (Variags, warriors) | one | game Forlorn blade |
-| Easterlings | [ ] halberd ★ (warriors) | two | game ruined bardiche (no shield with it) |
+| Easterlings | [x] halberd ★ (warriors): the Easterling axe (0.0.112) | two | |
 | Easterlings | [ ] hammer ★, [ ] axe ★, [ ] sword ★ (warlord) | one | none |
 | Easterlings | [ ] dagger | one | none |
 | Easterlings | [ ] bow | | game recurve bow |
@@ -53,9 +53,9 @@ model is in the mod.
 | Dunlendings | [ ] dagger | one | none |
 | Dunlendings | [ ] bow | | game simple bow |
 | Dunlendings | [ ] shield (my note) | | game crude shield |
-| Black Numenoreans | [ ] sword | one | game Blackguard blade |
+| Black Numenoreans | [ ] sword (captains have the steel sword and Morgul blade since 0.0.112) | one | game Blackguard blade |
 | Black Numenoreans | [ ] mace | one | game ruined flanged mace |
-| Black Numenoreans | [ ] spear | one | game black bronze spear |
+| Black Numenoreans | [x] spear (0.0.112) | one | |
 | Black Numenoreans | [ ] dagger | one | none |
 | Black Numenoreans | [ ] bow | | game longbow |
 | Isengard (Uruk-hai) | [ ] sword | one | game iron falx |
@@ -64,7 +64,7 @@ model is in the mod.
 | Isengard (Uruk-hai) | [ ] dagger | one | none |
 | Isengard (Uruk-hai) | [ ] shield | | none |
 | Isengard (Uruk-hai) | [ ] bow | | game longbow |
-| Elves | [ ] sword | one | game iron falx |
+| Elves | [x] sword: the elven longsword, two-handed (0.0.112) | two | |
 | Elves | [ ] dagger | one | none (they carry your elven spear and shield) |
 | Elves | [ ] bow | | game recurve bow |
 | Tormented elves | [ ] sword | one | game ruined gladius |
@@ -99,7 +99,8 @@ dwarves has one yet).
 - [x] Dwarves: walking axe, battleaxe, dagger, boar spear, tower shield, iron shield, warhammer and shorthammer (0.0.95)
 - [x] Gondor: curved shield and Boromir's round shield (0.0.94); Captain's sword for captains (0.0.95)
 - [x] Haradrim: spear (0.0.94), sword, curved sword, light shield and heavy shield (0.0.97)
-- [x] Black Numenoreans: kite shield
+- [x] Black Numenoreans: black shield (0.0.112; Mordor orcs may carry it too); the Numenorean kite shield went to Arnor
+- [x] Gondor iron and steel swords, Rohan spear and sword, Black Numenorean steel sword, Morgul blade and spear, elven longsword, Easterling axe, dwarven steel warhammer and shorthammer for captains (0.0.112)
 - [x] Easterlings: shield
 - [x] Gundabad: bone armor (your armor mod), Gundabad Helmet for captains (gundabad-bone-armor 0.3.0)
 

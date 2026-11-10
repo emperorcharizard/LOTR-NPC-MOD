@@ -340,3 +340,15 @@ Install `lotrnpcs_0.0.109-test.zip` (instead of any older lotrnpcs zip); restart
 ## 111. Why NPCs stand idle (0.0.111)
 
 - [ ] 111.1 Same fight as 110.1 (38 orc warriors v 26 Dunlending warriors, log on). The chat totals now say what idle NPCs were doing, e.g. "idle while fighting 477 NPC-seconds (FactionSeek 60%, none 25%, ...)". Send the CSV: its new "idle" rows show each idle second with the NPC's running tasks, target and distance, so the next build can fix the biggest cause.
+
+## 112. Reserve captains, safe spawn, bodies, patrols (0.0.112)
+
+- [ ] 112.1 Battle lines with captains: before contact the captains stand one step behind the middle of their line; at contact they join the fight.
+- [ ] 112.2 Within 64 blocks of the world spawn, aggressive and guarding recruits of an enemy side don't attack you on sight. Hit one: it and its group fight back.
+- [ ] 112.3 Kill a wild NPC and a recruit of each rank. Each body opens to a knife like a drifter's: rusty gears (recruit 0-1, warrior/archer 1-2, captain 3-5) and maybe one cloth or leather, no armor or weapons. The body rots away after about 3 in-game hours. Change `HiredBodyLoot` in lotrnpcs-factions.json, `/recruits faction reload`, and check a recruit's new body follows it.
+- [ ] 112.4 Give a zone 3 points with `/recruits zone patrol <n>` at three spots, then `/recruits zone spawnnow` inside it. The group walks to the nearest point, then round the points in order, pausing at each; it still fights anything hostile on the way. `/recruits zone list` shows the points.
+- [ ] 112.5 After the update, lotrnpcs-factions.json says `"Version": 29` and `"NpcHitsIgnoreHurtWindow": true`, and `/recruits battlelog on` reports "NPC hits ignore the hurt window: yes".
+- [ ] 112.6 New weapons in hand (spawn several of each): Gondor recruits/warriors the Gondorian sword, captains the Captain's sword or the steel sword; Rohan the Rohirric spear and sword; Black Numenorean recruits/warriors the Numenorean spear, captains the steel sword, Morgul blade or spear; elves the two-handed elven longsword (no shield with it); Easterlings the two-handed Easterling axe (no shield). Each sits in the hand by its handle, blade forward like the Haradrim sword, and swings or thrusts.
+- [ ] 112.7 Steel only for captains: dwarf and wicked-dwarf captains carry the steel warhammer or shorthammer, recruits and warriors only the iron ones.
+- [ ] 112.8 Shields: Black Numenoreans carry their new black shield (red emblem facing out); Mordor orcs carry their own shield or the black one; Arnor carries the Numenorean kite shield. Each sits on the forearm without floating or sinking in, in idle, walk and attack.
+- [ ] 112.9 Orc helmets in the looks menu: each orc and Uruk unit offers only its own helmets (Black Uruk: Orc Warrior helmet; Mordor captain: red mask; Uruk captain: General helmets; Gundabad captain: warlord, tusked or Gundabad Helmet), plus "No helmet". Other factions still offer lower ranks' helmets.
