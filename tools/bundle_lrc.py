@@ -391,12 +391,24 @@ def add_animations(text):
     return text.replace(marker, marker + "".join("\n" + json.dumps(a, separators=(",", ":")) + "," for a in ours), 1)
 
 
+# LRC's ear and goblin face parts carry their own copy of the body's "Eyes" attachment point, so every NPC drawn with
+# them logged a duplicated-attachment-point warning (0.0.114, client log 2026-11-11). The body's Head keeps its own.
+EYES_AP = r'\{\s*"code":\s*"Eyes"[^{}]*\}'
+
+
+def drop_eyes(text):
+    text = re.sub(r',\s*' + EYES_AP, "", text)
+    text = re.sub(EYES_AP + r'\s*,?', "", text)
+    assert '"Eyes"' not in text, "an Eyes attachment point was left in a skin part"
+    return text
+
+
 for shape in sorted(shapes):
     dest = os.path.join(OUT, "shapes", shape + ".json")
     os.makedirs(os.path.dirname(dest), exist_ok=True)
     with open(lrc_file("shapes", shape), encoding="utf-8-sig") as src, open(dest, "w", encoding="utf-8") as f:
         text = retarget(src.read())
-        f.write(add_animations(text) if shape in BODIES else text)
+        f.write(add_animations(text) if shape in BODIES else drop_eyes(text))
 
 def shrink_png(src, dest):
     """

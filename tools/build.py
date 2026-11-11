@@ -50,10 +50,12 @@ def main():
 
     shutil.rmtree(GEN, ignore_errors=True)
     run([sys.executable, os.path.join(ROOT, "tools", "gen_testnpcs.py"), GEN])
+    # JSON patches kept as files (0.0.114: tools/angmar_stepparent_patch.py writes the Angmar one).
+    shutil.copytree(os.path.join(ROOT, "tools", "patches"), os.path.join(GEN, "assets", "lotrnpcs", "patches"))
     if not os.path.isdir(os.path.join(LRC, "assets", "lrc")):
         with zipfile.ZipFile(LRC_ZIP) as z:
             z.extractall(LRC)
-    # bundle_lrc writes our own body shapes (with the poleaxe and greatsword animations); never copy FA Races' over them.
+    # bundle_lrc writes our own body shapes (with the poleaxe and greatsword animations).
     run([sys.executable, os.path.join(ROOT, "tools", "bundle_lrc.py"), os.path.join(LRC, "assets", "lrc"), os.path.join(GEN, "assets", "lotrnpcs")])
     entities = os.path.join(GEN, "assets", "lotrnpcs", "entities")
 

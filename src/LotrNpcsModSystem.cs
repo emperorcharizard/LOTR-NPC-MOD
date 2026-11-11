@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Reflection;
 using HarmonyLib;
 using Vintagestory.API.Client;
@@ -9,6 +10,7 @@ using Vintagestory.API.Common.Entities;
 using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
+using Vintagestory.API.Server;
 using Vintagestory.GameContent;
 
 namespace LotrNpcs
@@ -47,6 +49,9 @@ namespace LotrNpcs
 
         bool cameraGuardApplied;
 
+        // Unchanged NPC gear is not resent to players on every save (0.0.114).
+        public override void StartServerSide(ICoreServerAPI api) => GearSyncGuard.Apply(api);
+
         public override void StartClientSide(ICoreClientAPI api)
         {
             cameraGuardApplied = NpcCameraGuard.Apply(api);
@@ -62,6 +67,7 @@ namespace LotrNpcs
             if (cameraGuardApplied) NpcCameraGuard.Remove();
             cameraGuardApplied = false;
             XpInfoText.Remove();
+            GearSyncGuard.Remove();
         }
     }
 
@@ -107,6 +113,60 @@ namespace LotrNpcs
             if (!(__instance.entity is EntityPlayer player)) return false;
             string localUid = (__instance.entity.Api as ICoreClientAPI)?.World?.Player?.PlayerUID;
             return localUid == null || Attrs.Uid(player) == localUid;
+        }
+    }
+
+    /// <summary>
+    /// Stops an NPC's unchanged gear from being sent to every player each time the game saves the NPC or sends it to a
+    /// player. The game's gear behavior stores the gear in the watched attributes and marks it for sending on every
+    /// save (EntityBehaviorContainer.ToBytes calls storeInv), and each client then reloads the gear and rebuilds the
+    /// NPC's whole model (5-19 ms each), so an autosave rebuilt every NPC in view at once (0.0.114, client log
+    /// 2026-11-11). Only this mod's NPCs, on the server; a real gear change differs and is stored as before.
+    /// </summary>
+    public static class GearSyncGuard
+    {
+        const string HarmonyId = "lotrnpcs.gearsyncguard";
+        static Harmony harmony;
+
+        public static void Apply(ICoreAPI api)
+        {
+            if (harmony != null) return;
+            MethodInfo store = typeof(EntityBehaviorContainer).GetMethod(nameof(EntityBehaviorContainer.storeInv), BindingFlags.Instance | BindingFlags.Public, null, Type.EmptyTypes, null);
+            if (store == null)
+            {
+                api.Logger.Warning("[lotrnpcs] EntityBehaviorContainer.storeInv not found; NPC gear is resent on every save.");
+                return;
+            }
+            harmony = new Harmony(HarmonyId);
+            harmony.Patch(store, new HarmonyMethod(typeof(GearSyncGuard).GetMethod(nameof(SkipUnchanged), BindingFlags.Static | BindingFlags.NonPublic)), null, null, null);
+        }
+
+        public static void Remove()
+        {
+            harmony?.UnpatchAll(HarmonyId);
+            harmony = null;
+        }
+
+        // Harmony prefix. Returning false skips the store: the watched gear already holds exactly this.
+        static bool SkipUnchanged(EntityBehaviorContainer __instance)
+        {
+            Entity e = __instance.entity;
+            if (e?.Api == null || e.Api.Side != EnumAppSide.Server || e.Code?.Domain != "lotrnpcs" || __instance.Inventory == null) return true;
+            if (!(e.WatchedAttributes[__instance.InventoryClassName] is ITreeAttribute stored)) return true;
+            TreeAttribute now = new TreeAttribute();
+            __instance.Inventory.ToTreeAttributes(now);
+            return !SameTree(stored, now);
+        }
+
+        public static bool SameTree(IAttribute a, IAttribute b) => Bytes(a).AsSpan().SequenceEqual(Bytes(b));
+
+        static byte[] Bytes(IAttribute a)
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                using (BinaryWriter w = new BinaryWriter(ms)) a.ToBytes(w);
+                return ms.ToArray();
+            }
         }
     }
 

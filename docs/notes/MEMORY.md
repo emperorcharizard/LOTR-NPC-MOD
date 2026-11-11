@@ -19,7 +19,7 @@
 - Hire caps (user, 2026-11-03): hire up to 16 (changed from 15 in 0.0.51), max 5 following at once; extra hires guard where hired. Settings in lotrnpcs-factions.json.
 - Shared guards (user, 2026-11-03): opt-in "Guard this area for our people" option; owner's /group members borrow free (counts to their 5), returns to watch when posted/logoff; owner keeps ownership. Built 0.0.49.
 - Guard formations (user, 2026-11-03): guards in a formation stand still in it at their post (user chose this over marching); Loose patrols. 0.0.50; 0.0.51 tightened spots and stopped idle spinning (untested in game).
-- [lotrnpcs-performance](lotrnpcs-performance.md) — targeting benchmark and 0.0.43 vs 0.0.44 numbers, VS API hot-path costs (GetString interns), cache rules
+- [lotrnpcs-performance](lotrnpcs-performance.md) — targeting benchmark, VS API hot-path costs (GetString interns), cache rules; 2026-11-11 FPS log: vsync cliff, model rebuilds from watched-attribute removals and gear resends
 - [lotrnpcs-outfits](lotrnpcs-outfits.md) — user-picked Haradrim/Easterling/tormented elf outfits (0.0.41), "@slot" gear syntax, vanilla item name source
 - [lotrnpcs-weapons](lotrnpcs-weapons.md) — 0.0.45 cosmetic Mordor orc weapons: client-only hand slot, grips/anims/impact frames, texture swaps, offline preview tool
 - Weapons (user, 2026-11-03): dagger orientation as of 0.0.46 is correct (user confirmed); user's textures bundled 0.0.46; poleaxe guard grip fixed 0.0.48 (untested in game).

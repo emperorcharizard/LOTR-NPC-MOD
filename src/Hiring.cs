@@ -200,10 +200,27 @@ namespace LotrNpcs
         public const string GuardShared = "guard-shared";
         public const string SharedAttr = "lotrnpcsShared", BorrowerUidAttr = "lotrnpcsBorrowerUid", BorrowerNameAttr = "lotrnpcsBorrowerName";
         public static bool IsShared(Entity e) => e?.WatchedAttributes != null && e.WatchedAttributes.GetBool(SharedAttr);
+
+        // The game's RemoveAttribute on watched attributes resends all of them, even for a key that is not there, and
+        // that makes every player's client rebuild the NPC's whole model (5-19 ms each). Formation refreshes on
+        // every hire, promotion and order removed absent slot keys from every follower (0.0.114, client log 2026-11-11).
+        // So the key is taken out of the tree's entries directly and only that key is sent: an update for a key that
+        // is gone carries no data, and the client deletes a key whose update has none (the game's PartialUpdate).
+        static readonly FieldInfo TreeEntries = typeof(TreeAttribute).GetField("attributes", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+
+        static void Drop(Entity npc, string key) => DropWatched(npc.WatchedAttributes, key);
+
+        public static void DropWatched(SyncedTreeAttribute attrs, string key)
+        {
+            if (!attrs.HasAttribute(key)) return;
+            if (TreeEntries?.GetValue(attrs) is IDictionary<string, IAttribute> entries && entries.Remove(key)) attrs.MarkPathDirty(key);
+            else attrs.RemoveAttribute(key);
+        }
+
         public static void SetShared(Entity npc, bool shared)
         {
             if (shared) npc.WatchedAttributes.SetBool(SharedAttr, true);
-            else npc.WatchedAttributes.RemoveAttribute(SharedAttr);
+            else Drop(npc, SharedAttr);
         }
         /// <summary>The UID of the player who borrowed this shared guard, or null.</summary>
         public static string BorrowerUidOf(Entity e) => e == null || e is EntityPlayer ? null : Attrs.String(e.WatchedAttributes, BorrowerUidAttr);
@@ -216,8 +233,8 @@ namespace LotrNpcs
         }
         public static void ClearBorrower(Entity npc)
         {
-            npc.WatchedAttributes.RemoveAttribute(BorrowerUidAttr);
-            npc.WatchedAttributes.RemoveAttribute(BorrowerNameAttr);
+            Drop(npc, BorrowerUidAttr);
+            Drop(npc, BorrowerNameAttr);
         }
 
         public static string StanceOf(Entity e)
@@ -246,8 +263,8 @@ namespace LotrNpcs
         {
             if (slot == null)
             {
-                npc.WatchedAttributes.RemoveAttribute(SlotRight);
-                npc.WatchedAttributes.RemoveAttribute(SlotForward);
+                Drop(npc, SlotRight);
+                Drop(npc, SlotForward);
                 return;
             }
             npc.WatchedAttributes.SetDouble(SlotRight, slot.X);
@@ -264,10 +281,10 @@ namespace LotrNpcs
         {
             if (spot == null)
             {
-                npc.WatchedAttributes.RemoveAttribute(FaceYawAttr);
-                npc.WatchedAttributes.RemoveAttribute(SpotX);
-                npc.WatchedAttributes.RemoveAttribute(SpotY);
-                npc.WatchedAttributes.RemoveAttribute(SpotZ);
+                Drop(npc, FaceYawAttr);
+                Drop(npc, SpotX);
+                Drop(npc, SpotY);
+                Drop(npc, SpotZ);
                 return;
             }
             npc.WatchedAttributes.SetDouble(SpotX, spot.X);
@@ -338,7 +355,7 @@ namespace LotrNpcs
         public static void Release(Entity npc)
         {
             foreach (string key in new[] { OwnerUidAttr, OwnerNameAttr, OrderAttr, HoldX, HoldY, HoldZ, StanceAttr, FormationAttr, SlotRight, SlotForward, SharedAttr, BorrowerUidAttr, BorrowerNameAttr, SpotX, SpotY, SpotZ, FaceYawAttr })
-                npc.WatchedAttributes.RemoveAttribute(key);
+                Drop(npc, key);
         }
 
         /// <summary>Follow: stay near the owner, with no spot of its own. Hold: go back to where the NPC stands now and
@@ -349,9 +366,9 @@ namespace LotrNpcs
             SetGuardSpot(npc, null);
             if (order == Follow)
             {
-                npc.WatchedAttributes.RemoveAttribute(HoldX);
-                npc.WatchedAttributes.RemoveAttribute(HoldY);
-                npc.WatchedAttributes.RemoveAttribute(HoldZ);
+                Drop(npc, HoldX);
+                Drop(npc, HoldY);
+                Drop(npc, HoldZ);
                 return;
             }
             if (order != Hold) return;
@@ -2047,8 +2064,11 @@ namespace LotrNpcs
             // 0.0.77 (owner, 2026-11-04: on aggressive, "they run to me after they make a hit, then re aggro back onto
             // the closest enemy"): a follower in a fight stays in it between blows instead of running back to its
             // leader. It comes back when the fight is over, or (in a formation other than loose) when it breaks off.
+            // 0.0.114 (owner, 0.0.113 test: followers run to the player in battle again): the 3 s fighting mark lapses
+            // in a battle line's pauses (waiting in its slot, a turn on the target), so a line member counts as fighting
+            // too; lines keep members MemberGraceMs after their last target.
             if (Recruit.OrderOf(entity) == Recruit.Follow && hiring != null && Recruit.StanceOf(entity) != Recruit.Passive && !hiring.Disengaging(entity)
-                && entity.GetBehavior<EntityBehaviorFactionMember>()?.Fighting(now) == true) return false;
+                && (entity.GetBehavior<EntityBehaviorFactionMember>()?.Fighting(now) == true || hiring.Factions?.Lines.LineOf(entity.EntityId) != null)) return false;
             Vec3d goal = Goal();
             if (goal == null || Distance(goal) <= StartDistance)
             {

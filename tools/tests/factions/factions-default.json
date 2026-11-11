@@ -6,11 +6,13 @@
     "Members (since 0.0.92): a player is a member of the faction they picked from the join menu, which opens after they make their character (and on every join until they pick; /recruits join opens it again). The pick is permanent: only an admin changes it, with /recruits faction set, or /recruits faction clear to let them pick again. Joinable (in each faction): false leaves it out of the menu.",
     "RaceAndGroupMembership: false (the default since 0.0.92) means race and /group don't make anyone a member. true brings back the old rule: a player is also a member when their race is in FriendlyRaces (Player Model Lib codes such as lrc:harfoot; /recruits faction check shows a player's) or they are in one of its FriendlyGroups, unless an admin or the menu set their faction (which replaces the race; groups still count).",
     "HireCoin and HirePrices: what hiring one of the faction's NPCs costs, as a number of coins per rank (recruit, warrior, captain) and for archers (archer). HireCoin is the item code of the coin, game:gear-rusty (the game's rusty gear) by default since 0.0.94 (it was coinage:planchet-silver-lg, a large silver planchet). Rankless NPCs cost a recruit's price, and a price of 0 makes hiring free. The shipped prices (since 0.0.108) are fitted so the same coins spent on any two factions buy forces that win about as often as each other.",
-    "PromotePrices: what promoting a recruit costs in HireCoin, by the rank it becomes (warrior, archer, captain). By default it is the faction's hire price for that rank less 3 coins, or less 4 for a captain (Men: 12 to warrior or archer, 36 to captain); a rank left out gets that default. A hired recruit or warrior earns 1 XP for each NPC of this mod that dies within 10 seconds of its hit: at 15 XP a recruit can become a warrior or an archer, at 40 XP a warrior can become a captain. The owner promotes it in its talk menu. 0 makes it free.",
+    "PromotePrices: what promoting a recruit costs in HireCoin, by the rank it becomes (warrior, guard, shock, archer, captain). By default it is the faction's hire price for that rank less 3 coins, or less 4 for a captain (Men: 12 to warrior or archer, 36 to captain); a rank left out gets that default (guard and shock, which can't be hired: the warrior's promotion price). A hired recruit or warrior earns 1 XP for each NPC of this mod that dies within 10 seconds of its hit: at 15 XP a recruit can become a warrior, guard, shock trooper or archer, at 40 XP a warrior, guard or shock trooper can become a captain. The owner promotes it in its talk menu. 0 makes it free.",
     "Hiring: right-click an NPC to talk. Members of its faction, and members of an allied faction whose alliance has ShareFriends, can hire it, paying from their hotbar and backpack.",
     "MaxFollowers and MaxRecruits (in each faction): how many of the faction's recruits can follow a player at once, and how many a player can have. Each recruit uses a share: 1/MaxFollowers of the following and 1/MaxRecruits of the roster, and a player's shares must add up to no more than 1, so factions can be mixed (3 Gondor men and 2 Mordor orcs use 3/5 + 2/7 of the following). Past the following, a new recruit guards where it was hired and the rest hold or guard. A player over the limits when they join (after an admin lowers them) loses the most recently hired recruits until they fit. The MaxFollowers and MaxRecruits at the top of the file are the baseline (the Men's, 5 and 16) and count for a faction without its own.",
-    "Health and Damage (in each faction, by rank: recruit, warrior, captain, archer): the health and the damage of one hit of the faction's NPCs of that rank, in place of their unit's own (health is a whole number; an archer's damage is its arrow's, and its shove). The shipped tables were fitted so that at each rank a full band of each faction wins about half its fights against the others (the Uruk-hai a little more): for example Mordor orc recruits 19 health and 2.7 damage, Gondor recruits 22 and 3.15, elf captains 51 and 9.7. Damage tiers don't change. Wild groups grow with MaxFollowers too (see the spawning file).",
+    "Health and Damage (in each faction, by rank: recruit, warrior, captain, archer, and since 0.0.113 the promotion-only guard and shock, which a file without them gets as the warrior's health x1.25 and damage x0.8 (guard) or health x0.8 and damage x1.25 (shock)): the health and the damage of one hit of the faction's NPCs of that rank, in place of their unit's own (health is a whole number; an archer's damage is its arrow's, and its shove). The shipped tables were fitted so that at each rank a full band of each faction wins about half its fights against the others (the Uruk-hai a little more): for example Mordor orc recruits 19 health and 2.7 damage, Gondor recruits 22 and 3.15, elf captains 51 and 9.7. Damage tiers don't change. Wild groups grow with MaxFollowers too (see the spawning file).",
     "DamageSpread: every NPC hit, melee and arrows, deals its damage times a random 1 - DamageSpread to 1 + DamageSpread (0.2 = 80% to 120%), so fights aren't decided by whole numbers of hits. 0 turns it off; at most 0.9.",
+    "WildBodyLoot and HiredBodyLoot (by rank: recruit, warrior, captain, archer): what a dead wild NPC's body and a dead recruit's body hold for a player with a knife, as a list of { Code, Min, Max } (item code, and a random count from Min to Max). By default rusty gears (recruit 0-1, warrior and archer 1-2, captain 3-5) and up to one piece of cloth (recruits) or leather (the rest); armor and weapons are never dropped. Rankless NPCs use the recruit list; an empty list leaves an empty body. Bodies rot away after 3 in-game hours.",
+    "SpawnSafeRadius (64 by default, 0 = off): within this many blocks of the world spawn, recruits (guards, aggressive and raiding ones alike) never attack a player on sight. They still fight back against a player who attacks them, their owner or their group.",
     "GuardRadius: how many blocks around their post recruits told to Guard here patrol (4 to 64). On the aggressive and raid stances they attack any player there who isn't their owner, the owner's group mate, a member of a faction allied to the owner's, or on the owner's whitelist (/recruits whitelist add <player>), even while the owner is offline.",
     "Relations: how two factions treat each other. Relation is \"ally\", \"enemy\" or \"neutral\", and two factions without an entry are enemies. No factions are allies by default. Allies never fight and come to help each other; neutral factions leave each other's NPCs alone.",
     "ShareFriends (allies only): true makes each faction's members safe from the other's NPCs too, and lets them hire the other's NPCs. Otherwise a player is safe only from their own factions and hires only from them.",
@@ -19,14 +21,14 @@
     "MaxAttackersPerTarget: how many NPCs may fight one NPC at a time. 4 by default; 0 means no limit. With a limit, the rest look for another enemy, wait one step behind in a battle line, or, outside a line, join a full enemy anyway when there is no other within reach. Either way an NPC takes an enemy nobody is fighting before one already being fought. Players are never limited, and an NPC always strikes back at whoever hits it.",
     "CombatSpacing: how far apart, in blocks, fighting NPCs of the same side keep from each other, and the gap between neighbours in a battle line (0.8 to 4, 1.5 by default). Enemies only keep DuelDistanceMin apart. As many attackers as fit round an enemy this far apart (5 by default) fight it; the others take another enemy with room first, or else wait in a second ring one CombatSpacing farther out and step in when a place opens.",
     "DuelDistanceMin and DuelDistanceMax: how far from the center of the NPC it fights an attacker stands (1.0 to 1.6 blocks by default): it closes in when farther, steps back when closer, and stands and fights in between. Players are approached the vanilla way.",
-    "BattleLines (true by default): groups of NPCs line up when they meet another faction's NPCs, waiting in their places until an enemy comes near: wild NPCs, and recruits following in any formation but Loose. The front rank has one place per enemy; when the lines meet each front NPC fights the enemy facing it from its place in the line. NPCs past that (the side outnumbers the enemy) wait one step behind until the lines meet, then go round to surround, up to MaxAttackersPerTarget on one enemy. Wild NPCs and aggressive or raid recruits march to meet the enemy; defensive recruits hold their line until an enemy is within LineHoldRange blocks. Loose followers, guards, archers, and fights with players or monsters don't make lines. false lets NPCs fight as they find enemies.",
-    "NpcHitsIgnoreHurtWindow (false by default): true lets NPC hits on NPCs and creatures land even within half a second of another hit (the game's hurt window, which otherwise throws such hits away), so every attacker and every arrow counts, and NPCs stop waiting for a turn to hit such a target. Players always keep the hurt window.",
+    "BattleLines (true by default): groups of NPCs line up when they meet another faction's NPCs, waiting in their places until an enemy comes near: wild NPCs, and recruits following in any formation but Loose. The front rank has one place per enemy; when the lines meet each front NPC fights the enemy facing it from its place in the line. NPCs past that (the side outnumbers the enemy) lengthen the line at both ends and, when the lines meet, wrap round the enemy's flanks, up to MaxAttackersPerTarget on one enemy. Wild NPCs and aggressive or raid recruits march to meet the enemy; defensive recruits hold their line until an enemy is within LineHoldRange blocks. Loose followers, guards, archers, and fights with players or monsters don't make lines. false lets NPCs fight as they find enemies.",
+    "NpcHitsIgnoreHurtWindow (true by default since 0.0.112): true lets NPC hits on NPCs and creatures land even within half a second of another hit (the game's hurt window, which otherwise throws such hits away), so every attacker and every arrow counts, and NPCs stop waiting for a turn to hit such a target. Players always keep the hurt window.",
     "HelmetChance: the chance (0 to 1) that a newly spawned NPC that may go bare-headed wears its outfit's helmet. Which units may go bare-headed is set by the mod for each unit (all orcs and Uruk-hai, and the units of other factions marked so); the others always spawn with theirs. A helmet it doesn't wear is kept, and its owner can put it on or take any helmet off from the recruit's menu. Helmets are only for looks: NPC protection comes from rank. CaptainsAlwaysHelmeted: true makes every captain always wear theirs (false by default since 0.0.82).",
     "ShieldChance: the chance (0 to 1) that a newly spawned Mordor orc carries a shield. Shields are only for looks, are never carried with the poleaxe, and the owner can take one off or put it on from the recruit's menu.",
     "HealthRegenSpeed: how fast NPCs heal out of combat, as a multiple of vanilla's creature healing (1 = vanilla, 0.01 health a second; 30 = 0.3 a second). RegenDelaySeconds: how long after its last hit an NPC starts healing at that speed.",
     "Version: the file format. Don't change it; the mod updates older files once."
   ],
-  "Version": 28,
+  "Version": 30,
   "Factions": {
     "gondor": {
       "Stance": "aggressive",
@@ -42,7 +44,9 @@
       "PromotePrices": {
         "warrior": 12,
         "archer": 12,
-        "captain": 36
+        "captain": 36,
+        "guard": 12,
+        "shock": 12
       },
       "MaxFollowers": 5,
       "MaxRecruits": 16,
@@ -51,13 +55,17 @@
         "recruit": 22.0,
         "warrior": 34.0,
         "captain": 48.0,
-        "archer": 35.0
+        "archer": 35.0,
+        "guard": 43.0,
+        "shock": 27.0
       },
       "Damage": {
         "recruit": 3.15,
         "warrior": 3.95,
         "captain": 7.0,
-        "archer": 3.05
+        "archer": 3.05,
+        "guard": 3.16,
+        "shock": 4.94
       }
     },
     "rohan": {
@@ -74,7 +82,9 @@
       "PromotePrices": {
         "warrior": 12,
         "archer": 12,
-        "captain": 36
+        "captain": 36,
+        "guard": 12,
+        "shock": 12
       },
       "MaxFollowers": 5,
       "MaxRecruits": 16,
@@ -83,13 +93,17 @@
         "recruit": 22.0,
         "warrior": 34.0,
         "captain": 48.0,
-        "archer": 35.0
+        "archer": 35.0,
+        "guard": 43.0,
+        "shock": 27.0
       },
       "Damage": {
         "recruit": 3.15,
         "warrior": 3.95,
         "captain": 7.0,
-        "archer": 3.05
+        "archer": 3.05,
+        "guard": 3.16,
+        "shock": 4.94
       }
     },
     "dale": {
@@ -106,7 +120,9 @@
       "PromotePrices": {
         "warrior": 12,
         "archer": 12,
-        "captain": 36
+        "captain": 36,
+        "guard": 12,
+        "shock": 12
       },
       "MaxFollowers": 5,
       "MaxRecruits": 16,
@@ -115,13 +131,17 @@
         "recruit": 22.0,
         "warrior": 34.0,
         "captain": 48.0,
-        "archer": 35.0
+        "archer": 35.0,
+        "guard": 43.0,
+        "shock": 27.0
       },
       "Damage": {
         "recruit": 3.15,
         "warrior": 3.95,
         "captain": 7.0,
-        "archer": 3.05
+        "archer": 3.05,
+        "guard": 3.16,
+        "shock": 4.94
       }
     },
     "arnor": {
@@ -138,7 +158,9 @@
       "PromotePrices": {
         "warrior": 12,
         "archer": 12,
-        "captain": 36
+        "captain": 36,
+        "guard": 12,
+        "shock": 12
       },
       "MaxFollowers": 5,
       "MaxRecruits": 16,
@@ -147,13 +169,17 @@
         "recruit": 22.0,
         "warrior": 34.0,
         "captain": 48.0,
-        "archer": 35.0
+        "archer": 35.0,
+        "guard": 43.0,
+        "shock": 27.0
       },
       "Damage": {
         "recruit": 3.15,
         "warrior": 3.95,
         "captain": 7.0,
-        "archer": 3.05
+        "archer": 3.05,
+        "guard": 3.16,
+        "shock": 4.94
       }
     },
     "haradrim": {
@@ -172,7 +198,9 @@
       "PromotePrices": {
         "warrior": 12,
         "archer": 12,
-        "captain": 36
+        "captain": 36,
+        "guard": 12,
+        "shock": 12
       },
       "MaxFollowers": 5,
       "MaxRecruits": 16,
@@ -181,13 +209,17 @@
         "recruit": 22.0,
         "warrior": 34.0,
         "captain": 48.0,
-        "archer": 35.0
+        "archer": 35.0,
+        "guard": 43.0,
+        "shock": 27.0
       },
       "Damage": {
         "recruit": 3.15,
         "warrior": 3.95,
         "captain": 7.0,
-        "archer": 3.05
+        "archer": 3.05,
+        "guard": 3.16,
+        "shock": 4.94
       }
     },
     "dunlendings": {
@@ -206,7 +238,9 @@
       "PromotePrices": {
         "warrior": 9,
         "archer": 8,
-        "captain": 31
+        "captain": 31,
+        "guard": 9,
+        "shock": 9
       },
       "MaxFollowers": 6,
       "MaxRecruits": 19,
@@ -215,13 +249,17 @@
         "recruit": 18.0,
         "warrior": 28.0,
         "captain": 41.0,
-        "archer": 28.0
+        "archer": 28.0,
+        "guard": 35.0,
+        "shock": 22.0
       },
       "Damage": {
         "recruit": 2.85,
         "warrior": 3.6,
         "captain": 6.1,
-        "archer": 2.8
+        "archer": 2.8,
+        "guard": 2.88,
+        "shock": 4.5
       }
     },
     "blacknumenoreans": {
@@ -240,7 +278,9 @@
       "PromotePrices": {
         "warrior": 12,
         "archer": 12,
-        "captain": 36
+        "captain": 36,
+        "guard": 12,
+        "shock": 12
       },
       "MaxFollowers": 5,
       "MaxRecruits": 16,
@@ -249,20 +289,23 @@
         "recruit": 22.0,
         "warrior": 34.0,
         "captain": 48.0,
-        "archer": 35.0
+        "archer": 35.0,
+        "guard": 43.0,
+        "shock": 27.0
       },
       "Damage": {
         "recruit": 3.15,
         "warrior": 3.95,
         "captain": 7.0,
-        "archer": 3.05
+        "archer": 3.05,
+        "guard": 3.16,
+        "shock": 4.94
       }
     },
     "easterlings": {
       "Stance": "aggressive",
       "FriendlyRaces": [
-        "lrc:easterling",
-        "faraces:easterling"
+        "lrc:easterling"
       ],
       "FriendlyGroups": [],
       "HireCoin": "game:gear-rusty",
@@ -275,7 +318,9 @@
       "PromotePrices": {
         "warrior": 12,
         "archer": 12,
-        "captain": 36
+        "captain": 36,
+        "guard": 12,
+        "shock": 12
       },
       "MaxFollowers": 5,
       "MaxRecruits": 16,
@@ -284,21 +329,24 @@
         "recruit": 22.0,
         "warrior": 34.0,
         "captain": 48.0,
-        "archer": 35.0
+        "archer": 35.0,
+        "guard": 43.0,
+        "shock": 27.0
       },
       "Damage": {
         "recruit": 3.15,
         "warrior": 3.95,
         "captain": 7.0,
-        "archer": 3.05
+        "archer": 3.05,
+        "guard": 3.16,
+        "shock": 4.94
       }
     },
     "dwarves": {
       "Stance": "aggressive",
       "FriendlyRaces": [
         "lrc:longbeard",
-        "lrc:firebeardsandbroadbeams",
-        "faraces:dwarf"
+        "lrc:firebeardsandbroadbeams"
       ],
       "FriendlyGroups": [],
       "HireCoin": "game:gear-rusty",
@@ -311,7 +359,9 @@
       "PromotePrices": {
         "warrior": 16,
         "archer": 16,
-        "captain": 46
+        "captain": 46,
+        "guard": 16,
+        "shock": 16
       },
       "MaxFollowers": 4,
       "MaxRecruits": 13,
@@ -320,13 +370,17 @@
         "recruit": 31.0,
         "warrior": 47.0,
         "captain": 63.0,
-        "archer": 47.0
+        "archer": 47.0,
+        "guard": 59.0,
+        "shock": 38.0
       },
       "Damage": {
         "recruit": 3.2,
         "warrior": 4.15,
         "captain": 7.8,
-        "archer": 3.3
+        "archer": 3.3,
+        "guard": 3.32,
+        "shock": 5.19
       }
     },
     "wickeddwarves": {
@@ -345,7 +399,9 @@
       "PromotePrices": {
         "warrior": 16,
         "archer": 16,
-        "captain": 46
+        "captain": 46,
+        "guard": 16,
+        "shock": 16
       },
       "MaxFollowers": 4,
       "MaxRecruits": 13,
@@ -354,13 +410,17 @@
         "recruit": 31.0,
         "warrior": 47.0,
         "captain": 63.0,
-        "archer": 47.0
+        "archer": 47.0,
+        "guard": 59.0,
+        "shock": 38.0
       },
       "Damage": {
         "recruit": 3.2,
         "warrior": 4.15,
         "captain": 7.8,
-        "archer": 3.3
+        "archer": 3.3,
+        "guard": 3.32,
+        "shock": 5.19
       }
     },
     "shire": {
@@ -368,8 +428,7 @@
       "FriendlyRaces": [
         "lrc:harfoot",
         "lrc:stoor",
-        "lrc:fallohide",
-        "faraces:hobbit"
+        "lrc:fallohide"
       ],
       "FriendlyGroups": [],
       "HireCoin": "game:gear-rusty",
@@ -382,7 +441,9 @@
       "PromotePrices": {
         "warrior": 12,
         "archer": 12,
-        "captain": 36
+        "captain": 36,
+        "guard": 12,
+        "shock": 12
       },
       "MaxFollowers": 5,
       "MaxRecruits": 16,
@@ -391,13 +452,17 @@
         "recruit": 22.0,
         "warrior": 34.0,
         "captain": 48.0,
-        "archer": 35.0
+        "archer": 35.0,
+        "guard": 43.0,
+        "shock": 27.0
       },
       "Damage": {
         "recruit": 3.15,
         "warrior": 3.95,
         "captain": 7.0,
-        "archer": 3.05
+        "archer": 3.05,
+        "guard": 3.16,
+        "shock": 4.94
       }
     },
     "elves": {
@@ -405,8 +470,7 @@
       "FriendlyRaces": [
         "lrc:noldor",
         "lrc:sindar",
-        "lrc:avari",
-        "faraces:elf"
+        "lrc:avari"
       ],
       "FriendlyGroups": [],
       "HireCoin": "game:gear-rusty",
@@ -419,7 +483,9 @@
       "PromotePrices": {
         "warrior": 16,
         "archer": 17,
-        "captain": 46
+        "captain": 46,
+        "guard": 16,
+        "shock": 16
       },
       "MaxFollowers": 4,
       "MaxRecruits": 13,
@@ -428,13 +494,17 @@
         "recruit": 27.0,
         "warrior": 37.0,
         "captain": 51.0,
-        "archer": 36.0
+        "archer": 36.0,
+        "guard": 46.0,
+        "shock": 30.0
       },
       "Damage": {
         "recruit": 3.7,
         "warrior": 5.3,
         "captain": 9.7,
-        "archer": 4.3
+        "archer": 4.3,
+        "guard": 4.24,
+        "shock": 6.63
       }
     },
     "tormentedelves": {
@@ -453,7 +523,9 @@
       "PromotePrices": {
         "warrior": 16,
         "archer": 17,
-        "captain": 46
+        "captain": 46,
+        "guard": 16,
+        "shock": 16
       },
       "MaxFollowers": 4,
       "MaxRecruits": 13,
@@ -462,13 +534,17 @@
         "recruit": 27.0,
         "warrior": 37.0,
         "captain": 51.0,
-        "archer": 36.0
+        "archer": 36.0,
+        "guard": 46.0,
+        "shock": 30.0
       },
       "Damage": {
         "recruit": 3.7,
         "warrior": 5.3,
         "captain": 9.7,
-        "archer": 4.3
+        "archer": 4.3,
+        "guard": 4.24,
+        "shock": 6.63
       }
     },
     "mordor": {
@@ -485,7 +561,9 @@
       "PromotePrices": {
         "warrior": 9,
         "archer": 9,
-        "captain": 25
+        "captain": 25,
+        "guard": 9,
+        "shock": 9
       },
       "MaxFollowers": 6,
       "MaxRecruits": 22,
@@ -494,13 +572,17 @@
         "recruit": 19.0,
         "warrior": 30.0,
         "captain": 40.0,
-        "archer": 30.0
+        "archer": 30.0,
+        "guard": 38.0,
+        "shock": 24.0
       },
       "Damage": {
         "recruit": 2.7,
         "warrior": 3.35,
         "captain": 6.2,
-        "archer": 2.65
+        "archer": 2.65,
+        "guard": 2.68,
+        "shock": 4.19
       }
     },
     "angmar": {
@@ -517,7 +599,9 @@
       "PromotePrices": {
         "warrior": 9,
         "archer": 9,
-        "captain": 25
+        "captain": 25,
+        "guard": 9,
+        "shock": 9
       },
       "MaxFollowers": 6,
       "MaxRecruits": 22,
@@ -526,13 +610,17 @@
         "recruit": 19.0,
         "warrior": 30.0,
         "captain": 40.0,
-        "archer": 30.0
+        "archer": 30.0,
+        "guard": 38.0,
+        "shock": 24.0
       },
       "Damage": {
         "recruit": 2.7,
         "warrior": 3.35,
         "captain": 6.2,
-        "archer": 2.65
+        "archer": 2.65,
+        "guard": 2.68,
+        "shock": 4.19
       }
     },
     "mistymountains": {
@@ -549,7 +637,9 @@
       "PromotePrices": {
         "warrior": 6,
         "archer": 7,
-        "captain": 21
+        "captain": 21,
+        "guard": 6,
+        "shock": 6
       },
       "MaxFollowers": 8,
       "MaxRecruits": 26,
@@ -558,13 +648,17 @@
         "recruit": 17.0,
         "warrior": 22.0,
         "captain": 32.0,
-        "archer": 22.0
+        "archer": 22.0,
+        "guard": 28.0,
+        "shock": 18.0
       },
       "Damage": {
         "recruit": 1.85,
         "warrior": 2.8,
         "captain": 4.7,
-        "archer": 2.2
+        "archer": 2.2,
+        "guard": 2.24,
+        "shock": 3.5
       }
     },
     "gundabad": {
@@ -581,7 +675,9 @@
       "PromotePrices": {
         "warrior": 9,
         "archer": 9,
-        "captain": 25
+        "captain": 25,
+        "guard": 9,
+        "shock": 9
       },
       "MaxFollowers": 6,
       "MaxRecruits": 22,
@@ -590,13 +686,17 @@
         "recruit": 19.0,
         "warrior": 30.0,
         "captain": 40.0,
-        "archer": 30.0
+        "archer": 30.0,
+        "guard": 38.0,
+        "shock": 24.0
       },
       "Damage": {
         "recruit": 2.7,
         "warrior": 3.35,
         "captain": 6.2,
-        "archer": 2.65
+        "archer": 2.65,
+        "guard": 2.68,
+        "shock": 4.19
       }
     },
     "isengard": {
@@ -613,7 +713,9 @@
       "PromotePrices": {
         "warrior": 12,
         "archer": 13,
-        "captain": 37
+        "captain": 37,
+        "guard": 12,
+        "shock": 12
       },
       "MaxFollowers": 5,
       "MaxRecruits": 15,
@@ -622,13 +724,17 @@
         "recruit": 23.0,
         "warrior": 32.0,
         "captain": 48.0,
-        "archer": 36.0
+        "archer": 36.0,
+        "guard": 40.0,
+        "shock": 26.0
       },
       "Damage": {
         "recruit": 3.0,
         "warrior": 4.3,
         "captain": 7.1,
-        "archer": 3.0
+        "archer": 3.0,
+        "guard": 3.44,
+        "shock": 5.38
       }
     }
   },
@@ -655,12 +761,113 @@
   "HealthRegenSpeed": 30.0,
   "RegenDelaySeconds": 10,
   "GuardRadius": 16,
+  "SpawnSafeRadius": 64,
+  "WildBodyLoot": {
+    "recruit": [
+      {
+        "Code": "game:gear-rusty",
+        "Min": 0,
+        "Max": 1
+      },
+      {
+        "Code": "game:cloth-plain",
+        "Min": 0,
+        "Max": 1
+      }
+    ],
+    "warrior": [
+      {
+        "Code": "game:gear-rusty",
+        "Min": 1,
+        "Max": 2
+      },
+      {
+        "Code": "game:leather-normal-plain",
+        "Min": 0,
+        "Max": 1
+      }
+    ],
+    "archer": [
+      {
+        "Code": "game:gear-rusty",
+        "Min": 1,
+        "Max": 2
+      },
+      {
+        "Code": "game:leather-normal-plain",
+        "Min": 0,
+        "Max": 1
+      }
+    ],
+    "captain": [
+      {
+        "Code": "game:gear-rusty",
+        "Min": 3,
+        "Max": 5
+      },
+      {
+        "Code": "game:leather-normal-plain",
+        "Min": 0,
+        "Max": 1
+      }
+    ]
+  },
+  "HiredBodyLoot": {
+    "recruit": [
+      {
+        "Code": "game:gear-rusty",
+        "Min": 0,
+        "Max": 1
+      },
+      {
+        "Code": "game:cloth-plain",
+        "Min": 0,
+        "Max": 1
+      }
+    ],
+    "warrior": [
+      {
+        "Code": "game:gear-rusty",
+        "Min": 1,
+        "Max": 2
+      },
+      {
+        "Code": "game:leather-normal-plain",
+        "Min": 0,
+        "Max": 1
+      }
+    ],
+    "archer": [
+      {
+        "Code": "game:gear-rusty",
+        "Min": 1,
+        "Max": 2
+      },
+      {
+        "Code": "game:leather-normal-plain",
+        "Min": 0,
+        "Max": 1
+      }
+    ],
+    "captain": [
+      {
+        "Code": "game:gear-rusty",
+        "Min": 3,
+        "Max": 5
+      },
+      {
+        "Code": "game:leather-normal-plain",
+        "Min": 0,
+        "Max": 1
+      }
+    ]
+  },
   "MaxAttackersPerTarget": 4,
   "CombatSpacing": 1.5,
   "HelmetChance": 0.6,
   "CaptainsAlwaysHelmeted": false,
   "BattleLines": true,
-  "NpcHitsIgnoreHurtWindow": false,
+  "NpcHitsIgnoreHurtWindow": true,
   "DuelDistanceMin": 1.0,
   "DuelDistanceMax": 1.6,
   "LineHoldRange": 6.0,

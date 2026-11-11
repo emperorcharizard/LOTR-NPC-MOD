@@ -212,7 +212,7 @@ namespace LotrNpcs
             string current = Attrs.String(entity.WatchedAttributes, WeaponAttr);
             string pick = PickWeapon(current, weapons, rand, Fixed);
             if (pick == current) return;
-            if (pick == null) entity.WatchedAttributes.RemoveAttribute(WeaponAttr);
+            if (pick == null) Recruit.DropWatched(entity.WatchedAttributes, WeaponAttr);
             else entity.WatchedAttributes.SetString(WeaponAttr, pick);
             entity.WatchedAttributes.MarkPathDirty(WeaponAttr);
         }

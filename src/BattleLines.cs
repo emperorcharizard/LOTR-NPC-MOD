@@ -222,6 +222,18 @@ namespace LotrNpcs
                 double d = dx * dx + dz * dz;
                 if (d < best) { best = d; line = l; }
             }
+            // 0.0.114: a straggler further out joins its side's line already fighting near its enemy instead of
+            // starting a line of one, which marched in at the line's pace, alone (battle log 2026-11-11, goblin 5205
+            // 17 blocks out, about 20 s to arrive).
+            best = JoinRadius * JoinRadius;
+            if (line == null)
+                foreach (BattleLine l in lines)
+                {
+                    if (l.Side != side) continue;
+                    double dx = l.Ex - target.Pos.X, dz = l.Ez - target.Pos.Z;
+                    double d = dx * dx + dz * dz;
+                    if (d < best) { best = d; line = l; }
+                }
             if (line == null)
             {
                 double ex = target.Pos.X - npc.Pos.X, ez = target.Pos.Z - npc.Pos.Z, len = Math.Sqrt(ex * ex + ez * ez);

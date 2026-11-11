@@ -70,16 +70,16 @@ public static class Program {
         Check(fs.WithAllies("angmar").SequenceEqual(new[] { "angmar" }) && fs.WithAllies("mordor").SequenceEqual(new[] { "mordor" }), "only the faction itself answers a call for help when it has no allies");
 
         // players
-        var orcPlayer = Player("lrc:orc"); var faOrc = Player("faraces:orc"); var hobbitPlayer = Player("faraces:hobbit"); var nobody = Player(null); var dunPlayer = Player("lrc:wildmen");
-        var gondorian = Member("faraces:numenorean", "gondor");
-        Check(new[] { "mordor", "angmar", "mistymountains", "isengard" }.All(f => fs.WantsToAttack(f, orcPlayer) && fs.WantsToAttack(f, faOrc) && fs.WantsToAttack(f, Player("lrc:uruk")) && fs.WantsToAttack(f, Player("faraces:goblin"))), "orc-race players are nobody's friends: orc players join through groups");
+        var orcPlayer = Player("lrc:orc"); var faOrc = Player("lrc:uruk"); var hobbitPlayer = Player("lrc:harfoot"); var nobody = Player(null); var dunPlayer = Player("lrc:wildmen");
+        var gondorian = Member("lrc:freepeople", "gondor");
+        Check(new[] { "mordor", "angmar", "mistymountains", "isengard" }.All(f => fs.WantsToAttack(f, orcPlayer) && fs.WantsToAttack(f, faOrc) && fs.WantsToAttack(f, Player("lrc:uruk")) && fs.WantsToAttack(f, Player("lrc:orc"))), "orc-race players are nobody's friends: orc players join through groups");
         Check(fs.WantsToAttack("mordor", hobbitPlayer) && fs.WantsToAttack("isengard", nobody), "aggressive orcs attack non-friendly players on sight");
         Check(fs.WantsToAttack("gondor", orcPlayer) && fs.WantsToAttack("gondor", hobbitPlayer) && fs.WantsToAttack("rohan", gondorian) && fs.WantsToAttack("dwarves", nobody) && fs.WantsToAttack("dunlendings", nobody), "every faction but the Shire attacks non-members on sight");
-        Check(!fs.WantsToAttack("gondor", gondorian) && !fs.WantsToAttack("easterlings", Player("faraces:easterling")) && !fs.WantsToAttack("dwarves", Player("lrc:longbeard")) && !fs.WantsToAttack("dunlendings", dunPlayer), "factions leave their own members alone");
+        Check(!fs.WantsToAttack("gondor", gondorian) && !fs.WantsToAttack("easterlings", Player("lrc:easterling")) && !fs.WantsToAttack("dwarves", Player("lrc:longbeard")) && !fs.WantsToAttack("dunlendings", dunPlayer), "factions leave their own members alone");
         Check(!fs.WantsToAttack("shire", nobody) && !fs.WantsToAttack("shire", orcPlayer), "the Shire stays defensive");
         Check(!fs.WantsToAttack("dwarves", Player("LRC:Longbeard")), "race codes compare case-insensitively");
         Check(fs.WantsToAttack("mordor", dunPlayer), "a Dunlending player is not a Mordor friend");
-        Check(fs.IsFriend("shire", "faraces:hobbit", none) && !fs.IsFriend("rohan", "faraces:hobbit", none) && !fs.IsFriend("shire", "faraces:dwarf", none), "friendly races count for their own faction only");
+        Check(fs.IsFriend("shire", "lrc:harfoot", none) && !fs.IsFriend("rohan", "lrc:harfoot", none) && !fs.IsFriend("shire", "lrc:longbeard", none), "friendly races count for their own faction only");
         Check(fs.Config.Factions["mordor"].FriendlyRaces.Count == 0 && fs.Config.Factions["angmar"].FriendlyRaces.Count == 0, "orc factions list no races");
         // groups
         cfg = new FactionConfig(); cfg.FillDefaults(); cfg.Factions["gondor"].FriendlyGroups.Add("Minas Tirith"); cfg.Factions["mordor"].FriendlyGroups.Add("Barad-dur");
@@ -90,7 +90,7 @@ public static class Program {
         Check(fs.IsFriend("gondor", null, new List<string> { "minas tirith", "barad-dur" }) && fs.IsFriend("mordor", null, new List<string> { "minas tirith", "barad-dur" }), "a player in two factions' groups is a friend of both");
         Check(!fs.IsFriend("gondor", "lrc:orc", new List<string> { "edoras" }), "other groups don't count");
         Console.WriteLine("   > " + fs.DescribePlayer("Emperorcharizar", "lrc:orc", new List<string> { "barad-dur" }).Replace("\n", "\n   > "));
-        Console.WriteLine("   > " + fs.DescribePlayer("Hobbit", "faraces:hobbit", new List<string>()).Replace("\n", "\n   > "));
+        Console.WriteLine("   > " + fs.DescribePlayer("Hobbit", "lrc:harfoot", new List<string>()).Replace("\n", "\n   > "));
 
         // NPC vs NPC
         Check(fs.WantsToAttack("mordor", Npc("test-angmarorc-warrior")) && fs.WantsToAttack("isengard", Npc("test-goblin")) && fs.WantsToAttack("angmar", Npc("test-uruk-captain")) && fs.WantsToAttack("mistymountains", Npc("test-mordororc-recruit")), "orc factions fight each other on sight");
@@ -141,10 +141,10 @@ public static class Program {
         cfg.Relations.Add(new FactionRelationDef { A = "mordor", B = "gondor", Relation = "enemy", ShareFriends = true });
         cfg.Relations.Add(new FactionRelationDef { A = "dunlendings", B = "shire", Relation = "neutral", ShareFriends = true });
         SetLegacy(fs, cfg);
-        var rohirrim = Member("faraces:northman", "rohan"); var dwarf = Player("lrc:longbeard");
+        var rohirrim = Member("lrc:freepeople", "rohan"); var dwarf = Player("lrc:longbeard");
         Check(!fs.WantsToAttack("dwarves", rohirrim) && !fs.WantsToAttack("rohan", dwarf) && fs.IsFriend("dwarves", null, none, "rohan"), "ShareFriends on an alliance: each side spares the other's friends");
         Check(fs.WantsToAttack("gondor", rohirrim) && fs.WantsToAttack("gondor", dwarf) && fs.WantsToAttack("rohan", gondorian), "...and only those two factions");
-        Check(!fs.IsFriend("mordor", null, none, "gondor") && !fs.IsFriend("dunlendings", "faraces:hobbit", none), "ShareFriends does nothing between enemies or neutral factions");
+        Check(!fs.IsFriend("mordor", null, none, "gondor") && !fs.IsFriend("dunlendings", "lrc:harfoot", none), "ShareFriends does nothing between enemies or neutral factions");
         Check(fs.SharesFriends("rohan", "dwarves") && fs.SharesFriends("dwarves", "rohan") && !fs.SharesFriends("gondor", "rohan") && fs.Relation("gondor", "rohan") == FactionRelation.Enemy, "the default gondor/rohan example entry changes nothing");
         var example = cfg.Relations.First(r => r.A == "gondor" && r.B == "rohan"); example.Relation = "ally"; example.ShareFriends = true; SetLegacy(fs, cfg);
         Check(!fs.WantsToAttack("rohan", gondorian) && !fs.WantsToAttack("gondor", rohirrim) && fs.Relation("gondor", "rohan") == FactionRelation.Ally && !fs.WantsToAttack("gondor", Npc("test-rohan-warrior")), "editing the example to an ally that shares friends works");
@@ -165,7 +165,7 @@ public static class Program {
 
         // migrating older files
         var freshCfg = FactionConfig.FromFile(null, out bool storeFresh);
-        Check(storeFresh && freshCfg.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 29 && json.Contains("\"Version\": 29") && json.Contains("\"RosterPerCaptain\": 8") && !json.Contains("MaxHirelings") && json.Contains("\"ShieldChance\": 0.5") && json.Contains("\"HelmetChance\": 0.6") && json.Contains("\"CaptainsAlwaysHelmeted\": false") && json.Contains("\"MaxAttackersPerTarget\": 4") && json.Contains("\"CombatSpacing\": 1.5") && json.Contains("\"BattleLines\": true") && json.Contains("\"DuelDistanceMin\": 1.0") && json.Contains("\"DuelDistanceMax\": 1.6") && json.Contains("\"LineHoldRange\": 6.0") && json.Contains("\"MaxRecruits\": 16") && json.Contains("\"MaxFollowers\": 5") && json.Contains("\"GuardRadius\": 16") && json.Contains("\"HealthRegenSpeed\": 30.0") && json.Contains("\"ShareFriends\": false") && json.Contains("\"Relation\": \"enemy\"") && !freshCfg.Relations.Any(r => r.Relation == "ally") && freshCfg.Relations.Count == 1, "a new file is written with version 29 (no MaxHirelings, no alliance), the example entry, the battle spacing, helmet and shield settings, the regen settings, the guard radius and the hire and follow caps");
+        Check(storeFresh && freshCfg.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 30 && json.Contains("\"Version\": 30") && json.Contains("\"RosterPerCaptain\": 8") && !json.Contains("MaxHirelings") && json.Contains("\"ShieldChance\": 0.5") && json.Contains("\"HelmetChance\": 0.6") && json.Contains("\"CaptainsAlwaysHelmeted\": false") && json.Contains("\"MaxAttackersPerTarget\": 4") && json.Contains("\"CombatSpacing\": 1.5") && json.Contains("\"BattleLines\": true") && json.Contains("\"DuelDistanceMin\": 1.0") && json.Contains("\"DuelDistanceMax\": 1.6") && json.Contains("\"LineHoldRange\": 6.0") && json.Contains("\"MaxRecruits\": 16") && json.Contains("\"MaxFollowers\": 5") && json.Contains("\"GuardRadius\": 16") && json.Contains("\"HealthRegenSpeed\": 30.0") && json.Contains("\"ShareFriends\": false") && json.Contains("\"Relation\": \"enemy\"") && !freshCfg.Relations.Any(r => r.Relation == "ally") && freshCfg.Relations.Count == 1, "a new file is written with version 30 (no MaxHirelings, no alliance), the example entry, the battle spacing, helmet and shield settings, the regen settings, the guard radius and the hire and follow caps");
         var current = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(json.Replace("\"Stance\": \"aggressive\"", "\"Stance\": \"defensive\"")), out bool storeCurrent);
         Check(!storeCurrent && current.Factions["gondor"].Stance == "defensive", "a current file is left alone, even with defensive factions");
         // 0.0.112: files before version 19 are no longer converted step by step (both servers run 0.0.108 or later).
@@ -174,15 +174,15 @@ public static class Program {
         cfg = new FactionConfig(); SetLegacy(fs, cfg);
         var d = fs.Config.Factions;
         Check(new[] { "gondor", "rohan", "dale", "arnor", "haradrim", "dunlendings", "blacknumenoreans", "easterlings", "dwarves", "wickeddwarves", "shire", "elves", "tormentedelves", "mordor", "angmar", "mistymountains", "isengard" }.All(d.ContainsKey), "all 17 factions are in the default config");
-        Check(new[] { "gondor", "rohan", "dale", "arnor" }.All(f => d[f].FriendlyRaces.Count == 0) && new[] { "gondor", "rohan", "dale", "arnor" }.All(f => fs.WantsToAttack(f, Player("lrc:freepeople")) && fs.WantsToAttack(f, Player("faraces:northman"))), "Men of the West share one race, so Gondor, Rohan, Dale and Arnor list none and attack it (players join by group or /lotrfaction set)");
+        Check(new[] { "gondor", "rohan", "dale", "arnor" }.All(f => d[f].FriendlyRaces.Count == 0) && new[] { "gondor", "rohan", "dale", "arnor" }.All(f => fs.WantsToAttack(f, Player("lrc:freepeople")) && fs.WantsToAttack(f, Player("lrc:freepeople"))), "Men of the West share one race, so Gondor, Rohan, Dale and Arnor list none and attack it (players join by group or /lotrfaction set)");
         Check(!fs.WantsToAttack("haradrim", Player("lrc:haradrim")) && !fs.WantsToAttack("blacknumenoreans", Player("lrc:bnumenorean")) && !fs.WantsToAttack("dunlendings", Player("lrc:wildmen")) && !fs.WantsToAttack("easterlings", Player("lrc:easterling")), "Haradrim, Black Numenoreans, Dunlendings and Easterlings spare their own race");
-        Check(new[] { "lrc:harfoot", "lrc:stoor", "lrc:fallohide", "faraces:hobbit" }.All(r => fs.IsFriend("shire", r, none)), "every hobbit sub-race is the Shire");
+        Check(new[] { "lrc:harfoot", "lrc:stoor", "lrc:fallohide" }.All(r => fs.IsFriend("shire", r, none)), "every hobbit sub-race is the Shire");
         Check(new[] { "lrc:longbeard", "lrc:firebeardsandbroadbeams" }.All(r => fs.IsFriend("dwarves", r, none) && fs.WantsToAttack("wickeddwarves", Player(r))) && fs.IsFriend("wickeddwarves", "lrc:wickeddwarf", none) && fs.WantsToAttack("dwarves", Player("lrc:wickeddwarf")), "Longbeards and Firebeards are the Dwarves; wicked dwarves are their own faction");
         Check(new[] { "lrc:noldor", "lrc:sindar", "lrc:avari" }.All(r => fs.IsFriend("elves", r, none) && fs.WantsToAttack("tormentedelves", Player(r))) && fs.IsFriend("tormentedelves", "lrc:tormentedelf", none) && fs.WantsToAttack("elves", Player("lrc:tormentedelf")), "Noldor, Sindar and Avari are the Elves; tormented elves are their own faction");
         Check(fs.WantsToAttack("elves", Npc("test-tormentedelf-recruit")) && fs.WantsToAttack("dale", Npc("test-arnor-warrior")) && fs.WantsToAttack("wickeddwarves", Npc("test-dwarf-captain")) && fs.WantsToAttack("haradrim", Npc("test-blacknumenorean-recruit")), "the new factions fight each other on sight (no alliances by default)");
         // admin-set factions
-        var hobbitOrc = Member("faraces:hobbit", "mordor");
-        Check(!fs.WantsToAttack("mordor", hobbitOrc) && fs.WantsToAttack("angmar", hobbitOrc) && !fs.IsFriend("shire", "faraces:hobbit", none, "mordor") && fs.IsFriend("mordor", "faraces:hobbit", none, "mordor"), "/lotrfaction set: a hobbit set to Mordor is spared by Mordor, and is no longer a Shire member");
+        var hobbitOrc = Member("lrc:harfoot", "mordor");
+        Check(!fs.WantsToAttack("mordor", hobbitOrc) && fs.WantsToAttack("angmar", hobbitOrc) && !fs.IsFriend("shire", "lrc:harfoot", none, "mordor") && fs.IsFriend("mordor", "lrc:harfoot", none, "mordor"), "/lotrfaction set: a hobbit set to Mordor is spared by Mordor, and is no longer a Shire member");
         Check(fs.IsFriend("rohan", "lrc:freepeople", new List<string> { "edoras" }, "gondor") == false && fs.IsFriend("gondor", "lrc:freepeople", new List<string> { "edoras" }, "gondor"), "...the set faction counts");
         cfg = new FactionConfig(); cfg.FillDefaults(); cfg.Factions["rohan"].FriendlyGroups.Add("Edoras"); SetLegacy(fs, cfg);
         Check(fs.IsFriend("rohan", "lrc:freepeople", new List<string> { "edoras" }, "gondor"), "...and the player's groups still count");
@@ -193,7 +193,7 @@ public static class Program {
         Check(fs.AssignedFaction("uidX") == "shire", "set factions are stored lower case");
         cfg.Relations.Add(new FactionRelationDef { A = "elves", B = "dwarves", Relation = "ally", ShareFriends = true }); SetLegacy(fs, cfg);
         Check(!fs.WantsToAttack("dwarves", Member("lrc:wildmen", "elves")) && fs.WantsToAttack("gondor", Member("lrc:wildmen", "elves")), "a set faction shares friends through ShareFriends alliances like a race does");
-        string desc = fs.DescribePlayer("Bilbo", "faraces:hobbit", new List<string>(), "mordor");
+        string desc = fs.DescribePlayer("Bilbo", "lrc:harfoot", new List<string>(), "mordor");
         Check(desc.Contains("faction mordor") && desc.Contains("Friend of: mordor"), "/recruits faction check shows the player's faction");
         // hire prices
         cfg = new FactionConfig(); SetLegacy(fs, cfg);
@@ -257,6 +257,27 @@ public static class Program {
         Check(Recruit.OwnerUidOf(guard) == uid && Recruit.OwnerUidOf(wildGondor) == null && Recruit.OwnerUidOf(lord) == null && Recruit.OrderOf(guard) == Recruit.Follow, "a hired NPC knows its owner and starts with Follow me");
         Recruit.SetOrder(guard2, Recruit.Hold);
         Check(Recruit.OrderOf(guard2) == Recruit.Hold && Recruit.HoldPos(guard2) != null && Recruit.HoldPos(guard) == null, "Hold your position remembers the spot");
+        {
+            // 0.0.114: a removal sends only that key (a full resend rebuilds the NPC's model on every client).
+            var server = new SyncedTreeAttribute(); server.SetDouble("a", 1); server.SetDouble("b", 2); server.MarkClean();
+            Recruit.DropWatched(server, "missing");
+            bool quiet = !server.AllDirty && !server.PartialDirty;
+            Recruit.DropWatched(server, "a");
+            server.GetDirtyPathData(out string[] paths, out byte[][] data);
+            var client = new SyncedTreeAttribute(); client.SetDouble("a", 1); client.SetDouble("b", 2);
+            for (int i = 0; i < paths.Length; i++) client.PartialUpdate(paths[i], data[i]);
+            guard.WatchedAttributes.MarkClean(); guard2.WatchedAttributes.MarkClean();
+            Recruit.SetOrder(guard, Recruit.Follow); Recruit.SetFollowSlot(guard, null);
+            bool looseQuiet = !guard.WatchedAttributes.AllDirty;
+            Recruit.SetOrder(guard2, Recruit.Follow);
+            Check(quiet && !server.AllDirty && paths.SequenceEqual(new[] { "a" }) && !server.HasAttribute("a") && !client.HasAttribute("a") && client.HasAttribute("b")
+                && looseQuiet && !guard2.WatchedAttributes.AllDirty && Recruit.HoldPos(guard2) == null,
+                "0.0.114: removing a recruit's watched key sends just that key and the client deletes it; a missing key sends nothing, so loose followers' orders resend nothing");
+            Recruit.SetOrder(guard2, Recruit.Hold);
+            TreeAttribute Gear(int durability) { var t = new TreeAttribute(); var slot = new TreeAttribute(); slot.SetInt("durability", durability); t["slot0"] = slot; t.SetInt("qslots", 15); return t; }
+            Check(GearSyncGuard.SameTree(Gear(40), Gear(40)) && !GearSyncGuard.SameTree(Gear(40), Gear(39)),
+                "0.0.114: an NPC's gear is resent only when it differs from what players already have (a save no longer rebuilds every NPC's model)");
+        }
         Check(!fs.WantsToAttack("gondor", guard) && !fs.WantsToAttack("shire", guard) && fs.WantsToAttack("mordor", guard) && fs.WantsToAttack("rohan", guard), "wild NPCs treat a recruit as they treat its owner: Gondor and the Shire leave a Gondor member's recruit alone, Mordor and Rohan attack it");
         Check(!fs.RecruitWantsToAttack(guard, uid, lord) && !fs.RecruitWantsToAttack(guard, uid, guard2) && !fs.RecruitWantsToAttack(guard, uid, guard), "a recruit never targets its owner or the owner's other recruits");
         Check(fs.RecruitWantsToAttack(guard, uid, wildMordor) && fs.RecruitWantsToAttack(guard, uid, wildRohan) && fs.RecruitWantsToAttack(guard, uid, drifter), "...attacks NPCs that would attack its owner, and monsters, on sight");
@@ -735,7 +756,7 @@ public static class Program {
         // With the owner offline, guards go by the owner's last known race, groups, faction and whitelist.
         var away = Player("lrc:longbeard"); hiring.SetOwner(away.PlayerUID, new HiringOwner { Name = "Away", Race = "lrc:longbeard", EntityId = 0 });
         var keeper = At(Hired("test-dwarf-warrior", away.PlayerUID), 200, 64, 200); Recruit.SetGuardAt(keeper, new Vec3d(200, 64, 200));
-        Check(!fs.RecruitWantsToAttack(keeper, away.PlayerUID, At(Member("lrc:longbeard", "dwarves"), 205, 64, 200)) && fs.RecruitWantsToAttack(keeper, away.PlayerUID, At(Player("faraces:hobbit"), 205, 64, 200)),
+        Check(!fs.RecruitWantsToAttack(keeper, away.PlayerUID, At(Member("lrc:longbeard", "dwarves"), 205, 64, 200)) && fs.RecruitWantsToAttack(keeper, away.PlayerUID, At(Player("lrc:harfoot"), 205, 64, 200)),
             "with the owner offline, guards still spare the owner's people (a dwarf) and stop strangers (a hobbit)");
 
         // Cached player sides follow every change at once.
@@ -793,7 +814,7 @@ public static class Program {
         // A config with mistakes is used as far as it makes sense, never stopping the server.
         var messy = new FactionConfig {
             Factions = new Dictionary<string, FactionDef> {
-                ["Gondor"] = new FactionDef { FriendlyRaces = new List<string> { null, " FARACES:Numenorean ", "" }, FriendlyGroups = new List<string> { null, "Minas Tirith", "minas tirith" }, Stance = " Aggressive ",
+                ["Gondor"] = new FactionDef { FriendlyRaces = new List<string> { null, " LRC:FreePeople ", "" }, FriendlyGroups = new List<string> { null, "Minas Tirith", "minas tirith" }, Stance = " Aggressive ",
                     HirePrices = new Dictionary<string, int> { ["Warrior"] = 20, ["warrior"] = 99, [" "] = 3 } },
                 ["gondor"] = new FactionDef { Stance = "defensive" },
                 ["mordor"] = null,
@@ -804,7 +825,7 @@ public static class Program {
         bool threw = false;
         try { SetLegacy(fs, messy); } catch (Exception e) { threw = true; Console.WriteLine("  " + e); }
         Check(!threw && fs.Config.Factions.Count == 3 && fs.Config.Factions.Keys.OrderBy(k => k).SequenceEqual(new[] { "gondor", "mordor", "rohan" }), "a config with an id twice (in other case), an empty id and an empty entry loads, keeping the first of each");
-        Check(!threw && fs.Config.Factions["gondor"].Stance == "aggressive" && fs.Config.Factions["gondor"].FriendlyRaces.SequenceEqual(new[] { "faraces:numenorean" }) && fs.Config.Factions["gondor"].FriendlyGroups.SequenceEqual(new[] { "minas tirith" })
+        Check(!threw && fs.Config.Factions["gondor"].Stance == "aggressive" && fs.Config.Factions["gondor"].FriendlyRaces.SequenceEqual(new[] { "lrc:freepeople" }) && fs.Config.Factions["gondor"].FriendlyGroups.SequenceEqual(new[] { "minas tirith" })
             && HiringSystem.PriceFor(fs.Config.Factions["gondor"], "warrior") == 20 && HiringSystem.PriceFor(fs.Config.Factions["gondor"], "captain") == 40, "...empty and repeated races, groups and prices are dropped, case and spaces don't matter");
         Check(!threw && fs.Relation("mordor", "gondor") == FactionRelation.Ally && fs.Relation("rohan", "rohan") == FactionRelation.Ally && fs.WantsToAttack("gondor", Mob("game:drifter-normal"))
             && !fs.IsAggressive("rohan") && fs.IsAggressive("mordor") && !fs.WantsToAttack("rohan", Player(null)), "...relations without both sides are skipped, monster codes are trimmed, and an unknown stance fights only when attacked");
@@ -1808,6 +1829,17 @@ public static class Program {
             Check(lsys.LineCount == 0 && lsys.LineOf(o2.EntityId) == null, "a line with no members left is gone");
             var gGondor = Wild("test-gondor-recruit"); gGondor.Pos.SetPos(0, 0, 30);
             Check(lsys.Join(o1, gGondor, 0) != lsys.Join(Wild("test-gondor-warrior").Also(e => e.Pos.SetPos(0, 0, 40)), o1, 0), "each side has its own line");
+            {
+                var ls = new BattleLineSystem(fs);
+                var near = Wild("test-mordororc-warrior"); near.Pos.SetPos(0, 0, 0);
+                var straggler = Wild("test-mordororc-warrior"); straggler.Pos.SetPos(-17, 0, 0);
+                var farOrc = Wild("test-mordororc-warrior"); farOrc.Pos.SetPos(-17, 0, 60);
+                var foe = Wild("test-gondor-warrior"); foe.Pos.SetPos(8, 0, 0);
+                var foe2 = Wild("test-gondor-warrior"); foe2.Pos.SetPos(8, 0, 60);
+                var fought = ls.Join(near, foe, 0);
+                Check(ls.Join(straggler, foe, 0) == fought && ls.Join(farOrc, foe2, 0) != fought && ls.LineCount == 2,
+                    "0.0.114: a straggler beyond the join radius joins its side's line fighting near its enemy; one fighting another enemy far away starts its own");
+            }
 
             // Recruits: lines only for followers in a formation other than Loose.
             var rec = Wild("test-gondor-warrior");
@@ -1969,7 +2001,7 @@ public static class Program {
             }
             v27["Factions"]["angmar"]["HirePrices"]["captain"] = 30; v27["Factions"]["isengard"]["PromotePrices"]["warrior"] = 20; v27["Factions"]["elves"]["Damage"]["captain"] = 12;
             var m27 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v27.ToString()), out bool store27);
-            Check(store27 && m27.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 29
+            Check(store27 && m27.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 30
                 && H4(m27.Factions["mordor"].HirePrices) == "5/12/29/12" && P3(m27.Factions["mordor"].PromotePrices) == "9/9/25" && T4(m27.Factions["mordor"].Health) == "19/30/40/30"
                 && H4(m27.Factions["angmar"].HirePrices) == "4/11/30/11" && P3(m27.Factions["angmar"].PromotePrices) == "8/8/25" && T4(m27.Factions["angmar"].Damage) == "2.7/3.35/6.2/2.65"
                 && H4(m27.Factions["isengard"].HirePrices) == "4/15/41/16" && P3(m27.Factions["isengard"].PromotePrices) == "20/14/40"
@@ -2391,8 +2423,14 @@ public static class Program {
             var m28 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v28.ToString()), out bool store28);
             v28["Version"] = 29;
             var m29 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v28.ToString()), out _);
-            Check(store28 && m28.NpcHitsIgnoreHurtWindow && m28.Version == 29 && !m29.NpcHitsIgnoreHurtWindow,
+            Check(store28 && m28.NpcHitsIgnoreHurtWindow && m28.Version == FactionConfig.CurrentVersion && !m29.NpcHitsIgnoreHurtWindow,
                 "0.0.112 (owner: \"keep the i-frames off for now\"): a version 28 file's false turns on once; an admin's false in a version 29 file stays");
+            var v29 = Newtonsoft.Json.Linq.JObject.FromObject(c109); v29["Version"] = 29;
+            v29["Factions"]["shire"]["FriendlyRaces"] = new Newtonsoft.Json.Linq.JArray("lrc:harfoot", "faraces:hobbit", " FARACES:Hobbit2 ");
+            var m30 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v29.ToString()), out bool store30);
+            Check(store30 && m30.Version == 30 && m30.Factions["shire"].FriendlyRaces.SequenceEqual(new[] { "lrc:harfoot" })
+                && c109.Factions.Values.All(d => d.FriendlyRaces.All(r => !r.StartsWith("faraces:"))),
+                "0.0.114 (owner: \"remove connection with fa races\"): no faction lists a Fourth Age Races race, and a version 29 file drops them once");
             Check(BattleLog.Classify(true, true, true) == BattleLog.Result.Landed && BattleLog.Classify(false, true, true) == BattleLog.Result.LostWindow
                 && BattleLog.Classify(false, false, true) == BattleLog.Result.LostOther && BattleLog.Classify(false, true, false) == BattleLog.Result.LostOther,
                 "0.0.109: a hit is landed, lost to the hurt window (target alive and in its window), or lost otherwise");

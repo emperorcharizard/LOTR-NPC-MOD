@@ -271,7 +271,7 @@ namespace LotrNpcs
         // Format of the file. 0 = written by 0.0.31, 1 = by 0.0.32, 2 = by 0.0.33, 3 = by 0.0.34, 4 = by 0.0.35 to
         // 0.0.38, 5 = by 0.0.39 and 0.0.40, 6 = by 0.0.41 to 0.0.43, 7 = by 0.0.44 to 0.0.47, 8 = by 0.0.48 to 0.0.50, 9 = by 0.0.51 and 0.0.52, 10 = by 0.0.53, 11 = by 0.0.54, 12 = by 0.0.55 to 0.0.58, 13 = by 0.0.59 to 0.0.61, 14 = by 0.0.62 to 0.0.73, 15 = by 0.0.74 and 0.0.75, 16 = by 0.0.76 to 0.0.81, 17 = by 0.0.82 to 0.0.84, 18 = by 0.0.85 to 0.0.89, 19 = by 0.0.90, 20 = by 0.0.91, 21 = by 0.0.92, 22 = by 0.0.93, 23 = by 0.0.94 to 0.0.101, 24 = by 0.0.102, 25 = by 0.0.103, 26 = by 0.0.104 to 0.0.106, 27 = by 0.0.107, 28 = by 0.0.108 to 0.0.111, 29 = by 0.0.112;
         // Migrate() updates older files once and then stores them.
-        public const int CurrentVersion = 29;
+        public const int CurrentVersion = 30;
         public int Version;
         public Dictionary<string, FactionDef> Factions;
         public List<FactionRelationDef> Relations;
@@ -642,6 +642,13 @@ namespace LotrNpcs
             if (Version < 26 && Version > 0) BattleLines = true;
             // 0.0.112 (version 29, owner: "keep the i-frames off for now"): NPC hits on NPCs skip the hurt window, once.
             if (Version < 29 && Version > 0) NpcHitsIgnoreHurtWindow = true;
+            // 0.0.114 (version 30, owner: "remove connection with fa races"): Fourth Age Races' races leave every
+            // faction's friendly races, once.
+            if (Version < 30 && Version > 0)
+            {
+                foreach (FactionDef def in Factions.Values)
+                    def?.FriendlyRaces?.RemoveAll(r => r != null && r.Trim().StartsWith("faraces:", StringComparison.OrdinalIgnoreCase));
+            }
             // 0.0.103 (version 25, owner chose "Narrow orcs to ~0.78 of a Man"): orc-tier factions (Mordor, Angmar,
             // Gundabad, and any with the orc tables) whose health or damage table is still exactly 0.0.91's take the new
             // one; a table the admin changed stays.
@@ -701,11 +708,11 @@ namespace LotrNpcs
                 ["haradrim"] = F("aggressive", "lrc:haradrim"),
                 ["dunlendings"] = F("aggressive", "lrc:wildmen"),
                 ["blacknumenoreans"] = F("aggressive", "lrc:bnumenorean"),
-                ["easterlings"] = F("aggressive", "lrc:easterling", "faraces:easterling"),
-                ["dwarves"] = F("aggressive", "lrc:longbeard", "lrc:firebeardsandbroadbeams", "faraces:dwarf"),
+                ["easterlings"] = F("aggressive", "lrc:easterling"),
+                ["dwarves"] = F("aggressive", "lrc:longbeard", "lrc:firebeardsandbroadbeams"),
                 ["wickeddwarves"] = F("aggressive", "lrc:wickeddwarf"),
-                ["shire"] = F("defensive", "lrc:harfoot", "lrc:stoor", "lrc:fallohide", "faraces:hobbit"),
-                ["elves"] = F("aggressive", "lrc:noldor", "lrc:sindar", "lrc:avari", "faraces:elf"),
+                ["shire"] = F("defensive", "lrc:harfoot", "lrc:stoor", "lrc:fallohide"),
+                ["elves"] = F("aggressive", "lrc:noldor", "lrc:sindar", "lrc:avari"),
                 ["tormentedelves"] = F("aggressive", "lrc:tormentedelf"),
                 ["mordor"] = F("aggressive"),
                 ["angmar"] = F("aggressive"),

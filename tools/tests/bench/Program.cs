@@ -41,7 +41,7 @@ public static class Program {
             "test-rohan-recruit", "test-dwarf-warrior", "test-elf-recruit", "test-hobbit", "test-haradrim-recruit", "test-easterling-captain" };
         var crowd = new List<Entity>();
         for (int i = 0; i < 3; i++) foreach (string c in npcCodes) crowd.Add(Npc(c));
-        var players = new List<EntityPlayer> { Player("lrc:orc"), Player("lrc:longbeard"), Player("faraces:hobbit"), Player(null), Player("lrc:noldor"), Player("lrc:wildmen") };
+        var players = new List<EntityPlayer> { Player("lrc:orc"), Player("lrc:longbeard"), Player("lrc:harfoot"), Player(null), Player("lrc:noldor"), Player("lrc:wildmen") };
         fs.SetAssigned(players[3].PlayerUID, "Lord", "gondor");
         crowd.AddRange(players);
         for (int i = 0; i < 4; i++) { crowd.Add(Mob("game:drifter-normal", true)); crowd.Add(Mob("game:wolf-eurasian-adult-male", true)); crowd.Add(Mob("game:deer-redbrocket-male", true)); crowd.Add(Mob("game:armorstand", false)); }

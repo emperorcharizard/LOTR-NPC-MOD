@@ -57,6 +57,13 @@ namespace LotrNpcs
         public static bool WearsHelmet(string rank, double chance, bool captainsAlways, Random rand, bool helmetOptional = true) =>
             !helmetOptional || (captainsAlways && rank == "captain") || rand.NextDouble() < chance;
 
+        // On an NPC's watched attributes, sends just this key, not all of them (0.0.114, Recruit.DropWatched).
+        static void DropKept(ITreeAttribute attrs)
+        {
+            if (attrs is SyncedTreeAttribute synced) Recruit.DropWatched(synced, KeptHelmetAttr);
+            else attrs.RemoveAttribute(KeptHelmetAttr);
+        }
+
         /// <summary>Takes the helmet off into the kept attribute, or puts the kept one back on. True if it moved.</summary>
         public static bool MoveHelmet(ItemSlot head, ITreeAttribute attrs, bool on, IWorldAccessor world)
         {
@@ -72,7 +79,7 @@ namespace LotrNpcs
             ItemStack kept = KeptHelmet(attrs, world);
             if (kept == null || !head.Empty) return false;
             head.Itemstack = kept;
-            attrs.RemoveAttribute(KeptHelmetAttr);
+            DropKept(attrs);
             head.MarkDirty();
             return true;
         }
@@ -143,7 +150,7 @@ namespace LotrNpcs
                 stack = new ItemStack(item);
             }
             head.Itemstack = stack;
-            attrs.RemoveAttribute(KeptHelmetAttr);
+            DropKept(attrs);
             head.MarkDirty();
             return true;
         }
