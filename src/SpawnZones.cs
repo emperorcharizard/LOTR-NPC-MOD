@@ -726,7 +726,7 @@ namespace LotrNpcs
             }
             catch (Exception e)
             {
-                sapi.Logger.Error("[lotrnpcs] Could not read the saved spawn zones: " + e.Message);
+                SavedData.KeepUnreadable(sapi, SaveKey, bytes, "saved spawn zones", e);
             }
         }
 

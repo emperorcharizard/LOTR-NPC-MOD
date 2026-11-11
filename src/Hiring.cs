@@ -54,6 +54,24 @@ namespace LotrNpcs
         public int Count;
     }
 
+    /// <summary>0.0.113: a recruit as last seen loaded, saved with the world for the roster screen.</summary>
+    public class RecruitSummary
+    {
+        public string Code, Name, Rank, Faction, Order, Stance, Borrower;
+        public int Xp;
+        public double X, Y, Z;
+        public int Dimension;
+        public DateTime Seen;
+
+        public static RecruitSummary Of(Entity npc) => new RecruitSummary
+        {
+            Code = npc.Code?.ToShortString(), Name = Looks.NameOf(npc), Rank = NpcTypeInfo.Of(npc)?.Rank, Faction = FactionSystem.FactionOf(npc),
+            Order = Recruit.OrderOf(npc), Stance = Recruit.StanceOf(npc), Xp = Promotion.Xp(npc),
+            Borrower = Recruit.BorrowerUidOf(npc) != null ? npc.WatchedAttributes.GetString(Recruit.BorrowerNameAttr) : null,
+            X = npc.Pos.X, Y = npc.Pos.Y, Z = npc.Pos.Z, Dimension = npc.Pos.Dimension, Seen = DateTime.UtcNow,
+        };
+    }
+
     /// <summary>A player who has hired NPCs, saved with the world.</summary>
     public class HiringOwner
     {
@@ -71,6 +89,8 @@ namespace LotrNpcs
         public Dictionary<long, string> RecruitFactions = new Dictionary<long, string>();
         // 0.0.104: which recruits are captains, for the captain limit while they aren't loaded.
         public HashSet<long> Captains = new HashSet<long>();
+        // 0.0.113 roster screen: what each recruit was like when last seen, for the ones that aren't loaded.
+        public Dictionary<long, RecruitSummary> Summaries = new Dictionary<long, RecruitSummary>();
         // Players the owner's recruits never attack on sight (design doc: a whitelist with add, remove and list,
         // now /recruits whitelist), by UID, with the name they had when added.
         public Dictionary<string, string> Whitelist = new Dictionary<string, string>();
@@ -95,7 +115,7 @@ namespace LotrNpcs
     public static class ModCommands
     {
         public const string Root = "recruits";
-        public const string RootHelp = "LOTR NPCs, every command of the mod. For players: join, dismissall, whitelist, orders. For admins: faction, zone. Type /help recruits <command> for one of them.";
+        public const string RootHelp = "LOTR NPCs, every command of the mod. For players: join, dismissall, whitelist, orders, roster. For admins: faction, zone. Type /help recruits <command> for one of them.";
         public const string AdminOnlyText = "Only server admins can use /recruits faction and /recruits zone.";
 
         /// <summary>The mod's root command, made by whichever system starts first.</summary>
@@ -479,6 +499,7 @@ namespace LotrNpcs
             owner.Captains ??= new HashSet<long>();
             if (RankOf(npc) == "captain") owner.Captains.Add(npc.EntityId);
             else owner.Captains.Remove(npc.EntityId);
+            (owner.Summaries ??= new Dictionary<long, RecruitSummary>())[npc.EntityId] = RecruitSummary.Of(npc);
         }
 
         /// <summary>A captain's share of the player's captain places (0.0.104): 1 / CaptainsOf(its faction).</summary>
@@ -607,7 +628,7 @@ namespace LotrNpcs
         public static int PriceFor(FactionDef def, string rank)
         {
             Dictionary<string, int> prices = def?.HirePrices ?? FactionConfig.DefaultHirePrices();
-            if (rank != null && prices.TryGetValue(rank.ToLowerInvariant(), out int price)) return Math.Max(0, price);
+            if (rank != null && (prices.TryGetValue(rank.ToLowerInvariant(), out int price) || prices.TryGetValue(Promotion.BaseRank(rank.ToLowerInvariant()), out price))) return Math.Max(0, price);
             return prices.TryGetValue("recruit", out int recruit) ? Math.Max(0, recruit) : 0;
         }
 
@@ -772,23 +793,13 @@ namespace LotrNpcs
                     }
                 case string promote when promote.StartsWith("promote:"):
                     {
-                        string rank = promote.Substring("promote:".Length);
                         if (state.Mode != "own") return state;
-                        if (rank == "captain" && state.CaptainsFull) return StateFor(npc, player, "talk-captains-full");
-                        if (state.Promote == null || !state.Promote.TryGetValue(rank, out int price)) return state;
-                        if (Pay(player, state.Coin, price) is string poor)
-                        {
-                            TalkState refused = StateFor(npc, player, poor == "talk-poor" ? "talk-promote-poor" : "talk-promote-nocoin");
-                            refused.Price = price;
-                            return refused;
-                        }
-                        string before = Recruit.TitleInSentence(npc, player.LanguageCode);
-                        EntityAgent next = Promotions?.Promote(npc, rank);
-                        if (next == null) return state;
-                        player.SendMessage(GlobalConstants.GeneralChatGroup, Lang.GetL(player.LanguageCode, "lotrnpcs:promote-done", before, Recruit.TitleInSentence(next, player.LanguageCode)), EnumChatType.Notification);
-                        sapi?.Logger.Notification("[lotrnpcs] " + player.PlayerName + " promoted their recruit to " + rank + " for " + price + " " + state.Coin + ".");
-                        // The menu belonged to the old NPC: it closes.
-                        return null;
+                        string refusal = PromoteRecruit(npc, player, promote.Substring("promote:".Length), out int price);
+                        // Done: the menu belonged to the old NPC, so it closes.
+                        if (refusal == null) return null;
+                        TalkState refused = StateFor(npc, player, refusal);
+                        refused.Price = price;
+                        return refused;
                     }
                 case "dismiss":
                     if (state.Mode != "own") return state;
@@ -798,6 +809,141 @@ namespace LotrNpcs
                 default:
                     return state;
             }
+        }
+
+        /// <summary>
+        /// Promotes the player's own recruit to rank if its XP is full, the rank is on offer and the player pays (the talk
+        /// menu, and since 0.0.113 the promotion screen, also from the roster, at any distance). Null when done (the
+        /// owner is told in chat), else the reply's lang key, with the price it asked for.
+        /// </summary>
+        public string PromoteRecruit(EntityAgent npc, IServerPlayer player, string rank, out int price)
+        {
+            price = 0;
+            TalkState state = npc != null && npc.Alive ? StateFor(npc, player) : null;
+            if (state?.Mode != "own") return "promote-unavailable";
+            if (rank == "captain" && state.CaptainsFull) return "talk-captains-full";
+            if (state.Promote == null || !state.Promote.TryGetValue(rank, out price)) return "promote-unavailable";
+            if (Pay(player, state.Coin, price) is string poor) return poor == "talk-poor" ? "talk-promote-poor" : "talk-promote-nocoin";
+            string before = Recruit.TitleInSentence(npc, player.LanguageCode);
+            EntityAgent next = Promotions?.Promote(npc, rank);
+            if (next == null) return "promote-unavailable";
+            player.SendMessage(GlobalConstants.GeneralChatGroup, Lang.GetL(player.LanguageCode, "lotrnpcs:promote-done", before, Recruit.TitleInSentence(next, player.LanguageCode)), EnumChatType.Notification);
+            sapi?.Logger.Notification("[lotrnpcs] " + player.PlayerName + " promoted their recruit to " + rank + " for " + price + " " + state.Coin + ".");
+            return null;
+        }
+
+        // ---- 0.0.113: the roster screen and the promotion screen (Roster.cs) ----
+
+        /// <summary>Server: remembers how a recruit is now, for the roster while it isn't loaded (0.0.113).</summary>
+        public void Summarize(Entity npc)
+        {
+            if (Recruit.OwnerUidOf(npc) is string uid && Owner(uid) is HiringOwner owner && owner.Recruits.Contains(npc.EntityId))
+                (owner.Summaries ??= new Dictionary<long, RecruitSummary>())[npc.EntityId] = RecruitSummary.Of(npc);
+        }
+
+        /// <summary>Server: the roster screen's contents for this player. Loaded recruits are summarized afresh.</summary>
+        public RosterState RosterFor(IServerPlayer player, string notice = null)
+        {
+            string uid = player.PlayerUID;
+            string L(string key, object[] args) => Lang.GetL(player.LanguageCode, "lotrnpcs:" + key, args);
+            RosterState state = new RosterState { Notice = notice };
+            HiringOwner owner = Owner(uid);
+            if (owner == null || sapi == null) { state.Header.Add(L("roster-summary", new object[] { 0, 0 })); return state; }
+            owner.Summaries ??= new Dictionary<long, RecruitSummary>();
+            foreach (long id in owner.Recruits)
+            {
+                Entity e = sapi.World.GetEntityById(id);
+                bool loaded = e != null && e.Alive && Recruit.OwnerUidOf(e) == uid;
+                if (loaded) owner.Summaries[id] = RecruitSummary.Of(e);
+                owner.Summaries.TryGetValue(id, out RecruitSummary sum);
+                owner.RecruitFactions.TryGetValue(id, out string faction);
+                state.Rows.Add(new RosterRow
+                {
+                    Id = id, Loaded = loaded, Known = sum != null, Code = sum?.Code, Name = sum?.Name, Rank = sum?.Rank, Faction = sum?.Faction ?? faction,
+                    Xp = sum?.Xp ?? 0, Need = Promotion.Need(sum?.Rank), Order = sum?.Order, Stance = sum?.Stance, Borrower = sum?.Borrower,
+                    X = sum?.X ?? 0, Y = sum?.Y ?? 0, Z = sum?.Z ?? 0, Dimension = sum?.Dimension ?? 0,
+                    MinutesAgo = sum == null || loaded ? 0 : Math.Max(0, (int)(DateTime.UtcNow - sum.Seen).TotalMinutes),
+                });
+            }
+            state.Header.Add(L("roster-summary", new object[] { owner.Recruits.Count, Followers(uid).Count }));
+            string room = (RoomText(Room(uid, null), L) + " " + RosterText(RosterRoom(uid, null), L)).Trim();
+            if (room.Length > 0) state.Header.Add(room);
+            if (owner.Captains != null && owner.Captains.Count > 0) state.Header.Add(L("roster-captains", new object[] { Percent(CaptainsUsed(uid)) }));
+            return state;
+        }
+
+        /// <summary>Server: a roster row's button (call, dismiss). Returns what to tell the player.</summary>
+        public string RosterAction(IServerPlayer player, string action, long id)
+        {
+            string uid = player.PlayerUID;
+            string L(string key, params object[] args) => Lang.GetL(player.LanguageCode, "lotrnpcs:" + key, args);
+            if (sapi == null || !(Owner(uid) is HiringOwner owner) || !owner.Recruits.Contains(id)) return L("roster-gone");
+            EntityAgent npc = sapi.World.GetEntityById(id) as EntityAgent;
+            bool loaded = npc != null && npc.Alive && Recruit.OwnerUidOf(npc) == uid;
+            switch (action)
+            {
+                case "call":
+                    {
+                        if (!loaded || player.Entity == null) return L("roster-notloaded");
+                        if (Recruit.OrderOf(npc) == Recruit.Follow && Recruit.BorrowerUidOf(npc) == null) return L("roster-already", Recruit.TitleInSentence(npc, player.LanguageCode));
+                        if (!Fits(FollowUsed(uid, npc), FollowShare(FactionSystem.FactionOf(npc)))) return L("roster-call-full");
+                        string borrower = Recruit.BorrowerUidOf(npc);
+                        // As Follow me in the talk menu: the owner's word takes a lent guard back.
+                        Recruit.ClearBorrower(npc);
+                        Recruit.SetShared(npc, false);
+                        Recruit.SetOrder(npc, Recruit.Follow);
+                        Recruit.SetFollowSlot(npc, null);
+                        RefreshFollowSlots(owner, player.Entity);
+                        if (borrower != null && borrower != uid) RefreshBorrowerSlots(borrower);
+                        Learn(owner, npc);
+                        return L("roster-called", Recruit.TitleInSentence(npc, player.LanguageCode));
+                    }
+                case "dismiss":
+                    {
+                        if (loaded)
+                        {
+                            string title = Recruit.TitleInSentence(npc, player.LanguageCode);
+                            Dismiss(npc, uid);
+                            if (player.Entity != null) RefreshFollowSlots(owner, player.Entity);
+                            sapi.Logger.Notification("[lotrnpcs] " + player.PlayerName + " dismissed their recruit " + npc.Code + " (" + id + ") from the roster.");
+                            return L("roster-dismissed", title);
+                        }
+                        // As /recruits dismissall: off the list now, set free when it next loads.
+                        owner.Recruits.Remove(id);
+                        if (!owner.PendingDismiss.Contains(id)) owner.PendingDismiss.Add(id);
+                        sapi.Logger.Notification("[lotrnpcs] " + player.PlayerName + " dismissed their unloaded recruit " + id + " from the roster.");
+                        return L("roster-dismissed-later");
+                    }
+                default:
+                    return null;
+            }
+        }
+
+        /// <summary>Server: the promotion screen for the player's own loaded recruit, or null when it can't be promoted.</summary>
+        public PromoteMenu PromoteMenuFor(IServerPlayer player, long id)
+        {
+            if (sapi == null || !(sapi.World.GetEntityById(id) is EntityAgent npc) || !npc.Alive) return null;
+            TalkState state = StateFor(npc, player);
+            if (state?.Mode != "own" || ((state.Promote == null || state.Promote.Count == 0) && !state.CaptainsFull)) return null;
+            string faction = FactionSystem.FactionOf(npc);
+            AssetLocation coin = new AssetLocation(state.Coin);
+            PromoteMenu menu = new PromoteMenu
+            {
+                Id = id, Code = npc.Code.ToShortString(), Faction = faction, Title = Recruit.Title(npc, player.LanguageCode), Xp = Promotion.Xp(npc),
+                Need = Promotion.Need(RankOf(npc)), Coin = state.Coin, CaptainsFull = state.CaptainsFull,
+                Coins = Purse(player).Where(slot => WildcardUtil.Match(coin, slot.Itemstack.Collectible.Code)).Sum(slot => slot.StackSize),
+            };
+            foreach (string rank in Promotion.Targets(RankOf(npc)))
+            {
+                bool offered = state.Promote != null && state.Promote.ContainsKey(rank);
+                if (!offered && !(rank == "captain" && state.CaptainsFull)) continue;
+                menu.Cards.Add(new PromoteCard
+                {
+                    Rank = rank, Price = offered ? state.Promote[rank] : 0, Open = offered,
+                    Health = Factions?.Config.HealthFor(faction, rank) ?? 0, Damage = Factions?.Config.DamageFor(faction, rank) ?? 0,
+                });
+            }
+            return menu;
         }
 
         TalkState Hire(EntityAgent npc, IServerPlayer player, TalkState state)
@@ -866,6 +1012,7 @@ namespace LotrNpcs
             // Same faction (promotion only changes the rank), so the same shares.
             owner.RecruitFactions.Remove(old.EntityId);
             owner.Captains?.Remove(old.EntityId);
+            owner.Summaries?.Remove(old.EntityId);
             Learn(owner, next);
             Promotion.SyncOwnerGroups(next, owner.Groups);
             if (sapi?.World.PlayerByUid(uid)?.Entity is EntityPlayer by) RefreshFollowSlots(owner, by);
@@ -1091,8 +1238,11 @@ namespace LotrNpcs
             }
         }
 
+        int ticks;
+
         void OnTick(float dt)
         {
+            bool summarizeNow = ++ticks % 30 == 0;
             foreach (IPlayer player in sapi.World.AllOnlinePlayers)
             {
                 if (Owner(player.PlayerUID) is not HiringOwner owner || !(player.Entity is EntityPlayer ownerEntity)) continue;
@@ -1111,6 +1261,8 @@ namespace LotrNpcs
                     if (!recruit.Alive || Recruit.OwnerUidOf(recruit) != kv.Key) { ForgetFollowFight(list[i]); list.RemoveAt(i); continue; }
                     // Who may see its XP (0.0.76): the owner and the owner's /group.
                     Promotion.SyncOwnerGroups(recruit, kv.Value.Groups);
+                    // The roster's picture of it (0.0.113), every 30 seconds.
+                    if (summarizeNow) (kv.Value.Summaries ??= new Dictionary<long, RecruitSummary>())[recruit.EntityId] = RecruitSummary.Of(recruit);
                     // A borrower who left the game gives the guard back: it keeps watch where it stands.
                     if (Recruit.BorrowerUidOf(recruit) != null && Recruit.OnlineLeader(recruit) == null)
                     {
@@ -1294,6 +1446,8 @@ namespace LotrNpcs
             string L(string key, params object[] args) => Lang.GetL(player.LanguageCode, "lotrnpcs:" + key, args);
             EntityPlayer by = player.Entity;
             if (sapi == null || by == null || cmd == null) return L("cmd-none");
+            // The numbers come from the client (0.0.113): a NaN or infinity would end up in positions and facings.
+            if (!new[] { cmd.X, cmd.Y, cmd.Z, cmd.Fx, cmd.Fz }.All(double.IsFinite)) return L("cmd-none");
             List<EntityAgent> crew = Crew(by);
             if (crew.Count == 0) return L("cmd-none");
             HiringOwner owner = EnsureOwner(player);
@@ -1520,12 +1674,13 @@ namespace LotrNpcs
                     owner.PendingDismiss ??= new List<long>();
                     owner.RecruitFactions ??= new Dictionary<long, string>();
                     owner.Captains ??= new HashSet<long>();
+                    owner.Summaries ??= new Dictionary<long, RecruitSummary>();
                 }
                 sapi.Logger.Notification("[lotrnpcs] Loaded " + owners.Values.Sum(o => o.Recruits.Count) + " recruits of " + owners.Count + " players.");
             }
             catch (Exception e)
             {
-                sapi.Logger.Error("[lotrnpcs] Could not read the recruits list: " + e.Message);
+                SavedData.KeepUnreadable(sapi, SaveKey, bytes, "recruits list", e);
             }
         }
 
@@ -1537,6 +1692,7 @@ namespace LotrNpcs
                 if (owner.RecruitFactions == null) continue;
                 foreach (long id in owner.RecruitFactions.Keys.Where(id => !owner.Recruits.Contains(id)).ToList()) owner.RecruitFactions.Remove(id);
                 owner.Captains?.RemoveWhere(id => !owner.Recruits.Contains(id));
+                if (owner.Summaries != null) foreach (long id in owner.Summaries.Keys.Where(id => !owner.Recruits.Contains(id)).ToList()) owner.Summaries.Remove(id);
             }
             sapi.WorldManager.SaveGame.StoreData(SaveKey, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(owners)));
         }
@@ -1735,7 +1891,8 @@ namespace LotrNpcs
         {
             if (hiring == null || Recruit.OwnerUidOf(entity) == null) return;
             EnumDespawnReason reason = despawn?.Reason ?? EnumDespawnReason.Unload;
-            // Unloaded recruits stay hired; death is handled in OnEntityDeath.
+            // Unloaded recruits stay hired; death is handled in OnEntityDeath. The roster remembers where they were (0.0.113).
+            if (reason == EnumDespawnReason.Unload || reason == EnumDespawnReason.OutOfRange) hiring.Summarize(entity);
             if (reason == EnumDespawnReason.Unload || reason == EnumDespawnReason.Disconnect || reason == EnumDespawnReason.OutOfRange || reason == EnumDespawnReason.Death) return;
             hiring.OnRecruitGone(entity, false);
         }
@@ -2163,14 +2320,9 @@ namespace LotrNpcs
                 Choice("lotrnpcs:talk-opt-guard", () => Send(Recruit.Guard));
                 Choice("lotrnpcs:talk-opt-guard-shared", () => Send(Recruit.GuardShared));
                 Choice("lotrnpcs:talk-opt-looks", OpenLooks);
-                // Promotion (0.0.76), once the recruit's XP is full.
-                foreach (KeyValuePair<string, int> offer in state.Promote ?? new Dictionary<string, int>())
-                {
-                    string text = offer.Value > 0 ? Lang.Get("lotrnpcs:talk-opt-promote", Lang.Get("lotrnpcs:title-" + offer.Key), offer.Value, CoinName())
-                        : Lang.Get("lotrnpcs:talk-opt-promote-free", Lang.Get("lotrnpcs:title-" + offer.Key));
-                    string rank = offer.Key;
-                    Add(text, () => { Player(text); Send("promote:" + rank); });
-                }
+                // Promotion (0.0.76), once the recruit's XP is full. 0.0.113: one choice that opens the promotion screen.
+                if ((state.Promote != null && state.Promote.Count > 0) || state.CaptainsFull)
+                    Choice("lotrnpcs:talk-opt-promote-menu", () => { capi.ModLoader.GetModSystem<RosterSystem>()?.Send(new RosterRequest { Action = "promote-menu", Id = npc.EntityId }); Options(); });
                 Add(Lang.Get("lotrnpcs:talk-opt-ask"), Ask);
                 Choice("lotrnpcs:talk-opt-dismiss", () => { confirmDismiss = true; Npc(Format("lotrnpcs:talk-dismiss-ask")); Options(); });
             }

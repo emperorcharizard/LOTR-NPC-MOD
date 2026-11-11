@@ -1,5 +1,6 @@
 """Equal-coin win rates of the shipped prices under several ways of spending. Usage: python3 -I evalcoin.py <Factions.cs> RUNS"""
 import sys, random
+import os; sys.argv = os.environ.setdefault("LOTRNPCS_BALANCE_ARGV", "\n".join(sys.argv)).split("\n")  # Windows pool workers re-run this with the argv edited below; keep the real one
 SRC, RUNS = sys.argv[1], int(sys.argv[2]); sys.argv = [sys.argv[0], SRC, "1"]
 import sim105 as S
 from multiprocessing import Pool

@@ -294,7 +294,7 @@ namespace LotrNpcs
         public static ShieldRule ShieldOf(Entity npc)
         {
             EntityBehaviorHeldWeapon held = Behavior<EntityBehaviorHeldWeapon>(npc);
-            if (held?.ShieldItem == null) return null;
+            if (held?.ShieldItem == null || held.AlwaysShield) return null;
             return new ShieldRule { TwoHanded = held.Weapons.Where(w => w.TwoHanded).Select(w => w.Item).ToArray() };
         }
 

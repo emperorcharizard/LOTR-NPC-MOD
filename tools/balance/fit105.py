@@ -4,6 +4,7 @@ Objective: sum over tiers of (average win rate - target)^2 (Uruk 0.55, others ev
 current (0.0.103) values so the flavour stays. Hill climbing, health +-1 / damage +-0.05, common random numbers.
 Usage: python3 fit105.py <Factions.cs> RANK RUNS STEPS"""
 import sys, random, json
+import os; sys.argv = os.environ.setdefault("LOTRNPCS_BALANCE_ARGV", "\n".join(sys.argv)).split("\n")  # Windows pool workers re-run this with the argv edited below; keep the real one
 SRC, RANK, RUNS, STEPS = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4])
 sys.argv = [sys.argv[0], SRC, str(RUNS)]
 import sim105 as S

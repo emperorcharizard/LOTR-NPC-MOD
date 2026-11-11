@@ -1,0 +1,43 @@
+Balance checks 2026-11-10 (after 0.0.112). Equal-coin regression (tools/balance/evalcoin.py src/Factions.cs 300, two runs, after the Windows argv fix):
+run A 19s, run B 19s
+quarter   Men 0.47  Uruk 0.54  Levy 0.46  Orc 0.46  Goblin 0.51  Elf 0.49  Dwarf 0.56
+quarter   Men 0.47  Uruk 0.54  Levy 0.46  Orc 0.45  Goblin 0.52  Elf 0.49  Dwarf 0.56
+half      Men 0.55  Uruk 0.54  Levy 0.51  Orc 0.53  Goblin 0.49  Elf 0.43  Dwarf 0.46
+half      Men 0.54  Uruk 0.54  Levy 0.51  Orc 0.53  Goblin 0.49  Elf 0.43  Dwarf 0.46
+maxcap    Men 0.49  Uruk 0.45  Levy 0.55  Orc 0.43  Goblin 0.52  Elf 0.51  Dwarf 0.55
+maxcap    Men 0.49  Uruk 0.45  Levy 0.55  Orc 0.43  Goblin 0.53  Elf 0.51  Dwarf 0.54
+nocap     Men 0.45  Uruk 0.45  Levy 0.56  Orc 0.56  Goblin 0.49  Elf 0.46  Dwarf 0.53
+nocap     Men 0.46  Uruk 0.46  Levy 0.56  Orc 0.56  Goblin 0.49  Elf 0.45  Dwarf 0.53
+recruits  Men 0.45  Uruk 0.21  Levy 0.38  Orc 0.74  Goblin 0.66  Elf 0.56  Dwarf 0.51
+recruits  Men 0.44  Uruk 0.20  Levy 0.38  Orc 0.74  Goblin 0.65  Elf 0.56  Dwarf 0.52
+warriors  Men 0.38  Uruk 0.41  Levy 0.54  Orc 0.58  Goblin 0.59  Elf 0.52  Dwarf 0.48
+warriors  Men 0.38  Uruk 0.41  Levy 0.54  Orc 0.58  Goblin 0.59  Elf 0.53  Dwarf 0.48
+
+
+0.0.108 shipped values for comparison: tools/balance/evalcoin-0.0.108.txt (every cell within 0.02).
+
+Branching promotion check (tools/balance/branches.py src/Factions.cs 200):
+
+== veteran: price = warrior price x 1.67, rounded; damage x 1.15, health x m; win rate at m on fresh fights (200 per budget)
+  Men     m 2.32  health  79.0  damage  4.54  price  25   check 0.50
+  Uruk    m 2.34  health  75.0  damage  4.94  price  25   check 0.48
+  Levy    m 2.07  health  58.1  damage  4.14  price  20   check 0.51
+  Orc     m 2.07  health  62.0  damage  3.85  price  20   check 0.49
+  Goblin  m 1.95  health  42.9  damage  3.22  price  15   check 0.49
+  Elf     m 2.45  health  90.5  damage  6.09  price  32   check 0.48
+  Dwarf   m 2.40  health 112.7  damage  4.77  price  32   check 0.47
+
+== marksman: price = archer price x 1.67, rounded; health = archer's, arrow damage x m; win rate at m on fresh fights (200 per budget)
+  Men     m 2.60  health  35.0  damage  7.93  price  25   check 0.12
+  Uruk    m 2.60  health  36.0  damage  7.80  price  27   check 0.29
+  Levy    m 2.60  health  28.0  damage  7.28  price  18   check 0.23
+  Orc     m 2.60  health  30.0  damage  6.89  price  20   check 0.23
+  Goblin  m 2.60  health  22.0  damage  5.72  price  17   check 0.11
+  Elf     m 2.60  health  36.0  damage 11.17  price  33   check 0.17
+  Dwarf   m 2.60  health  47.0  damage  8.57  price  32   check 0.16
+
+== same-price warrior sidegrades against plain warriors, equal coin (200 per budget)
+  guard (health x1.25, damage x0.8) Men 0.48  Uruk 0.50  Levy 0.51  Orc 0.48  Goblin 0.50  Elf 0.49  Dwarf 0.50
+  shock (health x0.8, damage x1.25) Men 0.50  Uruk 0.53  Levy 0.49  Orc 0.49  Goblin 0.48  Elf 0.50  Dwarf 0.48
+  guard (health x1.15, damage x0.87)Men 0.52  Uruk 0.51  Levy 0.52  Orc 0.49  Goblin 0.50  Elf 0.50  Dwarf 0.50
+  shock (health x0.87, damage x1.15)Men 0.52  Uruk 0.51  Levy 0.51  Orc 0.50  Goblin 0.51  Elf 0.49  Dwarf 0.51

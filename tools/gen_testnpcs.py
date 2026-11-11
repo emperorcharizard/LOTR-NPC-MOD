@@ -264,6 +264,21 @@ NEW_WEAPONS = {
     "eastaxe": {"source": "easterling_axe.bbmodel", "name": "Easterling axe", "grip": (27.0, 0.75, 8.0),
                 "rotation": {}, "attack": "poleaxechop", "impact": 14, "hold": "poleaxehold", "twoHanded": True} | CARRY,
 }
+# 0.0.113 (owner, 2026-11-10: rohan_axe.bbmodel and "Easterling Scimitar.bbmodel", sent without notes; they fill the
+# model checklist's "Rohan axe, one-handed" and "Easterlings saber" slots). Measured on the boxes:
+# - Rohan axe: laid out like the orc axe (handle along +X, head at the far end, blade toward +Y, centred on z 8), so
+#   the orc axe's roll, swing and hold; grip on the middle of the wrap (x -1 to 4.1). 41.5 units, 1.56 blocks at the
+#   normal scale (the orc axe is 24 units, 0.91 blocks; the Rohirric sword 1.4-1.7).
+# - Easterling scimitar: along +X, flat in X/Y (z 1.6 to 3.4), the tip curving up to +Y, so the cutting edge (its
+#   "Sharp" boxes) is on the convex -Y side already, where the other swords' edges end up after their roll: no roll.
+#   Grip in the middle of the handle (x 2 to 5.6, y 0.6 to 1.6, z 2.5). 24.7 units, 0.93 blocks. One-handed, swung
+#   like the other swords, so it goes with the Easterling shield.
+NEW_WEAPONS |= {
+    "rhaxe": {"source": "rohan_axe.bbmodel", "name": "Rohirric axe", "grip": (1.5, 0.75, 8.0),
+              "rotation": {"x": 180}, "attack": "axehit", "impact": 22.5},
+    "eastscimitar": {"source": "easterling_scimitar.bbmodel", "name": "Easterling scimitar", "grip": (3.8, 1.1, 2.5),
+                     "rotation": {}, "attack": "falx", "impact": 12.5},
+}
 # 0.0.94 (owner, 2026-11-06: Haradrim_Spear.bbmodel "for haradrim only"; "replace the default option they have now for
 # spear / pike"): kept as tools/weapons/source/haradrim_spear.bbmodel and converted at build time. It lies along +Z,
 # blade at the far end and wide in X, so turned y 90 (along +X, blade forward) and x 90 (blade wide in Y, like the
@@ -362,11 +377,12 @@ GAME_LOADOUTS = {
     # Easterlings' bardiche (NEW_WEAPONS).
     "gondor": {"steelspear": PREFER, "gdsword": 1},
     "arnor": {"steelspear": PREFER, "steelfalx": 1},
-    "rohan": {"rhspear": 1, "rhsword": 1},
+    "rohan": {"rhspear": 1, "rhsword": 1, "rhaxe": 1},
     "dale": {"ironspear": 1, "falx": 1},
     "dunlending": {"woodclub": 1, "flintspear": 1, "ruinedbeardedaxe": 1},
     "blacknumenorean": {"blackguard": 1, "ruinedmace": 1, "bnspear": 1},
-    "easterling": {"bbronzespear": 1, "forlorn": 1, "eastaxe": 1},
+    # 0.0.113: the owner's scimitar replaces the game's Forlorn blade.
+    "easterling": {"bbronzespear": 1, "eastscimitar": 1, "eastaxe": 1},
     "uruk": {"falx": 1, "ironspear": 1, "ruinedbattleaxe": 1},
     "tormentedelf": {"ruinedsabre": 1, "ruinedgladius": 1, "silverspear": 1},
     "angmarorc": {"dagger": 1, "axe": 1, "scrapspear": 1, "scrapmace": 1},
@@ -528,6 +544,13 @@ SHIELD_OF = {"rohan": ["game:shield-woodmetal"], "dale": ["game:shield-woodmetal
              # (infantry, heavy infantry, warlord): the light shield for recruits, the heavy one for warriors and
              # captains. A dict by rank instead of a list.
              "haradrim": {"recruit": ["hdlightshield"], "warrior": ["hdheavyshield"], "captain": ["hdheavyshield"]}}
+# 0.0.113 (owner: "Guards should just be shielded units, and shock troops should be the two handed units"; chose game
+# stand-ins): a guard of a faction without a shield carries one of these, a shock trooper of a faction without a
+# two-handed weapon the game's ruined bardiche. Their other ranks stay as they were. Replaced as the models come.
+GUARD_SHIELD_STANDIN = {"uruk": ["game:shield-woodmetal"], "angmarorc": ["game:shield-crude"],
+                        "gundabadorc": ["game:shield-crude"], "tormentedelf": ["game:shield-woodmetal"],
+                        "wickeddwarf": ["dwtowershield", "dwshield"]}
+SHOCK_STANDIN = "ruinedbardiche"
 # The archers' bow (0.0.55): our own simple model (tools/weapons/orc_bow.json, dark wood, leather grip, iron nocks),
 # since no bow model was supplied; the owner can send one to replace it. Held in the right hand as vanilla holds bows,
 # grip at (0, 0, 8). 0.0.59 (user, 2026-11-03: "update the animations of the bow to be at rest until it is drawn to
@@ -735,19 +758,29 @@ def weapon_list(weapons=WEAPONS, weights=None):
 
 def held_weapon(faction, rank):
     """The lotrnpcs:heldweapon behavior for an NPC: archers keep their bow; other Mordor orcs pick a weapon and may
-    carry the shield."""
+    carry the shield. 0.0.113 branches pick from the warrior's list: guards its one-handed weapons and always the
+    shield (GUARD_SHIELD_STANDIN when the faction has none), shock troops its two-handed weapons (the ruined bardiche
+    when it has none), never with a shield."""
     if rank == "archer":
         bow, poses = BOW_OF.get(faction, DEFAULT_BOW)
         return {"code": "lotrnpcs:heldweapon", "fixed": True,
                 "weapons": [{"item": bow, "attackAnimation": "lotrnpcs-bow-attack"} | ({"poses": poses} if poses else {})]}
-    prefs = WEAPON_PREFS.get(faction, {}).get(rank)
+    base = BASE_RANK.get(rank, rank)
+    prefs = WEAPON_PREFS.get(faction, {}).get(base)
     listed = {name: ALL_WEAPONS[name] for name in prefs} if prefs else WEAPONS_OF.get(faction, {})
+    shields = SHIELD_OF.get(faction, [])
+    shields = shields.get(base, []) if isinstance(shields, dict) else shields
+    if rank == "guard":
+        listed = {n: w for n, w in listed.items() if not w.get("twoHanded")} or listed
+        shields = shields or GUARD_SHIELD_STANDIN.get(faction, [])
+    elif rank == "shock":
+        listed = {n: w for n, w in listed.items() if w.get("twoHanded")} or {SHOCK_STANDIN: ALL_WEAPONS[SHOCK_STANDIN]}
+        shields = []
     behavior = {"code": "lotrnpcs:heldweapon", "weapons": weapon_list(listed, prefs)}
-    if faction in SHIELD_OF:
-        shields = SHIELD_OF[faction]
-        shields = shields.get(rank, []) if isinstance(shields, dict) else shields
-        if shields:
-            behavior["shields"] = [s if ":" in s else f"lotrnpcs:orcweapon-{s}" for s in shields]
+    if shields:
+        behavior["shields"] = [s if ":" in s else f"lotrnpcs:orcweapon-{s}" for s in shields]
+        if rank == "guard":
+            behavior["alwaysShield"] = True
     return behavior
 
 
@@ -966,7 +999,13 @@ WARRIOR_GEAR = ["game:armor-head-chain-iron", "game:armor-body-chain-iron", "gam
 # Each entry is (health, rank armor tier, (melee damage, damage tier)); armor tier 0 leaves out lotrnpcs:rankarmor.
 RANK_STATS = {"recruit": (22, 0, (3, 8)), "warrior": (34, 0, (4, 9)), "captain": (48, 0, (7, 9)),
               # 0.0.55 archers (a unit, not a rank): a warrior's health, a recruit's shove when cornered.
-              "archer": (34, 0, (3, 8))}
+              "archer": (34, 0, (3, 8)),
+              # 0.0.113 promotion-only warrior branches (Promotion.Branches): guard health x1.25 and damage x0.8, shock
+              # the other way round. The faction config's tables replace these (FactionTiers.WithBranches).
+              "guard": (43, 0, (3.2, 9)), "shock": (27, 0, (5, 9))}
+# Ranks that wear, carry and offer what another rank does (0.0.113: the warrior branches).
+BASE_RANK = {"guard": "warrior", "shock": "warrior"}
+BRANCH_NAMES = {"guard": "guard", "shock": "shock trooper"}
 RANKLESS_STATS = (19, 0, (3, 1))
 CAPTAIN_GEAR = ["game:armor-head-antique-blackguard-damaged", "game:armor-body-antique-blackguard-damaged",
                 "game:armor-legs-antique-blackguard-damaged"]
@@ -1345,8 +1384,9 @@ FALLBACK_SETS = {"haradrim": {rank: HARADRIM_OUTFITS for rank in ("recruit", "wa
 
 def ranks(race, people, model, skin):
     """Recruit, warrior and captain test NPCs of one faction."""
-    return [(f"test-{race}-{rank}", f"{people} {rank}", model, skin, gear)
-            for rank, gear in (("recruit", RECRUIT_GEAR), ("warrior", WARRIOR_GEAR), ("captain", CAPTAIN_GEAR), ("archer", RECRUIT_GEAR))]
+    return [(f"test-{race}-{rank}", f"{people} {BRANCH_NAMES.get(rank, rank)}", model, skin, gear)
+            for rank, gear in (("recruit", RECRUIT_GEAR), ("warrior", WARRIOR_GEAR), ("captain", CAPTAIN_GEAR), ("archer", RECRUIT_GEAR),
+                               ("guard", WARRIOR_GEAR), ("shock", WARRIOR_GEAR))]
 
 
 TEST_NPCS = [
@@ -1355,25 +1395,33 @@ TEST_NPCS = [
     ("test-mordororc-warrior", "Mordor orc warrior", "lotrnpcs:mordororc", ORC_SKIN, WARRIOR_GEAR),
     ("test-mordororc-captain", "Mordor orc captain", "lotrnpcs:mordororc", ORC_SKIN, CAPTAIN_GEAR),
     ("test-mordororc-archer", "Mordor orc archer", "lotrnpcs:mordororc", ORC_SKIN, RECRUIT_GEAR),
+    ("test-mordororc-guard", "Mordor orc guard", "lotrnpcs:mordororc", ORC_SKIN, WARRIOR_GEAR),
+    ("test-mordororc-shock", "Mordor orc shock trooper", "lotrnpcs:mordororc", ORC_SKIN, WARRIOR_GEAR),
     # Angmar orcs (user): their own faction, same race model and stats as Mordor orcs, Angmar armor.
     ("test-angmarorc-recruit", "Angmar orc recruit", "lotrnpcs:mordororc", ORC_SKIN, RECRUIT_GEAR),
     ("test-angmarorc-warrior", "Angmar orc warrior", "lotrnpcs:mordororc", ORC_SKIN, WARRIOR_GEAR),
     ("test-angmarorc-captain", "Angmar orc captain", "lotrnpcs:mordororc", ORC_SKIN, CAPTAIN_GEAR),
     ("test-angmarorc-archer", "Angmar orc archer", "lotrnpcs:mordororc", ORC_SKIN, RECRUIT_GEAR),
+    ("test-angmarorc-guard", "Angmar orc guard", "lotrnpcs:mordororc", ORC_SKIN, WARRIOR_GEAR),
+    ("test-angmarorc-shock", "Angmar orc shock trooper", "lotrnpcs:mordororc", ORC_SKIN, WARRIOR_GEAR),
     ("test-uruk", "Uruk-hai", "lotrnpcs:uruk", SKINS + "orc/orcskin9", []),
     # Misty Mountains orcs and Isengard Uruk-hai (user): same ranks and stats as Mordor orcs, their own armor.
     ("test-goblin-recruit", "Misty Mountains orc recruit", "lotrnpcs:goblin", SKINS + "orc/orcskin6", RECRUIT_GEAR),
     ("test-goblin-warrior", "Misty Mountains orc warrior", "lotrnpcs:goblin", SKINS + "orc/orcskin6", WARRIOR_GEAR),
     ("test-goblin-captain", "Misty Mountains orc captain", "lotrnpcs:goblin", SKINS + "orc/orcskin6", CAPTAIN_GEAR),
     ("test-goblin-archer", "Misty Mountains orc archer", "lotrnpcs:goblin", SKINS + "orc/orcskin6", RECRUIT_GEAR),
+    ("test-goblin-guard", "Misty Mountains orc guard", "lotrnpcs:goblin", SKINS + "orc/orcskin6", WARRIOR_GEAR),
+    ("test-goblin-shock", "Misty Mountains orc shock trooper", "lotrnpcs:goblin", SKINS + "orc/orcskin6", WARRIOR_GEAR),
     ("test-uruk-recruit", "Isengard Uruk-hai recruit", "lotrnpcs:uruk", SKINS + "orc/orcskin9", RECRUIT_GEAR),
     ("test-uruk-warrior", "Isengard Uruk-hai warrior", "lotrnpcs:uruk", SKINS + "orc/orcskin9", WARRIOR_GEAR),
     ("test-uruk-captain", "Isengard Uruk-hai captain", "lotrnpcs:uruk", SKINS + "orc/orcskin9", CAPTAIN_GEAR),
     ("test-uruk-archer", "Isengard Uruk-hai archer", "lotrnpcs:uruk", SKINS + "orc/orcskin9", RECRUIT_GEAR),
+    ("test-uruk-guard", "Isengard Uruk-hai guard", "lotrnpcs:uruk", SKINS + "orc/orcskin9", WARRIOR_GEAR),
+    ("test-uruk-shock", "Isengard Uruk-hai shock trooper", "lotrnpcs:uruk", SKINS + "orc/orcskin9", WARRIOR_GEAR),
     # Gundabad (0.0.62, work in progress): the Mordor orc body at 0.9 size (user's choice), the bone armor, no helmets.
     # 0.0.63: their own race model, lotrnpcs:gundabadorc (bundle_lrc.py), the Mordor orc with lighter skins.
-    *[(f"test-gundabadorc-{rank}", f"Gundabad orc {rank}", "lotrnpcs:gundabadorc", SKINS + "orc/orcskin1", GUNDABAD_FALLBACK[rank])
-      for rank in ("recruit", "warrior", "captain", "archer")],
+    *[(f"test-gundabadorc-{rank}", f"Gundabad orc {BRANCH_NAMES.get(rank, rank)}", "lotrnpcs:gundabadorc", SKINS + "orc/orcskin1", GUNDABAD_FALLBACK[BASE_RANK.get(rank, rank)])
+      for rank in ("recruit", "warrior", "captain", "archer", "guard", "shock")],
     ("test-hobbit", "Hobbit", "lotrnpcs:hobbit", SKINS + "hobbit/hobbitskin1", HOBBIT_GEAR),
     # 0.0.35 (user, 2026-11-02): every faction has recruits, warriors and captains. These replace the unarmored
     # Gondor, Rohan, Dunlending, Easterling and Dwarf test NPCs.
@@ -1494,9 +1542,11 @@ for code, name, model, skin_texture, gear in TEST_NPCS:
     client_gear = [{"code": "seraphinventory"}, {"code": "lotrnpcs:helmethidehair", "hideBeardUnder": BEARD_HIDING_HELMETS, "hideEarsUnder": EAR_HIDING_HELMETS}] if gear else []
     faction, _, rank = code.removeprefix("test-").partition("-")
     rank = RANK_OF.get(code, rank)
-    sets = FACTION_SETS.get(faction, {}).get(rank, [])
+    # 0.0.113: guards and shock troops wear the warrior's armor and offer its helmets.
+    base = BASE_RANK.get(rank, rank)
+    sets = FACTION_SETS.get(faction, {}).get(base, [])
     # 0.0.78: sets worn only when no set above is complete (the owner's armor mod isn't installed).
-    fallback_sets = FALLBACK_SETS.get(faction, {}).get(rank, [])
+    fallback_sets = FALLBACK_SETS.get(faction, {}).get(base, [])
     server_gear = [{"code": "seraphinventory"}, {"code": "lotrnpcs:startinggear", "sets": sets, "items": gear}
                    | ({"fallbackSets": fallback_sets} if fallback_sets else {})
                    | ({"hats": HATS[faction]} if faction in HATS else {})] if gear else []
@@ -1522,17 +1572,17 @@ for code, name, model, skin_texture, gear in TEST_NPCS:
     # 0.0.112 (owner, 2026-11-09: "follow the prompt for armors to make sure they have the correct helmets whitelisted",
     # "specifically orcs"): orcs and Uruk-hai offer only the helmets the 0.0.82 loadout list gives their own unit (a
     # Black Uruk no longer picks the Raider helmets, an Uruk captain only the General helmets).
-    lower = [] if faction in ORC_RACES else {"warrior": ["recruit"], "captain": ["recruit", "warrior"]}.get(rank, [])
+    lower = [] if faction in ORC_RACES else {"warrior": ["recruit"], "captain": ["recruit", "warrior"]}.get(base, [])
     all_sets = sets + [st for r in lower for st in FACTION_SETS.get(faction, {}).get(r, [])]
     helmets = list(dict.fromkeys(c for s in all_sets for c in s if "armor-head-" in c and "@" not in c))
     if helmets:
         attributes["lotrnpcsHelmets"] = helmets
         # 0.0.82: whether it may spawn bare-headed (HELMET_ALWAYS); read by Looks.RollHelmet.
-        attributes["lotrnpcsHelmetOptional"] = helmet_optional(faction, rank)
+        attributes["lotrnpcsHelmetOptional"] = helmet_optional(faction, base)
     PORTRAITS[code] = {"model": model, "skin": skin_texture,
                        "parts": {"facialexpression": PORTRAIT_FACE.get(FACTION_OF[faction], "determined")} | PORTRAIT_PARTS.get(faction, {}),
                        "sets": sets + fallback_sets, "items": gear}
-    weapons = [held_weapon(faction, rank)] if rank == "archer" or ((faction in WEAPONS_OF or faction in SHIELD_OF or faction in WEAPON_PREFS) and rank in ("recruit", "warrior", "captain")) else []
+    weapons = [held_weapon(faction, rank)] if rank == "archer" or ((faction in WEAPONS_OF or faction in SHIELD_OF or faction in WEAPON_PREFS) and base in ("recruit", "warrior", "captain")) else []
     write(f"entities/{code}.json", entity(
         code, name, attributes,
         [preset] + gear_textures + skin[1:] + [{"code": "PlayerModelLib:EntityTextureSourceBehavior"}] + client_gear + weapons,
@@ -1546,7 +1596,7 @@ write_weapons()
 CREATIVE_FACTIONS = ["shire", "gondor", "rohan", "arnor", "dale", "dwarves", "elves",
                      "mordor", "angmar", "mistymountains", "gundabad", "isengard", "haradrim", "easterlings", "dunlendings",
                      "blacknumenoreans", "wickeddwarves", "tormentedelves"]
-CREATIVE_RANKS = ["recruit", "warrior", "captain", "archer"]
+CREATIVE_RANKS = ["recruit", "warrior", "guard", "shock", "captain", "archer"]
 def _creative_key(code):
     race, _, rank = code.removeprefix("test-").partition("-")
     return CREATIVE_FACTIONS.index(FACTION_OF[race]), CREATIVE_RANKS.index(RANK_OF.get(code, rank))
@@ -1680,6 +1730,9 @@ TALK = {
     "title-warrior": "Warrior",
     "title-captain": "Captain",
     "title-archer": "Archer",
+    # 0.0.113 promotion-only branches. title-<faction>-guard and title-<faction>-shock name a faction's own.
+    "title-guard": "Guard",
+    "title-shock": "Shock trooper",
     "title-shire-recruit": "Farmer",
     "recruit-yours": "Your {3}: {0} in {2} formation, {1} stance",
     "recruit-yours-guard": "Your {1}: guarding their post, {0} stance",
@@ -1705,6 +1758,68 @@ TALK = {
     "talk-opt-promote-free": "Promote to {0}",
     "talk-promote-poor": "A promotion costs {0} × {1}, and you don't have that much.",
     "talk-promote-nocoin": "A promotion would cost {0} × {1}, but nobody here has seen such a coin. (An admin can change HireCoin in lotrnpcs-factions.json.)",
+    # 0.0.113: the promotion screen (Roster.cs). {0} in promote-title is the recruit's title and name; promote-have {0}/{1}
+    # XP, {2} coins of {3}.
+    "talk-opt-promote-menu": "Promote...",
+    "promote-unavailable": "That promotion isn't open to them right now.",
+    "promote-title": "Promote {0}",
+    "promote-have": "XP {0}/{1}  ·  You have {2} × {3}",
+    "promote-health": "Health {0}",
+    "promote-damage": "Damage {0}",
+    "promote-arrows": "Arrows {0}",
+    "promote-withshield": "{0}, always with a shield",
+    "promote-leads": "Can become: {0}",
+    "promote-last": "The last rank on this path",
+    "promote-price": "{0} × {1}",
+    "promote-free": "Free",
+    "promote-poor": "Not enough coins",
+    "promote-captains-full": "Captain places full",
+    "promote-button": "Promote",
+    "promote-keeps": "The name, looks and orders stay. The armor becomes the new rank's.",
+    # 0.0.113: the roster screen. roster-summary {0} recruits, {1} following; roster-where {0} blocks, {1} compass point;
+    # roster-away and roster-elsewhere {0} x, {1} z (from the map middle), {2} how long ago.
+    "orders-roster": "Roster: all your recruits",
+    "roster-title": "Your recruits",
+    "roster-summary": "{0} recruits, {1} following you",
+    "roster-captains": "Captain places used: {0}",
+    "roster-filter-all": "All {0}",
+    "roster-filter-following": "Following {0}",
+    "roster-filter-guarding": "Guarding {0}",
+    "roster-filter-ready": "Ready to promote {0}",
+    "roster-filter-away": "Not loaded {0}",
+    "roster-col-name": "Name",
+    "roster-col-rank": "Rank",
+    "roster-col-xp": "XP",
+    "roster-col-order": "Order",
+    "roster-col-stance": "Stance",
+    "roster-col-where": "Where",
+    "roster-none": "No recruits here.",
+    "roster-borrowed": "Borrowed by {0}",
+    "roster-unseen": "Not seen since the update",
+    "roster-where": "{0} blocks {1}",
+    "roster-away": "Not loaded: last seen {0} / {1}, {2}",
+    "roster-elsewhere": "In another place: {0} / {1}",
+    "roster-minutes": "{0} min ago",
+    "roster-hours": "{0} h ago",
+    "roster-days": "{0} days ago",
+    "roster-map": "Map",
+    "roster-call": "Call",
+    "roster-promote": "Promote",
+    "roster-dismiss": "Dismiss",
+    "roster-dismiss-sure": "Sure?",
+    "roster-page": "Page {0} of {1}",
+    "roster-lastseen": "(last seen)",
+    "roster-mapped": "{0} is marked on your map until you rejoin.",
+    "roster-nomap": "The world map isn't available.",
+    "roster-gone": "That recruit is no longer yours.",
+    "roster-notloaded": "They're too far away to hear you (not loaded).",
+    "roster-already": "Your {0} is already following you.",
+    "roster-call-full": "Your band is full. Send someone off first.",
+    "roster-called": "Your {0} is on the way.",
+    "roster-dismissed": "Your {0} has been dismissed.",
+    "roster-dismissed-later": "Dismissed. They'll leave your service when their area next loads.",
+    "compass-n": "north", "compass-ne": "northeast", "compass-e": "east", "compass-se": "southeast",
+    "compass-s": "south", "compass-sw": "southwest", "compass-w": "west", "compass-nw": "northwest",
     # The whitelist menu (0.0.76), opened by /recruits whitelist. {0} in whitelist-more is how many aren't shown.
     "whitelist-title": "Recruit whitelist",
     "whitelist-explain": "Your recruits never attack the players on this list on sight, even when guarding or on the raid stance. They still fight back if one of them hurts you or your recruits.",
@@ -1944,7 +2059,7 @@ with open(os.path.join(out, "modinfo.json"), "w") as f:
         "type": "code",
         "modid": "lotrnpcs",
         "name": "LOTR NPCs",
-        "version": "0.0.112",
+        "version": "0.0.113",
         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Race models from "
                        "LOTR Races and Classes by Dango Dango Dango, Shakgriig and Buggoi, used with their permission.",

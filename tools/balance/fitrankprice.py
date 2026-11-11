@@ -2,6 +2,7 @@
 (no roster or captain limit) should win about half their fights averaged over the other six tiers. Men's prices fixed;
 whole-coin prices; coordinate search. Usage: python3 fitrankprice.py <Factions.cs> RUNS"""
 import sys, random, json
+import os; sys.argv = os.environ.setdefault("LOTRNPCS_BALANCE_ARGV", "\n".join(sys.argv)).split("\n")  # Windows pool workers re-run this with the argv edited below; keep the real one
 SRC, RUNS = sys.argv[1], int(sys.argv[2]); sys.argv = [sys.argv[0], SRC, "1"]
 import sim105 as S
 from multiprocessing import Pool

@@ -34,7 +34,10 @@ public static class Program {
         }
         EntityProperties T(string code) => types.First(t => t.Code.Path == code);
         Check(withSpawn == 0, "no vanilla spawn rules in the JSON any more");
-        Check(types.Count(t => t.Attributes?["lotrnpcsFaction"].Exists == true && t.Attributes["lotrnpcsRank"].Exists) == 69, "69 zone NPC types (17 factions x 3 ranks with Gundabad, the Shire's hobbit recruits, and archers for every faction but the Shire)");
+        bool Branch(EntityProperties t) => Array.IndexOf(Promotion.Branches, t.Attributes["lotrnpcsRank"].AsString()) >= 0;
+        Check(types.Count(t => t.Attributes?["lotrnpcsFaction"].Exists == true && t.Attributes["lotrnpcsRank"].Exists && !Branch(t)) == 69
+            && types.Count(t => t.Attributes?["lotrnpcsFaction"].Exists == true && t.Attributes["lotrnpcsRank"].Exists && Branch(t)) == 34,
+            "69 zone NPC types (17 factions x 3 ranks with Gundabad, the Shire's hobbit recruits, and archers for every faction but the Shire), plus 0.0.113's guards and shock troops for the 17 armed factions");
         var rankedFactions = types.Where(t => t.Attributes?["lotrnpcsRank"].Exists == true).Select(t => t.Attributes["lotrnpcsFaction"].AsString()).Distinct().OrderBy(f => f).ToList();
         Check(rankedFactions.SequenceEqual(SpawnZoneSystem.Factions.OrderBy(f => f)) && SpawnZoneSystem.Factions.All(f => (f == "shire" ? new[] { "recruit" } : new[] { "recruit", "warrior", "captain", "archer" }).All(r => types.Any(t => t.Attributes?["lotrnpcsFaction"].AsString() == f && t.Attributes["lotrnpcsRank"].AsString() == r))), "every faction /lotrzone accepts has a recruit, warrior and captain (the Shire only recruits), and no other faction has ranks");
         Check(T("test-hobbit").Attributes["lotrnpcsFaction"].AsString() == "shire" && T("test-hobbit").Attributes["lotrnpcsRank"].AsString() == "recruit", "hobbits are the Shire's recruits");
@@ -335,8 +338,9 @@ public static class Program {
             Console.WriteLine($"   > largest groups: men {MaxSize("gondor")}, levy {MaxSize("dunlendings")}, orcs {MaxSize("mordor")}, goblins {MaxSize("mistymountains")}, elves {MaxSize("elves")}, dwarves {MaxSize("dwarves")}; average men {menG.Average(g => g.Count):F2}, orcs {orcG.Average(g => g.Count):F2}");
             Check(MaxSize("gondor") == 5 && MaxSize("isengard") == 5 && MaxSize("dunlendings") == 6 && MaxSize("mordor") == 6 && MaxSize("mistymountains") == 8 && MaxSize("elves") == 4 && MaxSize("dwarves") == 4 && MaxSize("shire") == 5,
                 "wild groups are up to 5 men or Uruks, 6 Dunlendings, 6 orcs (0.0.107), 8 goblins, 4 elves or dwarves");
-            Check(orcG.Average(g => g.Count) > menG.Average(g => g.Count) * 1.1 && menG.All(g => g[0] == "recruit") && orcG.All(g => g[0] == "recruit"),
-                "orc groups are bigger on average than men's, and every group still starts with a recruit");
+            Check(orcG.Average(g => g.Count) > menG.Average(g => g.Count) * 1.1 && menG.All(g => g[0] == "recruit") && orcG.All(g => g[0] == "recruit")
+                && menG.Concat(Many("gondor", true)).All(g => g.All(r => Array.IndexOf(Promotion.Branches, r) < 0)),
+                "orc groups are bigger on average than men's, and every group still starts with a recruit; no wild guards or shock troops (0.0.113, players only)");
             Check(Escort("gondor") == (1, 3) && Escort("mordor") == (1, 4) && Escort("mistymountains") == (1, 5) && Escort("elves") == (1, 2),
                 "a captain's escort is 1 to 3 for men, 1 to 4 for orcs, 1 to 5 for goblins, 1 to 2 for elves");
             Check(Math.Abs(fc.GroupScaleOf("mordor") - 1.2) < 1e-9 && Math.Abs(1 / fc.GroupScaleOf("mistymountains") - 0.625) < 1e-9 && Math.Abs(1 / fc.GroupScaleOf("elves") - 1.25) < 1e-9 && fc.GroupScaleOf("nobody") == 1,

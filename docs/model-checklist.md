@@ -23,7 +23,7 @@ model is in the mod.
 | Gondor | [ ] Ranger bow | | game longbow |
 | Rohan | [x] spear (0.0.112) | one | |
 | Rohan | [x] sword (0.0.112) | one | |
-| Rohan | [ ] axe | one | none |
+| Rohan | [x] axe (0.0.113) | one | |
 | Rohan | [ ] dagger | one | none |
 | Rohan | [ ] bow | | game longbow |
 | Rohan | [ ] shield (my note, not asked for) | | game wood-and-metal shield |
@@ -42,7 +42,7 @@ model is in the mod.
 | Haradrim | [ ] dagger | one | none |
 | Haradrim | [ ] bow | | game recurve bow |
 | Easterlings | [ ] spear ★ (clansmen) | one | game black bronze spear |
-| Easterlings | [ ] saber ★ (Variags, warriors) | one | game Forlorn blade |
+| Easterlings | [x] saber ★ (Variags, warriors): the Easterling scimitar (0.0.113) | one | |
 | Easterlings | [x] halberd ★ (warriors): the Easterling axe (0.0.112) | two | |
 | Easterlings | [ ] hammer ★, [ ] axe ★, [ ] sword ★ (warlord) | one | none |
 | Easterlings | [ ] dagger | one | none |

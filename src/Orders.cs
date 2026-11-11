@@ -165,7 +165,7 @@ namespace LotrNpcs
         }
 
         /// <summary>A member's place in the formation order (0.0.106): captains, warriors, recruits (and rankless), archers.</summary>
-        public static int OrderOfRank(string rank) => rank switch { "captain" => 0, "warrior" => 1, "archer" => 3, _ => 2 };
+        public static int OrderOfRank(string rank) => Promotion.BaseRank(rank) switch { "captain" => 0, "warrior" => 1, "archer" => 3, _ => 2 };
 
         /// <summary>
         /// 0.0.106 (owner, 2026-11-09: "captains to try and be in the front middle, then warriors, then recruits", "with
@@ -506,6 +506,14 @@ namespace LotrNpcs
             c.AddDynamicText(status, detailFont, ElementBounds.Fixed(0, y, Width, 18), "status");
             y += 20;
             c.AddStaticText(Lang.Get("lotrnpcs:orders-hint", KeyName()), detailFont.Clone().WithColor(GuiStyle.DialogDefaultTextColor), ElementBounds.Fixed(0, y, Width, 16));
+            y += 20;
+            // 0.0.113: the roster screen, which stays open after the orders key is let go.
+            c.AddSmallButton(Lang.Get("lotrnpcs:orders-roster"), () =>
+            {
+                TryClose();
+                capi.ModLoader.GetModSystem<RosterSystem>()?.Send(new RosterRequest { Action = "open" });
+                return true;
+            }, ElementBounds.Fixed(0, y, Width, ButtonHeight), EnumButtonStyle.Normal);
             SingleComposer = c.EndChildElements().Compose();
 
             SingleComposer.ToggleButtonsSetValue("page", page);

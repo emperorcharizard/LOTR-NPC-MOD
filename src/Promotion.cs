@@ -34,10 +34,19 @@ namespace LotrNpcs
         public const int WindowMs = 10000;
 
         /// <summary>XP a rank needs before it can be promoted; 0 for ranks that earn none (archers, captains, rankless).</summary>
-        public static int Need(string rank) => rank == "recruit" ? 15 : rank == "warrior" ? 40 : 0;
+        public static int Need(string rank) => rank == "recruit" ? 15 : BaseRank(rank) == "warrior" ? 40 : 0;
+
+        /// <summary>
+        /// 0.0.113 (design-roster-promotion.md, owner: "branching promotion is good"): promotion-only sidegrades of the
+        /// warrior. Guard: health x1.25, damage x0.8, always a shield. Shock: health x0.8, damage x1.25, a two-handed
+        /// weapon. Both count as warriors everywhere else (prices they lack, body loot, order lists) and lead to captain.
+        /// </summary>
+        public static readonly string[] Branches = { "guard", "shock" };
+        /// <summary>The rank a branch stands in for (warrior), else the rank itself.</summary>
+        public static string BaseRank(string rank) => Array.IndexOf(Branches, rank) >= 0 ? "warrior" : rank;
 
         /// <summary>The ranks a rank can be promoted to, in menu order.</summary>
-        public static string[] Targets(string rank) => rank == "recruit" ? new[] { "warrior", "archer" } : rank == "warrior" ? new[] { "captain" } : Array.Empty<string>();
+        public static string[] Targets(string rank) => rank == "recruit" ? new[] { "warrior", "guard", "shock", "archer" } : BaseRank(rank) == "warrior" ? new[] { "captain" } : Array.Empty<string>();
 
         public static int Xp(Entity e) => e?.WatchedAttributes?.GetInt(XpAttr) ?? 0;
 

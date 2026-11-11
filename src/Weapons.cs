@@ -57,6 +57,9 @@ namespace LotrNpcs
         /// <summary>The shields its type may carry in the left hand (0.0.55 Mordor orcs; 0.0.76 a list, "shields").</summary>
         public IReadOnlyList<string> ShieldItems { get; private set; } = Array.Empty<string>();
 
+        /// <summary>0.0.113 guards: the shield is always on, and the looks menu has no switch for it.</summary>
+        public bool AlwaysShield { get; private set; }
+
         /// <summary>The shield item this NPC carries in the left hand when its shield is on, or null: its type's only
         /// shield, or the one it picked from several.</summary>
         public string ShieldItem => PickShield(Attrs.String(entity.WatchedAttributes, ShieldItemAttr), ShieldItems);
@@ -130,6 +133,7 @@ namespace LotrNpcs
             if (shields.Count == 0) shields.Add(Clean(attributes?["shield"].AsString()));
             ShieldItems = shields.Where(c => c != null).Select(c => c.Contains(':') ? c : "lotrnpcs:" + c).Distinct().ToArray();
             Fixed = attributes?["fixed"].AsBool(false) ?? false;
+            AlwaysShield = attributes?["alwaysShield"].AsBool(false) ?? false;
             resolvedFor = null;
             attackAnimation = null;
         }
@@ -238,7 +242,7 @@ namespace LotrNpcs
             }
             string weapon = Attrs.String(entity.WatchedAttributes, WeaponAttr);
             string now = Attrs.String(entity.WatchedAttributes, ShieldAttr);
-            string want = now == null ? (RollShield(firstSpawn, weapon, weapons, chance, rand) ? "on" : "off") : now;
+            string want = AlwaysShield ? "on" : now == null ? (RollShield(firstSpawn, weapon, weapons, chance, rand) ? "on" : "off") : now;
             if (want == "on" && IsTwoHanded(weapon, weapons)) want = "off";
             if (want == now) return;
             entity.WatchedAttributes.SetString(ShieldAttr, want);

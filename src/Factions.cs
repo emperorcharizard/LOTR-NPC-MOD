@@ -106,8 +106,8 @@ namespace LotrNpcs
             Dictionary<string, int> hire = new Dictionary<string, int> { ["recruit"] = recruit, ["warrior"] = warrior, ["captain"] = captain, ["archer"] = archer };
             return new FactionTier
             {
-                Name = name, Followers = followers, Roster = roster, Health090 = health090, Damage090 = damage090, Health = health, Damage = damage,
-                Hire = hire, Promote = PromoteFor(hire),
+                Name = name, Followers = followers, Roster = roster, Health090 = health090, Damage090 = damage090, Health = WithBranches(health, true), Damage = WithBranches(damage, false),
+                Hire = hire, Promote = WithBranchPrices(PromoteFor(hire)),
                 Promote090 = new Dictionary<string, int> { ["warrior"] = promoteWarrior, ["archer"] = promoteArcher, ["captain"] = promoteCaptain },
             };
         }
@@ -132,6 +132,32 @@ namespace LotrNpcs
                 if (hire != null && hire.TryGetValue(rank, out int price)) promote[rank] = PromotePrice(rank, price);
             }
             return promote;
+        }
+
+        /// <summary>0.0.113: promoting to a branch (guard, shock) costs what promoting to warrior does, unless listed.</summary>
+        public static Dictionary<string, int> WithBranchPrices(Dictionary<string, int> promote)
+        {
+            foreach (string branch in Promotion.Branches)
+            {
+                if (!promote.ContainsKey(branch) && promote.TryGetValue("warrior", out int price)) promote[branch] = price;
+            }
+            return promote;
+        }
+
+        /// <summary>0.0.113: a tier's branch stats from its warrior's (Promotion.Branches): guard health x1.25 and damage
+        /// x0.8, shock the other way round, so health x damage stays the warrior's (tools/balance/branches.py: 0.48 to 0.53
+        /// against plain warriors, coin for coin, in every faction).</summary>
+        static Dictionary<string, float> WithBranches(Dictionary<string, float> table, bool health)
+        {
+            foreach (string branch in Promotion.Branches) table[branch] = Branch(branch, table["warrior"], health);
+            return table;
+        }
+
+        /// <summary>A branch's health or damage from its warrior's.</summary>
+        public static float Branch(string branch, float warrior, bool health)
+        {
+            double scale = (branch == "guard") == health ? 1.25 : 0.8;
+            return health ? Round(warrior * scale) : (float)Math.Round(warrior * scale, 2);
         }
 
         public static readonly FactionTier Men = T("men", 5, 16, 1f, 1f, R(22, 34, 48, 35), R(3.15f, 3.95f, 7f, 3.05f), 5, 15, 40, 15, 10, 10, 30);
@@ -364,7 +390,7 @@ namespace LotrNpcs
                 {
                     if (!promote.ContainsKey(price.Key)) promote[price.Key] = price.Value;
                 }
-                def.PromotePrices = promote;
+                def.PromotePrices = FactionTiers.WithBranchPrices(promote);
                 FillLimits(def, tier, false);
             }
         }
@@ -384,17 +410,22 @@ namespace LotrNpcs
             if (replace || def.MaxRecruits == null) def.MaxRecruits = FactionTiers.Round(tier.Roster * (double)baseRecruits / DefaultMaxRecruits);
             def.MaxFollowers = GameMath.Clamp(def.MaxFollowers.Value, 1, MaxFollowersLimit);
             def.MaxRecruits = GameMath.Clamp(def.MaxRecruits.Value, 1, MaxRecruitsLimit);
-            def.Health = RankTable(replace ? null : def.Health, tier.Health, v => GameMath.Clamp(FactionTiers.Round(v), 1, MaxHealthValue));
-            def.Damage = RankTable(replace ? null : def.Damage, tier.Damage, v => GameMath.Clamp((float)Math.Round(v, 3), 0, MaxDamageValue));
+            def.Health = RankTable(replace ? null : def.Health, tier.Health, v => GameMath.Clamp(FactionTiers.Round(v), 1, MaxHealthValue), true);
+            def.Damage = RankTable(replace ? null : def.Damage, tier.Damage, v => GameMath.Clamp((float)Math.Round(v, 3), 0, MaxDamageValue), false);
         }
 
-        static Dictionary<string, float> RankTable(Dictionary<string, float> given, Dictionary<string, float> tier, System.Func<float, float> clean)
+        static Dictionary<string, float> RankTable(Dictionary<string, float> given, Dictionary<string, float> tier, System.Func<float, float> clean, bool health)
         {
             Dictionary<string, float> table = new Dictionary<string, float>();
             foreach (KeyValuePair<string, float> kv in given ?? new Dictionary<string, float>())
             {
                 string rank = kv.Key?.Trim().ToLowerInvariant();
                 if (!string.IsNullOrEmpty(rank) && !table.ContainsKey(rank) && !float.IsNaN(kv.Value)) table[rank] = clean(kv.Value);
+            }
+            // 0.0.113: a file from before the branches gets them from its own warrior's value, so an admin's change carries.
+            foreach (string branch in Promotion.Branches)
+            {
+                if (!table.ContainsKey(branch) && table.TryGetValue("warrior", out float warrior)) table[branch] = clean(FactionTiers.Branch(branch, warrior, health));
             }
             foreach (KeyValuePair<string, float> kv in tier)
             {
@@ -458,7 +489,7 @@ namespace LotrNpcs
         {
             var table = hired ? HiredBodyLoot : WildBodyLoot;
             var rolled = new List<(string, int)>();
-            if (table == null || (!table.TryGetValue(rank ?? "recruit", out var list) && !table.TryGetValue("recruit", out list)) || list == null) return rolled;
+            if (table == null || (!table.TryGetValue(rank ?? "recruit", out var list) && !table.TryGetValue(Promotion.BaseRank(rank) ?? "recruit", out list) && !table.TryGetValue("recruit", out list)) || list == null) return rolled;
             foreach (BodyLoot loot in list)
             {
                 if (string.IsNullOrEmpty(loot?.Code) || loot.Max <= 0) continue;
@@ -479,10 +510,10 @@ namespace LotrNpcs
             "Members (since 0.0.92): a player is a member of the faction they picked from the join menu, which opens after they make their character (and on every join until they pick; /recruits join opens it again). The pick is permanent: only an admin changes it, with /recruits faction set, or /recruits faction clear to let them pick again. Joinable (in each faction): false leaves it out of the menu.",
             "RaceAndGroupMembership: false (the default since 0.0.92) means race and /group don't make anyone a member. true brings back the old rule: a player is also a member when their race is in FriendlyRaces (Player Model Lib codes such as lrc:harfoot; /recruits faction check shows a player's) or they are in one of its FriendlyGroups, unless an admin or the menu set their faction (which replaces the race; groups still count).",
             "HireCoin and HirePrices: what hiring one of the faction's NPCs costs, as a number of coins per rank (recruit, warrior, captain) and for archers (archer). HireCoin is the item code of the coin, game:gear-rusty (the game's rusty gear) by default since 0.0.94 (it was coinage:planchet-silver-lg, a large silver planchet). Rankless NPCs cost a recruit's price, and a price of 0 makes hiring free. The shipped prices (since 0.0.108) are fitted so the same coins spent on any two factions buy forces that win about as often as each other.",
-            "PromotePrices: what promoting a recruit costs in HireCoin, by the rank it becomes (warrior, archer, captain). By default it is the faction's hire price for that rank less 3 coins, or less 4 for a captain (Men: 12 to warrior or archer, 36 to captain); a rank left out gets that default. A hired recruit or warrior earns 1 XP for each NPC of this mod that dies within 10 seconds of its hit: at 15 XP a recruit can become a warrior or an archer, at 40 XP a warrior can become a captain. The owner promotes it in its talk menu. 0 makes it free.",
+            "PromotePrices: what promoting a recruit costs in HireCoin, by the rank it becomes (warrior, guard, shock, archer, captain). By default it is the faction's hire price for that rank less 3 coins, or less 4 for a captain (Men: 12 to warrior or archer, 36 to captain); a rank left out gets that default (guard and shock, which can't be hired: the warrior's promotion price). A hired recruit or warrior earns 1 XP for each NPC of this mod that dies within 10 seconds of its hit: at 15 XP a recruit can become a warrior, guard, shock trooper or archer, at 40 XP a warrior, guard or shock trooper can become a captain. The owner promotes it in its talk menu. 0 makes it free.",
             "Hiring: right-click an NPC to talk. Members of its faction, and members of an allied faction whose alliance has ShareFriends, can hire it, paying from their hotbar and backpack.",
             "MaxFollowers and MaxRecruits (in each faction): how many of the faction's recruits can follow a player at once, and how many a player can have. Each recruit uses a share: 1/MaxFollowers of the following and 1/MaxRecruits of the roster, and a player's shares must add up to no more than 1, so factions can be mixed (3 Gondor men and 2 Mordor orcs use 3/5 + 2/7 of the following). Past the following, a new recruit guards where it was hired and the rest hold or guard. A player over the limits when they join (after an admin lowers them) loses the most recently hired recruits until they fit. The MaxFollowers and MaxRecruits at the top of the file are the baseline (the Men's, 5 and 16) and count for a faction without its own.",
-            "Health and Damage (in each faction, by rank: recruit, warrior, captain, archer): the health and the damage of one hit of the faction's NPCs of that rank, in place of their unit's own (health is a whole number; an archer's damage is its arrow's, and its shove). The shipped tables were fitted so that at each rank a full band of each faction wins about half its fights against the others (the Uruk-hai a little more): for example Mordor orc recruits 19 health and 2.7 damage, Gondor recruits 22 and 3.15, elf captains 51 and 9.7. Damage tiers don't change. Wild groups grow with MaxFollowers too (see the spawning file).",
+            "Health and Damage (in each faction, by rank: recruit, warrior, captain, archer, and since 0.0.113 the promotion-only guard and shock, which a file without them gets as the warrior's health x1.25 and damage x0.8 (guard) or health x0.8 and damage x1.25 (shock)): the health and the damage of one hit of the faction's NPCs of that rank, in place of their unit's own (health is a whole number; an archer's damage is its arrow's, and its shove). The shipped tables were fitted so that at each rank a full band of each faction wins about half its fights against the others (the Uruk-hai a little more): for example Mordor orc recruits 19 health and 2.7 damage, Gondor recruits 22 and 3.15, elf captains 51 and 9.7. Damage tiers don't change. Wild groups grow with MaxFollowers too (see the spawning file).",
             "DamageSpread: every NPC hit, melee and arrows, deals its damage times a random 1 - DamageSpread to 1 + DamageSpread (0.2 = 80% to 120%), so fights aren't decided by whole numbers of hits. 0 turns it off; at most 0.9.",
             "WildBodyLoot and HiredBodyLoot (by rank: recruit, warrior, captain, archer): what a dead wild NPC's body and a dead recruit's body hold for a player with a knife, as a list of { Code, Min, Max } (item code, and a random count from Min to Max). By default rusty gears (recruit 0-1, warrior and archer 1-2, captain 3-5) and up to one piece of cloth (recruits) or leather (the rest); armor and weapons are never dropped. Rankless NPCs use the recruit list; an empty list leaves an empty body. Bodies rot away after 3 in-game hours.",
             "SpawnSafeRadius (64 by default, 0 = off): within this many blocks of the world spawn, recruits (guards, aggressive and raiding ones alike) never attack a player on sight. They still fight back against a player who attacks them, their owner or their group.",
@@ -560,7 +591,7 @@ namespace LotrNpcs
                     if (kv.Value == null) continue;
                     FactionTier tier = FactionTiers.Of(kv.Key);
                     if (SamePrices(kv.Value.PromotePrices, tier.Promote090) || SamePrices(kv.Value.PromotePrices, tier.Promote))
-                        kv.Value.PromotePrices = FactionTiers.PromoteFor(kv.Value.HirePrices);
+                        kv.Value.PromotePrices = FactionTiers.WithBranchPrices(FactionTiers.PromoteFor(kv.Value.HirePrices));
                 }
             }
             // 0.0.108 (version 28, owner: "balance combat for equal coin spendage"): tables still exactly as 0.0.107 shipped
@@ -582,7 +613,7 @@ namespace LotrNpcs
                     {
                         bool derived = SamePrices(kv.Value.PromotePrices, FactionTiers.PromoteFor(oldHire));
                         kv.Value.HirePrices = new Dictionary<string, int>(tier.Hire);
-                        if (derived) kv.Value.PromotePrices = FactionTiers.PromoteFor(kv.Value.HirePrices);
+                        if (derived) kv.Value.PromotePrices = FactionTiers.WithBranchPrices(FactionTiers.PromoteFor(kv.Value.HirePrices));
                     }
                 }
             }
@@ -635,11 +666,15 @@ namespace LotrNpcs
             return true;
         }
 
+        // Both leave out the 0.0.113 branches, which FillDefaults adds to every file before Migrate compares it with the
+        // tables and prices older versions shipped without them.
         static bool SameTable(Dictionary<string, float> a, Dictionary<string, float> b) =>
-            a != null && b != null && a.Count == b.Count && b.All(kv => a.TryGetValue(kv.Key, out float v) && Math.Abs(v - kv.Value) < 1e-4);
+            a != null && b != null && NoBranches(a).Count() == NoBranches(b).Count() && NoBranches(b).All(kv => a.TryGetValue(kv.Key, out float v) && Math.Abs(v - kv.Value) < 1e-4);
 
         static bool SamePrices(Dictionary<string, int> a, Dictionary<string, int> b) =>
-            a != null && b != null && a.Count == b.Count && a.All(kv => b.TryGetValue(kv.Key, out int v) && v == kv.Value);
+            a != null && b != null && NoBranches(a).Count() == NoBranches(b).Count() && NoBranches(a).All(kv => b.TryGetValue(kv.Key, out int v) && v == kv.Value);
+
+        static IEnumerable<KeyValuePair<string, T>> NoBranches<T>(Dictionary<string, T> d) => d.Where(kv => Array.IndexOf(Promotion.Branches, kv.Key) < 0);
 
         public static bool SamePair(FactionRelationDef r, string a, string b)
         {
@@ -1163,7 +1198,7 @@ namespace LotrNpcs
             }
             catch (Exception e)
             {
-                sapi.Logger.Error("[lotrnpcs] Could not read the admin-set player factions: " + e.Message);
+                SavedData.KeepUnreadable(sapi, AssignedKey, bytes, "admin-set player factions", e);
             }
         }
 
@@ -1490,7 +1525,7 @@ namespace LotrNpcs
         }
 
         static string RankList(Dictionary<string, float> table) =>
-            table == null ? "as the units" : string.Join("/", FactionTiers.Ranks.Select(r => table.TryGetValue(r, out float v) ? v.ToString("0.##", CultureInfo.InvariantCulture) : "-"));
+            table == null ? "as the units" : string.Join("/", FactionTiers.Ranks.Concat(Promotion.Branches).Select(r => table.TryGetValue(r, out float v) ? v.ToString("0.##", CultureInfo.InvariantCulture) : "-"));
 
         public string DescribeFactions()
         {
