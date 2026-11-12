@@ -1126,6 +1126,8 @@ public static class Program {
             Check(Looks.ClassFor(true, false) == "shock" && Looks.ClassFor(true, true) == "shock" && Looks.ClassFor(false, true) == "guard" && Looks.ClassFor(false, false) == "warrior",
                 "a warrior's loadout picks its class: two-handed makes a shock trooper, a shield a guard, neither a warrior (0.0.115)");
             Check(Looks.LoadoutClass(lnpc) == null, "an NPC outside a warrior line has no loadout class");
+            Check(typeof(Vintagestory.GameContent.EntityBehaviorHarvestable).IsSubclassOf(typeof(Vintagestory.GameContent.EntityBehaviorContainer)) && !typeof(Vintagestory.GameContent.EntityBehaviorHarvestable).IsSubclassOf(typeof(Vintagestory.GameContent.EntityBehaviorTexturedClothing)),
+                "0.0.115: gear is found through EntityBehaviorTexturedClothing, since the body's harvestable inventory (listed first) is also a container");
             Check(EntityBehaviorHeldWeapon.PickWeapon(Looks.NoWeapon, new[] { new NpcWeapon { Item = "lotrnpcs:orcweapon-axe" } }, new Random(1)) == Looks.NoWeapon, "an orc whose weapon was taken away stays unarmed after a reload");
             Check(!Looks.NameOnHire(lnpc, new Random(1)) && Looks.NameOf(lnpc) == "Ugrath", "a recruit its owner named keeps its name when hired again");
 

@@ -1858,10 +1858,12 @@ namespace LotrNpcs
             LooksRequest req;
             try { req = JsonConvert.DeserializeObject<LooksRequest>(Encoding.UTF8.GetString(data)); }
             catch (Exception) { return; }
+            // Cancel resends the old loadout: only a real change of weapon or shield may change the class.
+            string gearBefore = Attrs.String(entity.WatchedAttributes, EntityBehaviorHeldWeapon.WeaponAttr) + "|" + Attrs.String(entity.WatchedAttributes, EntityBehaviorHeldWeapon.ShieldAttr);
             string refused = Looks.Apply(entity, player.PlayerUID, req, Looks.PartsOf(entity.Api, Attrs.String(entity.WatchedAttributes, "skinModel")), Looks.WeaponChoices(entity), Looks.Head(entity), Looks.ShieldOf(entity), Looks.HelmetChoices(entity));
             talkingUntilMs = entity.World.ElapsedMilliseconds + 30000;
             if (refused != null) ((ICoreServerAPI)entity.Api).Network.SendEntityPacket(player, entity.EntityId, LooksPacket, Encoding.UTF8.GetBytes(refused));
-            else if (req.Weapon != null || req.Shield != null) Reclass(player);
+            else if (gearBefore != Attrs.String(entity.WatchedAttributes, EntityBehaviorHeldWeapon.WeaponAttr) + "|" + Attrs.String(entity.WatchedAttributes, EntityBehaviorHeldWeapon.ShieldAttr)) Reclass(player);
         }
 
         // 0.0.115: a warrior whose new weapon or shield makes another class (Looks.ClassFor) becomes that class, as a

@@ -93,7 +93,7 @@ namespace LotrNpcs
 
         public static ItemSlot Head(Entity npc)
         {
-            InventoryBase inv = Behavior<EntityBehaviorContainer>(npc)?.Inventory;
+            InventoryBase inv = Behavior<EntityBehaviorTexturedClothing>(npc)?.Inventory;
             return inv != null && HeadSlot < inv.Count ? inv[HeadSlot] : null;
         }
 
@@ -166,7 +166,7 @@ namespace LotrNpcs
 
         public static void StoreGear(Entity npc)
         {
-            Behavior<EntityBehaviorContainer>(npc)?.storeInv();
+            Behavior<EntityBehaviorTexturedClothing>(npc)?.storeInv();
             npc.WatchedAttributes.MarkPathDirty(KeptHelmetAttr);
         }
 

@@ -533,7 +533,7 @@ namespace LotrNpcs
             if (item == null) return;
             ItemStack stack = new ItemStack(item, 1);
             EnumCharacterDressType? slotType = GearCode.Slot(code);
-            EntityBehaviorContainer gear = entity.GetBehavior<EntityBehaviorContainer>();
+            EntityBehaviorContainer gear = entity.GetBehavior<EntityBehaviorTexturedClothing>();
             InventoryBase inv = gear?.Inventory;
             int index = slotType.HasValue ? (int)slotType.Value : -1;
             if (index >= 0 && inv != null && index < inv.Count && inv[index].Empty)

@@ -106,7 +106,7 @@ namespace LotrNpcs
         /// <summary>The code of the worn head armor, or null.</summary>
         AssetLocation WornHelmet()
         {
-            IInventory inv = entity.GetBehavior<EntityBehaviorContainer>()?.Inventory;
+            IInventory inv = entity.GetBehavior<EntityBehaviorTexturedClothing>()?.Inventory;
             if (inv == null) return null;
             foreach (ItemSlot slot in inv)
             {

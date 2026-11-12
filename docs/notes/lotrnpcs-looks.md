@@ -12,6 +12,8 @@ My defaults (told the user, awaiting objection): HelmetChance 0.6, captains alwa
 
 PML 1.24.0 facts (decompiled with ilspycmd): skin in WatchedAttributes skinConfig/appliedParts/<part>=variant; client PML only re-tesselates when the MODEL changes, so our hireable client listener calls MarkShapeModified on skinConfig changes. Face parts read from our bundled assets/lotrnpcs/config/customplayermodels/<race>.json (category standard only).
 
+To do (owner, 2026-11-12: "the misty mountains orc warriors should also get the moria orc helmet option"): add norc("head", "tierthreechain", "norchelmetmedium") (in game "Moria Orc Helmet") to the goblin warrior heads in tools/gen_testnpcs.py FACTION_SETS (now GUNDABAD_HEAD and MORD_WARRIOR_HEAD only; recruits already have it). Guards and shock troopers take the warrior's sets, so check they get it too. Not built yet.
+
 Related: [[lotrnpcs-hiring]], [[lotrnpcs-weapons]], [[lotrnpcs-outfits]]
 
 0.0.55 (BUILT 2026-11-03, untested in game; prompt /mnt/project-files/lotrnpcs/prompts/hobbits-archers-orcs.md): hobbits wear "clothes similar to vanilla traders, minus any helmets" plus "a hat on rare occasion" -> 12 vanilla wearable sets, barefoot, hat 0.125 from 6 vanilla hats (startinggear "hats", clothes head slot, not the helmet toggle). Shared orc helmets: Mordor/Angmar/MM share raider/soldier/warrior helmets; Moria/Gundabad MM-only; captains and Isengard unchanged. Mordor orc shield + archers: see [[lotrnpcs-archery]].

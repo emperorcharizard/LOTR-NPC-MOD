@@ -374,7 +374,8 @@ namespace LotrNpcs
     /// <summary>Client: the promotion screen, one card per rank the recruit can become.</summary>
     public class GuiDialogPromote : GuiDialog
     {
-        const int CardWidth = 200, CardHeight = 270, Gap = 10;
+        // MinWidth: one card alone (a warrior's captain card) left the title, the XP line and the footer no room.
+        const int CardWidth = 200, CardHeight = 270, Gap = 10, MinWidth = 460;
         readonly PromoteMenu menu;
         readonly Action<string> promote;
 
@@ -408,7 +409,7 @@ namespace LotrNpcs
             ElementBounds dialogBounds = ElementStdBounds.AutosizedMainDialog.WithAlignment(EnumDialogArea.CenterMiddle);
             CairoFont text = CairoFont.WhiteSmallText(), detail = CairoFont.WhiteDetailText();
             string coin = RosterSystem.CoinName(capi.World, menu.Coin);
-            int width = Math.Max(1, menu.Cards.Count) * (CardWidth + Gap) - Gap;
+            int cardsWidth = Math.Max(1, menu.Cards.Count) * (CardWidth + Gap) - Gap, width = Math.Max(cardsWidth, MinWidth), left = (width - cardsWidth) / 2;
             GuiComposer c = capi.Gui.CreateCompo("lotrnpcs-promote", dialogBounds)
                 .AddShadedDialogBG(bgBounds, true)
                 .AddDialogTitleBar(Lang.Get("lotrnpcs:promote-title", menu.Title), () => TryClose())
@@ -419,7 +420,7 @@ namespace LotrNpcs
             for (int i = 0; i < menu.Cards.Count; i++)
             {
                 PromoteCard card = menu.Cards[i];
-                int x = i * (CardWidth + Gap), cy = y;
+                int x = left + i * (CardWidth + Gap), cy = y;
                 c.AddInset(ElementBounds.Fixed(x, cy, CardWidth, CardHeight), 2);
                 AssetLocation code = Promotion.CodeAtRank(new AssetLocation(menu.Code), card.Rank);
                 EntityProperties type = capi.World.GetEntityType(code);
@@ -454,7 +455,7 @@ namespace LotrNpcs
                     c.AddSmallButton(Lang.Get("lotrnpcs:promote-button"), () => { promote(rank); TryClose(); return true; }, ElementBounds.Fixed(x + 40, cy, CardWidth - 80, 26));
             }
             y += CardHeight + 10;
-            c.AddStaticText(Lang.Get("lotrnpcs:promote-keeps"), detail, ElementBounds.Fixed(0, y, width, 20))
+            c.AddStaticText(Lang.Get("lotrnpcs:promote-keeps"), detail, ElementBounds.Fixed(0, y, width, 40))
              .EndChildElements();
             SingleComposer = c.Compose();
         }

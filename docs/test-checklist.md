@@ -368,11 +368,11 @@ Install `lotrnpcs_0.0.109-test.zip` (instead of any older lotrnpcs zip); restart
 
 ## 114. Fewer model rebuilds, quieter logs, line fixes, no FA Races (0.0.114)
 
-- [ ] 114.1 Followers in a battle line (any formation but Loose) hold their place between swings instead of walking back to you. They go back to following when the line breaks up, when you are more than 12 blocks away, or on a move order.
+- [x] 114.1 Followers in a battle line (any formation but Loose) hold their place between swings instead of walking back to you. They go back to following when the line breaks up, when you are more than 12 blocks away, or on a move order.
 - [x] 114.2 Stragglers: start a wild fight, then spawn one more NPC of one side about 17 blocks behind it. It runs straight to its side's line and joins it, instead of walking in alone over about 20 seconds.
 - [x] 114.3 Frame rate: turn on `.debug logticks 30` and watch a fight of 20 or more NPCs. In client-main.log, `esr-tesseleateshape` should show up only when an NPC spawns, is promoted or changes gear, not several times a second. Giving move and formation orders to a big band, and the game's autosave, cause no stutter.
 - [x] 114.4 Orders still reach your screen: switch recruits between Hold, Guard and Follow, and between a formation and Loose. Each takes effect at once, and again after you leave and rejoin the world.
-- [ ] 114.5 Gear still updates: take a recruit's helmet off and put it back in the looks menu, and change its weapon. You (and a second player, if one is on) see each change at once, and it is still right after you rejoin.
+- [x] 114.5 Gear still updates: take a recruit's helmet off and put it back in the looks menu, and change its weapon. You (and a second player, if one is on) see each change at once, and it is still right after you rejoin.
 - [x] 114.6 Logs: client-main.log has no "duplicated attachment point code 'Eyes'" warnings and no "Step parented shape angmar:..." warnings, and no "Failed to apply patch" naming lotrnpcs:patches/angmar-stepparent.json. NPCs in Angmar armor look exactly as before, with no pieces missing.
 - [x] 114.7 Config: after the update, lotrnpcs-factions.json says `"Version": 30`, and no faction's FriendlyRaces lists a `faraces:` race.
 - [ ] 114.8 Admin XP: look at your hired recruit and type `/recruits xp 15`. Its XP line shows 15/15, you get the "ready to promote" message, and Promote is offered in its talk menu. `/recruits xp -100` takes it back to 0. Looking at an archer, a captain, a wild NPC, a dead recruit or nothing gives an error. A player without admin rights is refused.
