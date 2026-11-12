@@ -1594,6 +1594,8 @@ public static class Program {
             Check(Promotion.Xp(r1) == 2, "...and once per kill however often it hit");
             for (int i = 0; i < 20; i++) Promotion.AddXp(r1);
             Check(Promotion.Xp(r1) == 15 && !Promotion.AddXp(r1), "XP stops at the rank's requirement");
+            Check(!Promotion.AddXp(r1, -20) && Promotion.Xp(r1) == 0 && Promotion.AddXp(r1, 99) && Promotion.Xp(r1) == 15 && !Promotion.AddXp(arc, 5) && Promotion.Xp(arc) == 0,
+                "an admin's /recruits xp takes XP down to 0 or straight up to the requirement, and gives an archer none");
             Check(Promotion.MaySeeXp("uidA", "rangers,watch", "uidA", null) && Promotion.MaySeeXp("uidA", "rangers,watch", "uidB", new[] { "Watch" }) && !Promotion.MaySeeXp("uidA", "rangers", "uidB", new[] { "orcs" })
                 && !Promotion.MaySeeXp("uidA", "", "uidB", new[] { "orcs" }),
                 "the XP line shows to the owner and to players in one of the owner's /groups, nobody else");

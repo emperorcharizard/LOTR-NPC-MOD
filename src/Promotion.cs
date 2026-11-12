@@ -53,15 +53,18 @@ namespace LotrNpcs
         /// <summary>A hired NPC of a rank that earns XP.</summary>
         public static bool Earns(Entity e) => e != null && e.Alive && Recruit.OwnerUidOf(e) != null && Need(NpcTypeInfo.Of(e)?.Rank) > 0;
 
-        /// <summary>One more XP for a recruit, capped at its rank's need. True when that filled it.</summary>
-        public static bool AddXp(Entity e)
+        /// <summary>More XP for a recruit (less when negative, as /recruits xp allows), kept between 0 and its rank's
+        /// need. True when that filled it.</summary>
+        public static bool AddXp(Entity e, int amount = 1)
         {
             int need = Need(NpcTypeInfo.Of(e)?.Rank);
             int xp = Xp(e);
-            if (need <= 0 || xp >= need) return false;
-            e.WatchedAttributes.SetInt(XpAttr, xp + 1);
+            if (need <= 0 || (amount > 0 && xp >= need)) return false;
+            int now = Math.Clamp(xp + amount, 0, need);
+            if (now == xp) return false;
+            e.WatchedAttributes.SetInt(XpAttr, now);
             e.WatchedAttributes.MarkPathDirty(XpAttr);
-            return xp + 1 == need;
+            return now == need;
         }
 
         /// <summary>The entity code of the same race at another rank: test-goblin-recruit -> test-goblin-warrior.</summary>
@@ -124,6 +127,29 @@ namespace LotrNpcs
             hiring = api.ModLoader.GetModSystem<HiringSystem>();
             Find = id => api.World.GetEntityById(id);
             api.Event.RegisterGameTickListener(_ => Purge(), 10000);
+            // 0.0.114 (owner: "add an option to add xp to a unit, admin wise").
+            ModCommands.RootOf(api)
+                .BeginSubCommand("xp")
+                .WithDescription("Admins: give XP to the hired recruit or warrior you are looking at (a negative amount takes it away). It stays between 0 and what its rank needs.")
+                .RequiresPrivilege(Privilege.controlserver)
+                .RequiresPlayer()
+                .WithArgs(api.ChatCommands.Parsers.Int("amount"))
+                .HandleWith(ModCommands.AdminOnly(XpCommand))
+                .EndSubCommand();
+        }
+
+        TextCommandResult XpCommand(TextCommandCallingArgs args)
+        {
+            EntityPlayer me = args.Caller.Player.Entity;
+            BlockSelection bsel = null;
+            EntitySelection esel = null;
+            sapi.World.RayTraceForSelection(me.SidedPos.XYZ.Add(me.LocalEyePos), me.SidedPos.Pitch, me.SidedPos.Yaw, (float)HiringSystem.CommandRange, ref bsel, ref esel, null, e => e != me);
+            Entity npc = esel?.Entity;
+            int need = Promotion.Need(NpcTypeInfo.Of(npc)?.Rank);
+            if (npc == null || Recruit.OwnerUidOf(npc) == null || need <= 0)
+                return TextCommandResult.Error("Look at a hired recruit or warrior (archers, captains and wild NPCs have no XP).");
+            if (Promotion.AddXp(npc, (int)args[0])) TellOwner(npc);
+            return TextCommandResult.Success(Recruit.TitleInSentence(npc, args.LanguageCode) + " now has " + Promotion.Xp(npc) + "/" + need + " XP.");
         }
 
         /// <summary>An NPC of this mod was hurt: remember the hit if a recruit that earns XP made it.</summary>

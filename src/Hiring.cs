@@ -115,8 +115,8 @@ namespace LotrNpcs
     public static class ModCommands
     {
         public const string Root = "recruits";
-        public const string RootHelp = "LOTR NPCs, every command of the mod. For players: join, dismissall, whitelist, orders, roster. For admins: faction, zone. Type /help recruits <command> for one of them.";
-        public const string AdminOnlyText = "Only server admins can use /recruits faction and /recruits zone.";
+        public const string RootHelp = "LOTR NPCs, every command of the mod. For players: join, dismissall, whitelist, orders, roster. For admins: faction, zone, battlelog, xp. Type /help recruits <command> for one of them.";
+        public const string AdminOnlyText = "Only server admins can use /recruits faction, zone, battlelog and xp.";
 
         /// <summary>The mod's root command, made by whichever system starts first.</summary>
         public static IChatCommand RootOf(ICoreServerAPI api) =>

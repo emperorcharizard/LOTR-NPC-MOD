@@ -176,6 +176,7 @@ Since 0.0.89 every command of the mod is under `/recruits` (`/help recruits` lis
 | `/recruits zone addfaction` / `removefaction` | Change which factions a zone spawns. |
 | `/recruits zone patrol <n>` / `patrolclear <n>` | 0.0.112: add where you stand as the zone's next patrol point, or remove them all. With 2 or more points, wild groups spawned in the zone walk them in order, round and round, pausing at each; they still fight whatever they meet, and hiring one ends its patrol. Groups already spawned keep the route they had. |
 | `/recruits zone spawnnow` | Spawn a group near you right away, for testing. |
+| `/recruits xp <amount>` | 0.0.114, admins: give XP to the hired recruit or warrior you are looking at (a negative amount takes it away). XP stays between 0 and what its rank needs; filling it tells the owner it can be promoted. |
 | `/recruits whitelist` | Any player (0.0.76): opens the whitelist menu, to add and remove players with buttons. |
 | `/recruits whitelist add/remove/list <player>` | Any player: players your recruits never attack on sight. |
 | `/recruits dismissall` (or `fireall`), then `/recruits dismissall confirm` | Any player: dismiss every recruit you have, as Dismiss in the talk menu does (fees not refunded). Ones far away are freed when their area next loads. |
