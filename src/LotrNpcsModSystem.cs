@@ -57,6 +57,8 @@ namespace LotrNpcs
             cameraGuardApplied = NpcCameraGuard.Apply(api);
             // The XP line under a recruit's health (0.0.76, Promotion.cs).
             XpInfoText.Apply(api);
+            // Far NPCs animate less often (0.0.116, AnimationLod.cs).
+            AnimationLod.Apply(api);
             // Spawn item portraits are built a few at a time once the player is in creative mode, so opening the LOTR
             // NPCs tab doesn't stall the game.
             api.Event.LevelFinalize += () => PortraitWarmUp.Start(api);
@@ -67,6 +69,7 @@ namespace LotrNpcs
             if (cameraGuardApplied) NpcCameraGuard.Remove();
             cameraGuardApplied = false;
             XpInfoText.Remove();
+            AnimationLod.Remove();
             GearSyncGuard.Remove();
         }
     }

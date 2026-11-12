@@ -1131,6 +1131,14 @@ public static class Program {
             Check(!FactionConfig.FromFile(null, out _).DebugCommands && !FactionConfig.FromFile(new FactionConfig { Version = 29 }, out _).DebugCommands
                 && FactionConfig.InstructionText.Any(l => l.StartsWith("DebugCommands")) && ModCommands.DebugOffText.Contains("DebugCommands"),
                 "0.0.115: the testing commands are off in a new or an old config, the file explains DebugCommands, and the refusal says how to turn them on");
+            Check(AnimationLod.Interval(19.9 * 19.9, 20) == 1 && AnimationLod.Interval(39 * 39, 20) == 2 && AnimationLod.Interval(59 * 59, 20) == 3 && AnimationLod.Interval(61 * 61, 20) == 4
+                && AnimationLod.Interval(100, 1) == 3 && AnimationLod.Interval(100 * 100, 1000) == 1,
+                "0.0.116: far NPCs animate every 2nd, 3rd or 4th frame past 1, 2 and 3 times the full-rate distance (kept between 4 and 256 blocks)");
+            int lodCount = 0; float lodSkipped = 0; int lodRuns = 0; float lodTime = 0;
+            for (int f = 0; f < 12; f++) { float dt = 0.01f; if (AnimationLod.Step(ref lodCount, ref lodSkipped, ref dt, 3)) { lodRuns++; lodTime += dt; } }
+            float nearDt = 0.01f; int nearCount = 0; float nearSkipped = 0;
+            Check(lodRuns == 4 && Math.Abs(lodTime - 0.12f) < 1e-4 && AnimationLod.Step(ref nearCount, ref nearSkipped, ref nearDt, 1) && nearDt == 0.01f && new ClientConfig().FarAnimationLod,
+                "0.0.116: an NPC animated every 3rd frame runs 4 times in 12 frames and still advances the full 12 frames' time; near ones run every frame; on by default");
             Check(EntityBehaviorHeldWeapon.PickWeapon(Looks.NoWeapon, new[] { new NpcWeapon { Item = "lotrnpcs:orcweapon-axe" } }, new Random(1)) == Looks.NoWeapon, "an orc whose weapon was taken away stays unarmed after a reload");
             Check(!Looks.NameOnHire(lnpc, new Random(1)) && Looks.NameOf(lnpc) == "Ugrath", "a recruit its owner named keeps its name when hired again");
 

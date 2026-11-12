@@ -43,3 +43,24 @@ In-game results, 2026-11-12, run by Claude through computer use on the owner's P
 - 114.6: client-main.log and client-debug.log have 0 "Eyes" duplicate warnings (previous session 210), 0 Angmar step-parent warnings, 0 failed patches. The 144 "Missing mapping for texture code #missing_texture" errors for iseng Dunlending, arnor heavier and angmar armor bodies were already there before 0.0.114 (288 in earlier sessions): those armor mods' own shapes.
 - 114.7: lotrnpcs-factions.json is version 30 with no faraces entries.
 - 114.8: only the refusal checked (looking at the ground gives the error). The owner has no recruits in this world, so the rest needs a hire first.
+
+## 0.0.116: animation LOD for far NPCs (2026-11-12, prompts/fps-optimization.md)
+
+Research, from the game's IL (VintagestoryLib SystemRenderEntities.OnBeforeRender, VintagestoryAPI AnimationManager.OnClientFrame) and the installed mods:
+- Every frame, for each entity renderer, the game frustum-culls (SphereInFrustum + IsChunkRendered sets Entity.IsRendered), then calls AnimManager.OnClientFrame; the profiler mark esr-afteranim follows it. OnClientFrame runs Animator.OnFrame (ClientAnimator: keyframe blend and calculateMatrices over every joint/element of the composite shape) only when the entity IsRendered or IsShadowRendered. So off-screen NPCs already cost nothing; the cost is all in visible ones, per element, every frame, at any distance.
+- OptiTime 1.5.12 has "Distance-based animation LOD (skip frames for far entities)" (EntityAnimationOptimizations) but turns it off when Combat Overhaul / Overhaul Lib is loaded ("Overhaullib compatibility mode"): OverhaullibLegacyCompat 1.2.15 patches AnimationManager.OnClientFrame (AnimationPatches.AnimationManagerOnClientFrame) and ClientAnimator.calculateMatrices for its player animations. That is why it shows "OFF (Conflict)" on the owner's PC.
+- Rejected for now: cutting elements of the armor shapes (other mods' assets; a visible risk and a big job), lowering our NPCs' render distance (they would pop out of a battle), and skipping shadow-only animation (small).
+
+Built: src/AnimationLod.cs, a Harmony prefix (Priority.First) on AnimationManager.OnClientFrame that only acts on rendered entities of the lotrnpcs domain. Within AnimationFullRateWithin blocks of the player (default 20) they animate every frame; to 2x that every 2nd frame, to 3x every 3rd, beyond every 4th. A skipped frame's time is added to the next run, so animations keep their pace, and each NPC's count starts at its entity id so they skip different frames. Players and other mods' entities are never touched, and nothing changes on the server. Client config ModConfig/lotrnpcs-client.json (FarAnimationLod, AnimationFullRateWithin); chat command `.npcanimlod on | off | <blocks>` switches it live and saves it. Tests: Interval and Step in the factions suite.
+
+Measured on the owner's PC (i7-12700KF, RTX 3070, vsync setting 1, max FPS 241, view distance 256), `/recruits bench 200` (armies 10 to 22 blocks ahead, so this is close range):
+
+| Setting | avg FPS | 1% low | worst frame | server ticks/s |
+| --- | --- | --- | --- | --- |
+| off (as 0.0.115) | 64.7 | 36.0 | 38 ms | 29.3 |
+| 20 blocks (default) | 70.4 | 38.2 | 33 ms | 29.3 |
+| 10 blocks | 103.2 | 48.3 | 26 ms | - |
+| 4 blocks | 122.2 | 53.6 | 23 ms | 29.3 |
+
+Mid-fight screenshots at 20 blocks looked normal (walking, shields, bows). In real battles NPCs spread farther than the bench, so the default helps more there than in this table. The default is the owner's call: 10 nearly doubles the bench's FPS, with far NPCs animating at half rate past 10 blocks.
+

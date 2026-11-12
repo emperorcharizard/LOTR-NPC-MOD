@@ -1,8 +1,8 @@
-# LOTR NPCs in-game test pass (0.0.115)
+# LOTR NPCs in-game test pass (0.0.116)
 
 Updated 2026-11-12 for 0.0.115.
 
-Everything built since 0.0.44 that nobody has seen in game yet, in one play session. Install **lotrnpcs 0.0.115** (only one lotrnpcs zip in Mods, full game restart) and **gundabad-bone-armor 0.3.0**. Spawn fresh NPCs from the LOTR NPCs creative tab: older ones keep their old weapon, hair and looks. For anything wrong, note the step number and send a screenshot plus client-main.log and server-main.log.
+Everything built since 0.0.44 that nobody has seen in game yet, in one play session. Install **lotrnpcs 0.0.116** (only one lotrnpcs zip in Mods, full game restart) and **gundabad-bone-armor 0.3.0**. Spawn fresh NPCs from the LOTR NPCs creative tab: older ones keep their old weapon, hair and looks. For anything wrong, note the step number and send a screenshot plus client-main.log and server-main.log.
 
 ## 1. Weapons and animations (0.0.65 to 0.0.68)
 
@@ -386,3 +386,10 @@ Install `lotrnpcs_0.0.109-test.zip` (instead of any older lotrnpcs zip); restart
 - [x] 115.4 Promotion screen: a warrior with 40 XP picks "Promote...". The single captain card sits in a screen wide enough for the title, the XP and coins line and the whole last sentence.
 - [x] 115.5 Moria helmet: Misty Mountains warriors, guards and shock troopers offer the Moria Orc Helmet in the looks menu, and some spawn wearing it.
 - [x] 115.6 Testing commands off: on a new or updated config, `/recruits xp 15`, `/recruits bench 20`, `/recruits battlelog on` and `/recruits zone spawnnow` each refuse with a message naming DebugCommands. Set `"DebugCommands": true` in ModConfig/lotrnpcs-factions.json, run `/recruits faction reload`, and they work again.
+
+## 116. Far NPCs animate less often (0.0.116)
+
+- [x] 116.1 FPS: with `DebugCommands` on, `.npcanimlod off` then `/recruits bench 200`, then `.npcanimlod 10` and the bench again. The second run has clearly higher FPS (owner's PC: 64.7 against 103.2); the server line is the same.
+- [ ] 116.2 Looks: at the default (20 blocks), watch a battle from close and from 40 to 80 blocks. Up close nothing changes; far NPCs may move a little less smoothly but never freeze, slide or snap. Say if 20 should be lower (more FPS) or higher.
+- [ ] 116.3 ModConfig/lotrnpcs-client.json appears after the first start with FarAnimationLod true and AnimationFullRateWithin 20; `.npcanimlod off` writes false, and the setting holds after a restart.
+
