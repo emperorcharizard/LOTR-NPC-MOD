@@ -1077,7 +1077,8 @@ FACTION_SETS = {
     "goblin": {
         "recruit": [[head, norc("body", "tierthreechain", "norcarmormedium"), norc("legs", "tierthreechain", "norcleggingsmedium")]
                     for head in (norc("head", "tierthreechain", "norchelmetmedium"), GUNDABAD_HEAD, MORD_RAIDER_HEAD)],
-        "warrior": [[head, GUNDABAD_BODY, GUNDABAD_LEGS] for head in (GUNDABAD_HEAD, MORD_WARRIOR_HEAD)],
+        # 0.0.115 (owner, 2026-11-12: "the misty mountains orc warriors should also get the moria orc helmet option").
+        "warrior": [[head, GUNDABAD_BODY, GUNDABAD_LEGS] for head in (GUNDABAD_HEAD, MORD_WARRIOR_HEAD, norc("head", "tierthreechain", "norchelmetmedium"))],
         "captain": [[head, norc("body", "tierfiveplate", "norcarmorheavier"), norc("legs", "tierfiveplate", "norcleggingsheavier")]
                     for head in (norc("head", "tierfiveplate", "norchelmetheavier"), GUNDABAD_HEAD)],
     },

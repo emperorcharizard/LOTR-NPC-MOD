@@ -12,7 +12,7 @@ My defaults (told the user, awaiting objection): HelmetChance 0.6, captains alwa
 
 PML 1.24.0 facts (decompiled with ilspycmd): skin in WatchedAttributes skinConfig/appliedParts/<part>=variant; client PML only re-tesselates when the MODEL changes, so our hireable client listener calls MarkShapeModified on skinConfig changes. Face parts read from our bundled assets/lotrnpcs/config/customplayermodels/<race>.json (category standard only).
 
-To do (owner, 2026-11-12: "the misty mountains orc warriors should also get the moria orc helmet option"): add norc("head", "tierthreechain", "norchelmetmedium") (in game "Moria Orc Helmet") to the goblin warrior heads in tools/gen_testnpcs.py FACTION_SETS (now GUNDABAD_HEAD and MORD_WARRIOR_HEAD only; recruits already have it). Guards and shock troopers take the warrior's sets, so check they get it too. Not built yet.
+0.0.115 (owner, 2026-11-12: "the misty mountains orc warriors should also get the moria orc helmet option"): the goblin warrior sets gain norc("head", "tierthreechain", "norchelmetmedium") (in game "Moria Orc Helmet") beside the Gundabad and black uruk helmets. Guards and shock troopers take the warrior's sets, so they get it too; captains don't (orcs offer only their own unit's helmets). Warriors may now also spawn wearing it.
 
 Related: [[lotrnpcs-hiring]], [[lotrnpcs-weapons]], [[lotrnpcs-outfits]]
 

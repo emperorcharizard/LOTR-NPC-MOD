@@ -1,8 +1,8 @@
-# LOTR NPCs in-game test pass (0.0.114)
+# LOTR NPCs in-game test pass (0.0.115)
 
-Updated 2026-11-11 for 0.0.114.
+Updated 2026-11-12 for 0.0.115.
 
-Everything built since 0.0.44 that nobody has seen in game yet, in one play session. Install **lotrnpcs 0.0.114** (only one lotrnpcs zip in Mods, full game restart) and **gundabad-bone-armor 0.3.0**. Spawn fresh NPCs from the LOTR NPCs creative tab: older ones keep their old weapon, hair and looks. For anything wrong, note the step number and send a screenshot plus client-main.log and server-main.log.
+Everything built since 0.0.44 that nobody has seen in game yet, in one play session. Install **lotrnpcs 0.0.115** (only one lotrnpcs zip in Mods, full game restart) and **gundabad-bone-armor 0.3.0**. Spawn fresh NPCs from the LOTR NPCs creative tab: older ones keep their old weapon, hair and looks. For anything wrong, note the step number and send a screenshot plus client-main.log and server-main.log.
 
 ## 1. Weapons and animations (0.0.65 to 0.0.68)
 
@@ -377,3 +377,11 @@ Install `lotrnpcs_0.0.109-test.zip` (instead of any older lotrnpcs zip); restart
 - [x] 114.7 Config: after the update, lotrnpcs-factions.json says `"Version": 30`, and no faction's FriendlyRaces lists a `faraces:` race.
 - [ ] 114.8 Admin XP: look at your hired recruit and type `/recruits xp 15`. Its XP line shows 15/15, you get the "ready to promote" message, and Promote is offered in its talk menu. `/recruits xp -100` takes it back to 0. Looking at an archer, a captain, a wild NPC, a dead recruit or nothing gives an error. A player without admin rights is refused.
 - [x] 114.9 Bench: on open flat ground type `/recruits bench 100` and keep looking at the fight. Two armies appear about 16 blocks ahead and fight. About 35 s later chat shows a "bench client" line (FPS, 1% low, worst frame, vsync, view distance) and a "bench server" line (ticks), and both are in the logs. `/recruits bench clear` removes every bench NPC and body. Run it at 50, 100 and 200 with vsync off and send the three client lines.
+
+## 115. A warrior's gear picks its class, helmet row, promotion screen, Moria helmet (0.0.115)
+
+- [x] 115.1 Class from gear: in a hired warrior's looks menu pick a two-handed weapon. Chat says it is now a shock trooper; turn its shield on with a one-handed weapon and it becomes a guard; neither makes a warrior again. Its XP stays.
+- [x] 115.2 Cancel: open the looks menu of a warrior with its shield on and press Cancel. It stays a warrior.
+- [x] 115.3 Helmet row: the looks menu of any recruit that can wear helmets has a Helmet row, and the helmet you pick shows on the model.
+- [x] 115.4 Promotion screen: a warrior with 40 XP picks "Promote...". The single captain card sits in a screen wide enough for the title, the XP and coins line and the whole last sentence.
+- [ ] 115.5 Moria helmet: Misty Mountains warriors, guards and shock troopers offer the Moria Orc Helmet in the looks menu, and some spawn wearing it.
