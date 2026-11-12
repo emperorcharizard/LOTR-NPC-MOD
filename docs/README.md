@@ -2,7 +2,7 @@
 
 | What | Where |
 | --- | --- |
-| How to test the current build in game | `test-checklist.md` (sections 98-112 cover 0.0.98 to 0.0.112) |
+| How to test the current build in game | `test-checklist.md` (sections 98-114 cover 0.0.98 to 0.0.114) |
 | Design decisions, per topic, with dates and the owner's words | `notes/` (the project's memory notes; start with `notes/MEMORY.md`) |
 | 2026-11-09 design review: questions, arguments and the owner's answers | `notes/lotrnpcs-review-answers.md`; the full review is the Claude Doc https://claude.ai/artifact/XURXPMgYM266SZTsm4AamD |
 | Roster screen and branching promotion (built in 0.0.113 with default answers to Q1-Q6, see `notes/lotrnpcs-0113.md`) | `design-roster-promotion.md` |

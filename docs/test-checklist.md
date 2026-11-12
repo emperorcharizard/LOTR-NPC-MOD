@@ -1,8 +1,8 @@
-# LOTR NPCs in-game test pass (0.0.112)
+# LOTR NPCs in-game test pass (0.0.114)
 
-Updated 2026-11-09 for 0.0.112.
+Updated 2026-11-11 for 0.0.114.
 
-Everything built since 0.0.44 that nobody has seen in game yet, in one play session. Install **lotrnpcs 0.0.112** (only one lotrnpcs zip in Mods, full game restart) and **gundabad-bone-armor 0.3.0**. Spawn fresh NPCs from the LOTR NPCs creative tab: older ones keep their old weapon, hair and looks. For anything wrong, note the step number and send a screenshot plus client-main.log and server-main.log.
+Everything built since 0.0.44 that nobody has seen in game yet, in one play session. Install **lotrnpcs 0.0.114** (only one lotrnpcs zip in Mods, full game restart) and **gundabad-bone-armor 0.3.0**. Spawn fresh NPCs from the LOTR NPCs creative tab: older ones keep their old weapon, hair and looks. For anything wrong, note the step number and send a screenshot plus client-main.log and server-main.log.
 
 ## 1. Weapons and animations (0.0.65 to 0.0.68)
 
@@ -365,3 +365,13 @@ Install `lotrnpcs_0.0.109-test.zip` (instead of any older lotrnpcs zip); restart
 - [ ] 113.8 Roster buttons: Map puts a marker on the world map (gone when you rejoin); Call makes a loaded recruit follow you (refused when your band is full); Promote opens the promotion screen from any distance; Dismiss asks "Sure?" first. Walk far away so one unloads: its row says "Not loaded: last seen x / z, n min ago", and Dismiss still works (it leaves when its area loads).
 - [ ] 113.9 Recruits hired before 0.0.113 show "Not seen since the update" until they first load.
 - [ ] 113.10 Old config: an existing lotrnpcs-factions.json gains guard and shock health and damage from its own warrior values, and PromotePrices guard and shock at the warrior's price.
+
+## 114. Fewer model rebuilds, quieter logs, line fixes, no FA Races (0.0.114)
+
+- [ ] 114.1 Followers in a battle line (any formation but Loose) hold their place between swings instead of walking back to you. They go back to following when the line breaks up, when you are more than 12 blocks away, or on a move order.
+- [ ] 114.2 Stragglers: start a wild fight, then spawn one more NPC of one side about 17 blocks behind it. It runs straight to its side's line and joins it, instead of walking in alone over about 20 seconds.
+- [ ] 114.3 Frame rate: turn on `.debug logticks 30` and watch a fight of 20 or more NPCs. In client-main.log, `esr-tesseleateshape` should show up only when an NPC spawns, is promoted or changes gear, not several times a second. Giving move and formation orders to a big band, and the game's autosave, cause no stutter.
+- [ ] 114.4 Orders still reach your screen: switch recruits between Hold, Guard and Follow, and between a formation and Loose. Each takes effect at once, and again after you leave and rejoin the world.
+- [ ] 114.5 Gear still updates: take a recruit's helmet off and put it back in the looks menu, and change its weapon. You (and a second player, if one is on) see each change at once, and it is still right after you rejoin.
+- [ ] 114.6 Logs: client-main.log has no "duplicated attachment point code 'Eyes'" warnings and no "Step parented shape angmar:..." warnings, and no "Failed to apply patch" naming lotrnpcs:patches/angmar-stepparent.json. NPCs in Angmar armor look exactly as before, with no pieces missing.
+- [ ] 114.7 Config: after the update, lotrnpcs-factions.json says `"Version": 30`, and no faction's FriendlyRaces lists a `faraces:` race.

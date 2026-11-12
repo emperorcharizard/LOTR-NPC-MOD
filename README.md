@@ -2,7 +2,7 @@
 
 LOTR NPC factions for Vintage Story 1.22.7: wild faction NPCs in admin spawn zones, hiring, orders and formations, battle lines, per-faction balance tiers.
 
-Current version: 0.0.112 (see `tools/gen_testnpcs.py` and `docs/test-checklist.md`, sections 98-112). Last in-game test: 0.0.109 on 2026-11-09 (results in `docs/notes/lotrnpcs-0109.md`).
+Current version: 0.0.114 (see `tools/gen_testnpcs.py` and `docs/test-checklist.md`, sections 98-114). Last in-game test: 0.0.109 on 2026-11-09 (results in `docs/notes/lotrnpcs-0109.md`).
 
 ## Layout
 
