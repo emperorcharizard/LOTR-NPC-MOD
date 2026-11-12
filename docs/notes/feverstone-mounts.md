@@ -50,3 +50,19 @@ Spike first: one admin command that spawns a horse and mounts a test NPC on it. 
 - When a rider dies its mount runs off: it turns wild and wanders away (no free tamed mounts to farm). When the mount dies, the rider fights on foot.
 - Wild riders: in groups, at a chance below a captain's, not leading the group.
 - Still open (default proposed, not asked): riders earn XP like guards and shock troopers and are the last rank on their path; promoting to rider costs the captain's price.
+
+## Spike, 2026-11-12 (src/MountSpike.cs, `/recruits mountspike`, needs DebugCommands)
+
+Owner, same day: "the goal is to have [the mount] spawn as a part of the unit" and "the behavior should remain the same for commanding the unit": a rider spawns already seated, and takes the same orders (follow, hold, move, guard, formations, fights) as on foot; the mount only carries it.
+
+The command: `spawn [npc code] [mount code]` makes a new NPC and its mount together where you look (default Rohan warrior on `feverstonewilds:horse-tamed-male-quarter`) and seats it; `ai | controls | direct` seat the NPC you look at, or switch its steering; `off` gets it off. Steering modes: `ai` (the goal) turns the mount toward the rider's own walk vector, so its normal tasks drive it; `controls` presses the rider's movement keys and lets the game's EntityBehaviorRideable read them; `direct` sets the mount's gait and yaw ourselves. Once a second each rider logs mode, yaw, gait and walk vector to server-main.log.
+
+Found so far (in game, 0.0.115 build):
+- The mount entities spawn fine from our code (tamed quarter-horse stallion, tame dire wolf).
+- The game's `TryGiveItemStack` on a mount throws IndexOutOfRange on the server (EntityBehaviorAttachable maps client selection boxes), and `GetSlotConfigFromAPName` finds no slot on the server for the same reason. The current code puts the saddle and bridle straight into the accessory inventory, at the index of the slot whose `forCategoryCodes` names saddle-/bridle- in the mount's `rideableaccessories` config (horse: saddle 3, bridle 0). **Built but not run in game yet.**
+- With no saddle, `TryMount` is refused, so the seat needs the saddle (the rideable's CanRide check). The latest build also reports `CanMount` and lists the mount's behaviors when the accessory behavior is missing.
+- Not reached yet: the sitting animation on an NPC, whether `ai` steering moves the mount, and staying mounted across a save and reload.
+
+Next step: install the latest build (releases/lotrnpcs_0.0.115-test.zip, built from this commit), set `"DebugCommands": true`, and run `/recruits mountspike spawn lotrnpcs:test-goblin-warrior feverstonewilds:tame-direwolf-male` while looking at open ground. Then `/recruits mountspike spawn` (Rohan on a horse). Read the chat line and the `mountspike` lines in server-main.log.
+
+Testing note for whoever drives the game by script: never send Escape. Computer use treats an Escape keypress as the user stopping the turn, so scripts that open the pause menu with Escape cut themselves off.
