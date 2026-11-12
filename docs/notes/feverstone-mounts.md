@@ -42,3 +42,11 @@ Spike first: one admin command that spawns a horse and mounts a test NPC on it. 
 - When the rider dies, does the mount stay as a tamed animal anyone can take, run off, or vanish? And when the mount dies, does the rider fight on foot?
 - Do riders earn XP, and what does promotion to rider cost?
 - In the wild: does a rider lead a group like a captain, or ride alone?
+
+## Owner's answers, 2026-11-12
+
+- Who rides: the suggested set (Rohan, Gondor, Dale, Arnor on horses; Isengard, Mordor, Gundabad, Angmar orcs on dire wolves; no hobbits), plus **elves on elk** and **dwarves on Teapot's giant boars**. Those are two more mods, both in the owner's ModsByServer/199.115.74.6-9100 folder: elkjaunt 1.4.0 with elkvariants 3.7.2, and teapotsgiantboar 1.0.14. Not read yet: whether their elk and boar use the game's rideable behavior (as Feverstone's horse and wolf do) and what their entity codes are.
+- Dependency: optional. Without Feverstone (or the elk / boar mods) the mod works as now, with no riders for those factions.
+- When a rider dies its mount runs off: it turns wild and wanders away (no free tamed mounts to farm). When the mount dies, the rider fights on foot.
+- Wild riders: in groups, at a chance below a captain's, not leading the group.
+- Still open (default proposed, not asked): riders earn XP like guards and shock troopers and are the last rank on their path; promoting to rider costs the captain's price.
