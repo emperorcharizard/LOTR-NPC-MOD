@@ -47,3 +47,4 @@
 - [lotrnpcs-review-answers](lotrnpcs-review-answers.md) — 2026-11-09 design review doc + user answers: feature freeze until in-game test, battle log + hurt-window switch first, post-test build list
 - [lotrnpcs-0109](lotrnpcs-0109.md) — 0.0.109 battle log + hurt-window switch, the 2026-11-09 in-game test results, and 0.0.110 extras on the flanks
 - [lotrnpcs-0113](lotrnpcs-0113.md) — 0.0.113: Guard/Shock ranks, promotion and roster screens, map marker, save-overwrite + NaN fixes, defaults taken for Q1-Q6
+- [feverstone-mounts](feverstone-mounts.md) — Feverstone Wilds 3.1.1 read for Rohan/warg riders: game riding is client-steered, so NPC riders need our own steering; plan + open questions

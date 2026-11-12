@@ -277,6 +277,11 @@ public static class Program {
             TreeAttribute Gear(int durability) { var t = new TreeAttribute(); var slot = new TreeAttribute(); slot.SetInt("durability", durability); t["slot0"] = slot; t.SetInt("qslots", 15); return t; }
             Check(GearSyncGuard.SameTree(Gear(40), Gear(40)) && !GearSyncGuard.SameTree(Gear(40), Gear(39)),
                 "0.0.114: an NPC's gear is resent only when it differs from what players already have (a save no longer rebuilds every NPC's model)");
+            var benchFrames = Enumerable.Repeat(10.0, 199).Append(50.0).Append(30.0).ToList();
+            string bench = BenchStats.Summarize(benchFrames);
+            Check(bench == "avg 97.1 FPS (10.3 ms), 1% low 25.0 FPS (40.0 ms), worst frame 50 ms, 201 frames" && BenchStats.Summarize(new List<double>()) == "no frames timed"
+                && BenchStats.Summarize(new List<double> { 40 }, "ticks/s", "tick") == "avg 25.0 ticks/s (40.0 ms), 1% low 25.0 ticks/s (40.0 ms), worst tick 40 ms, 1 ticks",
+                "0.0.114: /recruits bench reports average FPS, the 1% low as the slowest 1% of frames, and the worst frame (got: " + bench + ")");
         }
         Check(!fs.WantsToAttack("gondor", guard) && !fs.WantsToAttack("shire", guard) && fs.WantsToAttack("mordor", guard) && fs.WantsToAttack("rohan", guard), "wild NPCs treat a recruit as they treat its owner: Gondor and the Shire leave a Gondor member's recruit alone, Mordor and Rohan attack it");
         Check(!fs.RecruitWantsToAttack(guard, uid, lord) && !fs.RecruitWantsToAttack(guard, uid, guard2) && !fs.RecruitWantsToAttack(guard, uid, guard), "a recruit never targets its owner or the owner's other recruits");
@@ -1118,6 +1123,9 @@ public static class Program {
                 && lnpc.WatchedAttributes.GetString(EntityBehaviorHeldWeapon.WeaponAttr) == Looks.NoWeapon && lhead.Empty && lnpc.WatchedAttributes.HasAttribute(Looks.KeptHelmetAttr),
                 "the owner renames it, changes its hair and eyes, takes its weapon away and its helmet off");
             Check(Looks.Apply(lnpc, "uidOwner", new LooksRequest { Helmet = "on" }, lparts, lweapons, lhead) == null && !lhead.Empty, "...and can put the helmet back on");
+            Check(Looks.ClassFor(true, false) == "shock" && Looks.ClassFor(true, true) == "shock" && Looks.ClassFor(false, true) == "guard" && Looks.ClassFor(false, false) == "warrior",
+                "a warrior's loadout picks its class: two-handed makes a shock trooper, a shield a guard, neither a warrior (0.0.115)");
+            Check(Looks.LoadoutClass(lnpc) == null, "an NPC outside a warrior line has no loadout class");
             Check(EntityBehaviorHeldWeapon.PickWeapon(Looks.NoWeapon, new[] { new NpcWeapon { Item = "lotrnpcs:orcweapon-axe" } }, new Random(1)) == Looks.NoWeapon, "an orc whose weapon was taken away stays unarmed after a reload");
             Check(!Looks.NameOnHire(lnpc, new Random(1)) && Looks.NameOf(lnpc) == "Ugrath", "a recruit its owner named keeps its name when hired again");
 

@@ -115,8 +115,8 @@ namespace LotrNpcs
     public static class ModCommands
     {
         public const string Root = "recruits";
-        public const string RootHelp = "LOTR NPCs, every command of the mod. For players: join, dismissall, whitelist, orders, roster. For admins: faction, zone, battlelog, xp. Type /help recruits <command> for one of them.";
-        public const string AdminOnlyText = "Only server admins can use /recruits faction, zone, battlelog and xp.";
+        public const string RootHelp = "LOTR NPCs, every command of the mod. For players: join, dismissall, whitelist, orders, roster. For admins: faction, zone, battlelog, xp, bench. Type /help recruits <command> for one of them.";
+        public const string AdminOnlyText = "Only server admins can use /recruits faction, zone, battlelog, xp and bench.";
 
         /// <summary>The mod's root command, made by whichever system starts first.</summary>
         public static IChatCommand RootOf(ICoreServerAPI api) =>
@@ -1861,6 +1861,22 @@ namespace LotrNpcs
             string refused = Looks.Apply(entity, player.PlayerUID, req, Looks.PartsOf(entity.Api, Attrs.String(entity.WatchedAttributes, "skinModel")), Looks.WeaponChoices(entity), Looks.Head(entity), Looks.ShieldOf(entity), Looks.HelmetChoices(entity));
             talkingUntilMs = entity.World.ElapsedMilliseconds + 30000;
             if (refused != null) ((ICoreServerAPI)entity.Api).Network.SendEntityPacket(player, entity.EntityId, LooksPacket, Encoding.UTF8.GetBytes(refused));
+            else if (req.Weapon != null || req.Shield != null) Reclass(player);
+        }
+
+        // 0.0.115: a warrior whose new weapon or shield makes another class (Looks.ClassFor) becomes that class, as a
+        // promotion makes a new NPC (PromotionSystem.Promote), keeping its XP. The looks dialog closes with the old NPC.
+        void Reclass(IServerPlayer player)
+        {
+            string target = Looks.LoadoutClass(entity);
+            if (target == null || target == NpcTypeInfo.Of(entity)?.Rank || !(entity is EntityAgent npc)) return;
+            int xp = Promotion.Xp(entity);
+            string before = Recruit.TitleInSentence(entity, player.LanguageCode);
+            EntityAgent next = hiring?.Promotions?.Promote(npc, target);
+            if (next == null) return;
+            next.WatchedAttributes.SetInt(Promotion.XpAttr, xp);
+            next.WatchedAttributes.MarkPathDirty(Promotion.XpAttr);
+            player.SendMessage(GlobalConstants.GeneralChatGroup, Lang.GetL(player.LanguageCode, "lotrnpcs:promote-done", before, Recruit.TitleInSentence(next, player.LanguageCode)), EnumChatType.Notification);
         }
 
         public override void OnReceivedServerPacket(int packetid, byte[] data, ref EnumHandling handled)

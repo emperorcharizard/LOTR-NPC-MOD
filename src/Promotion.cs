@@ -145,9 +145,9 @@ namespace LotrNpcs
             EntitySelection esel = null;
             sapi.World.RayTraceForSelection(me.SidedPos.XYZ.Add(me.LocalEyePos), me.SidedPos.Pitch, me.SidedPos.Yaw, (float)HiringSystem.CommandRange, ref bsel, ref esel, null, e => e != me);
             Entity npc = esel?.Entity;
-            int need = Promotion.Need(NpcTypeInfo.Of(npc)?.Rank);
-            if (npc == null || Recruit.OwnerUidOf(npc) == null || need <= 0)
-                return TextCommandResult.Error("Look at a hired recruit or warrior (archers, captains and wild NPCs have no XP).");
+            if (!Promotion.Earns(npc))
+                return TextCommandResult.Error("Look at a living hired recruit or warrior (archers, captains and wild NPCs have no XP).");
+            int need = Promotion.Need(NpcTypeInfo.Of(npc).Rank);
             if (Promotion.AddXp(npc, (int)args[0])) TellOwner(npc);
             return TextCommandResult.Success(Recruit.TitleInSentence(npc, args.LanguageCode) + " now has " + Promotion.Xp(npc) + "/" + need + " XP.");
         }

@@ -287,7 +287,49 @@ namespace LotrNpcs
             IReadOnlyList<NpcWeapon> weapons = held?.Weapons;
             // An archer's bow isn't the owner's to change (0.0.55).
             if (weapons == null || weapons.Count == 0 || held.Fixed) return Array.Empty<string>();
+            NpcWeapon[] line = LineWeapons(npc);
+            if (line.Length > 0) weapons = line;
             return weapons.Select(w => w.Item).Append(NoWeapon).ToArray();
+        }
+
+        // ---- A warrior's loadout picks its class (0.0.115) ----
+
+        /// <summary>
+        /// The class a warrior's loadout makes (user, 2026-11-12: "based on whether or not they have the two handed
+        /// weapons, or the one handed with or without the shield, it changes their class"): a two-handed weapon makes a
+        /// shock trooper, a shield a guard, neither a plain warrior.
+        /// </summary>
+        public static string ClassFor(bool twoHanded, bool shieldOn) => twoHanded ? "shock" : shieldOn ? "guard" : "warrior";
+
+        /// <summary>The held-weapon config of each class in this NPC's warrior line (warrior, guard, and shock when its
+        /// weapon takes both hands), by rank; empty when the NPC isn't in such a line.</summary>
+        static Dictionary<string, JsonObject> LineConfigs(Entity npc)
+        {
+            Dictionary<string, JsonObject> line = new Dictionary<string, JsonObject>();
+            if (npc?.World == null || Promotion.BaseRank(NpcTypeInfo.Of(npc)?.Rank) != "warrior") return line;
+            foreach (string rank in new[] { "warrior", "guard", "shock" })
+            {
+                EntityProperties type = npc.World.GetEntityType(Promotion.CodeAtRank(npc.Code, rank));
+                JsonObject held = (type?.Client?.BehaviorsAsJsonObj ?? type?.Server?.BehaviorsAsJsonObj)?.FirstOrDefault(b => b["code"].AsString() == "lotrnpcs:heldweapon");
+                // A shock trooper with a one-handed weapon (factions without a two-handed one) can't be told apart by its loadout.
+                if (held != null && (rank != "shock" || EntityBehaviorHeldWeapon.ReadWeapons(held["weapons"]).Any(w => w.TwoHanded))) line[rank] = held;
+            }
+            // Only a line with a choice to make, that this NPC's own class is part of.
+            return line.Count > 1 && line.ContainsKey(NpcTypeInfo.Of(npc).Rank) ? line : new Dictionary<string, JsonObject>();
+        }
+
+        /// <summary>Every weapon of the NPC's warrior line (the warrior's, then the guard's and shock trooper's); empty
+        /// outside a line.</summary>
+        static NpcWeapon[] LineWeapons(Entity npc) =>
+            LineConfigs(npc).Values.SelectMany(h => EntityBehaviorHeldWeapon.ReadWeapons(h["weapons"])).GroupBy(w => w.Item).Select(g => g.First()).ToArray();
+
+        /// <summary>The class this NPC's weapon and shield make, or null when it isn't in a warrior line.</summary>
+        public static string LoadoutClass(Entity npc)
+        {
+            NpcWeapon[] line = LineWeapons(npc);
+            if (line.Length == 0) return null;
+            bool twoHanded = EntityBehaviorHeldWeapon.IsTwoHanded(Attrs.String(npc.WatchedAttributes, EntityBehaviorHeldWeapon.WeaponAttr), line);
+            return ClassFor(twoHanded, !twoHanded && Attrs.String(npc.WatchedAttributes, EntityBehaviorHeldWeapon.ShieldAttr) == "on");
         }
 
         /// <summary>What the shield may go with, for Apply: null when the NPC has no shield.</summary>
@@ -301,6 +343,10 @@ namespace LotrNpcs
         public static ShieldRule ShieldOf(Entity npc)
         {
             EntityBehaviorHeldWeapon held = Behavior<EntityBehaviorHeldWeapon>(npc);
+            // In a warrior line the shield is always the owner's to choose: it makes the guard (0.0.115).
+            Dictionary<string, JsonObject> line = held == null ? null : LineConfigs(npc);
+            if (line != null && line.Count > 0 && line.Values.Any(h => (h["shields"].AsArray()?.Length ?? 0) > 0 || h["shield"].Exists))
+                return new ShieldRule { TwoHanded = LineWeapons(npc).Where(w => w.TwoHanded).Select(w => w.Item).ToArray() };
             if (held?.ShieldItem == null || held.AlwaysShield) return null;
             return new ShieldRule { TwoHanded = held.Weapons.Where(w => w.TwoHanded).Select(w => w.Item).ToArray() };
         }

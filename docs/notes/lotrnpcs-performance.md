@@ -26,3 +26,20 @@ Frame rate with many NPCs (2026-11-11, owner's client log with `.debug logticks 
 - Log noise fixed: LRC's ear and goblin face parts carried a second "Eyes" attachment point (bundle_lrc.py drop_eyes); Angmar's armor parts have stepParentName "" (the game leaves them under their own parent, so they show, but warns each time): tools/angmar_stepparent_patch.py writes tools/patches/angmar-stepparent.json (514 removes, dependsOn lotrangmar), copied into the mod by build.py. Rerun it if Angmar updates its shapes.
 
 Related: [[lotrnpcs-build]], [[lotrnpcs-hiring]], [[npc-ai-tuning]]
+
+Benchmark in game (0.0.114, owner 2026-11-12: "add it", to get FPS for other PC tiers): `/recruits bench <2-300>` (src/Bench.cs) spawns Gondor warriors and archers against Mordor orcs 16 blocks ahead of the admin, waits 5 s, then times the admin's client frames (an IRenderer at EnumRenderStage.Done) and the server's ticks for 30 s; BenchStats.Summarize prints average, 1% low (average of the slowest 1%) and worst. Bench NPCs carry the entity attribute lotrnpcsBench and stay until `/recruits bench clear` despawns them. The only measured PC so far is the owner's (i7-12700KF, RTX 3070, 32 GB). GPU use can't be read from a mod.
+
+In-game results, 2026-11-12, run by Claude through computer use on the owner's PC (i7-12700KF, RTX 3070, 32 GB; world "Emperorcharizars Superflat Place", creative, superflat, day, vsync setting 1, max FPS 241, view distance 256). Bench lines from client-main.log / server-main.log:
+
+| NPCs | client avg | 1% low | worst frame | server ticks/s (worst tick) |
+| --- | --- | --- | --- | --- |
+| 50 | 153.1 FPS (6.5 ms) | 84.7 FPS (11.8 ms) | 17 ms | 29.3 (36 ms) |
+| 100 | 96.8 FPS (10.3 ms) | 51.1 FPS (19.6 ms) | 42 ms | 29.3 (38 ms) |
+| 100 (rerun) | 94.6 FPS (10.6 ms) | 48.5 FPS (20.6 ms) | 26 ms | 29.2 (44 ms) |
+| 200 | 56.3 FPS (17.8 ms) | 31.7 FPS (31.5 ms) | 37 ms | 29.2 (46 ms) |
+
+- The server holds about 29 ticks/s even at 200 NPCs fighting: the mod's AI is not the limit on this PC.
+- 114.3: `.debug logticks` is a toggle (a second call turns it off, whatever the number). With threshold 0, about 1000 consecutive frames with 150-256 NPCs drawn after a fight had no esr-tesseleateshape at all (0.0.113: about 10 rebuilds a second). esr-afteranim was 30-34 us per NPC, the bulk of each frame. One 40 ms frame was doneMTT (27 ms) when 100 NPCs spawned at once. With threshold 30 ms during the 200 fight, no frame was logged.
+- 114.6: client-main.log and client-debug.log have 0 "Eyes" duplicate warnings (previous session 210), 0 Angmar step-parent warnings, 0 failed patches. The 144 "Missing mapping for texture code #missing_texture" errors for iseng Dunlending, arnor heavier and angmar armor bodies were already there before 0.0.114 (288 in earlier sessions): those armor mods' own shapes.
+- 114.7: lotrnpcs-factions.json is version 30 with no faraces entries.
+- 114.8: only the refusal checked (looking at the ground gives the error). The owner has no recruits in this world, so the rest needs a hire first.
