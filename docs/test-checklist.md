@@ -384,4 +384,4 @@ Install `lotrnpcs_0.0.109-test.zip` (instead of any older lotrnpcs zip); restart
 - [x] 115.2 Cancel: open the looks menu of a warrior with its shield on and press Cancel. It stays a warrior.
 - [x] 115.3 Helmet row: the looks menu of any recruit that can wear helmets has a Helmet row, and the helmet you pick shows on the model.
 - [x] 115.4 Promotion screen: a warrior with 40 XP picks "Promote...". The single captain card sits in a screen wide enough for the title, the XP and coins line and the whole last sentence.
-- [ ] 115.5 Moria helmet: Misty Mountains warriors, guards and shock troopers offer the Moria Orc Helmet in the looks menu, and some spawn wearing it.
+- [x] 115.5 Moria helmet: Misty Mountains warriors, guards and shock troopers offer the Moria Orc Helmet in the looks menu, and some spawn wearing it.
