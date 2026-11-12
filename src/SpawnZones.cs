@@ -233,7 +233,7 @@ namespace LotrNpcs
                 .EndSubCommand()
                 .BeginSubCommand("spawnnow")
                     .WithDescription("Spawn a group near you right away, as the zone timer would (for testing)")
-                    .HandleWith(ModCommands.AdminOnly(OnSpawnNow))
+                    .HandleWith(ModCommands.DebugOnly(api, OnSpawnNow))
                 .EndSubCommand()
                 .EndSubCommand();
         }

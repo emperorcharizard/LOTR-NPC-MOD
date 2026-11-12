@@ -115,8 +115,9 @@ namespace LotrNpcs
     public static class ModCommands
     {
         public const string Root = "recruits";
-        public const string RootHelp = "LOTR NPCs, every command of the mod. For players: join, dismissall, whitelist, orders, roster. For admins: faction, zone, battlelog, xp, bench. Type /help recruits <command> for one of them.";
+        public const string RootHelp = "LOTR NPCs, every command of the mod. For players: join, dismissall, whitelist, orders, roster. For admins: faction, zone. For testing (admins, with DebugCommands on in lotrnpcs-factions.json): battlelog, xp, bench, zone spawnnow. Type /help recruits <command> for one of them.";
         public const string AdminOnlyText = "Only server admins can use /recruits faction, zone, battlelog, xp and bench.";
+        public const string DebugOffText = "This is a testing command, off on this server. An admin can turn testing commands on with \"DebugCommands\": true in ModConfig/lotrnpcs-factions.json, then /recruits faction reload.";
 
         /// <summary>The mod's root command, made by whichever system starts first.</summary>
         public static IChatCommand RootOf(ICoreServerAPI api) =>
@@ -126,6 +127,12 @@ namespace LotrNpcs
         /// RequiresPrivilege, in case the game only checks the root's).</summary>
         public static OnCommandDelegate AdminOnly(OnCommandDelegate handler) =>
             args => args.Caller.HasPrivilege(Privilege.controlserver) ? handler(args) : TextCommandResult.Error(AdminOnlyText);
+
+        /// <summary>An admin command for testing (owner, 2026-11-12: "turn off all debugging features before release, with
+        /// only a config option to turn them back on"): refused unless the faction config's DebugCommands is on, read at
+        /// each use so /recruits faction reload switches it.</summary>
+        public static OnCommandDelegate DebugOnly(ICoreServerAPI api, OnCommandDelegate handler) =>
+            AdminOnly(args => api.ModLoader.GetModSystem<FactionSystem>()?.Config?.DebugCommands == true ? handler(args) : TextCommandResult.Error(DebugOffText));
     }
 
     public static class Recruit

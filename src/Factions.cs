@@ -334,6 +334,9 @@ namespace LotrNpcs
         // target. Players keep the window. Off by default (the 0.0.98 staggered swings).
         // 0.0.112 (owner: "keep the i-frames off for now"): on by default; version 29 turns an old false on once.
         public bool NpcHitsIgnoreHurtWindow = true;
+        // 0.0.115 (owner: debugging features off before release, a config option turns them back on): the testing
+        // commands (ModCommands.DebugOnly). A file without it gets false.
+        public bool DebugCommands = false;
         public double DuelDistanceMin = BattleSpacing.DefaultDuelMin;
         public double DuelDistanceMax = BattleSpacing.DefaultDuelMax;
         public double LineHoldRange = 6;
@@ -530,6 +533,7 @@ namespace LotrNpcs
             "HelmetChance: the chance (0 to 1) that a newly spawned NPC that may go bare-headed wears its outfit's helmet. Which units may go bare-headed is set by the mod for each unit (all orcs and Uruk-hai, and the units of other factions marked so); the others always spawn with theirs. A helmet it doesn't wear is kept, and its owner can put it on or take any helmet off from the recruit's menu. Helmets are only for looks: NPC protection comes from rank. CaptainsAlwaysHelmeted: true makes every captain always wear theirs (false by default since 0.0.82).",
             "ShieldChance: the chance (0 to 1) that a newly spawned Mordor orc carries a shield. Shields are only for looks, are never carried with the poleaxe, and the owner can take one off or put it on from the recruit's menu.",
             "HealthRegenSpeed: how fast NPCs heal out of combat, as a multiple of vanilla's creature healing (1 = vanilla, 0.01 health a second; 30 = 0.3 a second). RegenDelaySeconds: how long after its last hit an NPC starts healing at that speed.",
+            "DebugCommands (false by default): true turns on the admin commands for testing: /recruits battlelog, xp, bench and zone spawnnow. /recruits faction reload applies a change without a restart.",
             "Version: the file format. Don't change it; the mod updates older files once.",
         };
 
@@ -882,7 +886,7 @@ namespace LotrNpcs
                 .WithDescription("Admins: battle log for testing. on starts it (a CSV file in the Logs folder), off stops it, no argument shows the totals so far")
                 .RequiresPrivilege(Privilege.controlserver)
                 .WithArgs(parsers.OptionalWord("on|off"))
-                .HandleWith(ModCommands.AdminOnly(args => TextCommandResult.Success(BattleLogCommand(args[0] as string))))
+                .HandleWith(ModCommands.DebugOnly(api, args => TextCommandResult.Success(BattleLogCommand(args[0] as string))))
                 .EndSubCommand();
             ModCommands.RootOf(api)
                 .BeginSubCommand("faction")

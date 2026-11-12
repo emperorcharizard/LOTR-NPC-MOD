@@ -307,7 +307,6 @@ namespace LotrNpcs
         }
 
         HotKey OrdersHotKey => capi.Input.GetHotKeyByCode(HotkeyCode);
-        int rawLogs;
 
         // The orders key, ignoring Shift, Ctrl and Alt unless the binding uses them (so it works while sprinting).
         bool IsOrdersKey(KeyEvent e)
@@ -330,12 +329,6 @@ namespace LotrNpcs
             List<GuiDialog> focused = capi.Gui.OpenedGuis.Where(g => g != dialog && g.Focused).ToList();
             bool typing = focused.Any(g => g.DialogType == EnumDialogType.Dialog || g.GetType().Name.IndexOf("Chat", StringComparison.OrdinalIgnoreCase) >= 0);
             bool menuOpen = capi.Gui.OpenedGuis.Any(g => g != dialog && g.DialogType == EnumDialogType.Dialog && g.PrefersUngrabbedMouse);
-            if (rawLogs < 5)
-            {
-                rawLogs++;
-                capi.Logger.Debug("[lotrnpcs] Orders key down: mouse grabbed {0}, focused [{1}], typing {2}, menu open {3}.", capi.Input.MouseGrabbed,
-                    string.Join(", ", focused.Select(g => g.GetType().Name + "/" + g.DialogType)), typing, menuOpen);
-            }
             if (typing || menuOpen) return;
             if (OpenMenu("key")) e.Handled = true;
         }
@@ -345,7 +338,6 @@ namespace LotrNpcs
             HotKey hotkey = OrdersHotKey;
             if (hotkey?.CurrentMapping == null || e.KeyCode != hotkey.CurrentMapping.KeyCode || dialog?.IsOpened() != true) return;
             dialog.TryClose();
-            capi.Logger.Debug("[lotrnpcs] Orders menu closed: key released.");
             e.Handled = true;
         }
 
@@ -356,7 +348,6 @@ namespace LotrNpcs
                 if (dialog?.IsOpened() == true)
                 {
                     dialog.TryClose();
-                    capi.Logger.Debug("[lotrnpcs] Orders menu closed: hotkey released.");
                 }
                 return true;
             }
@@ -372,7 +363,6 @@ namespace LotrNpcs
             {
                 dialog ??= new GuiDialogRecruitOrders(capi, this);
                 dialog.Open();
-                capi.Logger.Debug("[lotrnpcs] Orders menu opened ({0}): {1}.", how, dialog.IsOpened() ? "shown" : "not shown");
                 return dialog.IsOpened();
             }
             catch (Exception ex)

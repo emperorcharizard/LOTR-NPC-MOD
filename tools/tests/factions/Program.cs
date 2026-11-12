@@ -1128,6 +1128,9 @@ public static class Program {
             Check(Looks.LoadoutClass(lnpc) == null, "an NPC outside a warrior line has no loadout class");
             Check(typeof(Vintagestory.GameContent.EntityBehaviorHarvestable).IsSubclassOf(typeof(Vintagestory.GameContent.EntityBehaviorContainer)) && !typeof(Vintagestory.GameContent.EntityBehaviorHarvestable).IsSubclassOf(typeof(Vintagestory.GameContent.EntityBehaviorTexturedClothing)),
                 "0.0.115: gear is found through EntityBehaviorTexturedClothing, since the body's harvestable inventory (listed first) is also a container");
+            Check(!FactionConfig.FromFile(null, out _).DebugCommands && !FactionConfig.FromFile(new FactionConfig { Version = 29 }, out _).DebugCommands
+                && FactionConfig.InstructionText.Any(l => l.StartsWith("DebugCommands")) && ModCommands.DebugOffText.Contains("DebugCommands"),
+                "0.0.115: the testing commands are off in a new or an old config, the file explains DebugCommands, and the refusal says how to turn them on");
             Check(EntityBehaviorHeldWeapon.PickWeapon(Looks.NoWeapon, new[] { new NpcWeapon { Item = "lotrnpcs:orcweapon-axe" } }, new Random(1)) == Looks.NoWeapon, "an orc whose weapon was taken away stays unarmed after a reload");
             Check(!Looks.NameOnHire(lnpc, new Random(1)) && Looks.NameOf(lnpc) == "Ugrath", "a recruit its owner named keeps its name when hired again");
 

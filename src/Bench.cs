@@ -75,7 +75,7 @@ namespace LotrNpcs
                 .RequiresPrivilege(Privilege.controlserver)
                 .RequiresPlayer()
                 .WithArgs(parsers.Word("count|clear"))
-                .HandleWith(ModCommands.AdminOnly(OnBench))
+                .HandleWith(ModCommands.DebugOnly(api, OnBench))
                 .EndSubCommand();
         }
 

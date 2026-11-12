@@ -134,7 +134,7 @@ namespace LotrNpcs
                 .RequiresPrivilege(Privilege.controlserver)
                 .RequiresPlayer()
                 .WithArgs(api.ChatCommands.Parsers.Int("amount"))
-                .HandleWith(ModCommands.AdminOnly(XpCommand))
+                .HandleWith(ModCommands.DebugOnly(api, XpCommand))
                 .EndSubCommand();
         }
 
