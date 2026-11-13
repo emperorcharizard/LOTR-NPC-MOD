@@ -339,7 +339,7 @@ Install `lotrnpcs_0.0.109-test.zip` (instead of any older lotrnpcs zip); restart
 
 ## 111. Why NPCs stand idle (0.0.111)
 
-- [ ] 111.1 Same fight as 110.1 (38 orc warriors v 26 Dunlending warriors, log on). The chat totals now say what idle NPCs were doing, e.g. "idle while fighting 477 NPC-seconds (FactionSeek 60%, none 25%, ...)". Send the CSV: its new "idle" rows show each idle second with the NPC's running tasks, target and distance, so the next build can fix the biggest cause.
+- [x] 111.1 Same fight as 110.1 (38 orc warriors v 26 Dunlending warriors, log on). The chat totals now say what idle NPCs were doing, e.g. "idle while fighting 477 NPC-seconds (FactionSeek 60%, none 25%, ...)". Send the CSV: its new "idle" rows show each idle second with the NPC's running tasks, target and distance, so the next build can fix the biggest cause.
 
 ## 112. Reserve captains, safe spawn, bodies, patrols (0.0.112)
 
