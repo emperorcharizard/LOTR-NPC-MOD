@@ -64,3 +64,6 @@ Measured on the owner's PC (i7-12700KF, RTX 3070, vsync setting 1, max FPS 241, 
 
 Mid-fight screenshots at 20 blocks looked normal (walking, shields, bows). In real battles NPCs spread farther than the bench, so the default helps more there than in this table. Owner, 2026-11-12: "set default to ten". 10 nearly doubles the bench's FPS, with far NPCs animating at half rate past 10 blocks.
 
+
+In-game checks at the 10-block default (2026-11-12): 116.3 passed (lotrnpcs-client.json written on first start; `.npcanimlod off` writes false, `.npcanimlod 10` writes true/10, and the value holds across a restart). 116.2 seen but left for the owner's eye: a 100-NPC bench watched from about 45 blocks ran at 201.4 FPS average (1% low 81.8, worst 41 ms; the same bench viewed up close before the LOD was about 95), and in screenshots a fraction of a second apart far NPCs changed pose and moved, nothing frozen or sliding.
+A one-off .NET "Internal CLR error (0x80131506)" crashed the spawnzones test run once during tools/build.py; the rerun passed. Not seen again.
