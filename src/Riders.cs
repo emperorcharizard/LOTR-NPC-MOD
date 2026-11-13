@@ -273,6 +273,12 @@ namespace LotrNpcs
             double speed = target == null ? 0 : Riders.SpeedFor(Math.Sqrt(tx * tx + tz * tz), rider.Controls.Sprint);
             EntityBehaviorGait gait = mount.GetBehavior<EntityBehaviorGait>();
             if (speed > 0) mount.Pos.Yaw = Riders.TurnToward(mount.Pos.Yaw, (float)Math.Atan2(tx, tz), Riders.TurnRate * dt);
+            else if (rider.GetBehavior<EntityBehaviorTaskAI>()?.TaskManager?.ActiveTasksBySlot?.OfType<AiTaskBaseTargetable>().Select(t => t.TargetEntity).FirstOrDefault(e => e != null && e.Alive) is Entity foe)
+            {
+                // Standing in a fight: face the enemy, since a rider turns only a little in the saddle and melee contact
+                // is measured from just ahead of the rider (AiTaskBaseTargetable.hasDirectContact).
+                mount.Pos.Yaw = Riders.TurnToward(mount.Pos.Yaw, (float)Math.Atan2(foe.Pos.X - mount.Pos.X, foe.Pos.Z - mount.Pos.Z), Riders.TurnRate * dt);
+            }
             if (gait != null)
             {
                 if (speed <= 0) gait.SetIdle();

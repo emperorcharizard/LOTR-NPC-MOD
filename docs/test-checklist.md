@@ -397,9 +397,9 @@ Install `lotrnpcs_0.0.109-test.zip` (instead of any older lotrnpcs zip); restart
 
 - [x] 117.1 With Feverstone Wilds installed, a Rohan rider (creative tab, next to the captain) spawns already sitting on a saddled horse.
 - [x] 117.2 Promotion: a hired warrior with 40 XP shows a Rider card beside Captain (the captain's price). Promoted, it comes on its own horse; on Follow its horse carries it after you and stops beside you.
-- [ ] 117.3 Fights: a rider fights an enemy from the saddle and lands hits. Watch that it doesn't stand off out of reach.
-- [ ] 117.4 Kill a rider: its mount gallops away and is gone after a few seconds. Kill a rider's mount: the rider fights on foot.
-- [ ] 117.5 Leave and rejoin the world: riders are still on their mounts.
+- [x] 117.3 Fights: a rider fights an enemy from the saddle and lands hits. Watch that it doesn't stand off out of reach.
+- [x] 117.4 Kill a rider: its mount gallops away and is gone after a few seconds. Kill a rider's mount: the rider fights on foot.
+- [x] 117.5 Leave and rejoin the world: riders are still on their mounts.
 - [ ] 117.6 Orc riders on dire wolves, elves on elk, dwarves on giant boars (needs Teapot's Giant Boar), each saddled and moving.
 - [ ] 117.7 In a spawn zone, now and then a wild group has one rider.
 - [ ] 117.8 Without Feverstone Wilds, no Rider card is offered and no riders spawn wild.
