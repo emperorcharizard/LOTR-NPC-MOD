@@ -15,6 +15,7 @@ description: Where the lotrnpcs work stands and what's next; read first, update 
 
 **Owner's goal for battles (2026-11-13, after the 0.0.121 run), read before more line work:** these are still wild NPCs. The goal is NOT long lines fighting each other, only no giant blob of units; two ranks would be fine. The current line movement looks very choppy. Each test should show what changed from the last one, so compare runs with the same staging.
 Later (owner): "I just want combat to be as smooth as possible and as optimized lag wise as possible." Next test to try needs no code: `BattleLines: false` and `MaxAttackersPerTarget: 2` in ModConfig/lotrnpcs-factions.json (the BattleSpacing cap, second ring and push in Battle.cs already exist), same 38 v 26 staging, both armies spawned before the log starts.
+And (owner): "not too many conflicting paths": one system decides where a fighting NPC walks (not line slot vs pairing vs rally vs surround spot pulling against each other).
 
 **Open problems:**
 1. **110.1, lines fold into a blob at contact.** Within ~10 s of meeting, both lines collapse into one blob; up to 7 orcs hit one Dunlending in 20 s. The 38 orc v 26 Dunlending fight ended 24-4 for the orcs (110.1 wants it closer than 26-2). Look at what the front and the extras do at contact: front members take the nearest free enemy and hold their side (`HoldsFront`); extras wrap round (`HoldSlot` returns false once the line has met). Staging: batches of 5, columns 40 blocks apart, player at 1500 30 300 (see the "Staged" entries in lotrnpcs-0113.md).
