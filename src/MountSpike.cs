@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using HarmonyLib;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.Datastructures;
@@ -22,6 +24,8 @@ namespace LotrNpcs
     {
         public const string DefaultMount = "feverstonewilds:horse-tamed-male-quarter", DefaultRider = "lotrnpcs:test-rohan-warrior";
         const int TickMs = 100;
+        // Walk vector lengths per tick, about what the game's AI uses for walking and running creatures.
+        const double WalkSpeed = 0.03, SprintSpeed = 0.06;
 
         sealed class Rider
         {
@@ -33,7 +37,35 @@ namespace LotrNpcs
         ICoreServerAPI sapi;
         readonly Dictionary<long, Rider> riders = new Dictionary<long, Rider>();
 
-        public override bool ShouldLoad(EnumAppSide forSide) => forSide == EnumAppSide.Server;
+        public override bool ShouldLoad(EnumAppSide forSide) => true;
+
+        // The game's riding seat lets only players on (EntityRideableSeat.CanMount returns false for any other
+        // EntityAgent, then checks taming generation and the player's ownership). This mod's NPCs pass; players keep
+        // every vanilla check. The seat class is in VSSurvivalMod, which isn't referenced, so it's found by name.
+        static Harmony harmony;
+        const string HarmonyId = "lotrnpcs.mountspike";
+
+        public override void Start(ICoreAPI api)
+        {
+            if (harmony != null) return;
+            MethodInfo canMount = AccessTools.TypeByName("Vintagestory.GameContent.EntityRideableSeat")?.GetMethod("CanMount", new[] { typeof(EntityAgent) });
+            if (canMount == null) { api.Logger.Warning("[lotrnpcs] EntityRideableSeat.CanMount not found; NPCs can't ride."); return; }
+            harmony = new Harmony(HarmonyId);
+            harmony.Patch(canMount, new HarmonyMethod(typeof(MountSpikeSystem).GetMethod(nameof(NpcMayMount), BindingFlags.Static | BindingFlags.NonPublic)));
+        }
+
+        public override void Dispose()
+        {
+            harmony?.UnpatchAll(HarmonyId);
+            harmony = null;
+        }
+
+        static bool NpcMayMount(EntityAgent __0, ref bool __result)
+        {
+            if (__0?.Code?.Domain != "lotrnpcs") return true;
+            __result = true;
+            return false;
+        }
 
         public override void StartServerSide(ICoreServerAPI api)
         {
@@ -75,7 +107,21 @@ namespace LotrNpcs
                 string spawned = MountOn(rider, args[2] as string ?? DefaultMount, player, "ai", out bool ok);
                 return ok ? TextCommandResult.Success("Spawned " + rider.Code + ". " + spawned) : TextCommandResult.Error("Spawned " + rider.Code + ". " + spawned);
             }
-            if (!(esel?.Entity is EntityAgent npc) || npc.Code?.Domain != "lotrnpcs" || !npc.Alive) return TextCommandResult.Error("Look at a living LOTR NPC.");
+            // Looking at a mount picks the NPC riding it (the crosshair finds the mount, not its rider).
+            Entity looked = esel?.Entity;
+            if (looked != null && looked.Code?.Domain != "lotrnpcs")
+                looked = looked.SidedProperties?.Behaviors.OfType<IMountable>().FirstOrDefault()?.Seats?.Select(seat => seat.Passenger).FirstOrDefault(p => p?.Code?.Domain == "lotrnpcs") ?? looked;
+            if (!(looked is EntityAgent npc) || npc.Code?.Domain != "lotrnpcs" || !npc.Alive)
+            {
+                // Not looking at one: switch every rider (aiming at a moving mount from a script is unreliable).
+                if (mode == "spawn" || riders.Count == 0) return TextCommandResult.Error("Look at a living LOTR NPC, or the mount it rides.");
+                foreach (Rider each in riders.Values.ToList())
+                {
+                    if (mode == "off") { riders.Remove(each.Npc.EntityId); Release(each.Npc); }
+                    else each.Mode = mode;
+                }
+                return TextCommandResult.Success("All riders: " + mode + ".");
+            }
 
             if (mode == "off")
             {
@@ -109,14 +155,16 @@ namespace LotrNpcs
             // into the slot at their attachment point: the game's TryGiveItemStack throws on the server (it maps the
             // client's selection boxes). EntityBehaviorAttachable is in VSSurvivalMod, which we don't reference.
             string breed = code.Contains("direwolf") ? "direwolf" : code.Split('-').Last();
-            EntityBehavior tackBehavior = mount.SidedProperties.Behaviors.FirstOrDefault(b => b.PropertyName() == "rideableaccessories");
+            // The tack container ("dressable" on the server, EntityBehaviorRideableAccessories): the container that isn't the body's harvest inventory.
+            EntityBehavior tackBehavior = mount.SidedProperties.Behaviors.FirstOrDefault(b => b is EntityBehaviorContainer && !(b is EntityBehaviorHarvestable));
             List<string> tack = new List<string>();
-            if (tackBehavior == null) tack.Add("no rideableaccessories behavior (has: " + string.Join(" ", mount.SidedProperties.Behaviors.Select(x => x.PropertyName())) + ")");
+            if (tackBehavior == null) tack.Add("no tack container (has: " + string.Join(" ", mount.SidedProperties.Behaviors.Select(x => x.PropertyName())) + ")");
             // The slot for each piece: the one whose categories hold it, in the order of the mount's "wearableSlots"
             // (behaviorConfigs); looking slots up by attachment point needs the client's selection boxes, so it finds
             // nothing on the server. Fallback: Feverstone's order, bridle first and saddle fourth.
             InventoryBase inv = (tackBehavior as EntityBehaviorContainer)?.Inventory;
-            JsonObject[] slotConfigs = mount.Properties.Server?.BehaviorsAsJsonObj?.FirstOrDefault(b => b["code"].AsString() == "rideableaccessories")?["wearableSlots"].AsArray()
+            JsonObject[] slotConfigs = (mount.Properties.Server?.BehaviorsAsJsonObj?.FirstOrDefault(b => b["code"].AsString() == "rideableaccessories")?["wearableSlots"].AsArray()
+                ?? mount.Properties.Attributes?["behaviorConfigs"]?["rideableaccessories"]?["wearableSlots"].AsArray())
                 ?? Array.Empty<JsonObject>();
             foreach ((string item, string category, int fallback) in new[] { ("middleback-saddle", "saddle-", 3), ("head-bridle", "bridle-", 0) })
             {
@@ -173,11 +221,17 @@ namespace LotrNpcs
                 // (follow, hold, move, guard, seek, battle line) want to walk; the mount carries it there.
                 Vec3d walk = npc.Controls.WalkVector;
                 double walkLen = Math.Sqrt(walk.X * walk.X + walk.Z * walk.Z);
+                // A mounted rider's own walk vector stays 0 (the game doesn't move a mounted entity), so read where its AI
+                // path-follower is heading instead: every task that walks (follow, move, seek, battle line) goes through it.
+                PathTraverserBase path = npc.GetBehavior<EntityBehaviorTaskAI>()?.PathTraverser;
                 if (r.Mode == "ai")
                 {
-                    go = walkLen > 1e-4;
-                    fast = go && (npc.Controls.Sprint || walkLen > 0.04);
-                    if (go) want = (float)Math.Atan2(walk.X, walk.Z);
+                    Vec3d target = path != null && path.Active ? path.CurrentTarget : null;
+                    double tx = target == null ? 0 : target.X - mount.Pos.X, tz = target == null ? 0 : target.Z - mount.Pos.Z, tdist = Math.Sqrt(tx * tx + tz * tz);
+                    go = target != null && tdist > 1;
+                    fast = go && (npc.Controls.Sprint || tdist > 8);
+                    if (go) want = (float)Math.Atan2(tx, tz);
+                    walkLen = go ? tdist : 0;
                 }
                 float diff = GameMath.AngleRadDistance(mount.Pos.Yaw, want);
                 EntityBehaviorGait gait = mount.GetBehavior<EntityBehaviorGait>();
@@ -196,15 +250,25 @@ namespace LotrNpcs
                     string g = !go ? null : fast ? "sprint" : "walk";
                     if (g == null) gait.SetIdle();
                     else if (gait.Gaits.TryGetValue(g, out GaitMeta meta)) gait.CurrentGait = meta;
+                    // The gait alone doesn't move a ridden mount on the server (the game turns gait into motion only on
+                    // the controlling player's client): push it the way AI pathing moves any creature, by its walk vector.
+                    if (mount is EntityAgent mountAgent)
+                    {
+                        double speed = !go ? 0 : fast ? SprintSpeed : WalkSpeed;
+                        mountAgent.Controls.WalkVector.Set(go ? Math.Sin(want) * speed : 0, 0, go ? Math.Cos(want) * speed : 0);
+                        mountAgent.Controls.Forward = go;
+                        mountAgent.Controls.Sprint = go && fast;
+                    }
                 }
 
                 if (now - r.LastLogMs >= 1000)
                 {
                     r.LastLogMs = now;
                     sapi.Logger.Notification(string.Format(System.Globalization.CultureInfo.InvariantCulture,
-                        "[lotrnpcs] mountspike {0}: mode {1}, dist {2:0.0}, mountYaw {3:0.00}, want {4:0.00}, diff {5:0.00}, gait {6}, mount at {7:0.0} {8:0.0}, F{9} S{10} L{11} R{12}, walk {13:0.000}",
+                        "[lotrnpcs] mountspike {0}: mode {1}, dist {2:0.0}, mountYaw {3:0.00}, want {4:0.00}, diff {5:0.00}, gait {6}, mount at {7:0.0} {8:0.0}, F{9} S{10} L{11} R{12}, walk {13:0.000}, mount walk {14:0.000}, tasks {15}",
                         npc.EntityId, r.Mode, dist, mount.Pos.Yaw, want, diff, gait?.CurrentGait?.Code ?? "-", mount.Pos.X, mount.Pos.Z,
-                        npc.Controls.Forward ? 1 : 0, npc.Controls.Sprint ? 1 : 0, npc.Controls.Left ? 1 : 0, npc.Controls.Right ? 1 : 0, walkLen));
+                        npc.Controls.Forward ? 1 : 0, npc.Controls.Sprint ? 1 : 0, npc.Controls.Left ? 1 : 0, npc.Controls.Right ? 1 : 0, walkLen, (mount as EntityAgent)?.Controls.WalkVector.Length() ?? -1,
+                        string.Join("+", npc.GetBehavior<EntityBehaviorTaskAI>()?.TaskManager?.ActiveTasksBySlot?.Where(t => t != null).Select(t => t.GetType().Name.Replace("AiTask", "")) ?? Enumerable.Empty<string>())));
                 }
             }
         }
