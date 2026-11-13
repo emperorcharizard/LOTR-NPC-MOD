@@ -11,7 +11,7 @@ description: Where the lotrnpcs work stands and what's next; read first, update 
 - 0.0.118: a battle line counts as met when another line of its side within 24 blocks has met (`SideMetNear`).
 - 0.0.119 (owner: "only if they are set in the same formation"): idle allies of the same side and formation join a forming line (`Rally`, "joinLine" notify). In game, whole armies now form one long line before contact, and 60 of 64 NPCs fought (40 before).
 
-- 0.0.120: Rally asks before adding (`WouldRally`), and after contact members pair with the enemy nearest their slot, at most 2 per enemy (`Pair`), for the 110.1 blob.
+- 0.0.120: Rally asks before adding (`WouldRally`), and after contact members pair with the enemy nearest their slot, at most 2 per enemy (`Pair`), for the 110.1 blob. In game (17:10): blob NOT fixed, Dunlendings 27-7, new line-met-front idle; see the 0.0.120 section of lotrnpcs-0113.md.
 
 **Open problems:**
 1. **110.1, lines fold into a blob at contact.** Within ~10 s of meeting, both lines collapse into one blob; up to 7 orcs hit one Dunlending in 20 s. The 38 orc v 26 Dunlending fight ended 24-4 for the orcs (110.1 wants it closer than 26-2). Look at what the front and the extras do at contact: front members take the nearest free enemy and hold their side (`HoldsFront`); extras wrap round (`HoldSlot` returns false once the line has met). Staging: batches of 5, columns 40 blocks apart, player at 1500 30 300 (see the "Staged" entries in lotrnpcs-0113.md).
