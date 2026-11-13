@@ -9,6 +9,7 @@ Every non-empty battle log so far (`/recruits battlelog on|off` writes them to `
 - `20261113-102538`: 0.0.118, staged in columns 40 apart (24 of 64 never fought).
 - `20261113-104001` / `-104613`: 0.0.119 first builds, both armies stalled in forming lines (the bugs fixed before release).
 - `20261113-105114`: 0.0.119 release, whole armies in lines, orcs 24-4.
+- `20261113-171020`: 0.0.120 staged, 36 orcs (35 + 1 leftover, 8747) v 26 Dunlendings in batches of 5, last orc batches spawned after contact; Dunlendings won 27-7.
 
 ## game-config/
 The owner's `%APPDATA%\VintagestoryData\ModConfig` files as of 2026-11-13:
