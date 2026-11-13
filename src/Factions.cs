@@ -278,6 +278,9 @@ namespace LotrNpcs
         public List<string> MonsterCodes;
         public int GrudgeSeconds = 30;
         public int CallForHelpRange = 16;
+        // 0.0.124: how far a wild NPC that starts a fight calls idle NPCs of its faction (0.0.123 used CallForHelpRange,
+        // 16, and 11 of 38 orcs that had wandered off while the armies spawned still never joined).
+        public int JoinFightRange = 32;
         // Most NPCs one player may have hired at once, and how many of them may follow at a time (user, 2026-11-03:
         // hire more at a time, but only 5 may follow at once; hire cap 15, was 5 for both).
         // 0.0.51 (user, 2026-11-03): the hire cap is 16.
@@ -525,7 +528,7 @@ namespace LotrNpcs
             "GuardRadius: how many blocks around their post recruits told to Guard here patrol (4 to 64). On the aggressive and raid stances they attack any player there who isn't their owner, the owner's group mate, a member of a faction allied to the owner's, or on the owner's whitelist (/recruits whitelist add <player>), even while the owner is offline.",
             "Relations: how two factions treat each other. Relation is \"ally\", \"enemy\" or \"neutral\", and two factions without an entry are enemies. No factions are allies by default. Allies never fight and come to help each other; neutral factions leave each other's NPCs alone.",
             "ShareFriends (allies only): true makes each faction's members safe from the other's NPCs too, and lets them hire the other's NPCs. Otherwise a player is safe only from their own factions and hires only from them.",
-            "MonsterCodes: creatures every faction attacks on sight (* is a wildcard). GrudgeSeconds: how long NPCs fight someone who hurt them or an ally. CallForHelpRange: how many blocks away allies come to help; since 0.0.123 also how far a wild NPC that starts a fight calls idle NPCs of its faction to join it (they call in turn, so a spread-out army joins). 0 turns both off.",
+            "MonsterCodes: creatures every faction attacks on sight (* is a wildcard). GrudgeSeconds: how long NPCs fight someone who hurt them or an ally. CallForHelpRange: how many blocks away allies come to help. JoinFightRange (32 by default, since 0.0.124): how far a wild NPC that starts a fight calls idle wild NPCs of its faction to join it; they call in turn, so a spread-out army joins. 0 turns it off.",
             "RosterPerCaptain: one captain per this many places of a faction's roster (8 by default: Men 2, orcs and goblins 3, elves and dwarves 1, Uruk-hai and Dunlendings 2). Hiring or promoting past it is refused; captains a player already has stay. With several factions on one roster each captain counts its share. 0 means no limit.",
             "MaxAttackersPerTarget: how many NPCs may fight one NPC at a time. 4 by default; 0 means no limit. With a limit, the rest look for another enemy, wait one step behind in a battle line, or, outside a line, join a full enemy anyway when there is no other within reach. Either way an NPC takes an enemy nobody is fighting before one already being fought. Players are never limited, and an NPC always strikes back at whoever hits it.",
             "CombatSpacing: how far apart, in blocks, fighting NPCs of the same side keep from each other, and the gap between neighbours in a battle line (0.8 to 4, 1.5 by default). Enemies only keep DuelDistanceMin apart. As many attackers as fit round an enemy this far apart (5 by default) fight it; the others take another enemy with room first, or else wait in a second ring one CombatSpacing farther out and step in when a place opens.",
@@ -2130,7 +2133,7 @@ namespace LotrNpcs
 
         // 0.0.123 (owner, 2026-11-13: "Sure" to "when an NPC starts fighting, idle allies within about 16 blocks walk
         // over to join, with no lines"): in the 0.0.122 run 14 of 38 wild orcs never noticed a battle 24+ blocks away.
-        // A wild NPC that goes for a target calls the idle wild NPCs of its faction within CallForHelpRange; they come
+        // A wild NPC that goes for a target calls the idle wild NPCs of its faction within JoinFightRange (0.0.124; CallForHelpRange in 0.0.123); they come
         // without the sight and crowd checks (their own search sorts out the crowding once there), and call in turn, so
         // a whole army joins in hops. At most once per CallAlliesEveryMs per NPC.
         public const long CallAlliesEveryMs = 5000;
@@ -2148,7 +2151,7 @@ namespace LotrNpcs
             if (factions == null || targetEntity == null || !targetEntity.Alive || Recruit.OwnerUidOf(entity) != null || now - lastCallMs < CallAlliesEveryMs) return;
             if (Member?.Fighting(now) == true) return; // already in the fight: it called when it started
             lastCallMs = now;
-            float range = factions.Config.CallForHelpRange;
+            float range = factions.Config.JoinFightRange;
             if (range <= 0) return;
             called.Clear();
             foreach (Entity e in entity.World.GetEntitiesAround(entity.Pos.XYZ, range, range / 2, e => AnswersCall(entity, e, now))) called.Add(e);

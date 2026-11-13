@@ -114,3 +114,7 @@ metadata:
 
 ## 0.0.123: idle allies join a fight (2026-11-13, Claude, cloud session)
 - Owner: "Sure" to "when an NPC starts fighting, idle allies within about 16 blocks walk over to join, with no lines". Built in `AiTaskFactionSeek.StartExecute`: `CallIdleAllies` (wild NPCs only, at most once per 5 s, not when already fighting) notifies "joinFight" to idle wild NPCs of the same faction within `CallForHelpRange` (16); "joinFight" is handled like "joinLine" (no sight or crowd check, NowSeekRange raised to reach the target). Each answering NPC calls in turn when its own seek starts, so a spread-out army joins in hops. One offline check (`AnswersCall`). Untested in game.
+- In game 17:44 local (`lotrnpcs-battle-20261113-174429.csv`, same staging as 0.0.122): **Dunlendings 26 / 10**; 27 of 38 orcs appear (0.0.122: 25), stragglers ~15 s sooner; 11 never appear, scattered through the ID block (not one batch or the column ends), so likely orcs that wandered off during the ~25 s the Dunlendings took to spawn, beyond 16 blocks of every caller. Visually: small fights and a smooth stream of orcs walking in, no marching, no single blob. No lotrnpcs errors in the server logs.
+
+## 0.0.124: JoinFightRange (2026-11-13, Claude, cloud session)
+- New config `JoinFightRange` (32, 0 off; missing field takes the default) replaces CallForHelpRange (stays 16 for being hurt) as the radius of `CallIdleAllies`. Offline: all pass. Untested in game.

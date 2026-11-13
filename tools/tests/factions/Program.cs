@@ -2037,7 +2037,7 @@ public static class Program {
             // 0.0.123: a wild NPC starting a fight calls idle wild NPCs of its own faction, not men, recruits or itself.
             var callOrc = LineNpc("test-mordororc-warrior", 30, 30); var callOrc2 = LineNpc("test-mordororc-recruit", 34, 30); var callMan = LineNpc("test-gondor-warrior", 36, 30);
             Check(AiTaskFactionSeek.AnswersCall(callOrc, callOrc2, 0) && !AiTaskFactionSeek.AnswersCall(callOrc, callMan, 0) && !AiTaskFactionSeek.AnswersCall(callOrc, callOrc, 0)
-                && !AiTaskFactionSeek.AnswersCall(recLine, recLine2, 0) && FactionConfig.InstructionText.Any(l => l.Contains("since 0.0.123 also how far a wild NPC")),
+                && !AiTaskFactionSeek.AnswersCall(recLine, recLine2, 0) && FactionConfig.InstructionText.Any(l => l.Contains("JoinFightRange (32 by default")) && new FactionConfig().JoinFightRange == 32,
                 "0.0.123: a wild orc that starts a fight calls an idle orc, not a man, itself or a hired recruit; #Instructions explain it");
             // 0.0.122: wild NPCs form no lines unless WildBattleLines is on; recruits in formation still do.
             BattleLineSystem.WildLines = false;
