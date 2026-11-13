@@ -118,3 +118,4 @@ metadata:
 
 ## 0.0.124: JoinFightRange (2026-11-13, Claude, cloud session)
 - New config `JoinFightRange` (32, 0 off; missing field takes the default) replaces CallForHelpRange (stays 16 for being hurt) as the radius of `CallIdleAllies`. Offline: all pass. Untested in game.
+- In game 17:51 local (`lotrnpcs-battle-20261113-175145.csv`, same staging as 0.0.122/0.0.123): **Dunlendings 24 / 2**, over in ~100 s. Only 24 of 38 orcs appear (0.0.123: 27); orcs landed 66 of 66 swings for 184 damage, Dunlendings 119 of 138 for 426. Idle while fighting: Dunlendings 308 NPC-s, orcs 6. The kill afterwards found 38/38 orc and 26/26 Dunlending entities (corpses count), so 14 orcs were alive and never fought. The wider call did not bring more orcs in, so range isn't why they stay out; not yet known whether they got the "joinFight" notify and dropped the chase, or never got it. Next: a debug count of calls answered and of seeks started from "joinFight" that ended without contact.
