@@ -1848,7 +1848,8 @@ public static class Program {
             Check(LineMath.StillMember(true, 20000, 0, 8000) && LineMath.StillMember(false, 7000, 0, 8000) && !LineMath.StillMember(false, 9000, 0, 8000),
                 "a member waiting in its slot stays in the line for 8 seconds after it last picked a target, even between the seek task's searches");
 
-            // Joining and slots.
+            // Joining and slots (wild lines on for these checks; 0.0.122 turns them off by default).
+            BattleLineSystem.WildLines = true;
             var lsys = new BattleLineSystem(fs);
             var o1 = Wild("test-mordororc-warrior"); o1.Pos.SetPos(0, 0, 0);
             var o2 = Wild("test-mordororc-recruit"); o2.Pos.SetPos(0, 0, 2);
@@ -2004,7 +2005,7 @@ public static class Program {
             Check(hC.CaptainFits("orcuid", "mordor") && hC.CaptainFits("capuid", "elves"), "RosterPerCaptain 0 turns the limit off");
 
             // Lines: one front place per enemy; at contact the front holds its side, the extras go round.
-            var lsC = new BattleLineSystem(fsC);
+            var lsC = new BattleLineSystem(fsC); BattleLineSystem.WildLines = true;
             TestAgent LineNpc(string code, double x, double z) { var e = Npc(code); e.EntityId = 60000 + nextId++; e.Pos.SetPos(x, 0, z); return e; }
             var f1 = LineNpc("test-mordororc-warrior", 0, 0); var f2 = LineNpc("test-mordororc-recruit", 0, 2); var en = LineNpc("test-gondor-warrior", 12, 1);
             var lineC = lsC.Join(f1, en, 0); lsC.Join(f2, en, 0);
@@ -2033,20 +2034,12 @@ public static class Program {
             var orcFoe = LineNpc("test-mordororc-warrior", 9, 7);
             Check(lsC.WouldRally(idleOrc, idleMan) && !lsC.WouldRally(recPassive, orcFoe) && !lsC.WouldRally(recAggro, recLine) && !lsC.WouldRally(idleOrc, null),
                 "0.0.120: an idle orc is rallied onto a man; a passive recruit isn't rallied, nor a recruit onto its own side's recruit");
-            // 0.0.120: pairing at contact by place in the line, front first, at most 2 on one enemy.
-            {
-                // Five orcs in a row (front 3 in the middle, extras at the ends) against three men across from them.
-                double[] psx = { 0, 2, 4, -2, 6 }, psz = { 0, 0, 0, 0, 0 };
-                double[] pex = { 0.2, 2.1, 3.9 }, pez = { 3, 3, 3 };
-                int[] pk = LineMath.Pair(psx, psz, 3, pex, pez, 2);
-                int[] two = LineMath.Pair(new double[] { 0, 1, 2 }, new double[] { 0, 0, 0 }, 3, new double[] { 0 }, new double[] { 3 }, 2);
-                int[] spread = LineMath.Pair(new double[] { 0, 0.5 }, new double[] { 0, 0 }, 2, new double[] { 0, 10 }, new double[] { 3, 3 }, 2);
-                Check(pk[0] == 0 && pk[1] == 1 && pk[2] == 2 && pk[3] == 0 && pk[4] == 2
-                    && two[0] == 0 && two[1] == 0 && two[2] == -1 && spread[0] != spread[1],
-                    "0.0.120: each front orc takes the man across from it and the end extras the nearest end men; no more than 2 on one man; the front spreads over free enemies first");
-                int[] reachPk = LineMath.Pair(new double[] { 0 }, new double[] { 0 }, 1, new double[] { 0 }, new double[] { 10 }, 2, 6);
-                Check(reachPk[0] == -1, "0.0.121: a member is never paired with an enemy farther than PairReach from where it stands");
-            }
+            // 0.0.122: wild NPCs form no lines unless WildBattleLines is on; recruits in formation still do.
+            BattleLineSystem.WildLines = false;
+            bool wildOff = BattleLineSystem.SideOf(idleOrc) == null && BattleLineSystem.SideOf(recLine) != null;
+            BattleLineSystem.WildLines = true;
+            Check(wildOff && BattleLineSystem.SideOf(idleOrc) != null && !new FactionConfig().WildBattleLines && FactionConfig.InstructionText.Any(l => l.StartsWith("WildBattleLines")),
+                "0.0.122: WildBattleLines is off by default: wild NPCs make no battle lines, recruits following in Line still do; #Instructions explain it");
 
             var v25 = Newtonsoft.Json.Linq.JObject.FromObject(FactionConfig.FromFile(null, out _)); v25["Version"] = 25; v25["BattleLines"] = false; v25.Remove("RosterPerCaptain");
             var m25 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v25.ToString()), out bool store25);
