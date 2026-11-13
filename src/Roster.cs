@@ -444,7 +444,8 @@ namespace LotrNpcs
                 cy = y + CardHeight - 64;
                 bool afford = card.Price <= menu.Coins;
                 string price = card.Price > 0 ? Lang.Get("lotrnpcs:promote-price", card.Price, coin) : Lang.Get("lotrnpcs:promote-free");
-                c.AddStaticText(price, detail.Clone().WithColor(afford ? GuiStyle.DialogDefaultTextColor : GuiStyle.ErrorTextColor).WithOrientation(EnumTextOrientation.Center), ElementBounds.Fixed(x, cy, CardWidth, 20));
+                // A closed card (captain places full) comes with price 0; showing it would read "Free".
+                if (card.Open) c.AddStaticText(price, detail.Clone().WithColor(afford ? GuiStyle.DialogDefaultTextColor : GuiStyle.ErrorTextColor).WithOrientation(EnumTextOrientation.Center), ElementBounds.Fixed(x, cy, CardWidth, 20));
                 cy += 24;
                 string rank = card.Rank;
                 if (!card.Open)
