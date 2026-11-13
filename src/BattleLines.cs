@@ -152,7 +152,7 @@ namespace LotrNpcs
     /// </summary>
     public sealed class BattleLineSystem
     {
-        public const double JoinRadius = 12, ContactDistance = 3, EngageRange = 3.5, RearStrikeRange = 2;
+        public const double JoinRadius = 12, ContactDistance = 3, EngageRange = 3.5, RearStrikeRange = 2, MetNearRadius = 2 * JoinRadius;
         public const double StepPerUpdate = 0.6, MaxLag = 1.5, EnemyScanRadius = 8;
         public const long FormingMs = 1500, LoseEnemyMs = 4000, UpdateMs = 500, MemberGraceMs = 8000;
         public const double TurnShare = 0.2;
@@ -436,7 +436,7 @@ namespace LotrNpcs
                     Entity e = world.GetEntityById(id), t = world.GetEntityById(TargetOf(id));
                     dists.Add(t == null || !t.Alive ? double.NaN : Math.Sqrt((t.Pos.X - e.Pos.X) * (t.Pos.X - e.Pos.X) + (t.Pos.Z - e.Pos.Z) * (t.Pos.Z - e.Pos.Z)));
                 }
-                if (LineMath.FrontEngaged(dists, line.Front, line.Advances ? EngageRange : HoldRange))
+                if (LineMath.FrontEngaged(dists, line.Front, line.Advances ? EngageRange : HoldRange) || SideMetNear(line))
                 {
                     line.Contact = true;
                     Wake(world, line);
@@ -462,6 +462,20 @@ namespace LotrNpcs
                 line.Pz += line.Dz * move;
             }
             else if (toEnemy <= HoldRange) { line.Contact = true; Wake(world, line); }
+        }
+
+        /// <summary>0.0.118: another line of the same side within MetNearRadius has met the enemy, so the battle has
+        /// started here too (battle log 2026-11-13: 3 orcs of a second line stood ~20 s waiting for their line to form
+        /// while the main line fought).</summary>
+        public bool SideMetNear(BattleLine line)
+        {
+            foreach (BattleLine l in lines)
+            {
+                if (l == line || !l.Contact || l.Side != line.Side) continue;
+                double dx = l.Px - line.Px, dz = l.Pz - line.Pz;
+                if (dx * dx + dz * dz <= MetNearRadius * MetNearRadius) return true;
+            }
+            return false;
         }
 
         // The front rank goes for its enemies now, instead of when its seek task next searches (every second or two).

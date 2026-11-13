@@ -2014,6 +2014,10 @@ public static class Program {
             lineC.Contact = true;
             Check(lineC.Front == 1 && extraWaits && noHoldBefore && !lsC.HoldSlot(extra, en, out _, out _) && lsC.HoldsFront(frontNpc, out double hfx, out double hfz) && Math.Abs(hfx * hfx + hfz * hfz - 1) < 1e-6 && !lsC.HoldsFront(extra, out _, out _),
                 "two orcs against one man: one in front, the extra waits on the flank; once the lines meet the front orc keeps its side of the man and the extra goes round to surround");
+            var near = lsC.Join(LineNpc("test-mordororc-warrior", 0, 20), LineNpc("test-gondor-warrior", 12, 21), 0);
+            var far = lsC.Join(LineNpc("test-mordororc-warrior", 0, 60), LineNpc("test-gondor-warrior", 12, 61), 0);
+            Check(near != lineC && far != lineC && lsC.SideMetNear(near) && !lsC.SideMetNear(far) && !lsC.SideMetNear(lineC),
+                "0.0.118: a second orc line 20 blocks from one that has met counts as met too; one 60 blocks off doesn't, nor does a met line by itself");
 
             var v25 = Newtonsoft.Json.Linq.JObject.FromObject(FactionConfig.FromFile(null, out _)); v25["Version"] = 25; v25["BattleLines"] = false; v25.Remove("RosterPerCaptain");
             var m25 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v25.ToString()), out bool store25);

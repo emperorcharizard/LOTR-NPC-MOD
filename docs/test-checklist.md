@@ -404,3 +404,9 @@ Install `lotrnpcs_0.0.109-test.zip` (instead of any older lotrnpcs zip); restart
 - [x] 117.7 In a spawn zone, now and then a wild group has one rider.
 - [ ] 117.8 Without Feverstone Wilds, no Rider card is offered and no riders spawn wild.
 
+
+## 118. Lines that meet together (0.0.118)
+
+Install `lotrnpcs_0.0.118-test.zip`; restart fully.
+
+- [ ] 118.1 Rerun 110.1 (38 Misty Mountains orc warriors v 26 Dunlending warriors, battle log on), standing within about 40 blocks of everyone (Synergy freezes NPCs past 48). Once any part of a side's line has met the enemy, every other line of that side within 24 blocks fights too: after contact, the CSV's idle rows show almost no "line-forming" for either side.
