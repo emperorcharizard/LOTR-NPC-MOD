@@ -8,6 +8,9 @@ The owner works with Claude from more than one Claude account. Everything a sess
 3. `docs/handover/`: battle-log CSVs, the owner's mod configs (DebugCommands on), and the permissions a new account needs (README).
 4. `docs/notes/MEMORY.md`: the index of decision and per-version notes. Append test results and build notes to the latest version note (now `docs/notes/lotrnpcs-0113.md`).
 
+## Claude plugins
+`.claude/settings.json` turns on the Ponytail plugin (github DietrichGebert/ponytail: smallest change that works, plus `/ponytail-review` and `/ponytail-audit`). Claude Code asks to trust the marketplace the first time; `/ponytail off` or `/ponytail lite` changes it for a session.
+
 ## Build
 `python tools/build.py` builds the DLL, generates assets, runs the offline tests (factions, spawnzones) and writes `releases/lotrnpcs_<version>-test.zip`. `--publish` also makes GitHub release v<version>. The version is set in `tools/gen_testnpcs.py` (`"version"`). Run the Python tools with plain `python` (Pillow is in user site-packages). Details in `docs/notes/lotrnpcs-build.md`.
 
