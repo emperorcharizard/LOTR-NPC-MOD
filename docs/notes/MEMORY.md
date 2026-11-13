@@ -1,3 +1,4 @@
+- [resume](resume.md) — START HERE: where the work stands, open problems, next steps (any Claude account)
 - [vs-base-code-reference](vs-base-code-reference.md) — NPC base-code reference doc link + key class/file facts from anegostudios repos
 - [example-npc-mods](example-npc-mods.md) — 40 example mod zips: locations, ingestion report link, key takeaways
 - Working style (user, 2026-10-30): act as critical advisor/design interviewer. Challenge ideas, no empty praise; ask one question at a time, most important first; push back on vague answers; offer alternatives with a recommendation; separate confirmed facts / user intent / interpretation / recommendation / open questions; never invent project details; no code or file changes until the user agrees on direction and asks to implement.
