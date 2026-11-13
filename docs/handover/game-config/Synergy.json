@@ -1,0 +1,22 @@
+{
+  "BlockTickPoolingEnabled": true,
+  "NetworkFlushConsolidationEnabled": false,
+  "InventoryDirtyScanEnabled": true,
+  "EntityActivationRangeEnabled": true,
+  "EntityActivationRangeBlocks": 48.0,
+  "ActivationRangeExcludedEntities": [
+    "smoke"
+  ],
+  "CollisionFastPathEnabled": true,
+  "PathfindingOptimizationsEnabled": true,
+  "PathfindingThrottleEnabled": true,
+  "RepulseAgentsThrottleEnabled": true,
+  "AiBrainThrottleEnabled": true,
+  "EntityTrackingHysteresisEnabled": true,
+  "DistanceBasedSendFrequencyEnabled": true,
+  "AttributeSyncResyncPreventionEnabled": true,
+  "EntitySpawnPriorityOrderingEnabled": true,
+  "DeltaEncodingEnabled": true,
+  "EntityLoadBudgetingEnabled": true,
+  "GcDiagnosticsEnabled": true
+}

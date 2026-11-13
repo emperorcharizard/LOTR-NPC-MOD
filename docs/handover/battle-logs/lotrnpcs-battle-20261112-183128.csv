@@ -1,0 +1,15 @@
+﻿ms,event,attacker,attackerFaction,attackerRank,target,targetFaction,targetRank,damage,result,targetHealth
+8229,melee,7949,gondor,warrior,7947,mistymountains,warrior,3.63,landed,18.37
+8532,melee,7947,mistymountains,warrior,7949,gondor,warrior,2.96,landed,31.04
+11004,melee,7949,gondor,warrior,7947,mistymountains,warrior,4.45,landed,13.95
+11209,melee,7947,mistymountains,warrior,7949,gondor,warrior,2.68,landed,28.38
+13682,melee,7949,gondor,warrior,7947,mistymountains,warrior,3.35,landed,10.63
+14127,melee,7947,mistymountains,warrior,7949,gondor,warrior,2.42,landed,25.99
+16357,melee,7949,gondor,warrior,7947,mistymountains,warrior,3.25,landed,7.42
+16840,melee,7947,mistymountains,warrior,7949,gondor,warrior,2.42,landed,23.59
+19245,melee,7949,gondor,warrior,7947,mistymountains,warrior,3.57,landed,3.87
+19861,melee,7947,mistymountains,warrior,7949,gondor,warrior,3.35,landed,20.28
+21986,melee,7949,gondor,warrior,7947,mistymountains,warrior,3.21,landed,0.69
+22739,melee,7947,mistymountains,warrior,7949,gondor,warrior,3.2,landed,17.09
+24655,death,7949,gondor,warrior,7947,mistymountains,warrior,0,died,0
+24656,melee,7949,gondor,warrior,7947,mistymountains,warrior,4.39,kill,0

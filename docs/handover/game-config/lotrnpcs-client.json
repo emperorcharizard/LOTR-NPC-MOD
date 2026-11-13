@@ -1,0 +1,9 @@
+{
+  "Instructions": [
+    "LOTR NPCs, settings for this computer only (not the server).",
+    "FarAnimationLod (true by default; the chat command .npcanimlod on / off / <blocks> changes it in game): NPCs of this mod farther than AnimationFullRateWithin blocks from you animate every 2nd frame, past twice that every 3rd and past three times that every 4th, so big battles cost less frame time. Up close nothing changes. false animates every NPC every frame, as the game does.",
+    "AnimationFullRateWithin (20 by default, 4 to 256): how many blocks around you NPCs always animate every frame."
+  ],
+  "FarAnimationLod": true,
+  "AnimationFullRateWithin": 10.0
+}
