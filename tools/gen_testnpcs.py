@@ -776,6 +776,9 @@ def held_weapon(faction, rank):
     elif rank == "shock":
         listed = {n: w for n, w in listed.items() if w.get("twoHanded")} or {SHOCK_STANDIN: ALL_WEAPONS[SHOCK_STANDIN]}
         shields = []
+    if rank == "rider" and any(w.get("attack") == "spearhit" for w in listed.values()):
+        # 0.0.125 (owner, 2026-11-13: riders "prefer spears"): each spear weighs PREFER times what it would on foot.
+        prefs = {n: (prefs or {}).get(n, 1) * (PREFER if w.get("attack") == "spearhit" else 1) for n, w in listed.items()}
     behavior = {"code": "lotrnpcs:heldweapon", "weapons": weapon_list(listed, prefs)}
     if shields:
         behavior["shields"] = [s if ":" in s else f"lotrnpcs:orcweapon-{s}" for s in shields]
@@ -2082,7 +2085,7 @@ with open(os.path.join(out, "modinfo.json"), "w") as f:
         "type": "code",
         "modid": "lotrnpcs",
         "name": "LOTR NPCs",
-        "version": "0.0.124",
+        "version": "0.0.125",
         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Race models from "
                        "LOTR Races and Classes by Dango Dango Dango, Shakgriig and Buggoi, used with their permission.",

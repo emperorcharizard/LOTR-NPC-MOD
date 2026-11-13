@@ -856,6 +856,15 @@ public static class Program {
         Check(armed.All(c => JToken.DeepEquals(HeldWeapon(entityFiles[c], "server"), HeldWeapon(entityFiles[c], "client")) && HeldWeapon(entityFiles[c], "server")["weapons"].Count() == 6), "...with the same six weapons listed on both sides");
         var bodyShape = JObject.Parse(File.ReadAllText(Path.Combine(assets, "shapes", "entity", "humanoid", "seraph-faceless.json")));
         var bodyAnims = new HashSet<string>(bodyShape["animations"].Select(a => (string)a["code"]));
+        // 0.0.125 riders: spears weigh PREFER (3) times their foot weight, the rest stay; seated riders keep only the riding pose.
+        float MountWeaponWeight(string code, string item) => HeldWeapon(entityFiles[code], "server")["weapons"].Where(w => ((string)w["item"]).Contains(item)).Select(w => (float?)w["weight"] ?? 1f).Single();
+        Check(MountWeaponWeight("test-rohan-rider", "rhspear") == 3 && MountWeaponWeight("test-rohan-rider", "rhsword") == 1 && MountWeaponWeight("test-rohan-warrior", "rhspear") == 1
+            && MountWeaponWeight("test-gondor-rider", "spear-generic-steel") == 9 && MountWeaponWeight("test-gondor-rider", "gdsword") == 1,
+            "0.0.125: riders prefer spears (3x their weight on foot), warriors on foot are unchanged");
+        Check(Riders.IsLegAnimation(new AnimationMetaData { Code = "sprint", Animation = "sprint" }) && Riders.IsLegAnimation(new AnimationMetaData { Code = "idle", Animation = "idle1" })
+            && !Riders.IsLegAnimation(new AnimationMetaData { Code = "rideelk-walk", Animation = "rideelk-walk" }) && !Riders.IsLegAnimation(new AnimationMetaData { Code = "hit", Animation = "hit" })
+            && !Riders.IsLegAnimation(null) && new[] { "rideelk-idle", "rideelk-walk", "rideelk-run" }.All(bodyAnims.Contains) && Riders.MountedExtraReach == 1f && Riders.MountedReach(null) == (0f, 0f),
+            "0.0.125: a seated rider skips walk, run and idle (its body has the riding poses), and reaches a block farther from the saddle");
         var weaponEntries = HeldWeapon(entityFiles["test-mordororc-warrior"], "server")["weapons"].ToList();
         var entityAnims = entityFiles["test-mordororc-warrior"]["client"]["animations"].ToDictionary(a => (string)a["code"]);
         bool animsOk = true, itemsOk = true, texturesOk = true;

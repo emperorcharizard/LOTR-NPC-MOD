@@ -58,14 +58,27 @@ namespace LotrNpcs
         public static double SpeedFor(double waypointDistance, bool riderSprints) =>
             waypointDistance <= 1 ? 0 : riderSprints || waypointDistance > 3 ? SprintSpeed : WalkSpeed;
 
-        /// <summary>How much farther (horizontally, vertically) a mounted NPC's melee reaches: half a block for the mount's
-        /// body, and the height its seat lifts it above the mount's feet. (0, 0) on foot.</summary>
+        /// <summary>The extra horizontal reach from the saddle. 0.0.125 (owner, 2026-11-13: "a bit longer attack range to
+        /// compensate for the height difference"): a block (was half a block, the mount's body only).</summary>
+        public const float MountedExtraReach = 1f;
+
+        /// <summary>How much farther (horizontally, vertically) a mounted NPC's melee reaches: MountedExtraReach, and the
+        /// height its seat lifts it above the mount's feet. (0, 0) on foot.</summary>
         public static (float Horizontal, float Vertical) MountedReach(Entity npc)
         {
             Entity mount = (npc as EntityAgent)?.MountedOn?.Entity;
             if (mount == null) return (0, 0);
-            return (0.5f, (float)Math.Max(0, npc.Pos.Y - mount.Pos.Y));
+            return (MountedExtraReach, (float)Math.Max(0, npc.Pos.Y - mount.Pos.Y));
         }
+
+        // The rider's own walking, running, idle and swimming animations (its AI tasks start walk or sprint while it moves).
+        static readonly HashSet<string> legAnimations = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            { "walk", "sprint", "run", "walkback", "idle", "idle1", "swim", "swimidle", "jump", "newjump", "land" };
+
+        /// <summary>0.0.125 (owner: "the legs were moving constantly for the passengers"): animations a seated rider
+        /// doesn't play, so only the seat's riding pose (the game's rideelk animations) moves its legs.</summary>
+        public static bool IsLegAnimation(AnimationMetaData meta) =>
+            meta != null && (legAnimations.Contains(meta.Code ?? "") || legAnimations.Contains(meta.Animation ?? ""));
 
         // Tack items by the category their attachableToEntity names ("saddle", "saddle-quarter", "bridle-giantboar"...).
         static Dictionary<string, Item> tackByCategory;
@@ -224,6 +237,20 @@ namespace LotrNpcs
         public EntityBehaviorRider(Entity entity) : base(entity) { }
 
         public override string PropertyName() => "lotrnpcs:rider";
+
+        public override void AfterInitialized(bool onFirstSpawn)
+        {
+            base.AfterInitialized(onFirstSpawn);
+            if (entity.AnimManager is AnimationManager anims) anims.OnStartAnimation += SkipLegsWhileMounted;
+        }
+
+        // The game starts the seat's riding pose on mounting; the rider's AI tasks would lay walk or sprint over it.
+        bool SkipLegsWhileMounted(ref AnimationMetaData meta, ref EnumHandling handling)
+        {
+            if ((entity as EntityAgent)?.MountedOn == null || !Riders.IsLegAnimation(meta)) return false;
+            handling = EnumHandling.PreventSubsequent;
+            return false;
+        }
 
         public override void OnGameTick(float deltaTime)
         {

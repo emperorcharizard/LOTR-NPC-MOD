@@ -424,3 +424,11 @@ Install `lotrnpcs_0.0.120-test.zip`; restart fully.
 
 - [ ] 120.1 Staged 38 goblin warriors v 26 Dunlending warriors as in 110.1 (batches of 5, columns 40 blocks apart, player at about 1500 15 300, battle log on). For at least 20 s after contact the two lines stay two lines: each front fighter fights the enemy across from it, and the extras come in at the ends instead of the middle folding into one blob. In the CSV, no Dunlending is hit by more than 2 different orcs in any 5 s stretch (dead targets aside), and the result is closer than 0.0.119's 24-4.
 - [ ] 120.2 Your recruits following in Line with a Passive stance next to a forming line of yours aren't pulled into it (they stay with you, and the line's march doesn't stall).
+
+## 125. Riders sit still, prefer spears, reach farther (0.0.125)
+
+Install `lotrnpcs_0.0.125-test.zip`; restart fully. Needs Feverstone Wilds.
+
+- [ ] 125.1 A Rohan rider (creative tab) walking, running and standing on its horse: its legs hold the riding pose (rideelk) and never play the walk or run cycle. On foot after its horse dies, it walks normally again.
+- [ ] 125.2 Spawn about ten Rohan or Gondor riders: most hold a spear (spears weigh 3 times their foot weight).
+- [ ] 125.3 A rider fights a goblin warrior on foot from the saddle and lands hits without riding on top of it (reach is now a block past the foot reach, plus the seat height).
