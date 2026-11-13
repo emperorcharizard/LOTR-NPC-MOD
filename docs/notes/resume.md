@@ -13,6 +13,8 @@ description: Where the lotrnpcs work stands and what's next; read first, update 
 
 - 0.0.120: Rally asks before adding (`WouldRally`), and after contact members pair with the enemy nearest their slot, at most 2 per enemy (`Pair`), for the 110.1 blob. In game (17:10): blob NOT fixed, Dunlendings 27-7, new line-met-front idle; see the 0.0.120 section of lotrnpcs-0113.md.
 
+**Owner's goal for battles (2026-11-13, after the 0.0.121 run), read before more line work:** these are still wild NPCs. The goal is NOT long lines fighting each other, only no giant blob of units; two ranks would be fine. The current line movement looks very choppy. Each test should show what changed from the last one, so compare runs with the same staging.
+
 **Open problems:**
 1. **110.1, lines fold into a blob at contact.** Within ~10 s of meeting, both lines collapse into one blob; up to 7 orcs hit one Dunlending in 20 s. The 38 orc v 26 Dunlending fight ended 24-4 for the orcs (110.1 wants it closer than 26-2). Look at what the front and the extras do at contact: front members take the nearest free enemy and hold their side (`HoldsFront`); extras wrap round (`HoldSlot` returns false once the line has met). Staging: batches of 5, columns 40 blocks apart, player at 1500 30 300 (see the "Staged" entries in lotrnpcs-0113.md).
 2. Checklist items still open in 110-119: 110.1, 112.2 (needs a second player), 112.6, 112.8 (weapons and shields in hand, by eye), 113.5, 113.8, 113.9, 114.8, 116.2, 117.6 (needs Teapot's Giant Boar), 117.8 (needs Feverstone Wilds removed), 119.2 (recruits in two formations).
