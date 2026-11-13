@@ -2018,6 +2018,15 @@ public static class Program {
             var far = lsC.Join(LineNpc("test-mordororc-warrior", 0, 60), LineNpc("test-gondor-warrior", 12, 61), 0);
             Check(near != lineC && far != lineC && lsC.SideMetNear(near) && !lsC.SideMetNear(far) && !lsC.SideMetNear(lineC),
                 "0.0.118: a second orc line 20 blocks from one that has met counts as met too; one 60 blocks off doesn't, nor does a met line by itself");
+            // 0.0.119: idle allies of the same side and formation are rallied into a line; others aren't.
+            var idleOrc = LineNpc("test-mordororc-warrior", 5, 5); var idleMan = LineNpc("test-gondor-warrior", 5, 6);
+            TestAgent Rec(string formation) { var r = LineNpc("test-gondor-warrior", 5, 7); r.WatchedAttributes.SetString(Recruit.OwnerUidAttr, "uidR"); Recruit.SetOrder(r, Recruit.Follow); r.WatchedAttributes.SetString(Recruit.FormationAttr, formation); return r; }
+            var recLine = Rec(Formation.Line); var recLine2 = Rec(Formation.Line); var recWedge = Rec(Formation.Wedge);
+            string recSide = BattleLineSystem.SideOf(recLine), recForm = Recruit.FormationOf(recLine);
+            Check(lsC.CanRally(idleOrc, lineC.Side, Recruit.FormationOf(f1), 0) && !lsC.CanRally(idleMan, lineC.Side, Recruit.FormationOf(f1), 0)
+                && !lsC.CanRally(f2, lineC.Side, Recruit.FormationOf(f1), 0)
+                && lsC.CanRally(recLine2, recSide, recForm, 0) && !lsC.CanRally(recWedge, recSide, recForm, 0),
+                "0.0.119: an idle orc is rallied into the orc line, not a man or an orc already in a line; a recruit in Line formation joins its leader's Line, not one set to Wedge");
 
             var v25 = Newtonsoft.Json.Linq.JObject.FromObject(FactionConfig.FromFile(null, out _)); v25["Version"] = 25; v25["BattleLines"] = false; v25.Remove("RosterPerCaptain");
             var m25 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v25.ToString()), out bool store25);

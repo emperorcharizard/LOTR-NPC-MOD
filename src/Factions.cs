@@ -2190,6 +2190,18 @@ namespace LotrNpcs
         // NPC onto an enemy NPC that already has its share.
         public override bool Notify(string key, object data)
         {
+            // 0.0.119: rallied into its side's battle line (BattleLineSystem.Rally), which already counted it in, so
+            // no crowd or sight check: it takes its slot like any member. A recruit still never turns on its side.
+            if (key == "joinLine" && data is Entity rallyTarget)
+            {
+                if (!rallyTarget.Alive || BeyondLeash(rallyTarget)) return false;
+                if (Recruit.OwnerUidOf(entity) is string rallyOwner
+                    && (Recruit.IsTeam(rallyTarget, rallyOwner) || (factions != null && !factions.RecruitWantsToAttack(entity, rallyOwner, rallyTarget)))) return false;
+                // Vanilla ContinueExecute gives up on a target beyond NowSeekRange (seekingRange, 24 for warriors), which a
+                // rallied NPC's target often is; the next search sets it back.
+                NowSeekRange = Math.Max(NowSeekRange, (float)entity.Pos.DistanceTo(rallyTarget.Pos) + 8);
+                return base.Notify("seekEntity", rallyTarget);
+            }
             if (key == "seekEntity" && data is Entity target)
             {
                 if (Recruit.OwnerUidOf(entity) is string owner

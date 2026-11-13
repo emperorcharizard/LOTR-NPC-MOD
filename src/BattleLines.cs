@@ -246,11 +246,18 @@ namespace LotrNpcs
                 };
                 lines.Add(line);
             }
+            Add(line, id, target.EntityId, now);
+            return line;
+        }
+
+        void Add(BattleLine line, long id, long target, long now)
+        {
+            targetOf[id] = target;
+            lastJoin[id] = now;
             line.Members.Add(id);
             line.Front = LineMath.FrontCount(line.Members.Count, line.Enemies);
             line.Dirty = true;
             lineOf[id] = line;
-            return line;
         }
 
         public void Leave(long id)
@@ -373,6 +380,7 @@ namespace LotrNpcs
                 enemies = Math.Max(enemies, around);
             }
             line.Enemies = enemies;
+            if (founder != null) Rally(world, line, founder, now);
 
             // Center and facing.
             double mx = 0, mz = 0, my = 0;
@@ -427,6 +435,19 @@ namespace LotrNpcs
                 line.Dirty = false;
             }
 
+            // 0.0.119: a member with no enemy in its seekingRange (rallied ones) stops its seek task at its place and
+            // never restarts it, so it stood still while its place marched on and held the whole line back (the
+            // march waits for laggards). Send it on whenever its place has moved off.
+            if (!line.Contact)
+                for (int i = 0; i < n; i++)
+                {
+                    Entity e = world.GetEntityById(line.Members[i]), t = world.GetEntityById(TargetOf(line.Members[i]));
+                    if (e == null || t == null || !t.Alive || SeekRunning(e)) continue;
+                    LineMath.SlotOffset(i, n, line.Front, Gap, out double right, out double back, line.Reserve);
+                    LineMath.SlotAt(line.Px, line.Pz, line.Dx, line.Dz, right, back, out double sx, out double sz);
+                    if ((e.Pos.X - sx) * (e.Pos.X - sx) + (e.Pos.Z - sz) * (e.Pos.Z - sz) > 1) e.Notify("joinLine", t);
+                }
+
             // Met: once any front member is in reach of its enemy, the whole front fights, starting now.
             if (!line.Contact)
             {
@@ -462,6 +483,49 @@ namespace LotrNpcs
                 line.Pz += line.Dz * move;
             }
             else if (toEnemy <= HoldRange) { line.Contact = true; Wake(world, line); }
+        }
+
+        /// <summary>0.0.119 (owner, 2026-11-13: allies join a forming line "only if they are set in the same formation"):
+        /// can this NPC be rallied into a line of this side and formation? Idle (not fighting, in no line), same side
+        /// (same faction for wild NPCs, same leader for recruits) and same formation setting.</summary>
+        public bool CanRally(Entity ally, string side, string formation, long now) =>
+            ally != null && ally.Alive && !lineOf.ContainsKey(ally.EntityId) && SideOf(ally) == side && Recruit.FormationOf(ally) == formation
+            && (ally.World == null || ally.GetBehavior<EntityBehaviorFactionMember>()?.Fighting(now) != true); // no world: test entities, no behaviours
+
+        // Battle log 2026-11-13: an army spread wider than its seekingRange (24) fought with only the NPCs near an
+        // enemy; 24 of 64 never noticed the battle. Idle allies near the line now join it, each taking the target of
+        // the member nearest to it, and the next update rallies those near them in turn.
+        readonly List<Entity> rallied = new List<Entity>();
+        void Rally(IWorldAccessor world, BattleLine line, Entity founder, long now)
+        {
+            string formation = Recruit.FormationOf(founder);
+            double reach = JoinRadius + line.Members.Count * Gap / 2;
+            rallied.Clear();
+            foreach (Entity e in world.GetEntitiesAround(new Vintagestory.API.MathTools.Vec3d(line.Px, line.Py, line.Pz), (float)reach, 4,
+                         e => CanRally(e, line.Side, formation, now)))
+                rallied.Add(e);
+            foreach (Entity ally in rallied)
+            {
+                Entity target = null;
+                double best = JoinRadius * JoinRadius;
+                foreach (long id in line.Members)
+                {
+                    Entity m = world.GetEntityById(id), t = world.GetEntityById(TargetOf(id));
+                    if (m == null || t == null || !t.Alive) continue;
+                    double dx = m.Pos.X - ally.Pos.X, dz = m.Pos.Z - ally.Pos.Z, d = dx * dx + dz * dz;
+                    if (d <= best) { best = d; target = t; }
+                }
+                if (target == null) continue;
+                Add(line, ally.EntityId, target.EntityId, now);
+                ally.Notify("joinLine", target);
+            }
+        }
+
+        static bool SeekRunning(Entity e)
+        {
+            var active = e.GetBehavior<Vintagestory.GameContent.EntityBehaviorTaskAI>()?.TaskManager?.ActiveTasksBySlot;
+            if (active != null) foreach (var task in active) if (task is AiTaskFactionSeek) return true;
+            return false;
         }
 
         /// <summary>0.0.118: another line of the same side within MetNearRadius has met the enemy, so the battle has

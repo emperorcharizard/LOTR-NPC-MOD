@@ -410,3 +410,10 @@ Install `lotrnpcs_0.0.109-test.zip` (instead of any older lotrnpcs zip); restart
 Install `lotrnpcs_0.0.118-test.zip`; restart fully.
 
 - [x] 118.1 Rerun 110.1 (38 Misty Mountains orc warriors v 26 Dunlending warriors, battle log on), standing within about 40 blocks of everyone (Synergy freezes NPCs past 48). Once any part of a side's line has met the enemy, every other line of that side within 24 blocks fights too: after contact, the CSV's idle rows show almost no "line-forming" for either side.
+
+## 119. Whole armies form up (0.0.119)
+
+Install `lotrnpcs_0.0.119-test.zip`; restart fully.
+
+- [x] 119.1 Spawn two armies wider than 24 blocks facing each other (e.g. batches of 5 down two columns 40 blocks apart). Before contact each side forms one long line of all its warriors, not just those near an enemy; nearly every NPC fights.
+- [ ] 119.2 Your recruits following in a formation join a battle line that forms near them only if they're set to the same formation as the recruit that started it (Line with Line, Wedge with Wedge); Loose followers never do.
