@@ -3,9 +3,9 @@ name: resume
 description: Where the lotrnpcs work stands and what's next; read first, update before stopping
 ---
 
-# Where we are (updated 2026-11-13, after 0.0.120)
+# Where we are (updated 2026-11-13, after 0.0.122)
 
-**Latest build:** 0.0.120 (built and tested offline in a cloud session, not yet in game: checklist 120). Before it, 0.0.119, GitHub release v0.0.119. Commits up to `1a1c32e` and later doc commits on `main`.
+**Latest build:** 0.0.122: wild NPCs fight without battle lines (`WildBattleLines`, false by default; recruits in formation keep lines), 0.0.120/0.0.121 pairing removed (owner chose "Back to 0.0.119 fighting"). Not yet in game: same 38 v 26 staging, both armies spawned before the log. 0.0.121 (pair by position) ran 28-0 to the Dunlendings and is superseded. Before it, 0.0.119, GitHub release v0.0.119. Commits up to `1a1c32e` and later doc commits on `main`.
 
 **Recent work (full details in `lotrnpcs-0113.md`):**
 - 0.0.118: a battle line counts as met when another line of its side within 24 blocks has met (`SideMetNear`).
