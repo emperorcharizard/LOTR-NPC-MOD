@@ -2034,6 +2034,11 @@ public static class Program {
             var orcFoe = LineNpc("test-mordororc-warrior", 9, 7);
             Check(lsC.WouldRally(idleOrc, idleMan) && !lsC.WouldRally(recPassive, orcFoe) && !lsC.WouldRally(recAggro, recLine) && !lsC.WouldRally(idleOrc, null),
                 "0.0.120: an idle orc is rallied onto a man; a passive recruit isn't rallied, nor a recruit onto its own side's recruit");
+            // 0.0.123: a wild NPC starting a fight calls idle wild NPCs of its own faction, not men, recruits or itself.
+            var callOrc = LineNpc("test-mordororc-warrior", 30, 30); var callOrc2 = LineNpc("test-mordororc-recruit", 34, 30); var callMan = LineNpc("test-gondor-warrior", 36, 30);
+            Check(AiTaskFactionSeek.AnswersCall(callOrc, callOrc2, 0) && !AiTaskFactionSeek.AnswersCall(callOrc, callMan, 0) && !AiTaskFactionSeek.AnswersCall(callOrc, callOrc, 0)
+                && !AiTaskFactionSeek.AnswersCall(recLine, recLine2, 0) && FactionConfig.InstructionText.Any(l => l.Contains("since 0.0.123 also how far a wild NPC")),
+                "0.0.123: a wild orc that starts a fight calls an idle orc, not a man, itself or a hired recruit; #Instructions explain it");
             // 0.0.122: wild NPCs form no lines unless WildBattleLines is on; recruits in formation still do.
             BattleLineSystem.WildLines = false;
             bool wildOff = BattleLineSystem.SideOf(idleOrc) == null && BattleLineSystem.SideOf(recLine) != null;
