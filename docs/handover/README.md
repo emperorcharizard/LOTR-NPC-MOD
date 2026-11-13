@@ -53,3 +53,6 @@ Claude Code doesn't let Claude write its own permission files, so the owner sets
 ```
 
 4. **GitHub:** `gh auth login` once on the PC for releases (already done for this Windows user).
+
+## screenshots/
+From above the 38 v 26 battles: 0.0.118 staged (partial lines before contact), 0.0.119 (both whole armies in long lines before contact, then the blob ~10 s after they meet: the open 110.1 problem).
