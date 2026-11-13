@@ -91,3 +91,11 @@ metadata:
 - In game (staged 38 v 26, batches of 5, columns 40 blocks apart, CSV `lotrnpcs-battle-20261113-105114.csv`): **both armies formed one long line each before contact, and the orc line overlapped the Dunlendings at both ends** (screenshot). 60 of 64 NPCs swung (40 of 64 on 0.0.118). Within ~10 s of meeting the lines folded into one blob again. Result: **orcs 24 kills / 4 deaths**, back to 0.0.109's lopsided margin now that the whole bigger army fights. Swarming: in the first 20 s, single Dunlendings were hit by up to 7 different orcs.
 - 110.1 status: the long rank before contact passes; pairing off at contact and the closer margin don't. The next thing to look at is why the lines fold into a blob at contact (the front holds its side, but the extras wrap round and everyone piles onto the nearest enemies).
 - 119.2 (recruit formations) isn't tested in game; it needs hired followers in two formations.
+
+## 0.0.120: lines pair off at contact (2026-11-13, Claude, cloud session)
+
+- Owner, after a review of 0.0.116-0.0.119: "yes fix all the items". Built in src/BattleLines.cs:
+  - `WouldRally`: Rally (0.0.119) now adds an ally only if it would take the target (a recruit never turns on its side and follows its stance). 0.0.119 added it before asking, so a recruit that refused stood as a laggard for up to 8 s, held back the march, then was rallied again.
+  - `Pair` + `LineMath.Pair` (110.1 blob): after contact, twice a second, members are paired with the enemy nearest their own slot, front first (one each), then the extras, never more than `LinePerEnemy` (2, the owner's 0.0.82 "never more than 2 on one enemy") on one enemy. A member keeps its enemy unless it died, is over the cap, or another is `PairSlack` (2.5) blocks nearer its slot; it changes at most once per `RepairMs` (1.5 s). Enemies are scanned within 8 + half the line's width of the line's centre. Before, each member kept the enemy it picked on the march and the front stood on its own side of that enemy, so the line took the enemies' shape.
+  - Offline checks: two 0.0.120 lines in factions. Built on Linux with `tools/build.py`: all pass.
+- Untested in game (checklist 120). Release tags v0.0.116 (59598dc), v0.0.117 (dfe0250), v0.0.118 (4a8eab7) added afterwards so every build has one.

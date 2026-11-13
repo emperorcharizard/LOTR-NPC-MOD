@@ -417,3 +417,10 @@ Install `lotrnpcs_0.0.119-test.zip`; restart fully.
 
 - [x] 119.1 Spawn two armies wider than 24 blocks facing each other (e.g. batches of 5 down two columns 40 blocks apart). Before contact each side forms one long line of all its warriors, not just those near an enemy; nearly every NPC fights.
 - [ ] 119.2 Your recruits following in a formation join a battle line that forms near them only if they're set to the same formation as the recruit that started it (Line with Line, Wedge with Wedge); Loose followers never do.
+
+## 120. Lines pair off at contact (0.0.120)
+
+Install `lotrnpcs_0.0.120-test.zip`; restart fully.
+
+- [ ] 120.1 Staged 38 goblin warriors v 26 Dunlending warriors as in 110.1 (batches of 5, columns 40 blocks apart, player at about 1500 15 300, battle log on). For at least 20 s after contact the two lines stay two lines: each front fighter fights the enemy across from it, and the extras come in at the ends instead of the middle folding into one blob. In the CSV, no Dunlending is hit by more than 2 different orcs in any 5 s stretch (dead targets aside), and the result is closer than 0.0.119's 24-4.
+- [ ] 120.2 Your recruits following in Line with a Passive stance next to a forming line of yours aren't pulled into it (they stay with you, and the line's march doesn't stall).

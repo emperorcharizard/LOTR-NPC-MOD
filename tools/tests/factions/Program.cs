@@ -2027,6 +2027,24 @@ public static class Program {
                 && !lsC.CanRally(f2, lineC.Side, Recruit.FormationOf(f1), 0)
                 && lsC.CanRally(recLine2, recSide, recForm, 0) && !lsC.CanRally(recWedge, recSide, recForm, 0),
                 "0.0.119: an idle orc is rallied into the orc line, not a man or an orc already in a line; a recruit in Line formation joins its leader's Line, not one set to Wedge");
+            // 0.0.120: a recruit is rallied only onto a target it would attack.
+            var recPassive = Rec(Formation.Line); Recruit.SetStance(recPassive, Recruit.Passive);
+            var recAggro = Rec(Formation.Line); Recruit.SetStance(recAggro, Recruit.Aggressive);
+            var orcFoe = LineNpc("test-mordororc-warrior", 9, 7);
+            Check(lsC.WouldRally(idleOrc, idleMan) && !lsC.WouldRally(recPassive, orcFoe) && !lsC.WouldRally(recAggro, recLine) && !lsC.WouldRally(idleOrc, null),
+                "0.0.120: an idle orc is rallied onto a man; a passive recruit isn't rallied, nor a recruit onto its own side's recruit");
+            // 0.0.120: pairing at contact by place in the line, front first, at most 2 on one enemy.
+            {
+                // Five orcs in a row (front 3 in the middle, extras at the ends) against three men across from them.
+                double[] psx = { 0, 2, 4, -2, 6 }, psz = { 0, 0, 0, 0, 0 };
+                double[] pex = { 0.2, 2.1, 3.9 }, pez = { 3, 3, 3 };
+                int[] pk = LineMath.Pair(psx, psz, 3, pex, pez, 2);
+                int[] two = LineMath.Pair(new double[] { 0, 1, 2 }, new double[] { 0, 0, 0 }, 3, new double[] { 0 }, new double[] { 3 }, 2);
+                int[] spread = LineMath.Pair(new double[] { 0, 0.5 }, new double[] { 0, 0 }, 2, new double[] { 0, 10 }, new double[] { 3, 3 }, 2);
+                Check(pk[0] == 0 && pk[1] == 1 && pk[2] == 2 && pk[3] == 0 && pk[4] == 2
+                    && two[0] == 0 && two[1] == 0 && two[2] == -1 && spread[0] != spread[1],
+                    "0.0.120: each front orc takes the man across from it and the end extras the nearest end men; no more than 2 on one man; the front spreads over free enemies first");
+            }
 
             var v25 = Newtonsoft.Json.Linq.JObject.FromObject(FactionConfig.FromFile(null, out _)); v25["Version"] = 25; v25["BattleLines"] = false; v25.Remove("RosterPerCaptain");
             var m25 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v25.ToString()), out bool store25);

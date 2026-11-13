@@ -44,6 +44,40 @@ namespace LotrNpcs
             right = j < left ? -(half + left - j) * gap : (half + 1 + j - left) * gap;
         }
 
+        public static double Dist(double ax, double az, double bx, double bz) => Math.Sqrt((ax - bx) * (ax - bx) + (az - bz) * (az - bz));
+
+        /// <summary>
+        /// 0.0.120: pairs line members (slot positions, slot order: the first `front` are the front rank) with enemies,
+        /// by distance from each member's slot. Round 1 gives the front one enemy each, then the extras the enemies
+        /// still free; each later round lets one more member onto an enemy, up to perEnemy. Returns the enemy index per
+        /// member, -1 for none (more members than perEnemy x enemies).
+        /// </summary>
+        public static int[] Pair(IReadOnlyList<double> sx, IReadOnlyList<double> sz, int front, IReadOnlyList<double> ex, IReadOnlyList<double> ez, int perEnemy)
+        {
+            int n = sx.Count, m = ex.Count;
+            int[] pick = new int[n], count = new int[m];
+            for (int i = 0; i < n; i++) pick[i] = -1;
+            front = Math.Clamp(front, 0, n);
+            for (int cap = 1; cap <= Math.Max(1, perEnemy); cap++)
+                foreach (bool frontPass in new[] { true, false })
+                    for (int i = frontPass ? 0 : front; i < (frontPass ? front : n); i++)
+                    {
+                        if (pick[i] >= 0) continue;
+                        int best = -1;
+                        double bestD = double.MaxValue;
+                        for (int j = 0; j < m; j++)
+                        {
+                            if (count[j] >= cap) continue;
+                            double d = Dist(sx[i], sz[i], ex[j], ez[j]);
+                            if (d < bestD) { bestD = d; best = j; }
+                        }
+                        if (best < 0) continue;
+                        pick[i] = best;
+                        count[best]++;
+                    }
+            return pick;
+        }
+
         /// <summary>The point right and back of (px, pz) for direction (dx, dz).</summary>
         public static void SlotAt(double px, double pz, double dx, double dz, double right, double back, out double x, out double z)
         {
@@ -262,6 +296,7 @@ namespace LotrNpcs
 
         public void Leave(long id)
         {
+            lastPair.Remove(id);
             if (!lineOf.TryGetValue(id, out BattleLine line)) return;
             lineOf.Remove(id);
             line.Members.Remove(id);
@@ -344,6 +379,7 @@ namespace LotrNpcs
                 {
                     line.Members.RemoveAt(i);
                     lineOf.Remove(id);
+                    lastPair.Remove(id);
                     line.Dirty = true;
                 }
             }
@@ -483,6 +519,64 @@ namespace LotrNpcs
                 line.Pz += line.Dz * move;
             }
             else if (toEnemy <= HoldRange) { line.Contact = true; Wake(world, line); }
+            if (line.Contact) Pair(world, line, founder, now);
+        }
+
+        // 0.0.120 (110.1, lines folding into a blob at contact): after contact each member was left with whatever
+        // enemy it had picked on the march, and a front member stands on its own side of that enemy, so the line took
+        // the shape of wherever the enemies went, and the extras piled onto the nearest ones (up to 7 orcs on one
+        // Dunlending in 20 s). Now, twice a second, members are paired with the enemy nearest their own place in the
+        // line: the front first, one each, then the extras, never more than LinePerEnemy on one enemy (the owner's
+        // 0.0.82 rule: "never more than 2 on one enemy"). A member keeps its enemy unless it died, is over the cap, or
+        // another is PairSlack blocks nearer its place, and changes at most once every RepairMs.
+        public const int LinePerEnemy = 2;
+        public const double PairSlack = 2.5;
+        public const long RepairMs = 1500;
+        readonly Dictionary<long, long> lastPair = new Dictionary<long, long>();
+        readonly List<Entity> pairEnemies = new List<Entity>();
+        readonly List<double> slotX = new List<double>(), slotZ = new List<double>(), enemyX = new List<double>(), enemyZ = new List<double>();
+        readonly Dictionary<long, int> chasing = new Dictionary<long, int>();
+
+        void Pair(IWorldAccessor world, BattleLine line, Entity founder, long now)
+        {
+            if (founder == null || factions == null) return;
+            int n = line.Members.Count;
+            double reach = EnemyScanRadius + n * Gap / 2;
+            pairEnemies.Clear();
+            foreach (Entity e in world.GetEntitiesAround(new Vintagestory.API.MathTools.Vec3d(line.Px, line.Py, line.Pz), (float)reach, 4,
+                         e => e.Alive && !(e is EntityPlayer) && FactionSystem.FactionOf(e) != null && SideOf(e) != line.Side && factions.IsEnemyOf(founder, e)))
+                pairEnemies.Add(e);
+            if (pairEnemies.Count == 0) return;
+            slotX.Clear(); slotZ.Clear(); enemyX.Clear(); enemyZ.Clear(); chasing.Clear();
+            for (int i = 0; i < n; i++)
+            {
+                LineMath.SlotOffset(i, n, line.Front, Gap, out double right, out double back, line.Reserve);
+                LineMath.SlotAt(line.Px, line.Pz, line.Dx, line.Dz, right, back, out double sx, out double sz);
+                slotX.Add(sx); slotZ.Add(sz);
+                long t = TargetOf(line.Members[i]);
+                chasing[t] = chasing.TryGetValue(t, out int c) ? c + 1 : 1;
+            }
+            foreach (Entity e in pairEnemies) { enemyX.Add(e.Pos.X); enemyZ.Add(e.Pos.Z); }
+            int[] pick = LineMath.Pair(slotX, slotZ, line.Front, enemyX, enemyZ, LinePerEnemy);
+            for (int i = 0; i < n; i++)
+            {
+                if (pick[i] < 0) continue;
+                long id = line.Members[i];
+                Entity next = pairEnemies[pick[i]];
+                long cur = TargetOf(id);
+                if (cur == next.EntityId) continue;
+                if (lastPair.TryGetValue(id, out long last) && now - last < RepairMs) continue;
+                Entity me = world.GetEntityById(id), curE = cur == 0 ? null : world.GetEntityById(cur);
+                if (me == null || !me.Alive || !WouldRally(me, next)) continue;
+                bool change = curE == null || !curE.Alive || (chasing.TryGetValue(cur, out int k) && k > LinePerEnemy)
+                    || LineMath.Dist(slotX[i], slotZ[i], curE.Pos.X, curE.Pos.Z) > LineMath.Dist(slotX[i], slotZ[i], next.Pos.X, next.Pos.Z) + PairSlack;
+                if (!change) continue;
+                if (chasing.TryGetValue(cur, out int was)) chasing[cur] = was - 1;
+                chasing[next.EntityId] = chasing.TryGetValue(next.EntityId, out int now2) ? now2 + 1 : 1;
+                targetOf[id] = next.EntityId;
+                lastPair[id] = now;
+                me.Notify("seekEntity", next);
+            }
         }
 
         /// <summary>0.0.119 (owner, 2026-11-13: allies join a forming line "only if they are set in the same formation"):
@@ -515,11 +609,18 @@ namespace LotrNpcs
                     double dx = m.Pos.X - ally.Pos.X, dz = m.Pos.Z - ally.Pos.Z, d = dx * dx + dz * dz;
                     if (d <= best) { best = d; target = t; }
                 }
-                if (target == null) continue;
+                if (target == null || !WouldRally(ally, target)) continue;
                 Add(line, ally.EntityId, target.EntityId, now);
                 ally.Notify("joinLine", target);
             }
         }
+
+        /// <summary>0.0.120: would this ally take the target it's rallied to? A recruit never turns on its own side and
+        /// follows its stance (passive, disengaging); 0.0.119 added it to the line before asking, so one that said no
+        /// stood as a laggard for up to 8 s (holding back the march) and was rallied again.</summary>
+        public bool WouldRally(Entity ally, Entity target) =>
+            target != null && target.Alive
+            && !(Recruit.OwnerUidOf(ally) is string owner && (Recruit.IsTeam(target, owner) || (factions != null && !factions.RecruitWantsToAttack(ally, owner, target))));
 
         static bool SeekRunning(Entity e)
         {
@@ -554,7 +655,7 @@ namespace LotrNpcs
 
         void Disband(BattleLine line)
         {
-            foreach (long id in line.Members) lineOf.Remove(id);
+            foreach (long id in line.Members) { lineOf.Remove(id); lastPair.Remove(id); }
             line.Members.Clear();
             lines.Remove(line);
         }

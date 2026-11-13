@@ -6,7 +6,7 @@ The owner works with Claude from more than one Claude account. Everything a sess
 1. `docs/notes/resume.md`: where the work stands and what's next. Read it first, and update it before you stop.
 2. `docs/test-checklist.md`: the in-game test list. Tick items (`- [x]`) as they pass.
 3. `docs/handover/`: battle-log CSVs, the owner's mod configs (DebugCommands on), and the permissions a new account needs (README).
-4. `docs/notes/MEMORY.md`: the index of decision and per-version notes. Append test results and build notes to the latest version note (now `docs/notes/lotrnpcs-0113.md`).
+4. `docs/notes/MEMORY.md`: the index of decision and per-version notes. Append test results and build notes to the running version note, `docs/notes/lotrnpcs-0113.md` (it covers 0.0.113 to 0.0.120).
 
 ## Claude plugins
 `.claude/settings.json` turns on the Ponytail plugin (github DietrichGebert/ponytail: smallest change that works, plus `/ponytail-review` and `/ponytail-audit`). Claude Code asks to trust the marketplace the first time; `/ponytail off` or `/ponytail lite` changes it for a session.
