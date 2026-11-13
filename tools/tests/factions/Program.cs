@@ -47,7 +47,7 @@ public static class Program {
         Check(!types["test-uruk"].Attributes["lotrnpcsRank"].Exists && !types["test-goblin"].Attributes["lotrnpcsRank"].Exists, "rankless NPCs have no rank (so zones never spawn them)");
         Check(types["test-hobbit"].Attributes["lotrnpcsRank"].AsString() == "recruit", "hobbits count as the Shire's recruits");
         Check(types.Values.All(t => FactionConfig.DefaultFactions().ContainsKey(t.Attributes["lotrnpcsFaction"].AsString())), "every NPC's faction is in the default config");
-        Check(!types.ContainsKey("test-gondor") && !types.ContainsKey("test-dwarf") && types.Count == 105, "the unarmored Gondor, Rohan, Dunlending, Easterling and Dwarf NPCs are replaced by ranked ones (" + types.Count + " NPCs)");
+        Check(!types.ContainsKey("test-gondor") && !types.ContainsKey("test-dwarf") && types.Count == 115, "the unarmored Gondor, Rohan, Dunlending, Easterling and Dwarf NPCs are replaced by ranked ones (" + types.Count + " NPCs)");
 
         TestAgent Npc(string code) { var e = new TestAgent(); e.SetProps(types[code]); SetCode(e, types[code].Code); return e; }
         long nextId = 1;
@@ -219,7 +219,7 @@ public static class Program {
         File.WriteAllText("factions-default.json", text);
 
         // ---- hiring (0.0.37) ----
-        Check(types.Count == 105, "every NPC has the recruit behavior on both sides and the follow task (checked per file above)");
+        Check(types.Count == 115, "every NPC has the recruit behavior on both sides and the follow task (checked per file above)");
         var lang = JObject.Parse(File.ReadAllText(Path.Combine(argv[0], "..", "lang", "en.json")));
         var factionIds = FactionConfig.DefaultFactions().Keys.ToList();
         Check(factionIds.All(f => lang["talk-greet-" + f + "-1"] != null && lang["talk-greet-" + f + "-2"] != null && lang["talk-hired-" + f] != null
@@ -583,8 +583,8 @@ public static class Program {
             && tabCodes.ToHashSet().SetEquals(entityFiles.Keys.Where(c => !hidden.Contains(c)));
         var tabFactions = tabCodes.Select(c => types[c].Attributes["lotrnpcsFaction"].AsString()).ToList();
         bool grouped = tabFactions.Select((f, i) => i == 0 || f == tabFactions[i - 1] || !tabFactions.Take(i).Contains(f)).All(x => x);
-        Check(grouped && tabCodes.First() == "test-hobbit" && tabCodes.IndexOf("test-mordororc-recruit") + 5 == tabCodes.IndexOf("test-mordororc-archer") && tabCodes.IndexOf("test-mordororc-warrior") + 1 == tabCodes.IndexOf("test-mordororc-guard"),
-            "0.0.71: the creative tab lists each faction's units together, recruit, warrior, guard, shock trooper (0.0.113), captain, archer (" + string.Join(" ", tabFactions.Distinct()) + ")");
+        Check(grouped && tabCodes.First() == "test-hobbit" && tabCodes.IndexOf("test-mordororc-recruit") + 6 == tabCodes.IndexOf("test-mordororc-archer") && tabCodes.IndexOf("test-mordororc-captain") + 1 == tabCodes.IndexOf("test-mordororc-rider") && tabCodes.IndexOf("test-mordororc-warrior") + 1 == tabCodes.IndexOf("test-mordororc-guard"),
+            "0.0.71: the creative tab lists each faction's units together, recruit, warrior, guard, shock trooper (0.0.113), captain, rider (0.0.117), archer (" + string.Join(" ", tabFactions.Distinct()) + ")");
         Check((string)lang["game:tabname-lotrnpcs"] == "LOTR NPCs" && tabsOk && hidden.All(c => entityFiles.ContainsKey(c) && (bool?)entityFiles[c]["attributes"]["inCreativeInventory"] == false)
             && entityFiles.Keys.Where(c => !hidden.Contains(c)).All(c => entityFiles[c]["attributes"]["inCreativeInventory"] == null), "the creative tab reads LOTR NPCs and leaves out the plain goblin and Uruk-hai, which still exist; the hobbit is in it");
         Check(lang["orders-sharedkey"] != null && ((string)lang["orders-hint"]).Contains("Esc"), "the menu tells how to close it and warns about a shared key");
@@ -657,12 +657,12 @@ public static class Program {
         float JsonMaxHealth(string code) => (float)entityFiles[code]["server"]["behaviors"].First(b => (string)b["code"] == "health")["maxhealth"];
         bool healthOk = entityFiles.Keys.All(c => {
             string rank = (string)entityFiles[c]["attributes"]["lotrnpcsRank"];
-            float want = rank == "recruit" ? 22 : rank == "warrior" || rank == "archer" ? 34 : rank == "captain" ? 48 : rank == "guard" ? 43 : rank == "shock" ? 27 : 19;
+            float want = rank == "recruit" ? 22 : rank == "warrior" || rank == "archer" ? 34 : rank == "captain" ? 48 : rank == "guard" ? 43 : rank == "shock" ? 27 : rank == "rider" ? 34 : 19;
             float cur = (float)entityFiles[c]["server"]["behaviors"].First(b => (string)b["code"] == "health")["currenthealth"];
             if (JsonMaxHealth(c) != want || cur != want) { Console.WriteLine("  " + c + ": " + JsonMaxHealth(c) + " health"); return false; }
             return true;
         });
-        Check(healthOk && JsonMaxHealth("test-hobbit") == 22 && JsonMaxHealth("test-goblin") == 19, "recruits have 22 health, warriors and archers 34, captains 48, the rankless leftovers 19 (6 less than before); 0.0.113 guards 43 and shock troops 27");
+        Check(healthOk && JsonMaxHealth("test-hobbit") == 22 && JsonMaxHealth("test-goblin") == 19, "recruits have 22 health, warriors and archers 34, captains 48, the rankless leftovers 19 (6 less than before); 0.0.113 guards 43 and shock troops 27; 0.0.117 riders 34");
         TestAgent Hurt(float baseMax, float max, float cur) {
             var e = Wild("test-gondor-captain"); var h = new TreeAttribute();
             h.SetFloat("basemaxhealth", baseMax); h.SetFloat("maxhealth", max); h.SetFloat("currenthealth", cur); e.WatchedAttributes["health"] = h; return e;
@@ -848,7 +848,7 @@ public static class Program {
         string assets = Path.Combine(argv[0], "..");
         JToken HeldWeapon(JObject e, string side) => e[side]["behaviors"].FirstOrDefault(b => (string)b["code"] == "lotrnpcs:heldweapon");
         var armed = entityFiles.Where(kv => HeldWeapon(kv.Value, "server") != null || HeldWeapon(kv.Value, "client") != null).Select(kv => kv.Key).OrderBy(k => k).ToList();
-        string[] ranked = entityFiles.Keys.Where(c => c.EndsWith("-recruit") || c.EndsWith("-warrior") || c.EndsWith("-captain") || c.EndsWith("-guard") || c.EndsWith("-shock")).OrderBy(k => k).ToArray();
+        string[] ranked = entityFiles.Keys.Where(c => c.EndsWith("-recruit") || c.EndsWith("-warrior") || c.EndsWith("-captain") || c.EndsWith("-guard") || c.EndsWith("-shock") || c.EndsWith("-rider")).OrderBy(k => k).ToArray();
         Check(armed.Where(c => !c.EndsWith("-archer")).SequenceEqual(ranked) && armed.All(c => HeldWeapon(entityFiles[c], "server")["weapons"].Any())
             && armed.Count(c => c.EndsWith("-archer")) == 17 && entityFiles.Keys.Where(c => c.EndsWith("-archer")).All(armed.Contains),
             "every ranked NPC carries a weapon (0.0.76: the falx where its faction has no model yet), the Shire's hobbits and the rankless ones none, and every archer its bow");
@@ -907,7 +907,7 @@ public static class Program {
         bool speedsOk = weaponEntries.All(w => { var m = entityAnims[(string)w["attackAnimation"]]; return (string)m["blendMode"] == "Average" && (float)m["elementWeight"]["UpperArmR"] > (float)m["elementWeight"]["UpperFootR"] * 10; });
         Check(speedsOk, "swings take over the arms and torso but leave the legs to walking and running");
         var melee = entityFiles.Values.Select(e => e["server"]["behaviors"].First(b => (string)b["code"] == "taskai")["aitasks"].First(t => (string)t["code"] == "lotrnpcs:meleeattack")).ToList();
-        Check(melee.Count == 105 && melee.All(t => (int)t["mincooldown"] == 1700 && (int)t["maxcooldown"] == 2100 && (int)t["attackDurationMs"] == 900 && (int)t["damagePlayerAtMs"] == 400 && (string)t["animation"] == "hit"),
+        Check(melee.Count == 115 && melee.All(t => (int)t["mincooldown"] == 1700 && (int)t["maxcooldown"] == 2100 && (int)t["attackDurationMs"] == 900 && (int)t["damagePlayerAtMs"] == 400 && (string)t["animation"] == "hit"),
             "every NPC waits 1700 to 2100 ms between swings (0.0.108: 0.5 s less than 0.0.44), with the same swing length, hit timing and unarmed punch");
         Check(entityFiles["test-mordororc-captain"]["server"]["behaviors"].First(b => (string)b["code"] == "taskai")["aitasks"].First(t => (string)t["code"] == "lotrnpcs:meleeattack").Value<int>("damage") == 7
             && (int)melee.First()["damageTier"] > 0, "weapons change no damage numbers (captain still 7)");
@@ -1139,6 +1139,29 @@ public static class Program {
             float nearDt = 0.01f; int nearCount = 0; float nearSkipped = 0;
             Check(lodRuns == 4 && Math.Abs(lodTime - 0.12f) < 1e-4 && AnimationLod.Step(ref nearCount, ref nearSkipped, ref nearDt, 1) && nearDt == 0.01f && new ClientConfig().FarAnimationLod,
                 "0.0.116: an NPC animated every 3rd frame runs 4 times in 12 frames and still advances the full 12 frames' time; near ones run every frame; on by default");
+            // ---- 0.0.117 mounted riders ----
+            string[] riderCodes = entityFiles.Keys.Where(c => c.EndsWith("-rider")).OrderBy(c => c).ToArray();
+            string[] MountsOf(string code) => entityFiles[code]["attributes"]["lotrnpcsMounts"]?.Select(x => (string)x).ToArray() ?? Array.Empty<string>();
+            Check(riderCodes.SequenceEqual(new[] { "angmarorc", "arnor", "dale", "dwarf", "elf", "gondor", "gundabadorc", "mordororc", "rohan", "uruk" }.Select(r => "test-" + r + "-rider"))
+                && riderCodes.All(c => (string)entityFiles[c]["attributes"]["lotrnpcsRank"] == "rider" && entityFiles[c]["server"]["behaviors"].Any(b => (string)b["code"] == "lotrnpcs:rider") && MountsOf(c).Length > 0)
+                && MountsOf("test-rohan-rider").All(m => m.StartsWith("feverstonewilds:horse-tamed-")) && MountsOf("test-uruk-rider").All(m => m.StartsWith("feverstonewilds:tame-direwolf-"))
+                && MountsOf("test-elf-rider").All(m => m.StartsWith("game:tameddeer-elk-")) && MountsOf("test-dwarf-rider").All(m => m.StartsWith("teapotsgiantboar:tame-giantboar-")),
+                "0.0.117: riders for Men of the West on horses, Shadow orcs on dire wolves, elves on elk and dwarves on giant boars, each with the rider behavior and its mounts");
+            var riderConfig = new FactionConfig { Version = FactionConfig.CurrentVersion }; riderConfig.FillDefaults();
+            Check(Promotion.StatRank("rider") == "warrior" && Promotion.PriceRank("rider") == "captain" && Promotion.StatRank("guard") == "warrior" && Promotion.PriceRank("shock") == "warrior"
+                && riderConfig.HealthFor("rohan", "rider") == riderConfig.HealthFor("rohan", "warrior") && riderConfig.DamageFor("rohan", "rider") == riderConfig.DamageFor("rohan", "warrior")
+                && HiringSystem.PriceFor(new FactionDef { HirePrices = new Dictionary<string, int> { ["captain"] = 40, ["warrior"] = 15 } }, "rider") == 40,
+                "0.0.117: a rider fights with its faction's warrior numbers and costs a captain's price unless the config lists its own");
+            Check(!Riders.CanHaveMount(null, null) && Riders.AvailableMounts(null, null).Length == 0, "0.0.117: no world or no type means no mount (the rank isn't offered)");
+            var rr = new Random(3);
+            var withRider = SpawnZoneSystem.WithRider(new List<string> { "recruit", "warrior", "warrior" }, rr, 1);
+            var noRider = SpawnZoneSystem.WithRider(new List<string> { "recruit", "warrior" }, rr, 0);
+            var noWarrior = SpawnZoneSystem.WithRider(new List<string> { "recruit", "recruit" }, rr, 1);
+            Check(withRider.SequenceEqual(new[] { "recruit", "rider", "warrior" }) && noRider.SequenceEqual(new[] { "recruit", "warrior" }) && noWarrior.SequenceEqual(new[] { "recruit", "recruit" }),
+                "0.0.117: a wild group's first warrior rides at RiderChance; a group without warriors gets no rider");
+            Check(Math.Abs(Riders.TurnToward(0, 2, 0.5f) - 0.5f) < 1e-4 && Math.Abs(Riders.TurnToward(0, -2, 0.5f) + 0.5f) < 1e-4 && Riders.TurnToward(1, 1.2f, 0.5f) == 1.2f
+                && Riders.SpeedFor(0.5, true) == 0 && Riders.SpeedFor(2, false) == Riders.WalkSpeed && Riders.SpeedFor(2, true) == Riders.SprintSpeed && Riders.SpeedFor(5, false) == Riders.SprintSpeed,
+                "0.0.117: a mount turns toward its rider's next waypoint at a limited rate, stands within a block of it, walks to near ones and runs to far ones or when the rider sprints");
             Check(EntityBehaviorHeldWeapon.PickWeapon(Looks.NoWeapon, new[] { new NpcWeapon { Item = "lotrnpcs:orcweapon-axe" } }, new Random(1)) == Looks.NoWeapon, "an orc whose weapon was taken away stays unarmed after a reload");
             Check(!Looks.NameOnHire(lnpc, new Random(1)) && Looks.NameOf(lnpc) == "Ugrath", "a recruit its owner named keeps its name when hired again");
 
@@ -1589,9 +1612,10 @@ public static class Program {
 
             // XP rules.
             Check(Promotion.Need("recruit") == 15 && Promotion.Need("warrior") == 40 && Promotion.Need("captain") == 0 && Promotion.Need("archer") == 0 && Promotion.Need(null) == 0
-                && Promotion.Need("guard") == 40 && Promotion.Need("shock") == 40 && Promotion.Targets("guard").SequenceEqual(new[] { "captain" }) && Promotion.Targets("shock").SequenceEqual(new[] { "captain" })
-                && Promotion.Targets("recruit").SequenceEqual(new[] { "warrior", "guard", "shock", "archer" }) && Promotion.Targets("warrior").SequenceEqual(new[] { "captain" }) && Promotion.Targets("archer").Length == 0,
-                "recruits need 15 XP to become warriors, guards, shock troops (0.0.113) or archers, those three 40 to become captains; archers and captains go no further");
+                && Promotion.Need("guard") == 40 && Promotion.Need("shock") == 40 && Promotion.Targets("guard").SequenceEqual(new[] { "captain", "rider" }) && Promotion.Targets("shock").SequenceEqual(new[] { "captain", "rider" })
+                && Promotion.Targets("recruit").SequenceEqual(new[] { "warrior", "guard", "shock", "archer" }) && Promotion.Targets("warrior").SequenceEqual(new[] { "captain", "rider" }) && Promotion.Targets("archer").Length == 0
+                && Promotion.Need("rider") == 0 && Promotion.Targets("rider").Length == 0,
+                "recruits need 15 XP to become warriors, guards, shock troops (0.0.113) or archers, those three 40 to become captains or (0.0.117) riders; archers, captains and riders go no further");
             Check(Promotion.CodeAtRank(new AssetLocation("lotrnpcs:test-goblin-recruit"), "archer").ToString() == "lotrnpcs:test-goblin-archer"
                 && Promotion.CodeAtRank(new AssetLocation("lotrnpcs:test-blacknumenorean-warrior"), "captain").ToString() == "lotrnpcs:test-blacknumenorean-captain", "a promotion keeps the race and changes the rank");
             var ps = new PromotionSystem();

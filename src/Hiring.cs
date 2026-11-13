@@ -652,7 +652,7 @@ namespace LotrNpcs
         public static int PriceFor(FactionDef def, string rank)
         {
             Dictionary<string, int> prices = def?.HirePrices ?? FactionConfig.DefaultHirePrices();
-            if (rank != null && (prices.TryGetValue(rank.ToLowerInvariant(), out int price) || prices.TryGetValue(Promotion.BaseRank(rank.ToLowerInvariant()), out price))) return Math.Max(0, price);
+            if (rank != null && (prices.TryGetValue(rank.ToLowerInvariant(), out int price) || prices.TryGetValue(Promotion.PriceRank(rank.ToLowerInvariant()), out price))) return Math.Max(0, price);
             return prices.TryGetValue("recruit", out int recruit) ? Math.Max(0, recruit) : 0;
         }
 

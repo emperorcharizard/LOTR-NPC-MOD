@@ -35,9 +35,11 @@ public static class Program {
         EntityProperties T(string code) => types.First(t => t.Code.Path == code);
         Check(withSpawn == 0, "no vanilla spawn rules in the JSON any more");
         bool Branch(EntityProperties t) => Array.IndexOf(Promotion.Branches, t.Attributes["lotrnpcsRank"].AsString()) >= 0;
-        Check(types.Count(t => t.Attributes?["lotrnpcsFaction"].Exists == true && t.Attributes["lotrnpcsRank"].Exists && !Branch(t)) == 69
-            && types.Count(t => t.Attributes?["lotrnpcsFaction"].Exists == true && t.Attributes["lotrnpcsRank"].Exists && Branch(t)) == 34,
-            "69 zone NPC types (17 factions x 3 ranks with Gundabad, the Shire's hobbit recruits, and archers for every faction but the Shire), plus 0.0.113's guards and shock troops for the 17 armed factions");
+        bool Rider(EntityProperties t) => t.Attributes["lotrnpcsRank"].AsString() == "rider";
+        Check(types.Count(t => t.Attributes?["lotrnpcsFaction"].Exists == true && t.Attributes["lotrnpcsRank"].Exists && !Branch(t) && !Rider(t)) == 69
+            && types.Count(t => t.Attributes?["lotrnpcsFaction"].Exists == true && t.Attributes["lotrnpcsRank"].Exists && Branch(t)) == 34
+            && types.Count(t => t.Attributes?["lotrnpcsFaction"].Exists == true && Rider(t)) == 10,
+            "69 zone NPC types (17 factions x 3 ranks with Gundabad, the Shire's hobbit recruits, and archers for every faction but the Shire), plus 0.0.113's guards and shock troops for the 17 armed factions and 0.0.117's riders for the 10 mounted ones");
         var rankedFactions = types.Where(t => t.Attributes?["lotrnpcsRank"].Exists == true).Select(t => t.Attributes["lotrnpcsFaction"].AsString()).Distinct().OrderBy(f => f).ToList();
         Check(rankedFactions.SequenceEqual(SpawnZoneSystem.Factions.OrderBy(f => f)) && SpawnZoneSystem.Factions.All(f => (f == "shire" ? new[] { "recruit" } : new[] { "recruit", "warrior", "captain", "archer" }).All(r => types.Any(t => t.Attributes?["lotrnpcsFaction"].AsString() == f && t.Attributes["lotrnpcsRank"].AsString() == r))), "every faction /lotrzone accepts has a recruit, warrior and captain (the Shire only recruits), and no other faction has ranks");
         Check(T("test-hobbit").Attributes["lotrnpcsFaction"].AsString() == "shire" && T("test-hobbit").Attributes["lotrnpcsRank"].AsString() == "recruit", "hobbits are the Shire's recruits");
@@ -73,6 +75,8 @@ public static class Program {
         var world = Fake.Make<IServerWorldAccessor>(new() {
             ["get_EntityTypes"] = (m, a) => types, ["get_DefaultSpawnPosition"] = (m, a) => new EntityPos(Mid, 110, Mid),
             ["get_ElapsedMilliseconds"] = (m, a) => now,
+            // 0.0.117: no mount mods in the test world, so no riders spawn.
+            ["GetEntityType"] = (m, a) => types.FirstOrDefault(t => t.Code.Equals(a[0])),
             ["get_LoadedEntities"] = (m, a) => loaded, ["get_BlockAccessor"] = (m, a) => ba, ["get_ClassRegistry"] = (m, a) => classReg,
             ["SpawnEntity"] = (m, a) => { var e = (Entity)a[0]; e.EntityId = nextEntityId++; loaded[e.EntityId] = e; return null; } });
         var save = new Dictionary<string, byte[]>();

@@ -199,6 +199,9 @@ namespace LotrNpcs
         // Longest the damage timer waits for the NPC to turn to its target before the vanilla timing takes over (so
         // an attack on a target it can never face still ends).
         const long MaxTurnWaitMs = 1000;
+        // 0.0.117 riders: the reach the config gives on foot. From the saddle the rider sits higher by its seat's height
+        // and a mount's length further off, so the direct-contact check gets that much more (Riders.MountedReach).
+        readonly float footMinDist, footMinVerDist;
 
         public AiTaskChestMeleeAttack(EntityAgent entity, JsonObject taskConfig, JsonObject aiConfig) : base(entity, taskConfig, aiConfig)
         {
@@ -208,6 +211,15 @@ namespace LotrNpcs
             baseDamage = damage;
             baseHitMs = damagePlayerAtMs;
             rank = EntityBehaviorFactionMember.RankOf(entity);
+            footMinDist = minDist;
+            footMinVerDist = minVerDist;
+        }
+
+        void FitReachToMount()
+        {
+            (float horizontal, float vertical) = Riders.MountedReach(entity);
+            minDist = footMinDist + horizontal;
+            minVerDist = footMinVerDist + vertical;
         }
 
         EntityBehaviorHeldWeapon Weapon
@@ -228,6 +240,7 @@ namespace LotrNpcs
         // NPC it claimed (its duel partner) is in reach and not striking back at someone else, that one is hit instead.
         public override bool ShouldExecute()
         {
+            FitReachToMount();
             if (!base.ShouldExecute()) return false;
             if (factions == null || targetEntity == null) return true;
             if (targetEntity != attackedByEntity)

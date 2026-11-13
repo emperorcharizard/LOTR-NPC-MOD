@@ -63,6 +63,9 @@ namespace LotrNpcs
         // (Mordor for now). Rolled before WarriorShare.
         public double ArcherShare = 0.2;
         public double CaptainGroupChance = 0.12;
+        // 0.0.117 (owner, 2026-11-12: riders "could spawn naturally, but would be rarer than captains"; in groups, not
+        // leading them): the chance that one warrior of a group rides, in factions whose mount's mod is installed.
+        public double RiderChance = 0.06;
         // 0.0.56 (user, 2026-11-03: "For two factions that are in the same zone and hostile, or in an overlapping zone
         // area, increase the spawn chance of enemy groups next to each other"): when a group spawns on ground that a
         // zone also gives to a faction it is at war with, the chance that a group of that enemy spawns
@@ -102,6 +105,7 @@ namespace LotrNpcs
             "WarriorShare: the chance for each member after the first (always a recruit) to be a warrior instead of a recruit. The Shire has no warriors or captains, so its groups are all hobbit farmers.",
             "ArcherShare: the chance for each member after the first to be an archer, in factions that have archers (every faction but the Shire since 0.0.69). Archers are a unit of their own, without ranks; the rest of the group follows WarriorShare.",
             "RivalGroupChance, RivalDistanceMin and RivalDistanceMax: where zones give the same ground to two factions at war (one zone listing both, or overlapping zones), the chance that a group spawning there brings a group of the enemy faction RivalDistanceMin to RivalDistanceMax blocks away, so they fight. 0 turns it off. The rival group still respects MaxNearby, MinDistanceToPlayer and the zones.",
+            "RiderChance (0.06 by default, since 0.0.117): the chance that one warrior of a wild group comes mounted, in factions that have riders and whose mount's mod is installed (Feverstone Wilds for horses and dire wolves, Teapot's Giant Boar for dwarves; elves ride the game's own elk).",
             "CaptainGroupChance: the chance that a group is a captain with CaptainEscortMin to CaptainEscortMax recruits, warriors and archers. CaptainEscortMax scales with the faction's MaxFollowers like the group size (orcs up to 4, elves up to 2).",
             "MinDistanceToPlayer and MaxDistanceToPlayer: how many blocks from the player a group appears. It always appears inside a zone that lists its faction.",
             "MaxNearby and NearbyRange: no group spawns while MaxNearby zone NPCs (24 by default since 0.0.94; was 8) are within NearbyRange blocks of the player. NPCs count by their faction's share, as their groups are bigger or smaller: an orc counts 5/7, a goblin 5/8, an elf or dwarf 5/4.",
@@ -362,7 +366,7 @@ namespace LotrNpcs
                 bool captainNearby = nearby.Any(e => NpcTypeInfo.Of(e)?.Rank == "captain");
                 bool captainGroup = !captainNearby && typesByFactionRank.ContainsKey(faction + "/captain") && rand.NextDouble() < config.CaptainGroupChance;
                 // A faction without warriors (the Shire) sends recruits in their place.
-                List<string> ranks = GroupRanks(captainGroup, typesByFactionRank.ContainsKey(faction + "/archer"), faction).Select(r => typesByFactionRank.ContainsKey(faction + "/" + r) ? r : "recruit").ToList();
+                List<string> ranks = WithRider(faction, GroupRanks(captainGroup, typesByFactionRank.ContainsKey(faction + "/archer"), faction).Select(r => typesByFactionRank.ContainsKey(faction + "/" + r) ? r : "recruit").ToList());
                 SpawnGroup(faction, ranks, feet);
                 Vec3d middle = sapi.World.DefaultSpawnPosition.XYZ;
                 sapi.Logger.Notification("[lotrnpcs] Zone spawn: " + faction + " " + string.Join(", ", ranks) + " at "
@@ -406,7 +410,7 @@ namespace LotrNpcs
                 if (spot == null) continue;
                 string rival = rivals[rand.Next(rivals.Count)];
                 bool captainGroup = !captainAround && typesByFactionRank.ContainsKey(rival + "/captain") && rand.NextDouble() < config.CaptainGroupChance;
-                List<string> ranks = GroupRanks(captainGroup, typesByFactionRank.ContainsKey(rival + "/archer"), rival).Select(r => typesByFactionRank.ContainsKey(rival + "/" + r) ? r : "recruit").ToList();
+                List<string> ranks = WithRider(rival, GroupRanks(captainGroup, typesByFactionRank.ContainsKey(rival + "/archer"), rival).Select(r => typesByFactionRank.ContainsKey(rival + "/" + r) ? r : "recruit").ToList());
                 SpawnGroup(rival, ranks, spot);
                 Vec3d middle = sapi.World.DefaultSpawnPosition.XYZ;
                 sapi.Logger.Notification("[lotrnpcs] Zone spawn: " + rival + " " + string.Join(", ", ranks) + " at "
@@ -416,6 +420,19 @@ namespace LotrNpcs
         }
 
         List<string> GroupRanks(bool captainGroup, bool archers, string faction) => GroupRanks(config, rand, captainGroup, archers, GroupScale(faction));
+
+        // 0.0.117: one of the group's warriors rides, at RiderChance, when the faction has riders and their mount exists.
+        List<string> WithRider(string faction, List<string> ranks) =>
+            typesByFactionRank.TryGetValue(faction + "/rider", out EntityProperties riderType) && Riders.CanHaveMount(sapi?.World, riderType)
+                ? WithRider(ranks, rand, config.RiderChance) : ranks;
+
+        /// <summary>The ranks with their first warrior turned rider, at this chance. Public for tests.</summary>
+        public static List<string> WithRider(List<string> ranks, Random rand, double chance)
+        {
+            int warrior = ranks.IndexOf("warrior");
+            if (warrior >= 0 && rand.NextDouble() < GameMath.Clamp(chance, 0, 1)) ranks[warrior] = "rider";
+            return ranks;
+        }
 
         // 0.0.90 (owner chose "A": wild groups scale with the follow limit): a faction's group size over the baseline's
         // (its MaxFollowers over the file's baseline; orcs 6/5 since 0.0.107, elves 4/5), and what one of its NPCs counts for in

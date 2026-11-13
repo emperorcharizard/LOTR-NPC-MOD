@@ -1002,9 +1002,12 @@ RANK_STATS = {"recruit": (22, 0, (3, 8)), "warrior": (34, 0, (4, 9)), "captain":
               "archer": (34, 0, (3, 8)),
               # 0.0.113 promotion-only warrior branches (Promotion.Branches): guard health x1.25 and damage x0.8, shock
               # the other way round. The faction config's tables replace these (FactionTiers.WithBranches).
-              "guard": (43, 0, (3.2, 9)), "shock": (27, 0, (5, 9))}
-# Ranks that wear, carry and offer what another rank does (0.0.113: the warrior branches).
-BASE_RANK = {"guard": "warrior", "shock": "warrior"}
+              "guard": (43, 0, (3.2, 9)), "shock": (27, 0, (5, 9)),
+              # 0.0.117 riders (promoted from the warrior line next to captain): a warrior's numbers; the mount is the gain.
+              "rider": (34, 0, (4, 9))}
+# Ranks that wear, carry and offer what another rank does (0.0.113: the warrior branches; 0.0.117 riders, for gear only:
+# in the code a rider is its own rank, Promotion.StatRank).
+BASE_RANK = {"guard": "warrior", "shock": "warrior", "rider": "warrior"}
 BRANCH_NAMES = {"guard": "guard", "shock": "shock trooper"}
 RANKLESS_STATS = (19, 0, (3, 1))
 CAPTAIN_GEAR = ["game:armor-head-antique-blackguard-damaged", "game:armor-body-antique-blackguard-damaged",
@@ -1439,6 +1442,21 @@ TEST_NPCS = [
     *ranks("elf", "Elf", "lotrnpcs:elf", SKINS + "elf/elfskin1"),
     *ranks("tormentedelf", "Tormented elf", "lotrnpcs:tormentedelf", SKINS + "elf/elfskin11"),
 ]
+
+# 0.0.117 mounted riders (docs/notes/feverstone-mounts.md; owner, 2026-11-12: Rohan, Gondor, Dale and Arnor on horses,
+# Isengard, Mordor, Gundabad and Angmar orcs on dire wolves, elves on elk, dwarves on Teapot's giant boars; the mount
+# spawns as part of the unit, and the mod works without the mounts' mods). Each rider type lists the mounts it may get;
+# Riders.cs uses the first ones that exist in the world, and offers no rider rank when none do.
+HORSES = [f"feverstonewilds:horse-tamed-{g}-{t}" for t in ("quarter", "shire") for g in ("male", "female")]
+DIREWOLVES = [f"feverstonewilds:tame-direwolf-{g}" for g in ("male", "female")]
+ELK = [f"game:tameddeer-elk-{g}-adult" for g in ("male", "female")]
+GIANT_BOARS = [f"teapotsgiantboar:tame-giantboar-giant-{t}-male" for t in ("01", "02", "03", "04", "05")]     + [f"teapotsgiantboar:tame-giantboar-giant-{t}-female" for t in ("01", "02")]
+MOUNTS_OF = {"gondor": HORSES, "rohan": HORSES, "dale": HORSES, "arnor": HORSES,
+             "uruk": DIREWOLVES, "mordororc": DIREWOLVES, "gundabadorc": DIREWOLVES, "angmarorc": DIREWOLVES,
+             "elf": ELK, "dwarf": GIANT_BOARS}
+TEST_NPCS += [(code.removesuffix("-warrior") + "-rider", name.removesuffix(" warrior") + " rider", model, skin, gear)
+              for code, name, model, skin, gear in list(TEST_NPCS)
+              if code.endswith("-warrior") and code.removeprefix("test-").removesuffix("-warrior") in MOUNTS_OF]
 # Natural spawning (user, 2026-11-02): recruits, warriors and rare captains spawn on the surface inside admin
 # zones (/recruits zone) that list their faction, one group every 3 to 5 minutes near a player. SpawnZones.cs does all
 # of it, finding the NPC types by these lotrnpcsFaction and lotrnpcsRank attributes; there are no vanilla spawn
@@ -1559,6 +1577,8 @@ for code, name, model, skin_texture, gear in TEST_NPCS:
         attributes["inCreativeInventory"] = False
     if rank in RANK_STATS:
         attributes["lotrnpcsRank"] = rank
+    if rank == "rider":
+        attributes["lotrnpcsMounts"] = MOUNTS_OF[faction]
     if faction == "hobbit":
         attributes["lotrnpcsNames"], attributes["lotrnpcsSurnames"] = HOBBIT_NAMES, HOBBIT_SURNAMES
     elif faction in NAMES_OF:
@@ -1587,7 +1607,7 @@ for code, name, model, skin_texture, gear in TEST_NPCS:
     write(f"entities/{code}.json", entity(
         code, name, attributes,
         [preset] + gear_textures + skin[1:] + [{"code": "PlayerModelLib:EntityTextureSourceBehavior"}] + client_gear + weapons,
-        skin + server_gear + weapons,
+        skin + server_gear + weapons + ([{"code": "lotrnpcs:rider"}] if rank == "rider" else []),
         health, armor_tier, melee, archer=rank == "archer",
     ))
 
@@ -1597,7 +1617,7 @@ write_weapons()
 CREATIVE_FACTIONS = ["shire", "gondor", "rohan", "arnor", "dale", "dwarves", "elves",
                      "mordor", "angmar", "mistymountains", "gundabad", "isengard", "haradrim", "easterlings", "dunlendings",
                      "blacknumenoreans", "wickeddwarves", "tormentedelves"]
-CREATIVE_RANKS = ["recruit", "warrior", "guard", "shock", "captain", "archer"]
+CREATIVE_RANKS = ["recruit", "warrior", "guard", "shock", "captain", "rider", "archer"]
 def _creative_key(code):
     race, _, rank = code.removeprefix("test-").partition("-")
     return CREATIVE_FACTIONS.index(FACTION_OF[race]), CREATIVE_RANKS.index(RANK_OF.get(code, rank))
@@ -1734,6 +1754,8 @@ TALK = {
     # 0.0.113 promotion-only branches. title-<faction>-guard and title-<faction>-shock name a faction's own.
     "title-guard": "Guard",
     "title-shock": "Shock trooper",
+    # 0.0.117: mounted riders.
+    "title-rider": "Rider",
     "title-shire-recruit": "Farmer",
     "recruit-yours": "Your {3}: {0} in {2} formation, {1} stance",
     "recruit-yours-guard": "Your {1}: guarding their post, {0} stance",
@@ -2060,7 +2082,7 @@ with open(os.path.join(out, "modinfo.json"), "w") as f:
         "type": "code",
         "modid": "lotrnpcs",
         "name": "LOTR NPCs",
-        "version": "0.0.116",
+        "version": "0.0.117",
         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Race models from "
                        "LOTR Races and Classes by Dango Dango Dango, Shakgriig and Buggoi, used with their permission.",

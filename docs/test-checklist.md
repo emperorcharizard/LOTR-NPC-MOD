@@ -1,8 +1,8 @@
-# LOTR NPCs in-game test pass (0.0.116)
+# LOTR NPCs in-game test pass (0.0.117)
 
 Updated 2026-11-12 for 0.0.115.
 
-Everything built since 0.0.44 that nobody has seen in game yet, in one play session. Install **lotrnpcs 0.0.116** (only one lotrnpcs zip in Mods, full game restart) and **gundabad-bone-armor 0.3.0**. Spawn fresh NPCs from the LOTR NPCs creative tab: older ones keep their old weapon, hair and looks. For anything wrong, note the step number and send a screenshot plus client-main.log and server-main.log.
+Everything built since 0.0.44 that nobody has seen in game yet, in one play session. Install **lotrnpcs 0.0.117** (only one lotrnpcs zip in Mods, full game restart) and **gundabad-bone-armor 0.3.0**. Spawn fresh NPCs from the LOTR NPCs creative tab: older ones keep their old weapon, hair and looks. For anything wrong, note the step number and send a screenshot plus client-main.log and server-main.log.
 
 ## 1. Weapons and animations (0.0.65 to 0.0.68)
 
@@ -392,4 +392,15 @@ Install `lotrnpcs_0.0.109-test.zip` (instead of any older lotrnpcs zip); restart
 - [x] 116.1 FPS: with `DebugCommands` on, `.npcanimlod off` then `/recruits bench 200`, then `.npcanimlod 10` and the bench again. The second run has clearly higher FPS (owner's PC: 64.7 against 103.2); the server line is the same.
 - [ ] 116.2 Looks: at the default (10 blocks), watch a battle from close and from 40 to 80 blocks. Up close nothing changes; far NPCs may move a little less smoothly but never freeze, slide or snap. Say if 10 should be lower (more FPS) or higher.
 - [x] 116.3 ModConfig/lotrnpcs-client.json appears after the first start with FarAnimationLod true and AnimationFullRateWithin 10; `.npcanimlod off` writes false, and the setting holds after a restart.
+
+## 117. Mounted riders (0.0.117)
+
+- [x] 117.1 With Feverstone Wilds installed, a Rohan rider (creative tab, next to the captain) spawns already sitting on a saddled horse.
+- [x] 117.2 Promotion: a hired warrior with 40 XP shows a Rider card beside Captain (the captain's price). Promoted, it comes on its own horse; on Follow its horse carries it after you and stops beside you.
+- [ ] 117.3 Fights: a rider fights an enemy from the saddle and lands hits. Watch that it doesn't stand off out of reach.
+- [ ] 117.4 Kill a rider: its mount gallops away and is gone after a few seconds. Kill a rider's mount: the rider fights on foot.
+- [ ] 117.5 Leave and rejoin the world: riders are still on their mounts.
+- [ ] 117.6 Orc riders on dire wolves, elves on elk, dwarves on giant boars (needs Teapot's Giant Boar), each saddled and moving.
+- [ ] 117.7 In a spawn zone, now and then a wild group has one rider.
+- [ ] 117.8 Without Feverstone Wilds, no Rider card is offered and no riders spawn wild.
 

@@ -453,10 +453,10 @@ namespace LotrNpcs
         /// <summary>The health of this faction's NPCs of this rank (0.0.91), or null: the type's own (a faction the
         /// config doesn't know, a rank without an entry, a rankless NPC).</summary>
         public float? HealthFor(string faction, string rank) =>
-            rank != null && Def(faction)?.Health is Dictionary<string, float> table && table.TryGetValue(rank, out float v) ? v : (float?)null;
+            rank != null && Def(faction)?.Health is Dictionary<string, float> table && (table.TryGetValue(rank, out float v) || table.TryGetValue(Promotion.StatRank(rank), out v)) ? v : (float?)null;
         /// <summary>The damage of one hit (before the spread) of this faction's NPCs of this rank, or null: the type's.</summary>
         public float? DamageFor(string faction, string rank) =>
-            rank != null && Def(faction)?.Damage is Dictionary<string, float> table && table.TryGetValue(rank, out float v) ? v : (float?)null;
+            rank != null && Def(faction)?.Damage is Dictionary<string, float> table && (table.TryGetValue(rank, out float v) || table.TryGetValue(Promotion.StatRank(rank), out v)) ? v : (float?)null;
         /// <summary>The spread on every NPC hit (0.0.91), 0 to 0.9.</summary>
         public double Spread => double.IsNaN(DamageSpread) ? DefaultDamageSpread : GameMath.Clamp(DamageSpread, 0, 0.9);
         /// <summary>How much bigger this faction's wild groups are than the baseline's: its follow limit over the
@@ -492,7 +492,7 @@ namespace LotrNpcs
         {
             var table = hired ? HiredBodyLoot : WildBodyLoot;
             var rolled = new List<(string, int)>();
-            if (table == null || (!table.TryGetValue(rank ?? "recruit", out var list) && !table.TryGetValue(Promotion.BaseRank(rank) ?? "recruit", out list) && !table.TryGetValue("recruit", out list)) || list == null) return rolled;
+            if (table == null || (!table.TryGetValue(rank ?? "recruit", out var list) && !table.TryGetValue(Promotion.StatRank(rank) ?? "recruit", out list) && !table.TryGetValue("recruit", out list)) || list == null) return rolled;
             foreach (BodyLoot loot in list)
             {
                 if (string.IsNullOrEmpty(loot?.Code) || loot.Max <= 0) continue;

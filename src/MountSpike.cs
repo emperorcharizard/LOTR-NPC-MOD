@@ -39,33 +39,7 @@ namespace LotrNpcs
 
         public override bool ShouldLoad(EnumAppSide forSide) => true;
 
-        // The game's riding seat lets only players on (EntityRideableSeat.CanMount returns false for any other
-        // EntityAgent, then checks taming generation and the player's ownership). This mod's NPCs pass; players keep
-        // every vanilla check. The seat class is in VSSurvivalMod, which isn't referenced, so it's found by name.
-        static Harmony harmony;
-        const string HarmonyId = "lotrnpcs.mountspike";
-
-        public override void Start(ICoreAPI api)
-        {
-            if (harmony != null) return;
-            MethodInfo canMount = AccessTools.TypeByName("Vintagestory.GameContent.EntityRideableSeat")?.GetMethod("CanMount", new[] { typeof(EntityAgent) });
-            if (canMount == null) { api.Logger.Warning("[lotrnpcs] EntityRideableSeat.CanMount not found; NPCs can't ride."); return; }
-            harmony = new Harmony(HarmonyId);
-            harmony.Patch(canMount, new HarmonyMethod(typeof(MountSpikeSystem).GetMethod(nameof(NpcMayMount), BindingFlags.Static | BindingFlags.NonPublic)));
-        }
-
-        public override void Dispose()
-        {
-            harmony?.UnpatchAll(HarmonyId);
-            harmony = null;
-        }
-
-        static bool NpcMayMount(EntityAgent __0, ref bool __result)
-        {
-            if (__0?.Code?.Domain != "lotrnpcs") return true;
-            __result = true;
-            return false;
-        }
+        // Riders.cs lets this mod's NPCs onto the seats (RiderSystem patches EntityRideableSeat.CanMount).
 
         public override void StartServerSide(ICoreServerAPI api)
         {

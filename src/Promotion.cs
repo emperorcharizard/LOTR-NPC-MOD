@@ -46,7 +46,14 @@ namespace LotrNpcs
         public static string BaseRank(string rank) => Array.IndexOf(Branches, rank) >= 0 ? "warrior" : rank;
 
         /// <summary>The ranks a rank can be promoted to, in menu order.</summary>
-        public static string[] Targets(string rank) => rank == "recruit" ? new[] { "warrior", "guard", "shock", "archer" } : BaseRank(rank) == "warrior" ? new[] { "captain" } : Array.Empty<string>();
+        public static string[] Targets(string rank) => rank == "recruit" ? new[] { "warrior", "guard", "shock", "archer" } : BaseRank(rank) == "warrior" ? new[] { "captain", "rider" } : Array.Empty<string>();
+
+        /// <summary>0.0.117: the rank whose health, damage and body loot a rank takes when the config lists none of its
+        /// own (riders fight as warriors; the mount is what they gain), else BaseRank.</summary>
+        public static string StatRank(string rank) => rank == "rider" ? "warrior" : BaseRank(rank);
+        /// <summary>0.0.117: the rank whose hire and promotion price a rank takes when the config lists none (a rider
+        /// costs what a captain does).</summary>
+        public static string PriceRank(string rank) => rank == "rider" ? "captain" : BaseRank(rank);
 
         public static int Xp(Entity e) => e?.WatchedAttributes?.GetInt(XpAttr) ?? 0;
 
@@ -203,9 +210,12 @@ namespace LotrNpcs
             if (need <= 0 || Promotion.Xp(npc) < need) return offers;
             foreach (string target in Promotion.Targets(rank))
             {
-                if (npc.World.GetEntityType(Promotion.CodeAtRank(npc.Code, target)) == null) continue;
+                EntityProperties type = npc.World.GetEntityType(Promotion.CodeAtRank(npc.Code, target));
+                if (type == null) continue;
+                // 0.0.117: no rider rank without its mount's mod (Feverstone Wilds, Teapot's giant boars).
+                if (target == "rider" && !Riders.CanHaveMount(npc.World, type)) continue;
                 Dictionary<string, int> prices = def?.PromotePrices ?? FactionTiers.Men.Promote;
-                offers[target] = prices.TryGetValue(target, out int price) ? Math.Max(0, price) : 0;
+                offers[target] = prices.TryGetValue(target, out int price) || prices.TryGetValue(Promotion.PriceRank(target), out price) ? Math.Max(0, price) : 0;
             }
             return offers;
         }
