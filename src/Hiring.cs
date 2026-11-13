@@ -1970,7 +1970,11 @@ namespace LotrNpcs
         };
 
         public override WorldInteraction[] GetInteractionHelp(IClientWorldAccessor world, EntitySelection es, IClientPlayer player, ref EnumHandling handled) =>
-            player?.PlayerUID != null && Recruit.OwnerUidOf(entity) != null && Recruit.LeaderUidOf(entity) == player.PlayerUID ? OwnerHelp : null;
+            ShowsOwnerHelp(entity, player?.PlayerUID) ? OwnerHelp : null;
+
+        // A dead recruit's body offers only the harvest, not talk and orders (seen in game, 0.0.117 checklist 112.3).
+        public static bool ShowsOwnerHelp(Entity e, string playerUid) =>
+            playerUid != null && e.Alive && Recruit.OwnerUidOf(e) != null && Recruit.LeaderUidOf(e) == playerUid;
 
         public override string PropertyName() => "lotrnpcs:hireable";
     }

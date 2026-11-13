@@ -2572,6 +2572,14 @@ public static class Program {
                 "0.0.113: recruit summaries are saved with the world, and the roster and promotion screens' texts are in the lang file");
         }
 
+        {
+            var body = Mob("game:drifter-normal");
+            body.WatchedAttributes.SetString(Recruit.OwnerUidAttr, "uidB");
+            bool aliveHelp = EntityBehaviorHireable.ShowsOwnerHelp(body, "uidB") && !EntityBehaviorHireable.ShowsOwnerHelp(body, "uidX");
+            body.Alive = false;
+            Check(aliveHelp && !EntityBehaviorHireable.ShowsOwnerHelp(body, "uidB"), "0.0.117: talk and orders hints show on your living recruit only, not on its body");
+        }
+
         Console.WriteLine(fails == 0 ? "ALL PASSED" : fails + " FAILED");
         return fails;
     }
