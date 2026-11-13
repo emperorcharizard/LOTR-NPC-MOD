@@ -16,7 +16,7 @@ namespace LotrNpcs
         {
             "LOTR NPCs, settings for this computer only (not the server).",
             "FarAnimationLod (true by default; the chat command .npcanimlod on / off / <blocks> changes it in game): NPCs of this mod farther than AnimationFullRateWithin blocks from you animate every 2nd frame, past twice that every 3rd and past three times that every 4th, so big battles cost less frame time. Up close nothing changes. false animates every NPC every frame, as the game does.",
-            "AnimationFullRateWithin (20 by default, 4 to 256): how many blocks around you NPCs always animate every frame.",
+            "AnimationFullRateWithin (10 by default since 0.0.116 testing, owner 2026-11-12; 4 to 256): how many blocks around you NPCs always animate every frame.",
         };
         public bool FarAnimationLod = true;
         public double AnimationFullRateWithin = AnimationLod.DefaultFullRateWithin;
@@ -32,7 +32,7 @@ namespace LotrNpcs
     /// </summary>
     public static class AnimationLod
     {
-        public const double DefaultFullRateWithin = 20, MinFullRateWithin = 4, MaxFullRateWithin = 256;
+        public const double DefaultFullRateWithin = 10, MinFullRateWithin = 4, MaxFullRateWithin = 256;
         const string HarmonyId = "lotrnpcs.animationlod";
 
         sealed class State { public int Count; public float Skipped; }

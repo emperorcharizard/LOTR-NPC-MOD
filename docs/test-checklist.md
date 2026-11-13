@@ -390,6 +390,6 @@ Install `lotrnpcs_0.0.109-test.zip` (instead of any older lotrnpcs zip); restart
 ## 116. Far NPCs animate less often (0.0.116)
 
 - [x] 116.1 FPS: with `DebugCommands` on, `.npcanimlod off` then `/recruits bench 200`, then `.npcanimlod 10` and the bench again. The second run has clearly higher FPS (owner's PC: 64.7 against 103.2); the server line is the same.
-- [ ] 116.2 Looks: at the default (20 blocks), watch a battle from close and from 40 to 80 blocks. Up close nothing changes; far NPCs may move a little less smoothly but never freeze, slide or snap. Say if 20 should be lower (more FPS) or higher.
-- [ ] 116.3 ModConfig/lotrnpcs-client.json appears after the first start with FarAnimationLod true and AnimationFullRateWithin 20; `.npcanimlod off` writes false, and the setting holds after a restart.
+- [ ] 116.2 Looks: at the default (10 blocks), watch a battle from close and from 40 to 80 blocks. Up close nothing changes; far NPCs may move a little less smoothly but never freeze, slide or snap. Say if 10 should be lower (more FPS) or higher.
+- [ ] 116.3 ModConfig/lotrnpcs-client.json appears after the first start with FarAnimationLod true and AnimationFullRateWithin 10; `.npcanimlod off` writes false, and the setting holds after a restart.
 
