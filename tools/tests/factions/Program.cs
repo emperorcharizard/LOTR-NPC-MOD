@@ -2044,6 +2044,8 @@ public static class Program {
                 Check(pk[0] == 0 && pk[1] == 1 && pk[2] == 2 && pk[3] == 0 && pk[4] == 2
                     && two[0] == 0 && two[1] == 0 && two[2] == -1 && spread[0] != spread[1],
                     "0.0.120: each front orc takes the man across from it and the end extras the nearest end men; no more than 2 on one man; the front spreads over free enemies first");
+                int[] reachPk = LineMath.Pair(new double[] { 0 }, new double[] { 0 }, 1, new double[] { 0 }, new double[] { 10 }, 2, 6);
+                Check(reachPk[0] == -1, "0.0.121: a member is never paired with an enemy farther than PairReach from where it stands");
             }
 
             var v25 = Newtonsoft.Json.Linq.JObject.FromObject(FactionConfig.FromFile(null, out _)); v25["Version"] = 25; v25["BattleLines"] = false; v25.Remove("RosterPerCaptain");

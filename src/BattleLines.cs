@@ -52,7 +52,7 @@ namespace LotrNpcs
         /// still free; each later round lets one more member onto an enemy, up to perEnemy. Returns the enemy index per
         /// member, -1 for none (more members than perEnemy x enemies).
         /// </summary>
-        public static int[] Pair(IReadOnlyList<double> sx, IReadOnlyList<double> sz, int front, IReadOnlyList<double> ex, IReadOnlyList<double> ez, int perEnemy)
+        public static int[] Pair(IReadOnlyList<double> sx, IReadOnlyList<double> sz, int front, IReadOnlyList<double> ex, IReadOnlyList<double> ez, int perEnemy, double reach = double.MaxValue)
         {
             int n = sx.Count, m = ex.Count;
             int[] pick = new int[n], count = new int[m];
@@ -69,6 +69,7 @@ namespace LotrNpcs
                         {
                             if (count[j] >= cap) continue;
                             double d = Dist(sx[i], sz[i], ex[j], ez[j]);
+                            if (d > reach) continue;
                             if (d < bestD) { bestD = d; best = j; }
                         }
                         if (best < 0) continue;
@@ -531,6 +532,8 @@ namespace LotrNpcs
         // another is PairSlack blocks nearer its place, and changes at most once every RepairMs.
         public const int LinePerEnemy = 2;
         public const double PairSlack = 2.5;
+        /// <summary>0.0.121: a member is only ever paired with an enemy this close to it.</summary>
+        public const double PairReach = 6;
         public const long RepairMs = 1500;
         readonly Dictionary<long, long> lastPair = new Dictionary<long, long>();
         readonly List<Entity> pairEnemies = new List<Entity>();
@@ -550,14 +553,15 @@ namespace LotrNpcs
             slotX.Clear(); slotZ.Clear(); enemyX.Clear(); enemyZ.Clear(); chasing.Clear();
             for (int i = 0; i < n; i++)
             {
-                LineMath.SlotOffset(i, n, line.Front, Gap, out double right, out double back, line.Reserve);
-                LineMath.SlotAt(line.Px, line.Pz, line.Dx, line.Dz, right, back, out double sx, out double sz);
-                slotX.Add(sx); slotZ.Add(sz);
+                // 0.0.121: by where the member stands, not its slot. Slots stay where the lines met, so once the fight
+                // drifted 0.0.120 sent fronts to enemies 10 to 25 blocks off (battle log 171020: line-met-front idle).
+                Entity m = world.GetEntityById(line.Members[i]);
+                slotX.Add(m?.Pos.X ?? line.Px); slotZ.Add(m?.Pos.Z ?? line.Pz);
                 long t = TargetOf(line.Members[i]);
                 chasing[t] = chasing.TryGetValue(t, out int c) ? c + 1 : 1;
             }
             foreach (Entity e in pairEnemies) { enemyX.Add(e.Pos.X); enemyZ.Add(e.Pos.Z); }
-            int[] pick = LineMath.Pair(slotX, slotZ, line.Front, enemyX, enemyZ, LinePerEnemy);
+            int[] pick = LineMath.Pair(slotX, slotZ, line.Front, enemyX, enemyZ, LinePerEnemy, PairReach);
             for (int i = 0; i < n; i++)
             {
                 if (pick[i] < 0) continue;
