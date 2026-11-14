@@ -2007,6 +2007,18 @@ namespace LotrNpcs
 
         public override void OnEntityReceiveDamage(DamageSource damageSource, ref float damage)
         {
+            // 0.0.137: a hit in the back (from the projectile, attacker or source spot behind this NPC) does more.
+            if (damage > 0 && damageSource != null && damageSource.Type != EnumDamageType.Heal && entity.Api.Side == EnumAppSide.Server
+                && (entity as EntityAgent)?.MountedOn?.Entity != damageSource.SourceEntity)
+            {
+                FactionSystem fs = entity.Api.ModLoader.GetModSystem<FactionSystem>();
+                Vec3d from = damageSource.SourceEntity?.Pos.XYZ ?? damageSource.SourcePos ?? damageSource.GetCauseEntity()?.Pos.XYZ;
+                if (fs?.Config != null && from != null && BattleSpacing.FromBehind(entity.Pos.Yaw, from.X - entity.Pos.X, from.Z - entity.Pos.Z, fs.Config.BackArc))
+                {
+                    damage *= (float)fs.Config.BackScale;
+                    fs.Log.BackHit(entity);
+                }
+            }
             // Healing is never friendly fire, and nobody is attacked for it.
             if (hiring == null || damageSource?.Type == EnumDamageType.Heal || !(Recruit.OwnerUidOf(entity) is string owner)) return;
             Entity attacker = damageSource?.GetCauseEntity();

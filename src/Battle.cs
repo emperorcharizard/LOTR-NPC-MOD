@@ -314,6 +314,21 @@ namespace LotrNpcs
         /// farther, growing to 1 as they overlap. Two NPCs in exactly the same spot split in a direction picked from
         /// the entity id, so the two go opposite ways. True if the neighbor was too close.
         /// </summary>
+        /// <summary>0.0.137 (owner, 2026-11-14: "npcs to receive 1.5x damage in the back"): is a hit from (dx, dz) (from the
+        /// NPC to where the hit came from) inside the rear cone of arcDegrees, i.e. more than 180 - arc/2 degrees off the
+        /// facing (yaw, the game's convention: forward is (sin yaw, cos yaw))? A hit from the NPC's own spot isn't.</summary>
+        public static bool FromBehind(float yaw, double dx, double dz, double arcDegrees)
+        {
+            double len = Math.Sqrt(dx * dx + dz * dz);
+            if (len < 1e-6 || arcDegrees <= 0) return false;
+            double cos = GameMath.Clamp((Math.Sin(yaw) * dx + Math.Cos(yaw) * dz) / len, -1, 1);
+            return Math.Acos(cos) * 180 / Math.PI > 180 - Math.Min(arcDegrees, 360) / 2;
+        }
+
+        /// <summary>0.0.137: walking backwards: moving (mx, mz) more than BackStepDegrees off the facing.</summary>
+        public const double BackStepDegrees = 100, BackWalkSpeed = 0.02, FaceScan = 6;
+        public static bool Backing(float yaw, double mx, double mz) => FromBehind(yaw, mx, mz, 2 * (180 - BackStepDegrees));
+
         /// <summary>0.0.130 (owner, 2026-11-14: "the mobs dont intersect each other, like they have a solid surface"):
         /// how close two NPCs' centers may come (blocks, horizontally). The game has no creature-to-creature collision,
         /// only soft pushes the AI walks through.</summary>

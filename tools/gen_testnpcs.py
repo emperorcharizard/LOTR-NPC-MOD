@@ -38,6 +38,8 @@ ANIMS = [
     {"code": "jump", "animation": "newjump", "blendMode": "Average",
      "triggeredBy": {"onControls": ["Idle", "Jump"], "matchExact": True}},
     {"code": "hurt", "animation": "hurt", "blendMode": "Average"},
+    # 0.0.137: stepping back while facing an enemy (Factions.cs Face), weighted over the controls' walk.
+    {"code": "lotrnpcs-walkback", "animation": "walkback", "blendMode": "Average", "weight": 10, "animationSpeed": 1.1},
     {"code": "hit", "animation": "hit", "blendMode": "Add",
      "elementWeight": {"UpperArmR": 4, "LowerArmR": 4, "UpperArmL": 4, "LowerArmL": 4},
      "elementBlendMode": {"UpperArmR": "AddAverage", "LowerArmR": "AddAverage", "UpperArmL": "AddAverage", "LowerArmL": "AddAverage"}},
@@ -968,12 +970,13 @@ def entity(code, name, extra_attributes, skin_client, skin_server, health=25, ar
                 # Talk menu, hiring and recruit upkeep (Hiring.cs). Before health, so it can cancel friendly fire.
                 {"code": "lotrnpcs:hireable"},
                 {"code": "health", "currenthealth": health, "maxhealth": health},
-                # Fights back with its allies when hurt (Factions.cs).
-                {"code": "lotrnpcs:factionmember"},
                 {"code": "taskai", "aiCreatureType": "Humanoid", "aitasks": ai_tasks},
                 # 0.0.88 (owner: NPCs "will fling themselves off the edge" of deep pits): right after the AI, so it can
                 # stop a step the AI just set (EdgeGuard.cs).
                 {"code": "lotrnpcs:edgeguard"},
+                # Fights back with its allies when hurt (Factions.cs). 0.0.137: after the AI, so its facing (Face) wins
+                # over the path follower's turn toward where it walks.
+                {"code": "lotrnpcs:factionmember"},
                 # 0.0.112 (owner, review Q10): a drifter-style body. The drops list stays empty: lotrnpcs:bodyloot fills it
                 # from the config (WildBodyLoot, HiredBodyLoot), so admins can change it without new assets.
                 {"code": "harvestable", "duration": 2, "fixedweight": True, "drops": []},
@@ -2092,7 +2095,7 @@ with open(os.path.join(out, "modinfo.json"), "w") as f:
         "type": "code",
         "modid": "lotrnpcs",
         "name": "LOTR NPCs",
-        "version": "0.0.136",
+        "version": "0.0.137",
         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Race models from "
                        "LOTR Races and Classes by Dango Dango Dango, Shakgriig and Buggoi, used with their permission.",

@@ -366,6 +366,12 @@ namespace LotrNpcs
         // damage (melee, arrows, charge hits after their x2), so NPC fights last about twice as long; players take and
         // deal what they did. A file without it gets 0.5.
         public const float DefaultNpcVsNpcDamageMultiplier = 0.5f;
+        // 0.0.137 (owner: "npcs to receive 1.5x damage in the back"): hits on this mod's NPCs from their rear cone
+        // (BackArcDegrees wide, behind them) do BackHitMultiplier times the damage, on top of NpcVsNpcDamageMultiplier.
+        public const double DefaultBackHitMultiplier = 1.5, DefaultBackArcDegrees = 120;
+        public double BackHitMultiplier = DefaultBackHitMultiplier, BackArcDegrees = DefaultBackArcDegrees;
+        public double BackScale => double.IsNaN(BackHitMultiplier) ? DefaultBackHitMultiplier : GameMath.Clamp(BackHitMultiplier, 0, 10);
+        public double BackArc => double.IsNaN(BackArcDegrees) ? DefaultBackArcDegrees : GameMath.Clamp(BackArcDegrees, 0, 360);
         // 0.0.136: how long followers told to Retreat start no fights (1 to 60 s).
         public const double DefaultRetreatSeconds = 10;
         public double RetreatSeconds = DefaultRetreatSeconds;
@@ -571,6 +577,7 @@ namespace LotrNpcs
             "Hiring: right-click an NPC to talk. Members of its faction, and members of an allied faction whose alliance has ShareFriends, can hire it, paying from their hotbar and backpack.",
             "MaxFollowers and MaxRecruits (in each faction): how many of the faction's recruits can follow a player at once, and how many a player can have. Each recruit uses a share: 1/MaxFollowers of the following and 1/MaxRecruits of the roster, and a player's shares must add up to no more than 1, so factions can be mixed (3 Gondor men and 2 Mordor orcs use 3/5 + 2/7 of the following). Past the following, a new recruit guards where it was hired and the rest hold or guard. A player over the limits when they join (after an admin lowers them) loses the most recently hired recruits until they fit. The MaxFollowers and MaxRecruits at the top of the file are the baseline (3 and 16 since 0.0.135, every faction alike) and count for a faction without its own.",
             "Health and Damage (in each faction, by rank: recruit, warrior, captain, archer, and since 0.0.113 the promotion-only guard and shock, which a file without them gets as the warrior's health x1.25 and damage x0.8 (guard) or health x0.8 and damage x1.25 (shock)): the health and the damage of one hit of the faction's NPCs of that rank, in place of their unit's own (health is a whole number; an archer's damage is its arrow's, and its shove). Since 0.0.135 every faction ships the same numbers (health 22, 34, 48 and 35, damage 3.15, 3.95, 7 and 3.05 for recruit, warrior, captain and archer), with the same 3 followers, roster of 16 and prices, so fights between factions are decided by numbers and tactics. A rider without its own entry has its warrior's health and damage times 2.24. Damage tiers don't change. Wild groups grow with MaxFollowers over the baseline (1 for every faction now; see the spawning file).",
+            "BackHitMultiplier (1.5 by default, since 0.0.137; 0 to 10) and BackArcDegrees (120; 0 to 360): a hit on one of this mod's NPCs that comes from behind it, within a cone BackArcDegrees wide centred on its back, does BackHitMultiplier times the damage (on top of NpcVsNpcDamageMultiplier). Fighting NPCs keep turned toward the nearest enemy within 6 blocks and step backwards (at a walk) instead of turning their back.",
             "RetreatSeconds (10 by default, since 0.0.136; 1 to 60): after the Retreat order (combat page of the orders menu) your followers drop their fights, run back to you and start no fights for this many seconds; then they follow on as before. The Charge order sends them at the enemy you look at (within 48 blocks), out of formation, fighting like Aggressive, until no enemy is within 16 blocks of them for 5 seconds or 30 seconds have passed.",
             "NpcVsNpcDamageMultiplier (0.5 by default, since 0.0.135; 0 to 10): every hit this mod's NPCs land on anything that isn't a player is this times its damage (melee, arrows, and charge hits after their x2), so fights between NPCs last longer. Hits on players, and players' hits, don't change.",
             "DamageSpread: every NPC hit, melee and arrows, deals its damage times a random 1 - DamageSpread to 1 + DamageSpread (0.2 = 80% to 120%), so fights aren't decided by whole numbers of hits. 0 turns it off; at most 0.9.",
@@ -1672,7 +1679,7 @@ namespace LotrNpcs
         long fightingUntil;
         float sinceScan;
         double pushX, pushZ, scanSpacing, enemySpacing, brake, headX, headZ;
-        bool lookAhead;
+        bool lookAhead, scanFighting;
         // 0.0.130: neighbours within BattleSpacing.ContactScan at the last scan, kept out of this NPC's body every tick.
         readonly List<Entity> contacts = new List<Entity>(8);
         // 0.0.82: the turn toward the NPC it fights, at most FaceRadPerSec, while standing within FaceRange of it.
@@ -1832,31 +1839,71 @@ namespace LotrNpcs
             }
         }
 
-        // 0.0.82: a fighting NPC that isn't walking turns toward the NPC it fights (or, in a battle line, the enemy it
-        // last chased), so it faces its enemy between swings instead of its last path point.
+        // 0.0.82: a fighting NPC turns toward the NPC it fights. 0.0.137 (owner: NPCs should "keep their front toward
+        // the nearest enemy, and allow them to walk backwards"): its claimed target, else the nearest enemy from its scan
+        // or whoever last hurt it, within BattleSpacing.FaceScan, also while it walks (this behavior runs after the AI's
+        // path follower, which turns it the way it walks); moving away from that enemy it steps back at a walk with the
+        // walkback animation. Not mounted (the mount turns it) and not while breaking off (Retreat: they turn and run).
         void Face(float dt)
         {
             long now = entity.World.ElapsedMilliseconds;
-            if (now >= fightingUntil) return;
-            double mx = entity.Pos.Motion.X, mz = entity.Pos.Motion.Z;
-            if (mx * mx + mz * mz > 0.0004) return;
+            EntityAgent agent = entity as EntityAgent;
+            bool backing = false;
+            Entity threat = now < fightingUntil && agent?.MountedOn == null && factions.Hiring?.Disengaging(entity) != true ? Threat(now) : null;
+            if (threat != null)
+            {
+                double dx = threat.Pos.X - entity.Pos.X, dz = threat.Pos.Z - entity.Pos.Z;
+                if (dx * dx + dz * dz > 1e-4)
+                {
+                    float desired = (float)Math.Atan2(dx, dz);
+                    float diff = GameMath.AngleRadDistance(entity.Pos.Yaw, desired);
+                    float max = (float)(FaceRadPerSec * Math.Min(dt, 0.2f));
+                    entity.Pos.Yaw = (entity.Pos.Yaw + GameMath.Clamp(diff, -max, max)) % GameMath.TWOPI;
+                    agent.BodyYaw = entity.Pos.Yaw;
+                    Vec3d walk = agent.Controls.WalkVector;
+                    double wl = Math.Sqrt(walk.X * walk.X + walk.Z * walk.Z);
+                    if (wl > 1e-4 && BattleSpacing.Backing(entity.Pos.Yaw, walk.X, walk.Z))
+                    {
+                        backing = true;
+                        if (wl > BattleSpacing.BackWalkSpeed) { walk.X *= BattleSpacing.BackWalkSpeed / wl; walk.Z *= BattleSpacing.BackWalkSpeed / wl; }
+                        agent.Controls.Sprint = false;
+                    }
+                }
+            }
+            if (backing == walkingBack) return;
+            walkingBack = backing;
+            if (backing)
+            {
+                entity.AnimManager?.StopAnimation("sprint");
+                entity.AnimManager?.StartAnimation("lotrnpcs-walkback");
+            }
+            else entity.AnimManager?.StopAnimation("lotrnpcs-walkback");
+        }
+
+        bool walkingBack;
+        Entity nearestEnemy, lastAttacker;
+        double nearestEnemyD2;
+
+        // The enemy to face: the claimed target, else the nearer of the nearest scanned enemy and the last attacker
+        // (hit within FightingMs), within FaceScan.
+        Entity Threat(long now)
+        {
+            double r2 = BattleSpacing.FaceScan * BattleSpacing.FaceScan;
+            bool Near(Entity e) => e != null && e.Alive && e.Pos.Dimension == entity.Pos.Dimension && e.Pos.SquareDistanceTo(entity.Pos) <= r2;
             long id = factions.Spacing.TargetOf(entity.EntityId, now);
             if (id == 0) id = factions.Lines.TargetOf(entity.EntityId);
-            if (id == 0) return;
-            Entity target = entity.World.GetEntityById(id);
-            if (target == null || !target.Alive) return;
-            double dx = target.Pos.X - entity.Pos.X, dz = target.Pos.Z - entity.Pos.Z;
-            if (dx * dx + dz * dz > FaceRange * FaceRange || dx * dx + dz * dz < 1e-4) return;
-            float desired = (float)Math.Atan2(dx, dz);
-            float diff = GameMath.AngleRadDistance(entity.Pos.Yaw, desired);
-            float max = (float)(FaceRadPerSec * Math.Min(dt, 0.2f));
-            entity.Pos.Yaw = (entity.Pos.Yaw + GameMath.Clamp(diff, -max, max)) % GameMath.TWOPI;
+            Entity claimed = id == 0 ? null : entity.World.GetEntityById(id);
+            if (Near(claimed)) return claimed;
+            Entity a = Near(nearestEnemy) ? nearestEnemy : null, b = now - lastHurtMs < FightingMs && Near(lastAttacker) ? lastAttacker : null;
+            if (a == null || b == null) return a ?? b;
+            return a.Pos.SquareDistanceTo(entity.Pos) <= b.Pos.SquareDistanceTo(entity.Pos) ? a : b;
         }
 
         void Scan(long now, bool fighting, bool walking)
         {
             pushX = pushZ = 0; brake = 0;
             contacts.Clear();
+            nearestEnemy = null; nearestEnemyD2 = double.MaxValue; scanFighting = fighting;
             BattleSpacing spacing = factions.Spacing;
             // 0.0.82: enemies, the one it fights included, may come as close as the duel minimum; only its own side
             // keeps CombatSpacing (before, every NPC but its target did, which shoved fighters out of reach). 0.0.104:
@@ -1874,6 +1921,7 @@ namespace LotrNpcs
             if (partitions == null) return;
             onNeighbor ??= OnNeighbor;
             double radius = Math.Max(walking ? Math.Max(scanSpacing + 0.5, BattleSpacing.LookAhead) : scanSpacing + 0.5, BattleSpacing.ContactScan);
+            if (fighting) radius = Math.Max(radius, BattleSpacing.FaceScan);
             partitions.WalkEntities(entity.Pos.X, entity.Pos.InternalY, entity.Pos.Z, radius, onNeighbor, null, EnumEntitySearchType.Creatures);
             double length = Math.Sqrt(pushX * pushX + pushZ * pushZ);
             if (length < 1e-6) { pushX = pushZ = 0; return; }
@@ -1892,6 +1940,8 @@ namespace LotrNpcs
             // Cheap distance check first: most neighbours of a 5-block look-ahead scan are neither close nor ahead.
             double d2 = dx * dx + dz * dz;
             if (d2 < BattleSpacing.ContactScan * BattleSpacing.ContactScan && contacts.Count < 8) contacts.Add(e);
+            // 0.0.137: the nearest enemy, for Face.
+            if (scanFighting && d2 < nearestEnemyD2 && (target || !factions.SameSide(entity, e))) { nearestEnemy = e; nearestEnemyD2 = d2; }
             bool near = d2 < scanSpacing * scanSpacing;
             bool ahead = lookAhead && !target && d2 < BattleSpacing.LookAhead * BattleSpacing.LookAhead && dx * headX + dz * headZ < 0;
             if (!near && !ahead) return true;
@@ -1947,6 +1997,7 @@ namespace LotrNpcs
             if (entity.WatchedAttributes.GetFloat("regenSpeed", 1) != 1) entity.WatchedAttributes.SetFloat("regenSpeed", 1);
 
             Entity attacker = damageSource?.GetCauseEntity();
+            if (attacker != null && attacker != entity) lastAttacker = attacker;
             entity.Api.ModLoader.GetModSystem<PromotionSystem>()?.OnHit(entity, attacker);
             string faction = FactionSystem.FactionOf(entity);
             if (attacker == null || attacker == entity || !attacker.Alive || faction == null) return;

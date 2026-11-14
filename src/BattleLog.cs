@@ -28,7 +28,7 @@ namespace LotrNpcs
             public int Swings, SwingsLanded, SwingsLostWindow, SwingsLostOther, SwingsNoContact;
             public int Arrows, ArrowsLanded, ArrowsLostWindow, ArrowsLostOther;
             public double DamageDealt;
-            public int Kills, Deaths, TurnWaits, ChargeHits;
+            public int Kills, Deaths, TurnWaits, ChargeHits, BackHits;
             public double IdleSeconds;
             /// <summary>0.0.111: idle seconds by what the NPC was doing (IdleReason).</summary>
             public readonly Dictionary<string, double> IdleBy = new Dictionary<string, double>();
@@ -123,6 +123,13 @@ namespace LotrNpcs
         {
             if (!On || attacker == null) return;
             lastAttackMs[attacker.EntityId] = now;
+        }
+
+        /// <summary>0.0.137: an NPC of this faction was hit in the back.</summary>
+        public void BackHit(Entity npc)
+        {
+            if (!On || npc == null) return;
+            Of(FactionSystem.FactionOf(npc)).BackHits++;
         }
 
         /// <summary>0.0.133: a rider's charge hit landed.</summary>
@@ -238,6 +245,7 @@ namespace LotrNpcs
                         .Select(k => k.Key + " " + (k.Value / t.IdleSeconds * 100).ToString("0", CultureInfo.InvariantCulture) + "%"))).Append(')');
                 if (t.TurnWaits > 0) sb.Append("; waited for a turn ").Append(t.TurnWaits).Append(" times");
                 if (t.ChargeHits > 0) sb.Append("; ").Append(t.ChargeHits).Append(" charge hits");
+                if (t.BackHits > 0) sb.Append("; ").Append(t.BackHits).Append(" hits in the back");
             }
             return sb.ToString();
         }

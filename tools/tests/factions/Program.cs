@@ -870,6 +870,19 @@ public static class Program {
                 && Riders.ChargeDamageMultiplier == 2f && Riders.ChargeMax <= Riders.FocusRange && !Riders.IsChargeHit(null),
                 "0.0.133: a rider standing 5-16 blocks from its focus charges, closer it rides out first; a charge ends on a pass (hit, behind, or within 1.5) and rides on 7 blocks, or less when its orders hold it, then charges again; boxed in it stands and fights");
         }
+        // 0.0.137 back hits: the rear cone and the stacking.
+        {
+            float north = (float)Math.Atan2(0, 1); // facing +z
+            var bc = new FactionConfig();
+            Check(BattleSpacing.FromBehind(north, 0, -3, 120) && BattleSpacing.FromBehind(north, 1, -2, 120) && !BattleSpacing.FromBehind(north, 2, -1, 120)
+                && !BattleSpacing.FromBehind(north, 3, 0, 120) && !BattleSpacing.FromBehind(north, 0, 3, 120) && !BattleSpacing.FromBehind(north, 0, 0, 120)
+                && BattleSpacing.FromBehind(north, 3, 0.1, 360) && !BattleSpacing.FromBehind(north, 0, 3, 360) && !BattleSpacing.FromBehind(north, 0, -3, 0)
+                && BattleSpacing.Backing(north, 0, -0.03) && BattleSpacing.Backing(north, 0.02, -0.02) && !BattleSpacing.Backing(north, 0.03, 0) && !BattleSpacing.Backing(north, 0, 0.03)
+                && bc.BackScale == 1.5 && bc.BackArc == 120 && Math.Abs(bc.BackScale * bc.HitScaleFor(Npc("test-gondor-warrior")) - 0.75) < 1e-6 && Math.Abs(bc.BackScale * bc.HitScaleFor(Player(null)) - 1.5) < 1e-6
+                && new FactionConfig { BackHitMultiplier = 99, BackArcDegrees = -5 }.BackScale == 10 && new FactionConfig { BackArcDegrees = -5 }.BackArc == 0
+                && FactionConfig.InstructionText.Any(l => l.StartsWith("BackHitMultiplier")),
+                "0.0.137: a hit from within the 120-degree rear cone (more than 120 degrees off the facing) does 1.5x, on top of the NPC-v-NPC 0.5 (0.75 in all; a player's back hit on an NPC 1.5); moving more than 100 degrees off the facing is a back step");
+        }
         // 0.0.136 retreat and charge orders: target choice, timers, the retreat's fight-free window, lang and #Instructions.
         {
             var c = new List<(double X, double Z)> { (10, 0), (3, 4), (40, 40) };
@@ -2282,7 +2295,7 @@ public static class Program {
             var c90 = FactionConfig.FromFile(null, out bool store90);
             string j90 = Newtonsoft.Json.JsonConvert.SerializeObject(c90, Newtonsoft.Json.Formatting.Indented);
             FactionDef D(string f) => c90.Factions[f];
-            Check(store90 && c90.Version == FactionConfig.CurrentVersion && j90.Contains("\"MaxFollowers\": 3") && j90.Contains("\"Health\": {") && !j90.Replace("NpcVsNpcDamageMultiplier", "").Contains("Multiplier") && j90.Contains("\"DamageSpread\": 0.2") && c90.Factions.Count == 18
+            Check(store90 && c90.Version == FactionConfig.CurrentVersion && j90.Contains("\"MaxFollowers\": 3") && j90.Contains("\"Health\": {") && !j90.Replace("NpcVsNpcDamageMultiplier", "").Replace("BackHitMultiplier", "").Contains("Multiplier") && j90.Contains("\"DamageSpread\": 0.2") && c90.Factions.Count == 18
                 && c90.Factions.Values.All(d => d.MaxFollowers != null && d.MaxRecruits != null && d.Health?.Count == 6 && d.Damage?.Count == 6),
                 "a new file is version 20: every faction has MaxFollowers, MaxRecruits and Health and Damage for each rank (no multipliers), and DamageSpread 0.2");
             string RT(Dictionary<string, float> t) => string.Join("/", new[] { "recruit", "warrior", "captain", "archer" }.Select(r => t[r].ToString(System.Globalization.CultureInfo.InvariantCulture)));
@@ -2313,7 +2326,7 @@ public static class Program {
             string j19 = Newtonsoft.Json.JsonConvert.SerializeObject(m19);
             Check(store19 && m19.Version == FactionConfig.CurrentVersion && RT(m19.Factions["gondor"].Health) == "22/34/48/35" && RT(m19.Factions["dwarves"].Damage) == "3.15/3.95/7/3.05"
                 && RT(m19.Factions["mordor"].Health) == "22/34/48/34" && RT(m19.Factions["mordor"].Damage) == "3.15/3.95/7/3.05" && RT(m19.Factions["elves"].Damage) == "6/8/14/6" && RT(m19.Factions["elves"].Health) == "22/34/48/35"
-                && !j19.Replace("NpcVsNpcDamageMultiplier", "").Contains("Multiplier") && m19.DamageSpread == 0.2,
+                && !j19.Replace("NpcVsNpcDamageMultiplier", "").Replace("BackHitMultiplier", "").Contains("Multiplier") && m19.DamageSpread == 0.2,
                 "a version 19 file: multipliers as 0.0.90 shipped them take the fitted per-rank tables; ones the admin changed become the units' own values times theirs (orcs 22/34/48/34, elves hit 6/8/14/6); the multipliers aren't written back; DamageSpread 0.2 comes in");
             // The spread.
             Check(FactionTiers.Spread(10, 0.2, 0) == 8 && FactionTiers.Spread(10, 0.2, 1) == 12 && FactionTiers.Spread(10, 0.2, 0.5) == 10 && FactionTiers.Spread(10, 0, 0) == 10 && new FactionConfig().Spread == 0.2
@@ -2410,7 +2423,7 @@ public static class Program {
                 && langJ.Properties().Where(pp => pp.Name.StartsWith("room-") || pp.Name.StartsWith("limits-") || pp.Name.StartsWith("folk-")).All(pp => !((string)pp.Value).Contains("—")),
                 "lang: the room line, the over-limit lines and a folk name for every faction; the talk lines show the room line instead of the old caps; no em dashes");
             Check(FactionConfig.InstructionText.Any(l => l.StartsWith("MaxFollowers and MaxRecruits") && l.Contains("1/MaxFollowers")) && FactionConfig.InstructionText.Any(l => l.StartsWith("Health and Damage") && l.Contains("by rank"))
-                && FactionConfig.InstructionText.Any(l => l.StartsWith("DamageSpread")) && !FactionConfig.InstructionText.Any(l => !l.StartsWith("NpcVsNpcDamageMultiplier") && l.Contains("Multiplier"))
+                && FactionConfig.InstructionText.Any(l => l.StartsWith("DamageSpread")) && !FactionConfig.InstructionText.Any(l => !l.StartsWith("NpcVsNpcDamageMultiplier") && !l.StartsWith("BackHitMultiplier") && l.Contains("Multiplier"))
                 && FactionConfig.InstructionText.Any(l => l.StartsWith("ShareFriends") && l.Contains("hire")) && FactionConfig.InstructionText.Any(l => l.StartsWith("Hiring:") && l.Contains("ShareFriends")),
                 "#Instructions explain follow shares, the multipliers, and that ShareFriends allies can hire each other's NPCs (owner: \"every faction they are allied to\")");
             Check(fs90.DescribeFactions().Contains("mordor: aggressive") && fs90.DescribeFactions().Contains("follow 3, roster 16, health 22/34/48/35/43/27, damage 3.15/3.95/7/3.05/3.16/4.94") && fs90.DescribeFactions().Contains("Hits vary by 20% either way."),

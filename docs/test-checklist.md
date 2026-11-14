@@ -512,3 +512,12 @@ Install `lotrnpcs_0.0.136-test.zip`; restart fully. Hire 3 followers (any factio
 - [ ] 136.3 The charge ends by itself: 5 s after the last enemy near them dies (or after 30 s) they come back to their follow places.
 - [ ] 136.4 Retreat in the middle of the fight: they stop swinging, come back to you at a run (a rider gallops) and don't start new fights for 10 s even when hit; then they fight again as usual.
 - [ ] 136.5 A hired rider on Charge gallops at the target and lands charge hits.
+
+## 137. Hits in the back, facing the enemy, stepping back (0.0.137)
+
+Install `lotrnpcs_0.0.137-test.zip`; restart fully. Battle log on.
+
+- [ ] 137.1 Hit a standing NPC from behind and from the front with the same weapon: the hit from behind does 1.5x (watch its health or the battle log); `/recruits battlelog` shows "hits in the back" in an NPC fight.
+- [ ] 137.2 In a 9 v 9 warrior fight, NPCs keep their faces toward the nearest enemy; when one backs off (spacing, hiding) it steps back facing the enemy with the walk-back animation, at a walk, not moonwalking in place or sliding.
+- [ ] 137.3 On Retreat, followers turn and run (no stepping back); riders never step back.
+- [ ] 137.4 lotrnpcs-factions.json has BackHitMultiplier 1.5 and BackArcDegrees 120, and #Instructions explain them.
