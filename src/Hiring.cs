@@ -425,6 +425,17 @@ namespace LotrNpcs
         // 0.0.77: followers in a formation (not loose) -> their leader's entity, and those breaking off to regroup.
         readonly Dictionary<long, Entity> formationLeader = new Dictionary<long, Entity>();
         readonly HashSet<long> regrouping = new HashSet<long>();
+        // 0.0.136 (owner: "I also want to add retreat and charge commands"): recruit entity id -> charge (until when, and
+        // since when no enemy has been within ChargeQuietRange, 0 while one is). In memory only, like disengageUntil.
+        readonly Dictionary<long, (long Until, long QuietSince)> charging = new Dictionary<long, (long, long)>();
+        // The same ids for the battle lines (BattleLineSystem.SideOf is static): charging recruits form no lines.
+        static readonly HashSet<long> chargingIds = new HashSet<long>();
+        public static bool ChargingId(long id) { lock (chargingIds) return chargingIds.Contains(id); }
+        /// <summary>A charge lasts at most ChargeMs and ends ChargeQuietMs after the last enemy within ChargeQuietRange of
+        /// the recruit; the target is looked for ChargeLookRange blocks along the owner's view, then ChargeNearPoint
+        /// blocks around the point looked at, then ChargeNearOwner blocks around the owner.</summary>
+        public const long ChargeMs = 30000, ChargeQuietMs = 5000;
+        public const double ChargeQuietRange = 16, ChargeLookRange = 48, ChargeNearPoint = 8, ChargeNearOwner = 24;
         /// <summary>Clock for tests, used when no server is attached.</summary>
         public long NowForTests;
         long Now => sapi?.World.ElapsedMilliseconds ?? NowForTests;
@@ -1298,6 +1309,16 @@ namespace LotrNpcs
                     // Only followers come along; holders and guards stay at their posts.
                     EntityPlayer leader = Recruit.OnlineLeader(recruit);
                     bool follows = leader != null && Recruit.OrderOf(recruit) == Recruit.Follow && leader.Alive && recruit.Pos.Dimension == leader.Pos.Dimension;
+                    // 0.0.136: a charge ends after ChargeMs, or ChargeQuietMs after the last enemy near the recruit.
+                    if (charging.TryGetValue(recruit.EntityId, out var ch))
+                    {
+                        long nowMs = Now;
+                        bool enemyNear = Factions != null && sapi.World.GetEntitiesAround(recruit.Pos.XYZ, (float)ChargeQuietRange, (float)ChargeQuietRange / 2,
+                            e => e != recruit && Factions.RecruitWantsToAttack(recruit, kv.Key, e)).Length > 0;
+                        long quiet = enemyNear ? 0 : ch.QuietSince > 0 ? ch.QuietSince : nowMs;
+                        if (ChargeOver(nowMs, ch.Until, quiet)) EndCharge(recruit.EntityId);
+                        else charging[recruit.EntityId] = (ch.Until, quiet);
+                    }
                     // Formation followers too far from the leader break off their fight (0.0.77).
                     if (UpdateFollowFight(recruit, follows ? leader : null) && recruit is EntityAgent agent) StopFights(agent);
                     // A loose follower in a fight isn't pulled away from it (0.0.77); it comes when the fight is over.
@@ -1327,6 +1348,46 @@ namespace LotrNpcs
 
         // ---- orders (hold R) ----
 
+        /// <summary>0.0.136: is this recruit charging on its owner's order?</summary>
+        public bool Charging(Entity recruit) => recruit != null && charging.TryGetValue(recruit.EntityId, out var c) && c.Until > Now;
+
+        /// <summary>Whether a charge is over: past its end, or ChargeQuietMs with no enemy near (quietSince 0: one is).</summary>
+        public static bool ChargeOver(long now, long until, long quietSince) => now >= until || (quietSince > 0 && now - quietSince >= ChargeQuietMs);
+
+        void StartCharge(Entity recruit)
+        {
+            charging[recruit.EntityId] = (Now + ChargeMs, 0);
+            lock (chargingIds) chargingIds.Add(recruit.EntityId);
+            disengageUntil.Remove(recruit.EntityId);
+            regrouping.Remove(recruit.EntityId);
+        }
+
+        void EndCharge(long id)
+        {
+            charging.Remove(id);
+            lock (chargingIds) chargingIds.Remove(id);
+        }
+
+        /// <summary>The charge's target: the entity the owner looks at when it is a candidate, else the candidate nearest
+        /// the point looked at within ChargeNearPoint, else the one nearest the owner within ChargeNearOwner; -1 for none.
+        /// Positions are (x, z). Public for tests.</summary>
+        public static int ChooseChargeTarget(IList<(double X, double Z)> candidates, int lookedAt, (double X, double Z)? point, (double X, double Z) owner)
+        {
+            if (lookedAt >= 0 && lookedAt < candidates.Count) return lookedAt;
+            int Nearest((double X, double Z) at, double within)
+            {
+                int best = -1; double bestD = within * within;
+                for (int i = 0; i < candidates.Count; i++)
+                {
+                    double dx = candidates[i].X - at.X, dz = candidates[i].Z - at.Z, d = dx * dx + dz * dz;
+                    if (d <= bestD) { bestD = d; best = i; }
+                }
+                return best;
+            }
+            int near = point is (double, double) p ? Nearest(p, ChargeNearPoint) : -1;
+            return near >= 0 ? near : Nearest(owner, ChargeNearOwner);
+        }
+
         /// <summary>Is this recruit still breaking off after a movement order?</summary>
         public bool Disengaging(Entity recruit) => regrouping.Contains(recruit.EntityId) || (disengageUntil.TryGetValue(recruit.EntityId, out long until) && until > Now);
 
@@ -1348,6 +1409,8 @@ namespace LotrNpcs
         {
             long id = recruit.EntityId;
             bool inFormation = leader != null && Recruit.OrderOf(recruit) == Recruit.Follow && Recruit.FormationOf(recruit) != Formation.Loose;
+            // 0.0.136: a charging recruit fights wherever the charge takes it.
+            if (inFormation && Charging(recruit)) { formationLeader[id] = leader; regrouping.Remove(id); return false; }
             if (!inFormation)
             {
                 formationLeader.Remove(id);
@@ -1370,11 +1433,12 @@ namespace LotrNpcs
         void ForgetFollowFight(long id) { formationLeader.Remove(id); regrouping.Remove(id); }
 
         /// <summary>Starts the break-off after a movement order. Public for tests.</summary>
-        public void SetDisengaging(Entity recruit)
+        public void SetDisengaging(Entity recruit, long ms = DisengageMs)
         {
             long now = Now;
             FactionSystem.RemoveExpired(disengageUntil, now);
-            disengageUntil[recruit.EntityId] = now + DisengageMs;
+            disengageUntil[recruit.EntityId] = now + ms;
+            EndCharge(recruit.EntityId);
         }
 
         /// <summary>Which way followers in formation line up: the way the owner has been walking, else the way they last
@@ -1551,6 +1615,42 @@ namespace LotrNpcs
                             Place(crew, formation, post, fx, fz, by.Pos.Dimension, true);
                         }
                         return cmd.Action == Recruit.GuardShared || returned ? L("cmd-guard-shared", crew.Count, (int)GuardRadius) : L("cmd-guard", crew.Count, (int)GuardRadius);
+                    }
+
+                case "retreat":
+                    {
+                        // 0.0.136: followers drop their fights, come back at a run (the follow task runs past 6 blocks, a
+                        // rider's mount gallops) and start no fights for RetreatSeconds; they still take hits. Then they
+                        // simply follow on, stance and formation unchanged.
+                        List<EntityAgent> back = crew.Where(e => Recruit.OrderOf(e) == Recruit.Follow).ToList();
+                        if (back.Count == 0) return L("cmd-nofollowers");
+                        long ms = (long)(FactionConfig.ClampRetreatSeconds(Factions?.Config.RetreatSeconds ?? FactionConfig.DefaultRetreatSeconds) * 1000);
+                        foreach (EntityAgent npc in back) { StopFights(npc); SetDisengaging(npc, ms); }
+                        return L("cmd-retreat", back.Count, (int)(ms / 1000));
+                    }
+
+                case "charge":
+                    {
+                        // 0.0.136: followers run at the enemy the owner looks at (or the nearest to where they look, or to
+                        // them), out of formation and battle lines, and fight from there until the charge ends (Charging).
+                        List<EntityAgent> chargers = crew.Where(e => Recruit.OrderOf(e) == Recruit.Follow && Recruit.StanceOf(e) != Recruit.Passive).ToList();
+                        if (chargers.Count == 0) return L("cmd-nofollowers");
+                        bool Wanted(Entity e) => Factions != null && chargers.Any(n => Factions.RecruitWantsToAttack(n, Recruit.OwnerUidOf(n), e, true));
+                        List<Entity> candidates = sapi.World.GetEntitiesAround(by.Pos.XYZ, (float)ChargeLookRange, (float)ChargeLookRange / 2, e => e.Alive && e != by && Wanted(e)).ToList();
+                        int looked = cmd.TargetId == 0 ? -1 : candidates.FindIndex(e => e.EntityId == cmd.TargetId);
+                        int pick = ChooseChargeTarget(candidates.Select(e => (e.Pos.X, e.Pos.Z)).ToList(), looked,
+                            cmd.HasTarget ? (cmd.X, cmd.Z) : ((double, double)?)null, (by.Pos.X, by.Pos.Z));
+                        if (pick < 0) return L("cmd-charge-none");
+                        Entity foe = candidates[pick];
+                        int sent = 0;
+                        foreach (EntityAgent npc in chargers)
+                        {
+                            if (!Factions.RecruitWantsToAttack(npc, Recruit.OwnerUidOf(npc), foe, true)) continue;
+                            StartCharge(npc);
+                            npc.Notify("seekEntity", foe);
+                            sent++;
+                        }
+                        return sent == 0 ? L("cmd-charge-none") : L("cmd-charge", sent);
                     }
 
                 case "move":

@@ -502,3 +502,13 @@ Install `lotrnpcs_0.0.135-test.zip`; restart fully. Battle log on, each side on 
 - [ ] 135.3 A warrior hitting you does its full damage (not halved), and your hits on NPCs are unchanged.
 - [ ] 135.4 The hire menu shows 3 followers for every faction, and a third follower of any faction fills the band.
 - [ ] 135.5 Wild zone groups of orcs or goblins are no bigger than men's.
+
+## 136. Retreat and Charge orders (0.0.136)
+
+Install `lotrnpcs_0.0.136-test.zip`; restart fully. Hire 3 followers (any factions), spawn 6 enemy warriors about 20 blocks off.
+
+- [ ] 136.1 Hold R, Tab to Combat: "5. Retreat" and "6. Charge (what you look at)" show under the stances, and the keys 5 and 6 work.
+- [ ] 136.2 Charge while looking at one enemy: the followers break formation and run at it, then fight the others nearby; the chat line says how many charge. Looking at empty ground near enemies, or at nothing with enemies within 24 blocks, still finds one; with no enemy around you get the "no enemy there" line. Defensive followers charge too; passive ones don't.
+- [ ] 136.3 The charge ends by itself: 5 s after the last enemy near them dies (or after 30 s) they come back to their follow places.
+- [ ] 136.4 Retreat in the middle of the fight: they stop swinging, come back to you at a run (a rider gallops) and don't start new fights for 10 s even when hit; then they fight again as usual.
+- [ ] 136.5 A hired rider on Charge gallops at the target and lands charge hits.

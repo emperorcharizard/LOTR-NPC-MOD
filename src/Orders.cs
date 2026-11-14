@@ -24,6 +24,8 @@ namespace LotrNpcs
         public double X, Y, Z;
         // The way the player looked (across the ground).
         public double Fx, Fz;
+        // 0.0.136 charge: the entity the player looked at (0 for none); X, Y, Z is then the block looked at.
+        public long TargetId;
     }
 
     /// <summary>Server to client: open the orders menu (0.0.89, /recruits orders, which was the client command
@@ -491,6 +493,11 @@ namespace LotrNpcs
                 c.AddStaticText(string.Join("\n", Recruit.Stances.Select(st => Lang.Get("lotrnpcs:stance-" + st) + ": " + Lang.Get("lotrnpcs:stance-desc-" + st))),
                     detailFont, ElementBounds.Fixed(0, y, Width, 64));
                 y += 68;
+                // 0.0.136: Retreat and Charge, on the next number keys after the stances.
+                ElementBounds[] acts = Grid(y, 2, 2);
+                Button(c, "lotrnpcs:orders-retreat", () => Order("retreat"), acts[0]);
+                Button(c, "lotrnpcs:orders-charge", () => Order("charge"), acts[1]);
+                y += ButtonHeight + Gap + 2;
             }
 
             c.AddDynamicText(status, detailFont, ElementBounds.Fixed(0, y, Width, 18), "status");
@@ -549,6 +556,17 @@ namespace LotrNpcs
             EntityPlayer me = capi.World.Player.Entity;
             Vec3f view = me.Pos.GetViewVector();
             RecruitCommand cmd = new RecruitCommand { Action = action, Fx = view.X, Fz = view.Z };
+            if (action == "charge")
+            {
+                // What the crosshair is on, up to the charge range: an entity, else the block (the server picks near it).
+                BlockSelection cb = null;
+                EntitySelection ce = null;
+                Vec3d ceye = me.Pos.XYZ.Add(me.LocalEyePos);
+                capi.World.RayTraceForSelection(ceye, me.Pos.Pitch, me.Pos.Yaw, (float)HiringSystem.ChargeLookRange, ref cb, ref ce, null, e => e != me);
+                if (ce?.Entity != null) cmd.TargetId = ce.Entity.EntityId;
+                Vec3d at = ce?.Entity?.Pos.XYZ ?? (cb?.Position != null ? new Vec3d(cb.Position.X + 0.5, cb.Position.Y, cb.Position.Z + 0.5) : null);
+                if (at != null) { cmd.HasTarget = true; cmd.X = at.X; cmd.Y = at.Y; cmd.Z = at.Z; }
+            }
             if (action == "move")
             {
                 // The block the crosshair is on, up to the order range; the recruits stand on top of it, or next to

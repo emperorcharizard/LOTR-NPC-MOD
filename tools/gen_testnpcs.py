@@ -1871,6 +1871,9 @@ TALK = {
     "orders-guard": "4. Guard here",
     "orders-guard-shared": "5. Guard here for my group",
     "orders-formation": "Formation",
+    # 0.0.136: combat-page orders after the four stances.
+    "orders-retreat": "5. Retreat",
+    "orders-charge": "6. Charge (what you look at)",
     "orders-hint": "Scroll or Tab: switch page. Let go of {0} or press Esc to close.",
     "orders-sharedkey": "The recruit orders key {0} is also bound to: {1}. Holding {0} opens the orders menu first, so that won't react to it any more; to keep both, give one of them another key in Settings > Controls.",
     "formation-loose": "Loose",
@@ -1892,6 +1895,10 @@ TALK = {
     "cmd-follow-full": "Recruits following you: {0}. {1} stayed behind because your band is full. {2}",
     "cmd-hold": "Recruits holding position: {0}",
     "cmd-move": "Recruits on the move: {0}",
+    "cmd-retreat": "Recruits falling back to you: {0}. They start no fights for {1} seconds.",
+    "cmd-charge": "Recruits charging: {0}",
+    "cmd-charge-none": "No enemy there to charge. Look at one (up to 48 blocks), or have one near you.",
+    "cmd-nofollowers": "None of your followers can hear you. Tell them to follow you first.",
     # Guard here (0.0.44). {1} is GuardRadius from lotrnpcs-factions.json.
     "cmd-guard": "Recruits guarding this spot: {0}. They patrol {1} blocks around it, and on the aggressive or raid stance they attack any player there who isn't a friend of yours (see /recruits whitelist).",
     "cmd-guard-shared": "Recruits guarding this spot for your group: {0}. They patrol {1} blocks around it, and anyone in your groups may talk to them to borrow one.",
@@ -2085,7 +2092,7 @@ with open(os.path.join(out, "modinfo.json"), "w") as f:
         "type": "code",
         "modid": "lotrnpcs",
         "name": "LOTR NPCs",
-        "version": "0.0.135",
+        "version": "0.0.136",
         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Race models from "
                        "LOTR Races and Classes by Dango Dango Dango, Shakgriig and Buggoi, used with their permission.",

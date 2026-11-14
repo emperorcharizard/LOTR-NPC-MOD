@@ -870,6 +870,24 @@ public static class Program {
                 && Riders.ChargeDamageMultiplier == 2f && Riders.ChargeMax <= Riders.FocusRange && !Riders.IsChargeHit(null),
                 "0.0.133: a rider standing 5-16 blocks from its focus charges, closer it rides out first; a charge ends on a pass (hit, behind, or within 1.5) and rides on 7 blocks, or less when its orders hold it, then charges again; boxed in it stands and fights");
         }
+        // 0.0.136 retreat and charge orders: target choice, timers, the retreat's fight-free window, lang and #Instructions.
+        {
+            var c = new List<(double X, double Z)> { (10, 0), (3, 4), (40, 40) };
+            Check(HiringSystem.ChooseChargeTarget(c, 2, (0, 0), (0, 0)) == 2 && HiringSystem.ChooseChargeTarget(c, -1, (11, 1), (0, 0)) == 0
+                && HiringSystem.ChooseChargeTarget(c, -1, (30, -30), (0, 0)) == 1 && HiringSystem.ChooseChargeTarget(c, -1, null, (0, 0)) == 1
+                && HiringSystem.ChooseChargeTarget(c, -1, null, (100, 100)) == -1 && HiringSystem.ChooseChargeTarget(new List<(double, double)>(), -1, (0, 0), (0, 0)) == -1,
+                "0.0.136: Charge takes the enemy looked at, else the one nearest the point looked at (within 8), else the one nearest the owner (within 24), else none");
+            Check(!HiringSystem.ChargeOver(1000, 31000, 0) && HiringSystem.ChargeOver(31000, 31000, 0) && !HiringSystem.ChargeOver(5000, 31000, 1000) && HiringSystem.ChargeOver(6000, 31000, 1000),
+                "0.0.136: a charge ends after 30 s, or 5 s after the last enemy within 16 blocks");
+            var hr = new HiringSystem { NowForTests = 1000 };
+            var rt = Npc("test-gondor-warrior");
+            hr.SetDisengaging(rt, (long)(FactionConfig.ClampRetreatSeconds(new FactionConfig().RetreatSeconds) * 1000));
+            bool during = hr.Disengaging(rt); hr.NowForTests = 10999; bool late = hr.Disengaging(rt); hr.NowForTests = 11001;
+            Check(during && late && !hr.Disengaging(rt) && !hr.Charging(rt) && !HiringSystem.ChargingId(rt.EntityId) && FactionConfig.ClampRetreatSeconds(500) == 60 && FactionConfig.ClampRetreatSeconds(0) == 1
+                && new[] { "orders-retreat", "orders-charge", "cmd-retreat", "cmd-charge", "cmd-charge-none", "cmd-nofollowers" }.All(k => lang[k] != null)
+                && ((string)lang["orders-retreat"]).StartsWith("5.") && ((string)lang["orders-charge"]).StartsWith("6.") && FactionConfig.InstructionText.Any(l => l.StartsWith("RetreatSeconds")),
+                "0.0.136: Retreat keeps followers out of fights for RetreatSeconds (10, clamped 1 to 60) and ends any charge; the menu lines (keys 5 and 6), replies and #Instructions are there");
+        }
         // 0.0.135: NPC-on-NPC damage multiplier; a version 30 file's shipped 0.0.134 values move to the equal ones.
         {
             var cm = new FactionConfig();

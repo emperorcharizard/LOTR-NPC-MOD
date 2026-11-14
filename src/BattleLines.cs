@@ -187,7 +187,7 @@ namespace LotrNpcs
             if (npc == null || npc is EntityPlayer || Recruit.IsArcher(npc)) return null;
             if (Recruit.OwnerUidOf(npc) != null)
             {
-                if (Recruit.OrderOf(npc) != Recruit.Follow || Recruit.FormationOf(npc) == Formation.Loose) return null;
+                if (Recruit.OrderOf(npc) != Recruit.Follow || Recruit.FormationOf(npc) == Formation.Loose || HiringSystem.ChargingId(npc.EntityId)) return null;
                 return "o:" + Recruit.LeaderUidOf(npc);
             }
             // 0.0.122 (owner, 2026-11-13: "I just want combat to be as smooth as possible and as optimized lag wise as

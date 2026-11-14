@@ -40,6 +40,8 @@ And (owner): "not too many conflicting paths": one system decides where a fighti
 
 **0.0.135 (owner: "Equal stats, everyone 3"):** every faction has the Men's per-rank numbers, 3 followers, roster 16 and the Men's prices (the prices were the coordinator's call); riders 2.24x everywhere; NpcVsNpcDamageMultiplier 0.5 halves NPC hits on non-players so fights last longer; config version 31 moves shipped values. Checklist 135, not yet in game. Next queued: 0.0.136 retreat and charge orders.
 
+**0.0.136:** Retreat and Charge on the orders menu's combat page (keys 5 and 6): Retreat = drop fights, come back, no new fights for RetreatSeconds (10); Charge = run at the enemy looked at (48 blocks; else nearest the point; else nearest you within 24), fight like Aggressive out of formation for up to 30 s (ends 5 s after the last enemy within 16). Checklist 136, not yet in game.
+
 **Open problems:**
 1. **110.1, lines fold into a blob at contact.** Within ~10 s of meeting, both lines collapse into one blob; up to 7 orcs hit one Dunlending in 20 s. The 38 orc v 26 Dunlending fight ended 24-4 for the orcs (110.1 wants it closer than 26-2). Look at what the front and the extras do at contact: front members take the nearest free enemy and hold their side (`HoldsFront`); extras wrap round (`HoldSlot` returns false once the line has met). Staging: batches of 5, columns 40 blocks apart, player at 1500 30 300 (see the "Staged" entries in lotrnpcs-0113.md).
 2. Checklist items still open in 110-119: 110.1, 112.2 (needs a second player), 112.6, 112.8 (weapons and shields in hand, by eye), 113.5, 113.8, 113.9, 114.8, 116.2, 117.6 (needs Teapot's Giant Boar), 117.8 (needs Feverstone Wilds removed), 119.2 (recruits in two formations).

@@ -366,6 +366,10 @@ namespace LotrNpcs
         // damage (melee, arrows, charge hits after their x2), so NPC fights last about twice as long; players take and
         // deal what they did. A file without it gets 0.5.
         public const float DefaultNpcVsNpcDamageMultiplier = 0.5f;
+        // 0.0.136: how long followers told to Retreat start no fights (1 to 60 s).
+        public const double DefaultRetreatSeconds = 10;
+        public double RetreatSeconds = DefaultRetreatSeconds;
+        public static double ClampRetreatSeconds(double s) => double.IsNaN(s) ? DefaultRetreatSeconds : GameMath.Clamp(s, 1, 60);
         public float NpcVsNpcDamageMultiplier = DefaultNpcVsNpcDamageMultiplier;
         /// <summary>The multiplier for a hit on target: NpcVsNpcDamageMultiplier (0 to 10) on non-players, 1 on players.</summary>
         public float HitScaleFor(Entity target) => target is EntityPlayer ? 1f : (float.IsNaN(NpcVsNpcDamageMultiplier) ? DefaultNpcVsNpcDamageMultiplier : GameMath.Clamp(NpcVsNpcDamageMultiplier, 0, 10));
@@ -567,6 +571,7 @@ namespace LotrNpcs
             "Hiring: right-click an NPC to talk. Members of its faction, and members of an allied faction whose alliance has ShareFriends, can hire it, paying from their hotbar and backpack.",
             "MaxFollowers and MaxRecruits (in each faction): how many of the faction's recruits can follow a player at once, and how many a player can have. Each recruit uses a share: 1/MaxFollowers of the following and 1/MaxRecruits of the roster, and a player's shares must add up to no more than 1, so factions can be mixed (3 Gondor men and 2 Mordor orcs use 3/5 + 2/7 of the following). Past the following, a new recruit guards where it was hired and the rest hold or guard. A player over the limits when they join (after an admin lowers them) loses the most recently hired recruits until they fit. The MaxFollowers and MaxRecruits at the top of the file are the baseline (3 and 16 since 0.0.135, every faction alike) and count for a faction without its own.",
             "Health and Damage (in each faction, by rank: recruit, warrior, captain, archer, and since 0.0.113 the promotion-only guard and shock, which a file without them gets as the warrior's health x1.25 and damage x0.8 (guard) or health x0.8 and damage x1.25 (shock)): the health and the damage of one hit of the faction's NPCs of that rank, in place of their unit's own (health is a whole number; an archer's damage is its arrow's, and its shove). Since 0.0.135 every faction ships the same numbers (health 22, 34, 48 and 35, damage 3.15, 3.95, 7 and 3.05 for recruit, warrior, captain and archer), with the same 3 followers, roster of 16 and prices, so fights between factions are decided by numbers and tactics. A rider without its own entry has its warrior's health and damage times 2.24. Damage tiers don't change. Wild groups grow with MaxFollowers over the baseline (1 for every faction now; see the spawning file).",
+            "RetreatSeconds (10 by default, since 0.0.136; 1 to 60): after the Retreat order (combat page of the orders menu) your followers drop their fights, run back to you and start no fights for this many seconds; then they follow on as before. The Charge order sends them at the enemy you look at (within 48 blocks), out of formation, fighting like Aggressive, until no enemy is within 16 blocks of them for 5 seconds or 30 seconds have passed.",
             "NpcVsNpcDamageMultiplier (0.5 by default, since 0.0.135; 0 to 10): every hit this mod's NPCs land on anything that isn't a player is this times its damage (melee, arrows, and charge hits after their x2), so fights between NPCs last longer. Hits on players, and players' hits, don't change.",
             "DamageSpread: every NPC hit, melee and arrows, deals its damage times a random 1 - DamageSpread to 1 + DamageSpread (0.2 = 80% to 120%), so fights aren't decided by whole numbers of hits. 0 turns it off; at most 0.9.",
             "WildBodyLoot and HiredBodyLoot (by rank: recruit, warrior, captain, archer): what a dead wild NPC's body and a dead recruit's body hold for a player with a knife, as a list of { Code, Min, Max } (item code, and a random count from Min to Max). By default rusty gears (recruit 0-1, warrior and archer 1-2, captain 3-5) and up to one piece of cloth (recruits) or leather (the rest); armor and weapons are never dropped. Rankless NPCs use the recruit list; an empty list leaves an empty body. Bodies rot away after 3 in-game hours.",
@@ -1372,11 +1377,14 @@ namespace LotrNpcs
         /// allied (RaidTarget). Guarding ones (Guard here, 0.0.44) pick nothing on sight outside their area, and inside
         /// it they also attack intruders (IsIntruder).
         /// </summary>
-        public bool RecruitWantsToAttack(Entity recruit, string ownerUid, Entity target)
+        public bool RecruitWantsToAttack(Entity recruit, string ownerUid, Entity target, bool charge = false)
         {
             if (target == null || !target.Alive || target.EntityId == recruit.EntityId || Recruit.IsTeam(target, ownerUid)) return false;
             string stance = Recruit.StanceOf(recruit);
-            if (stance == Recruit.Passive || (Hiring != null && Hiring.Disengaging(recruit))) return false;
+            // 0.0.136: an ordered charge fights like Aggressive (passive recruits still never fight).
+            charge = charge || (Hiring != null && Hiring.Charging(recruit));
+            if (stance == Recruit.Passive || (!charge && Hiring != null && Hiring.Disengaging(recruit))) return false;
+            if (charge && stance == Recruit.Defensive) stance = Recruit.Aggressive;
             // 0.0.77 had followers in a formation (not loose) fight nothing more than 12 blocks from their leader; 0.0.84
             // (owner, 2026-11-04: "remove the limit") drops that. The break-off past 12 blocks (UpdateFollowFight) stays.
             if (Hiring != null && Hiring.HasTeamGrudge(ownerUid, target.EntityId)) return true;
@@ -2349,9 +2357,11 @@ namespace LotrNpcs
             {
                 if (Recruit.OwnerUidOf(entity) is string owner
                     && (Recruit.IsTeam(target, owner) || (factions != null && !factions.RecruitWantsToAttack(entity, owner, target)) || BeyondLeash(target))) return false;
-                if (factions != null && Ours && Crowded(target)) return false;
+                // 0.0.136: a charge goes for its target whoever else is on it, seen or not.
+                bool ordered = factions?.Hiring != null && factions.Hiring.Charging(entity);
+                if (!ordered && factions != null && Ours && Crowded(target)) return false;
                 // 0.0.94: a call for help sends only those who can see the attacker.
-                if (factions != null && Ours && !CanSee(target)) return false;
+                if (!ordered && factions != null && Ours && !CanSee(target)) return false;
             }
             return base.Notify(key, data);
         }
