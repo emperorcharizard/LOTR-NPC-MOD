@@ -484,13 +484,13 @@ Install `lotrnpcs_0.0.132-test.zip`; restart fully. Battle log on, each side on 
 
 Install `lotrnpcs_0.0.133-test.zip`; restart fully. Battle log on, each side on one spot.
 
-- [ ] 133.1 3 Rohan riders v 10 Dunlending warriors (riders at z 126, Dunlendings at z 142), twice: the riders gallop in, strike, ride on several blocks, wheel and charge the same enemy again; the `/recruits battlelog` summary shows charge hits for rohan.
+- [ ] 133.1 3 Rohan riders v 10 Dunlending warriors (riders at z 126, Dunlendings at z 142), twice: the riders gallop in, strike, ride on several blocks, wheel and charge the same enemy again; the `/recruits battlelog` summary shows charge hits for rohan. *2026-11-14 on 0.0.138: failed, riders never swung (0 rider rows in 146 s) and ended 100+ blocks away; fix in 0.0.139, see 139.*
 - [ ] 133.2 A charge hit visibly shoves the Dunlending back about a block or two (not flung far).
 - [ ] 133.3 No rider stays stuck: one boxed in by enemies stands and fights, then charges again when there's room. Riders stay within about 20 blocks of the fight.
 - [ ] 133.4 A hired rider on Guard stays inside its guard area while charging; one on Follow doesn't ride more than about 12 blocks from you.
 
 ## 134: smaller mod file (packaging only)
-- [ ] 134.1 Every race still shows its skins (dwarves, elves, hobbits, Men of each faction, orcs): the 25 duplicate skin pictures now point at one shared copy.
+- [x] 134.1 Every race still shows its skins (dwarves, elves, hobbits, Men of each faction, orcs): the 25 duplicate skin pictures now point at one shared copy. *2026-11-14: Haradrim, Black Númenórean, Easterling, dwarf, elf and tormented elf recruits, Gondor, Mordor and Dunlendings all showed their skins.*
 - [ ] 134.2 No new "texture not found" or JSON parse lines for lotrnpcs in client-main.log / server-main.log.
 
 ## 135. Equal stats, 3 followers, longer NPC fights (0.0.135)
@@ -498,7 +498,7 @@ Install `lotrnpcs_0.0.133-test.zip`; restart fully. Battle log on, each side on 
 Install `lotrnpcs_0.0.135-test.zip`; restart fully. Battle log on, each side on one spot.
 
 - [ ] 135.1 `/recruits faction list`: every faction shows follow 3, roster 16, health 22/34/48/35/43/27, damage 3.15/3.95/7/3.05/3.16/4.94; ModConfig/lotrnpcs-factions.json is Version 31 with NpcVsNpcDamageMultiplier 0.5.
-- [ ] 135.2 9 Gondor warriors v 9 Mordor warriors, twice: about even (each side wins some), and the fight lasts roughly twice as long as a 0.0.134 fight of the same size (battle log damage per NPC hit about half the warrior's 3.95, so about 1.6-2.4).
+- [ ] 135.2 9 Gondor warriors v 9 Mordor warriors, twice: about even (each side wins some), and the fight lasts roughly twice as long as a 0.0.134 fight of the same size (battle log damage per NPC hit about half the warrior's 3.95, so about 1.6-2.4). *2026-11-14 on 0.0.138: not even, Gondor won 3 of 3 (9-2, 9-7, 9-3); 1.96-1.97 per hit; 71-114 s from first blow (pre-0.0.135 about 25 s), so 3-4x longer. Same swing rate both sides; orc weapons land later (mean 462 v 367 ms). Owner deciding.*
 - [ ] 135.3 A warrior hitting you does its full damage (not halved), and your hits on NPCs are unchanged.
 - [ ] 135.4 The hire menu shows 3 followers for every faction, and a third follower of any faction fills the band.
 - [ ] 135.5 Wild zone groups of orcs or goblins are no bigger than men's.
@@ -517,7 +517,7 @@ Install `lotrnpcs_0.0.136-test.zip`; restart fully. Hire 3 followers (any factio
 
 Install `lotrnpcs_0.0.137-test.zip`; restart fully. Battle log on.
 
-- [ ] 137.1 Hit a standing NPC from behind and from the front with the same weapon: the hit from behind does 1.5x (watch its health or the battle log); `/recruits battlelog` shows "hits in the back" in an NPC fight.
+- [ ] 137.1 Hit a standing NPC from behind and from the front with the same weapon: the hit from behind does 1.5x (watch its health or the battle log); `/recruits battlelog` shows "hits in the back" in an NPC fight. *2026-11-14: "hits in the back" shows (22-35 per side per 9 v 9, about 20-25% of hits); the player hit test not done yet.*
 - [ ] 137.2 In a 9 v 9 warrior fight, NPCs keep their faces toward the nearest enemy; when one backs off (spacing, hiding) it steps back facing the enemy with the walk-back animation, at a walk, not moonwalking in place or sliding.
 - [ ] 137.3 On Retreat, followers turn and run (no stepping back); riders never step back.
 - [ ] 137.4 lotrnpcs-factions.json has BackHitMultiplier 1.5 and BackArcDegrees 120, and #Instructions explain them.

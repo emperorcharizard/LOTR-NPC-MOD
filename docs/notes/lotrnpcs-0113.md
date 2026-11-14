@@ -222,3 +222,21 @@ Offline: all pass. Untested in game (checklist 138).
 ## 0.0.139: riders strike while charging (2026-11-14, Claude)
 - In game 10:31 local on 0.0.138 (coordinator, `lotrnpcs-battle-20261114-103125.csv`): 3 Rohan riders v 10 Dunlending warriors: riders 0 swings logged at all (no landed, lost or nocontact rows), Dunlendings 6 of 40 landed (34 out of reach); the mounts galloped nearly all the time, ChestMeleeAttack showed for single seconds; at about 150 s the riders were more than 100 blocks away (past Synergy's freeze). No exceptions. Diagnosis (code): the 0.0.133 charge kept the mount at a gallop through the swing, the 0.0.99 swing sync held the blow up to 1 s for a rider that can't turn in the saddle, and the task ended before its blow (what ended it wasn't found in the game's code).
 - Fix: while the rider's melee swing hasn't struck (at most `Riders.SwingHoldMs` 600 ms) the mount rides straight at the one it swings at instead of riding out; a charge hit counts on whether the swing began at a charge (`SwingStarted`, `IsChargeHit`); mounted riders skip the swing-sync wait; a ride-out turns back 12 blocks from the focus (`RideOutMax`, was 16). With DebugCommands on, each rider swing goes to server-main.log ("[lotrnpcs] rider N melee: swing at / blow / ended without a blow / cancelled before the blow", with ms and phase). Offline: all pass. Untested in game (checklist 139).
+
+## In game 2026-11-14 on 0.0.138 (coordinator, computer use)
+- Install: the PC Claude installed 0.0.138 (config migrated to v32, MaxCaptains 1, RecruitExtraFollowers 1 set by hand). Superflat world, test spot 1512 4 126-146.
+- 133 riders (`lotrnpcs-battle-20261114-103125.csv`): 3 Rohan riders v 10 Dunlending warriors. Riders 0 damage, 0 swings in 146 s; Dunlendings 6/40 landed (34 out of reach), 13 damage, no kills either side; the fight stalled after ~84 s. Cleanup found no riders within 100 blocks, all 3 within 400. Diagnosis and fix: the 0.0.139 section above. Only run once (the second run waits for 0.0.139).
+- 135 equal stats, 9 Gondor warriors v 9 Mordor orc warriors, batches of 5 + 4, 14 blocks apart:
+
+  | log | staging | result | Gondor landed / swings, damage | Mordor landed / swings, damage | back hits G / M | first blow to last death |
+  | --- | --- | --- | --- | --- | --- | --- |
+  | 103643 | Gondor z 128, Mordor z 142 | Gondor 9-2 | 149/153, 294 | 115/124, 227 | 22 / 31 | 90.6 s |
+  | 103823 | swapped | Gondor 9-7 | 150/163, 293 | 144/151, 284 | 30 / 35 | 114.2 s |
+  | 104053 | side by side, x 1494 v 1508 | Gondor 9-3 | 151/165, 296 | 108/121, 216 | 26 / 34 | 70.9 s |
+
+  Damage per NPC hit 1.96-1.97 on both sides (warrior 3.95 x 0.5, as built). Fights about 92 s on average against about 25 s for a similar pre-0.0.135 fight (`20261112-092400`, Gondor 11 v Mordor 10, 3.52 per hit): 3-4x longer, more than the "about twice" the checklist expected.
+  Why Gondor wins (PC Claude, from the CSVs and gen): the swing cycle is the same (median gap 2.93-3.02 s both sides), so the extra swings follow from Gondor living longer. The asymmetry is when the blow lands: Gondor warriors carry spears (350 ms) and Gondorian swords (420 ms), mean about 367 ms; Mordor warriors scimitar 420, axe 600, hammer 550, dagger/knife 350, poleaxe 500, mean about 462 ms. Orcs also take ~25% more back hits. Proposed: one blow time (400 ms) for every melee weapon with each animation's speed scaled to it (undoes the owner's 0.0.99 natural timing), or extra damage for slow weapons. Owner card posted 2026-11-14.
+  The fights were tight blobs (bodies stayed apart). Facing and back-steps couldn't be judged by eye in the melee; the CSV has no yaw.
+- 134 skins: six races' recruits (Haradrim, Black Númenórean, Easterling, dwarf, elf, tormented elf) plus Gondor/Mordor/Dunlendings rendered with their skins, no missing textures seen.
+- Not done: 135.1/135.3-5, 136, 137.1 player hits, 137.2-4, 138 (needs hiring), 139.
+- Owner, 16:44Z: "Install but dont retest": 0.0.139 installed, not tested.

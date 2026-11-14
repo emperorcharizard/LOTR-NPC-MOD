@@ -3,7 +3,7 @@ name: resume
 description: Where the lotrnpcs work stands and what's next; read first, update before stopping
 ---
 
-# Where we are (updated 2026-11-13, after 0.0.122)
+# Where we are (updated 2026-11-14, 0.0.139 installed)
 
 **Latest build:** 0.0.124 (idle wild allies within JoinFightRange, 32, join a fight in hops, `CallIdleAllies`; 0.0.123 used 16) on top of 0.0.122: wild NPCs fight without battle lines (`WildBattleLines`, false by default; recruits in formation keep lines), 0.0.120/0.0.121 pairing removed (owner chose "Back to 0.0.119 fighting"). In game (17:51): Dunlendings 24-2, only 24 of 38 orcs fought (0.0.123: 27, 26-10); 14 orcs stayed alive and never joined, so the call range isn't the cause (see lotrnpcs-0113.md 0.0.124). 0.0.121 (pair by position) ran 28-0 to the Dunlendings and is superseded. Before it, 0.0.119, GitHub release v0.0.119. Commits up to `1a1c32e` and later doc commits on `main`.
 
@@ -49,6 +49,8 @@ And (owner): "not too many conflicting paths": one system decides where a fighti
 **0.0.138:** one captain per player (MaxCaptains 1, config v32 from RosterPerCaptain); bands of 3 any-rank followers plus 2 recruit-only places (RecruitExtraFollowers); a promoted follower past the ranked places guards and stays on the roster. Checklist 138, not yet in game.
 
 **0.0.139:** riders strike while charging (mount holds straight at the target until the blow, at most 0.6 s; no swing-sync wait when mounted; ride-out turns back at 12 blocks; debug rider melee lines). 0.0.138's riders never struck (gallop through the swing). Checklist 139, not yet in game.
+
+**In game 2026-11-14 on 0.0.138 (results in lotrnpcs-0113.md):** riders never struck (fix = 0.0.139, installed but NOT tested, owner: "Install but dont retest"); 9 Gondor v 9 Mordor warriors: Gondor won 3 of 3, 1.97 per hit, ~92 s fights (3-4x longer than before); likely cause: orc weapons land their blow ~100 ms later (owner deciding: one 400 ms blow time for all weapons, extra damage for slow weapons, or more fights); back hits counted; skins fine. Still open: 135.1/135.3-5, 136, 137.1-137.4, 138, 139.
 
 **Open problems:**
 1. **110.1, lines fold into a blob at contact.** Within ~10 s of meeting, both lines collapse into one blob; up to 7 orcs hit one Dunlending in 20 s. The 38 orc v 26 Dunlending fight ended 24-4 for the orcs (110.1 wants it closer than 26-2). Look at what the front and the extras do at contact: front members take the nearest free enemy and hold their side (`HoldsFront`); extras wrap round (`HoldSlot` returns false once the line has met). Staging: batches of 5, columns 40 blocks apart, player at 1500 30 300 (see the "Staged" entries in lotrnpcs-0113.md).
