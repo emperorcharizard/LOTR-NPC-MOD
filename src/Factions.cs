@@ -322,7 +322,8 @@ namespace LotrNpcs
         public int MaxCaptains = DefaultMaxCaptains;
         // 0.0.138 (owner: "for recruits, maybe they can have an additional follower or two"): followers past the 3
         // ranked places, for recruits only (0 to 10).
-        public const int DefaultRecruitExtraFollowers = 2;
+        // Owner, 2026-11-14 (after 0.0.138 shipped with 2): "maybe just 1 recruit place".
+        public const int DefaultRecruitExtraFollowers = 1;
         public int RecruitExtraFollowers = DefaultRecruitExtraFollowers;
         public int RecruitExtra => GameMath.Clamp(RecruitExtraFollowers, 0, 10);
         // Out-of-combat healing (user, 2026-11-03: "increase the regen of the npcs", then "just a bit faster"), as a
@@ -599,7 +600,7 @@ namespace LotrNpcs
             "ShareFriends (allies only): true makes each faction's members safe from the other's NPCs too, and lets them hire the other's NPCs. Otherwise a player is safe only from their own factions and hires only from them.",
             "MonsterCodes: creatures every faction attacks on sight (* is a wildcard). GrudgeSeconds: how long NPCs fight someone who hurt them or an ally. CallForHelpRange: how many blocks away allies come to help. JoinFightRange (32 by default, since 0.0.124): how far a wild NPC that starts a fight calls idle wild NPCs of its faction to join it; they call in turn, so a spread-out army joins. 0 turns it off.",
             "MaxCaptains (1 by default, since 0.0.138; it replaces RosterPerCaptain): how many captains a player may have, whatever their faction. Hiring or promoting past it is refused; captains a player already has stay. 0 means no limit. Riders don't count.",
-            "RecruitExtraFollowers (2 by default, since 0.0.138; 0 to 10): places in a player's following for recruits only, past the MaxFollowers places every rank shares. So a band is up to 3 followers of any rank and 2 more recruits. A following recruit that is promoted while the ranked places are full stays on the roster but guards where it stands until a place frees.",
+            "RecruitExtraFollowers (1 by default, since 0.0.138; 0 to 10): places in a player's following for recruits only, past the MaxFollowers places every rank shares. So a band is up to 3 followers of any rank and 1 more recruit. A following recruit that is promoted while the ranked places are full stays on the roster but guards where it stands until a place frees.",
             "MaxAttackersPerTarget: how many NPCs may fight one NPC at a time. 4 by default; 0 means no limit. With a limit, the rest look for another enemy, wait one step behind in a battle line, or, outside a line, join a full enemy anyway when there is no other within reach. Either way an NPC takes an enemy nobody is fighting before one already being fought. Players are never limited, and an NPC always strikes back at whoever hits it.",
             "CombatSpacing: how far apart, in blocks, fighting NPCs of the same side keep from each other, and the gap between neighbours in a battle line (0.8 to 4, 1.5 by default). Enemies only keep DuelDistanceMin apart. As many attackers as fit round an enemy this far apart (5 by default) fight it; the others take another enemy with room first, or else wait in a second ring one CombatSpacing farther out and step in when a place opens.",
             "DuelDistanceMin and DuelDistanceMax: how far from the center of the NPC it fights an attacker stands (1.0 to 1.6 blocks by default): it closes in when farther, steps back when closer, and stands and fights in between. Players are approached the vanilla way.",

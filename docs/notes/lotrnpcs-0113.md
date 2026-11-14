@@ -217,3 +217,4 @@ Row's win rate against the column, 10 players a side (average fight length in br
 | old: 3 riders | 1.00 | 1.00 | 0.00 | 0.00 | 1.00 | 1.00 | 1.00 | 0.53 (30 s) |
 
 Offline: all pass. Untested in game (checklist 138).
+- Owner, 2026-11-14 16:18 (right after 0.0.138): "maybe just 1 recruit place". RecruitExtraFollowers default 1 in the code (from the next build) and set to 1 in the owner's ModConfig by hand; 0.0.138 as installed already reads 1 from the file.
