@@ -39,6 +39,61 @@ def run(args, cwd=ROOT):
         sys.exit(f"failed ({result.returncode}): {args[0]}")
 
 
+SKINS = os.path.join("textures", "entity", "humanoid", "skinparts")
+
+
+def dedupe_skins(assets):
+    """0.0.134 (owner, 2026-11-14: "debloat the size of the modfile"): LRC ships the same skin picture under several
+    races (dwarfskin1 = elfskin4 = hobbitskin8 = humanskin4, ...). Each picture is kept once, under the first of its
+    paths in sorted order, and every JSON reference to the other paths points there instead (about 350 KB)."""
+    import hashlib
+    root = os.path.join(assets, SKINS)
+    byhash = {}
+    for folder, _, files in os.walk(root):
+        for name in files:
+            if name.endswith(".png"):
+                path = os.path.join(folder, name)
+                byhash.setdefault(hashlib.sha256(open(path, "rb").read()).hexdigest(), []).append(path)
+    code = lambda path: "lotrnpcs:" + os.path.relpath(path, os.path.join(assets, "textures"))[:-4].replace(os.sep, "/")
+    moved = {}
+    for paths in byhash.values():
+        keep, *drop = sorted(paths, key=code)
+        for path in drop:
+            moved[code(path) + '"'] = code(keep) + '"'
+            os.remove(path)
+    for folder, _, files in os.walk(assets):
+        for name in files:
+            if name.endswith(".json"):
+                path = os.path.join(folder, name)
+                text = open(path, encoding="utf-8-sig").read()
+                new = text
+                for old, keep in moved.items():
+                    new = new.replace('"' + old, '"' + keep)
+                if new != text:
+                    open(path, "w", encoding="utf-8").write(new)
+    # Every skin a JSON file names must still exist.
+    import re
+    for folder, _, files in os.walk(assets):
+        for name in files:
+            if name.endswith(".json"):
+                for ref in re.findall(r'"lotrnpcs:(entity/humanoid/skinparts/[^"]+)"', open(os.path.join(folder, name), encoding="utf-8-sig").read()):
+                    if not os.path.isfile(os.path.join(assets, "textures", ref + ".png")):
+                        sys.exit(f"missing skin {ref} in {name}")
+    print(f"skins: {len(moved)} duplicate pictures dropped")
+
+
+def packed(path):
+    """0.0.134: JSON goes into the zip without indentation (about half the unpacked size). Files the strict parser
+    can't read (// credit comments, trailing commas) go in as they are."""
+    data = open(path, "rb").read()
+    if not path.endswith(".json"):
+        return data
+    try:
+        return json.dumps(json.loads(data.decode("utf-8-sig")), separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    except ValueError:
+        return data
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-zip", action="store_true")
@@ -57,6 +112,7 @@ def main():
             z.extractall(LRC)
     # bundle_lrc writes our own body shapes (with the poleaxe and greatsword animations).
     run([sys.executable, os.path.join(ROOT, "tools", "bundle_lrc.py"), os.path.join(LRC, "assets", "lrc"), os.path.join(GEN, "assets", "lotrnpcs")])
+    dedupe_skins(os.path.join(GEN, "assets", "lotrnpcs"))
     entities = os.path.join(GEN, "assets", "lotrnpcs", "entities")
 
     fac = os.path.join(ROOT, "tools", "tests", "factions")
@@ -87,7 +143,7 @@ def main():
             for name in sorted(files):
                 path = os.path.join(folder, name)
                 # Forward slashes: the game can't read zip entries with backslashes.
-                z.write(path, os.path.relpath(path, GEN).replace(os.sep, "/"))
+                z.writestr(os.path.relpath(path, GEN).replace(os.sep, "/"), packed(path), zipfile.ZIP_DEFLATED, 9)
     print("wrote", out)
 
     if opts.publish:

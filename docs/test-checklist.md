@@ -488,3 +488,7 @@ Install `lotrnpcs_0.0.133-test.zip`; restart fully. Battle log on, each side on 
 - [ ] 133.2 A charge hit visibly shoves the Dunlending back about a block or two (not flung far).
 - [ ] 133.3 No rider stays stuck: one boxed in by enemies stands and fights, then charges again when there's room. Riders stay within about 20 blocks of the fight.
 - [ ] 133.4 A hired rider on Guard stays inside its guard area while charging; one on Follow doesn't ride more than about 12 blocks from you.
+
+## 134: smaller mod file (packaging only)
+- [ ] 134.1 Every race still shows its skins (dwarves, elves, hobbits, Men of each faction, orcs): the 25 duplicate skin pictures now point at one shared copy.
+- [ ] 134.2 No new "texture not found" or JSON parse lines for lotrnpcs in client-main.log / server-main.log.

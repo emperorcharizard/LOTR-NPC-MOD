@@ -34,6 +34,8 @@ And (owner): "not too many conflicting paths": one system decides where a fighti
 
 **0.0.132:** a mounted rider keeps its melee target (focus) while it lives within 6 blocks; the mount steers by it. 0.0.131 in game: contact fixed (0 nocontact), riders 1-3 v 10 Dunlendings, hits spread. Owner choosing a charge, about 3x stats, or riders as they are. Checklist 132, not yet in game.
 
+**0.0.134:** packaging only: duplicate race skins bundled once, JSON packed without indentation (2.62 -> 2.09 MB zip, 16 -> 8.6 MB unpacked). Checklist 134.
+
 **0.0.133:** riders charge and wheel away (owner's choice): with a focus 5-16 blocks off they gallop at it, a blow at a gallop is a charge hit (x2 damage, knockback), they ride on 7 blocks and wheel back; boxed in they stand and fight; orders bound the ride-out. 0.0.132 in game: focus works, 3 and 5 kills but riders still lose 3 v 10. Checklist 133, not yet in game (owner: don't test yet).
 
 **Open problems:**
