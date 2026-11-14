@@ -51,3 +51,4 @@
 - [feverstone-mounts](feverstone-mounts.md) — Feverstone Wilds 3.1.1 read for Rohan/warg riders: game riding is client-steered, so NPC riders need our own steering; plan + open questions
 - [gear-pieces](gear-pieces.md) — shape elements per worn item and per NPC (100-420 per geared NPC, 70% tiny decorations on the heaviest), options to lighten gear
 - [balance-2026-11-14](balance-2026-11-14.md) — sim matches the 38v26 games once only the goblins that fought are counted; following-size matrix ~0.5; fights are knife-edge
+- [matchups 2026-11-14](../balance/matchups-2026-11-14.md) — every faction x rank under current rules: wild groups even, goblins/archers/riders by faction lopsided, equal coin favours cheap units
