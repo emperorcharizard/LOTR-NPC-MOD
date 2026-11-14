@@ -361,6 +361,58 @@ REFERENCES = {
 }
 
 
+# Ground storage (Ctrl + right click: leaning on the ground or a wall) and the tool rack, as the game's falx
+# (blade.json "*": groundStorageTransform translation (0.24, 0.195, -0.06), rotation (24, 61, -87), scale 0.88;
+# toolrackTransform translation (-0.1, 0.6, 0), rotation (0, 180, 1), scale 1.25). Our weapons are held as the falx
+# is, so hand^-1(falx) * hand(ours) takes our model into the falx's, and the falx's transform is applied after it:
+# the grip lands where the falx's grip does. The game's transforms: T(origin) S(scale) T(translation) R(rotation)
+# T(-origin); in the hand the attachment point's -180 about Y is added to the rotation.
+FALX_HAND_TF = {"translation": {"x": -1.03, "y": -0.005, "z": -0.66}, "rotation": {"x": 85, "y": 0, "z": 2},
+                "origin": {"x": 0.5, "y": 0, "z": 0.5}, "scale": 0.8}
+FALX_GROUND_STORAGE = {"translation": {"x": 0.24, "y": 0.195, "z": -0.06}, "rotation": {"x": 24, "y": 61, "z": -87}, "scale": 0.88}
+FALX_TOOLRACK = {"translation": {"x": -0.1, "y": 0.6, "z": 0}, "rotation": {"x": 0, "y": 180, "z": 1}, "scale": 1.25}
+
+
+def affine(tf, hand=False):
+    """A ModelTransform as (3x3 linear part, translation)."""
+    o = [tf.get("origin", {}).get(a, 0) for a in "xyz"]
+    t = [tf.get("translation", {}).get(a, 0) for a in "xyz"]
+    r = dict(tf.get("rotation", {}))
+    if hand:
+        r["y"] = r.get("y", 0) - 180
+    s = tf.get("scale", 1)
+    lin = [[s * v for v in row] for row in rot(r)]
+    # p -> o + s * (t + R (p - o))
+    move = [o[i] + s * t[i] - sum(lin[i][k] * o[k] for k in range(3)) for i in range(3)]
+    return lin, move
+
+
+def compose(a, b):
+    """a after b."""
+    lin = mul(a[0], b[0])
+    move = [sum(a[0][i][k] * b[1][k] for k in range(3)) + a[1][i] for i in range(3)]
+    return lin, move
+
+
+def invert(a):
+    s = sum(a[0][i][0] ** 2 for i in range(3)) ** 0.5
+    lin = [[v / (s * s) for v in row] for row in transpose(a[0])]
+    return lin, [-sum(lin[i][k] * a[1][k] for k in range(3)) for i in range(3)]
+
+
+def as_transform(a):
+    """(linear part, translation) with a uniform scale back into a ModelTransform with origin 0."""
+    s = sum(a[0][i][0] ** 2 for i in range(3)) ** 0.5
+    return {"translation": {ax: round(a[1][i] / s, 4) for i, ax in enumerate("xyz")},
+            "rotation": euler_xyz([[v / s for v in row] for row in a[0]]),
+            "origin": {"x": 0, "y": 0, "z": 0}, "scale": round(s, 4)}
+
+
+def like_the_falx(hand_tf, falx_tf):
+    into_falx = compose(invert(affine(FALX_HAND_TF, hand=True)), affine(hand_tf, hand=True))
+    return as_transform(compose(affine(falx_tf), into_falx))
+
+
 def display_transforms(rotation, shape, ref="falx"):
     """Icon and ground transforms for a model held with this in-hand rotation, laid as the reference item lies."""
     r = REFERENCES[ref]
@@ -392,20 +444,26 @@ def write_items():
         w, k = C.MELEE[key], KINDS[kind]
         gui, ground, centre = display_transforms(w["rotation"], shapes[key])
         shape = {"base": f"{DOMAIN}:item/{FOLDER}/{key}"}
+        hand = C.hand_transform(w["grip"], w["rotation"], w.get("scale", C.WEAPON_SCALE))
         item = {
             "code": code, "class": k["class"], "tags": ["weapon", "weapon-melee"], "damagedby": k["damagedby"],
             "variantgroups": [{"code": "metal", "states": METALS}],
             "shapeByType": {f"*-steel": {"base": f"{DOMAIN}:item/{FOLDER}/{STEEL_MODEL[key]}"}, "*": shape} if key in STEEL_MODEL else None,
             "shape": None if key in STEEL_MODEL else shape,
             "maxstacksize": 1,
-            "attributes": {"heldItemPitchFollow": 0.9, "handbook": {"groupBy": [code + "-*"]},
+            "attributes": {"heldItemPitchFollow": 0.9, "handbook": {"groupBy": [code + "-*"]}, "rackable": True,
+                           "groundStorageTransform": like_the_falx(hand, FALX_GROUND_STORAGE),
+                           "toolrackTransform": like_the_falx(hand, FALX_TOOLRACK),
                            "lotrweapons": {"catalog": key, "copies": k["copies"]}},
             "heldTpHitAnimation": w["attack"],
             "attackpowerByType": {f"*-{m}": better(k["power"][m]) for m in METALS},
             "durabilityByType": {f"*-{m}": k["durability"][m] for m in METALS},
             "creativeinventory": {"general": ["*"], "items": ["*"], "tools": ["*"], "lotrweapons": ["*"]},
-            "behaviors": k["behaviors"],
-            "tpHandTransform": C.hand_transform(w["grip"], w["rotation"], w.get("scale", C.WEAPON_SCALE)),
+            "behaviors": k["behaviors"] + [{"name": "GroundStorable", "properties": {
+                "layout": "WallHalves", "wallOffY": 2 if kind in LONG_KINDS else 1, "ctrlKey": True,
+                "selectionBox": {"x1": 0, "y1": 0, "z1": 0, "x2": 1, "y2": 0.1, "z2": 1},
+                "collisionBox": {"x1": 0, "y1": 0, "z1": 0, "x2": 0, "y2": 0, "z2": 0}}}],
+            "tpHandTransform": hand,
             "guiTransform": gui,
             "groundTransform": ground,
         }

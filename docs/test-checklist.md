@@ -552,6 +552,7 @@ First without Combat Overhaul (W1-W5), then with it (W6). Nothing here has been 
 - [ ] W1.6 Damage on a test animal matches 1.1 x the copied weapon: swords 5.5 / 5.78 (falx), knives 3.85 / 4.4, war axes and the battleaxe 5.5 / 6.6, maces 6.05 / 6.6, warhammer 5.5 / 6.6, poleaxe and halberd 5.5 / 6.6, great swords 6.05 / 6.82, spears 4.62 / 4.84 (iron / steel).
 - [ ] W1.7 Spears throw (hold right click, release): the thrown spear flies tip first at about its in-hand size, sticks, and can be picked up again.
 - [ ] W1.8 Axes chop wood; knives harvest.
+- [ ] W1.9 Each weapon hangs on a tool rack and stands on the ground or against a wall (Ctrl + right click) with its grip where a falx's grip would be; long weapons may poke out (note which).
 
 ## LOTR Weapons W2. Shields and bows (lotrweapons 0.0.2)
 

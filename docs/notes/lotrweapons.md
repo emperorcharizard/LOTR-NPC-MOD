@@ -92,3 +92,6 @@ Full plan: `prompts/player-weapons-mod.md`.
   move parts each body has. Run by build.py. Handbook lines (itemdesc-*) for every weapon, head, shield and bow.
   Under CO, spears are CO melee weapons (thrust, no throw): CO's own throwing needs its projectile behaviour and
   entity, not copied.
+  Ground storage (GroundStorable WallHalves, Ctrl + right click) and tool racks (rackable): transforms are the falx's
+  (blade.json "*") applied after hand(falx)^-1 * hand(ours), so each weapon's grip lands where the falx's does
+  (self-check: the falx maps back onto its own transforms). Long weapons may poke out of a rack.
