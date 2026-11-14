@@ -2,8 +2,8 @@
 ones lotrnpcs' NPCs carry, as player items in iron and steel (owner, 2026-11-14). Same models, textures and hand
 transforms as the NPCs (tools/weapon_catalog.py), the same swing and hold animations.
 
-Stats copy the nearest game weapon in the same metal (vanilla 1.22.7 itemtypes; KINDS below names each source). The
-mod is vanilla-only so far; the Combat Overhaul patch comes next (docs/notes/lotrweapons.md).
+Stats copy the nearest game weapon in the same metal, 10% stronger (KINDS below names each source). With Combat
+Overhaul installed, a patch turns them into its melee weapons (CO_KINDS). Notes: docs/notes/lotrweapons.md.
 """
 import json
 import math
@@ -41,59 +41,74 @@ def write(rel, data):
         f.write("\n")
 
 
-# What each kind of weapon copies, read from the game's 1.22.7 itemtypes (survival/itemtypes/tool/*.json), per metal:
-# attack power, tool tier, durability. Vanilla has no iron or steel mace, war hammer, battle axe, poleaxe, halberd or
-# great sword (only rusty "ruined" ones, 4.5 damage whatever their type), so those ("heavy") copy the iron and steel
-# falx, the nearest weapon the game makes in those metals.
-FALX = {"copies": "blade-falx", "class": "Item", "tool": "sword", "damagedby": ["blockbreaking", "attacking"],
-        "attackRange": 2.5, "power": {"iron": 5, "steel": 5.25}, "tier": {"iron": 4, "steel": 5},
-        "durability": {"iron": 850, "steel": 2125},
-        "behaviors": [{"name": "AnimationAuthoritative"}, {"name": "Buffable"}, {"name": "Sharpenable"}]}
+# What each kind of weapon copies, per metal: attack power, tool tier, durability, reach. Swords, knives and spears
+# copy the game's own (1.22.7 survival/itemtypes/tool/*.json). The game makes no iron or steel war axe, mace, war
+# hammer, halberd or great sword (only rusty "ruined" ones), so those copy Not Only Spear Expansion 0.4.1 (Kanahaku;
+# the owner sent it for comparison, 2026-11-14): its bartka (a battle axe), mace, polehammer, halberd and claymore.
+# Owner, 2026-11-14: "increase the damage to be slightly better than vanilla": every attack power (and the thrown
+# spear's damage) is the copied number times BETTER, here and in the Combat Overhaul patch.
+BETTER = 1.1
+_HIT = [{"name": "AnimationAuthoritative"}, {"name": "Buffable"}]
+_KIT = {"damagedby": ["blockbreaking", "attacking"], "behaviors": _HIT}
 KINDS = {
-    "sword": FALX,
-    "heavy": dict(FALX, tool=None, behaviors=[{"name": "AnimationAuthoritative"}, {"name": "Buffable"}]),
-    "knife": {"copies": "knife-generic", "class": "ItemKnife", "tool": "knife", "damagedby": ["blockbreaking", "attacking"],
-              "power": {"iron": 3.5, "steel": 4}, "durability": {"iron": 900, "steel": 2250},
-              "behaviors": [{"name": "AnimationAuthoritative"}]},
-    "axe": {"copies": "axe-felling", "class": "ItemAxe", "tool": "axe", "damagedby": ["blockbreaking", "attacking"],
-            "attackRange": 2, "power": {"iron": 3, "steel": 4}, "tier": {"iron": 4, "steel": 5},
-            "durability": {"iron": 900, "steel": 1800},
-            "miningspeed": {"iron": {"wood": 8.4, "plant": 5, "leaves": 3.2}, "steel": {"wood": 11, "plant": 6, "leaves": 4}},
-            "behaviors": [{"name": "AnimationAuthoritative"}]},
-    "spear": {"copies": "spear-generic", "class": "ItemSpear", "tool": "spear", "damagedby": ["attacking"],
+    "sword": _KIT | {"copies": "game:blade-falx", "class": "Item", "tool": "sword", "attackRange": 2.5,
+                     "power": {"iron": 5, "steel": 5.25}, "tier": {"iron": 4, "steel": 5}, "durability": {"iron": 850, "steel": 2125},
+                     "behaviors": _HIT + [{"name": "Sharpenable"}]},
+    "knife": _KIT | {"copies": "game:knife-generic", "class": "ItemKnife", "tool": "knife",
+                     "power": {"iron": 3.5, "steel": 4}, "durability": {"iron": 900, "steel": 2250}},
+    "spear": {"copies": "game:spear-generic", "class": "ItemSpear", "tool": "spear", "damagedby": ["attacking"],
               "attackRange": 3.5, "power": {"iron": 4.2, "steel": 4.4}, "durability": {"iron": 400, "steel": 700},
-              "thrown": {"iron": 6.8, "steel": 7.0}, "thrownTier": {"iron": 1, "steel": 2},
-              "behaviors": [{"name": "Buffable"}, {"name": "AnimationAuthoritative"}]},
+              "thrown": {"iron": 6.8, "steel": 7.0}, "thrownTier": {"iron": 1, "steel": 2}, "behaviors": _HIT},
+    # A war axe still fells trees: the game's felling axe's speeds.
+    "axe": _KIT | {"copies": "spearexpantion:bartka", "class": "ItemAxe", "tool": "axe", "attackRange": 2.5,
+                   "power": {"iron": 5, "steel": 6}, "tier": {"iron": 4, "steel": 5}, "durability": {"iron": 850, "steel": 2150},
+                   "miningspeed": {"iron": {"wood": 8.4, "plant": 5, "leaves": 3.2}, "steel": {"wood": 11, "plant": 6, "leaves": 4}}},
+    "battleaxe": _KIT | {"copies": "spearexpantion:bartka", "class": "Item", "attackRange": 2.5,
+                         "power": {"iron": 5, "steel": 6}, "tier": {"iron": 4, "steel": 5}, "durability": {"iron": 850, "steel": 2150}},
+    "mace": _KIT | {"copies": "spearexpantion:mace-common", "class": "Item", "attackRange": 2.5,
+                    "power": {"iron": 5.5, "steel": 6}, "tier": {"iron": 4, "steel": 5}, "durability": {"iron": 1000, "steel": 2350}},
+    "polehammer": _KIT | {"copies": "spearexpantion:polehammer", "class": "Item", "attackRange": 3.5,
+                          "power": {"iron": 5, "steel": 6}, "tier": {"iron": 4, "steel": 6}, "durability": {"iron": 1100, "steel": 2000}},
+    "halberd": _KIT | {"copies": "spearexpantion:halberd", "class": "Item", "attackRange": 3.5,
+                       "power": {"iron": 5, "steel": 6}, "tier": {"iron": 4, "steel": 5}, "durability": {"iron": 1100, "steel": 2000}},
+    "claymore": _KIT | {"copies": "spearexpantion:claymore", "class": "Item", "attackRange": 3,
+                        "power": {"iron": 5.5, "steel": 6.2}, "tier": {"iron": 4, "steel": 5}, "durability": {"iron": 1200, "steel": 2400}},
 }
+
+
+def better(value):
+    return round(value * BETTER, 2)
+
+
 # Catalog key -> (item code, kind, name). Codes are <weapon>-<people>, plus the metal: lotrweapons:sword-gondor-steel.
 # Gondor's sword and the dwarven war and short hammers are one weapon each with the owner's iron and steel models
 # (STEEL_MODEL); every other weapon uses its one model for both metals until the owner's steel skins arrive.
 WEAPONS = {
     "scimitar": ("scimitar-mordor", "sword", "Orc scimitar"),
     "axe": ("axe-mordor", "axe", "Orc axe"),
-    "hammer": ("hammer-mordor", "heavy", "Orc hammer"),
+    "hammer": ("hammer-mordor", "mace", "Orc hammer"),
     "dagger": ("dagger-mordor", "knife", "Orc dagger"),
     "knife": ("knife-mordor", "knife", "Orc knife"),
-    "poleaxe": ("poleaxe-mordor", "heavy", "Orc poleaxe"),
+    "poleaxe": ("poleaxe-mordor", "halberd", "Orc poleaxe"),
     "mmsword": ("sword-mistymountains", "sword", "Misty Mountains orc sword"),
     "mmspear": ("spear-mistymountains", "spear", "Misty Mountains orc spear"),
     "elfspear": ("spear-elven", "spear", "Elven spear"),
-    "elflongsword": ("longsword-elven", "heavy", "Elven longsword"),
+    "elflongsword": ("longsword-elven", "claymore", "Elven longsword"),
     "dwaxe": ("axe-dwarven", "axe", "Dwarven axe"),
-    "dwbattleaxe": ("battleaxe-dwarven", "heavy", "Dwarven battleaxe"),
+    "dwbattleaxe": ("battleaxe-dwarven", "battleaxe", "Dwarven battleaxe"),
     "dwdagger": ("dagger-dwarven", "knife", "Dwarven dagger"),
     "dwspear": ("boarspear-dwarven", "spear", "Dwarven boar spear"),
-    "dwwarhammer": ("warhammer-dwarven", "heavy", "Dwarven warhammer"),
-    "dwshorthammer": ("shorthammer-dwarven", "heavy", "Dwarven shorthammer"),
+    "dwwarhammer": ("warhammer-dwarven", "polehammer", "Dwarven warhammer"),
+    "dwshorthammer": ("shorthammer-dwarven", "mace", "Dwarven shorthammer"),
     "gdsword": ("sword-gondor", "sword", "Gondorian sword"),
-    "gdcaptsword": ("captainsword-gondor", "heavy", "Captain's sword"),
+    "gdcaptsword": ("captainsword-gondor", "claymore", "Captain's sword"),
     "rhsword": ("sword-rohan", "sword", "Rohirric sword"),
     "rhaxe": ("axe-rohan", "axe", "Rohirric axe"),
     "rhspear": ("spear-rohan", "spear", "Rohirric spear"),
     "bnsteelsword": ("sword-blacknumenorean", "sword", "Black Numenorean sword"),
     "bnspear": ("spear-numenorean", "spear", "Numenorean spear"),
     "morgulblade": ("morgulblade", "sword", "Morgul blade"),
-    "eastaxe": ("halberd-easterling", "heavy", "Easterling halberd"),
+    "eastaxe": ("halberd-easterling", "halberd", "Easterling halberd"),
     "eastscimitar": ("scimitar-easterling", "sword", "Easterling scimitar"),
     "hdspear": ("spear-haradrim", "spear", "Haradrim spear"),
     "hdsword": ("sword-haradrim", "sword", "Haradrim sword"),
@@ -122,6 +137,97 @@ ANIM_META = {
 }
 assert set(ANIM_META) == set(OWN_ANIMS)
 VANILLA_ANIMS = {"falx", "axehit", "hammerhit", "knifestab", "spearhit", "spearidle"}  # all in player.json
+
+
+# With Combat Overhaul (CO) installed, a patch makes every weapon but the knives one of its melee weapons
+# ("CombatOverhaul:MeleeWeapon", as Not Only Spear Expansion's CO patches do). Damage per metal comes from CO's own
+# falx (game/itemtypes/combatoverhaul/sword.json in CO's source) for swords, and from Not Only Spear Expansion's CO
+# patches for the rest (its numbers on CO's scale), all times BETTER. "Tier" is what CO's source reads; "Strength" is
+# the same number under the name Not Only Spear Expansion's patches use, for CO versions that read that. First person
+# uses CO's own animations (it has none for axes, so axes swing like its clubs); third person (AttackTpAnimation)
+# is the NPC's swing, so other players see the weapon used as the NPCs use it. Knives keep the game's knife.
+_FP = {
+    "falx": {"attack": ["combatoverhaul:sword-falx-slash-1", "combatoverhaul:sword-falx-slash-2"],
+             "ready": "combatoverhaul:sword-falx-ready", "idle": "combatoverhaul:sword-falx-idle"},
+    "club1h": {"attack": ["combatoverhaul:club-strike-1h-1", "combatoverhaul:club-strike-1h-2"],
+               "ready": "combatoverhaul:club-ready-1h", "idle": "combatoverhaul:club-idle-1h"},
+    "club2h": {"attack": ["combatoverhaul:club-strike-2h-1", "combatoverhaul:club-strike-2h-2"],
+               "ready": "combatoverhaul:club-ready-2h", "idle": "combatoverhaul:club-idle-2h"},
+    "greatsword": {"attack": ["combatoverhaul:sword-great-slash"],
+                   "ready": "combatoverhaul:sword-long-ready", "idle": "combatoverhaul:sword-great-idle-1h"},
+    "spear1h": {"attack": ["combatoverhaul:spear-thrust-1h"],
+                "ready": "combatoverhaul:spear-ready-1h", "idle": "combatoverhaul:spear-idle-1h"},
+    "spear2h": {"attack": ["combatoverhaul:spear-thrust-2h-1", "combatoverhaul:spear-thrust-2h-2", "combatoverhaul:spear-thrust-2h-3"],
+                "ready": "combatoverhaul:spear-ready-2h", "idle": "combatoverhaul:spear-idle-2h"},
+}
+CO_KINDS = {
+    "sword": {"copies": "combatoverhaul:blade-falx", "type": "SlashingAttack", "damage": {"iron": 4, "steel": 4},
+              "tier": {"iron": 5, "steel": 7}, "knockback": -0.5, "one": "falx", "skill": "oneHandedSwordsProficiency"},
+    "axe": {"copies": "spearexpantion:bartka", "type": "SlashingAttack", "damage": {"iron": 4.8, "steel": 5.3},
+            "tier": {"iron": 5, "steel": 7}, "knockback": -0.2, "one": "club1h", "skill": "axesProficiency"},
+    "battleaxe": {"copies": "spearexpantion:bartka", "type": "SlashingAttack", "damage": {"iron": 4.8, "steel": 5.3},
+                  "tier": {"iron": 5, "steel": 7}, "knockback": 0.5, "two": "club2h", "skill": "axesProficiency"},
+    "mace": {"copies": "spearexpantion:mace-common", "type": "BluntAttack", "damage": {"iron": 4.9, "steel": 5.2},
+             "tier": {"iron": 5, "steel": 6}, "knockback": 0, "one": "club1h", "skill": "macesProficiency"},
+    "polehammer": {"copies": "spearexpantion:polehammer", "type": "BluntAttack", "damage": {"iron": 5.1, "steel": 7.1},
+                   "tier": {"iron": 5, "steel": 7}, "knockback": 0.5, "two": "club2h", "skill": "halberdsProficiency"},
+    "halberd": {"copies": "spearexpantion:halberd", "type": "SlashingAttack", "damage": {"iron": 5.1, "steel": 7.1},
+                "tier": {"iron": 5, "steel": 7}, "knockback": 0.5, "two": "club2h", "skill": "halberdsProficiency"},
+    "claymore": {"copies": "spearexpantion:claymore", "type": "SlashingAttack", "damage": {"iron": 5, "steel": 6},
+                 "tier": {"iron": 4, "steel": 6}, "knockback": 0, "two": "greatsword", "skill": "twoHandedSwordsProficiency"},
+    "spear": {"copies": "spearexpantion:spear", "type": "PiercingAttack", "damage": {"iron": 4.5, "steel": 5},
+              "damage2h": {"iron": 5.5, "steel": 6}, "tier": {"iron": 4, "steel": 6}, "knockback": 0.5,
+              "one": "spear1h", "two": "spear2h", "reach2h": 15, "skill": "spearsProficiency"},
+}
+assert set(CO_KINDS) == set(KINDS) - {"knife"}
+CO_FP_ANIMS = {a for f in _FP.values() for a in f["attack"] + [f["ready"], f["idle"]]}
+
+
+def blade_line(w, shape):
+    """CO's hit line for a weapon, in model blocks: from the grip to the far end of the weapon along its longest
+    side (CO's falx: [0, 0, 0.5, 1.2, 0, 0.05], along its blade)."""
+    lo, hi = bounds(shape)
+    grip = [w["grip"][0] / 16, w["grip"][1] / 16, w["grip"][2] / 16 if len(w["grip"]) > 2 else 0.5]
+    axis = max(range(3), key=lambda i: hi[i] - lo[i])
+    tip = list(grip)
+    tip[axis] = hi[axis] if hi[axis] - grip[axis] >= grip[axis] - lo[axis] else lo[axis]
+    return [round(v, 3) for v in grip + tip]
+
+
+def co_stance(ck, w, line, anims, damage, reach):
+    fp = _FP[anims]
+    return {"CanAttack": True, "CanParry": False, "CanBlock": False, "CanSprint": True, "SpeedPenalty": 0,
+            "Attack": {"StopOnTerrainHit": False, "StopOnEntityHit": True, "CollideWithTerrain": True, "MaxReach": reach,
+                       "DamageTypes": [{"DamageByType": {f"*-{m}": {"DamageType": ck["type"], "Tier": ck["tier"][m],
+                                                                    "Strength": ck["tier"][m], "Damage": better(damage[m])}
+                                                         for m in METALS},
+                                        "Knockback": ck["knockback"], "DurabilityDamage": 1, "Collider": line}]},
+            "AttackHitSound": "game:sounds/thud", "AttackAnimation": {"Main": fp["attack"]},
+            "ReadyAnimation": fp["ready"], "IdleAnimation": fp["idle"], "AttackTpAnimation": w["attack"]}
+
+
+def write_co_patch(shapes):
+    patches = []
+    depends = [{"modid": "combatoverhaul"}]
+    for key, (code, kind, _) in WEAPONS.items():
+        ck = CO_KINDS.get(kind)
+        if not ck:
+            continue
+        w = C.MELEE[key]
+        line = blade_line(w, shapes[key])
+        # A two-handed weapon gets its two-handed swing in both stances (one hand when the other holds something).
+        one = ck.get("one") or ck["two"]
+        two = ck.get("two") or ck["one"]
+        attributes = {"ProficiencyStats": ["meleeProficiency", ck["skill"]], "RenderingOffset": False,
+                      "lotrweapons": {"catalog": key, "copies": KINDS[kind]["copies"], "coCopies": ck["copies"]},
+                      "OneHandedStance": co_stance(ck, w, line, one, ck["damage"], 9),
+                      "TwoHandedStance": co_stance(ck, w, line, two, ck.get("damage2h", ck["damage"]), ck.get("reach2h", 9))}
+        file = f"{DOMAIN}:itemtypes/{code}"
+        patches.append({"side": "Server", "dependsOn": depends, "file": file, "op": "replace", "path": "/class",
+                        "value": "CombatOverhaul:MeleeWeapon"})
+        patches.append({"side": "Server", "dependsOn": depends, "file": file, "op": "addmerge", "path": "/attributes",
+                        "value": attributes})
+    write("patches/combatoverhaul.json", patches)
 
 
 def write_animation_patches():
@@ -246,7 +352,7 @@ def write_items():
             "attributes": {"heldItemPitchFollow": 0.9, "handbook": {"groupBy": [code + "-*"]},
                            "lotrweapons": {"catalog": key, "copies": k["copies"]}},
             "heldTpHitAnimation": w["attack"],
-            "attackpowerByType": {f"*-{m}": k["power"][m] for m in METALS},
+            "attackpowerByType": {f"*-{m}": better(k["power"][m]) for m in METALS},
             "durabilityByType": {f"*-{m}": k["durability"][m] for m in METALS},
             "creativeinventory": {"general": ["*"], "items": ["*"], "tools": ["*"], "lotrweapons": ["*"]},
             "behaviors": k["behaviors"],
@@ -266,7 +372,7 @@ def write_items():
             item["heldTpIdleAnimation"] = w["hold"]
             item["heldRightReadyAnimation"] = w["hold"]
         if kind == "spear":
-            item["attributes"] |= {"damageByType": {f"*-{m}": k["thrown"][m] for m in METALS},
+            item["attributes"] |= {"damageByType": {f"*-{m}": better(k["thrown"][m]) for m in METALS},
                                    "damageTierByType": {f"*-{m}": k["thrownTier"][m] for m in METALS},
                                    "spearEntityCodeByType": {"*": f"{DOMAIN}:thrown-{code}-{{metal}}"}}
             write_thrown_spear(code, key, w, centre)
@@ -274,6 +380,7 @@ def write_items():
         for m in METALS:
             lang[f"item-{code}-{m}"] = f"{m.capitalize()} {name[0].lower() + name[1:] if name.startswith(('Orc', 'Captain')) else name}"
     write("lang/en.json", lang)
+    write_co_patch(shapes)
     return lang
 
 

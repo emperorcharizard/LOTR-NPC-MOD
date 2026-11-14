@@ -4,7 +4,9 @@
 
 Every item: iron and steel variants with stats for both, its shapes and their textures in the mod, a name per metal,
 swing and hold animations that exist on every player body, and the same hand transform as the NPC's copy of the weapon
-(lotrnpcs' orcweapon-<catalog key>). Spears have their thrown entity. Neither mod names the other's domain.
+(lotrnpcs' orcweapon-<catalog key>). Spears have their thrown entity. Every weapon but the knives has a Combat Overhaul
+patch (class and both stances, gated on combatoverhaul) using CO's own first-person animations and our third-person
+swing. Neither mod names the other's domain.
 """
 import json
 import os
@@ -48,6 +50,22 @@ for code, files in on_body.items():
         errors.append(f"animation {code} has no player.json settings (or no -fp)")
 anims_ok = VANILLA_ANIMS | set(on_body)
 
+# Combat Overhaul's own first-person animations (its config/animations/melee/*.json, source read 2026-11-14).
+CO_ANIMS = {"combatoverhaul:" + a for a in (
+    "sword-falx-slash-1", "sword-falx-slash-2", "sword-falx-ready", "sword-falx-idle", "club-strike-1h-1", "club-strike-1h-2",
+    "club-ready-1h", "club-idle-1h", "club-strike-2h-1", "club-strike-2h-2", "club-ready-2h", "club-idle-2h",
+    "sword-great-slash", "sword-long-ready", "sword-great-idle-1h", "spear-thrust-1h", "spear-ready-1h", "spear-idle-1h",
+    "spear-thrust-2h-1", "spear-thrust-2h-2", "spear-thrust-2h-3", "spear-ready-2h", "spear-idle-2h")}
+co_class, co_attr = set(), {}
+for p in load(os.path.join(A, "patches", "combatoverhaul.json")):
+    code = p["file"].rsplit("/", 1)[1]
+    if p.get("dependsOn") != [{"modid": "combatoverhaul"}]:
+        errors.append(f"CO patch on {code} must depend on combatoverhaul")
+    if p["path"] == "/class":
+        co_class.add(code) if p["value"] == "CombatOverhaul:MeleeWeapon" else errors.append(f"{code}: CO class {p['value']}")
+    else:
+        co_attr[code] = p["value"]
+
 lang = load(os.path.join(A, "lang", "en.json"))
 items = 0
 for name in sorted(os.listdir(os.path.join(A, "itemtypes"))):
@@ -81,6 +99,25 @@ for name in sorted(os.listdir(os.path.join(A, "itemtypes"))):
     npc_item = os.path.join(NA, "itemtypes", f"orcweapon-{catalog}.json")
     if load(npc_item)["tpHandTransform"] != item["tpHandTransform"]:
         errors.append(f"{code}: hand transform differs from the NPC's {catalog}")
+    power = item["attackpowerByType"]
+    if power["*-steel"] < power["*-iron"]:
+        errors.append(f"{code}: steel hits softer than iron")
+    knife = item["class"] == "ItemKnife"
+    if knife == (code in co_class or code in co_attr):
+        errors.append(f"{code}: {'knives keep the game knife under CO' if knife else 'no Combat Overhaul patch'}")
+    for name, st in ((n, co_attr.get(code, {}).get(n)) for n in ("OneHandedStance", "TwoHandedStance")):
+        if st is None:
+            if not knife:
+                errors.append(f"{code}: CO {name} missing")
+            continue
+        hits = st["Attack"]["DamageTypes"][0]
+        if set(hits["DamageByType"]) != {"*-iron", "*-steel"} or len(hits["Collider"]) != 6:
+            errors.append(f"{code}: CO {name} damage per metal or collider wrong")
+        if st["AttackTpAnimation"] not in anims_ok:
+            errors.append(f"{code}: CO {name} third-person animation {st['AttackTpAnimation']} is on no player body")
+        for a in st["AttackAnimation"]["Main"] + [st["ReadyAnimation"], st["IdleAnimation"]]:
+            if a not in CO_ANIMS:
+                errors.append(f"{code}: CO {name} animation {a} is not one of Combat Overhaul's")
     entity = item["attributes"].get("spearEntityCodeByType", {}).get("*")
     if (item["class"] == "ItemSpear") != bool(entity):
         errors.append(f"{code}: spear class and thrown entity don't match")
