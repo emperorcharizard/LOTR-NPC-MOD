@@ -538,3 +538,18 @@ Install `lotrnpcs_0.0.139-test.zip`; restart fully. DebugCommands on, battle log
 - [ ] 139.1 3 Rohan riders v 10 Dunlending warriors (riders at z 126, Dunlendings at z 142), twice: the CSV has rider melee rows (landed, some nocontact), the summary shows rohan charge hits, and riders kill some Dunlendings.
 - [ ] 139.2 server-main.log has "[lotrnpcs] rider ... melee:" lines: most swings end in "blow", few "ended without a blow" or "cancelled before the blow".
 - [ ] 139.3 Riders stay within about 20 blocks of the fight (none found more than 30 blocks away afterwards).
+
+## LOTR Weapons W1. Melee weapons as player items (lotrweapons 0.0.1)
+
+Install `lotrweapons_0.0.1-test.zip` next to lotrnpcs (restart.ps1 installs both); restart fully. Creative world.
+No Combat Overhaul patch yet: with CO installed these are plain vanilla weapons (W1.8 checks what CO does to them).
+
+- [ ] W1.1 The game loads with no lotrweapons errors in client-main.log / server-main.log (patches applied: "player-animations").
+- [ ] W1.2 The "LOTR Weapons" creative tab lists 58 items, an iron and a steel of each of the 29 weapons, with names like "Iron Gondorian sword" / "Steel Gondorian sword". Icons sit inside their slots, diagonal like the falx (offline sheet: previews/lotrweapons-icons-0.0.1.png); fix any with `.tfedit` and note the values.
+- [ ] W1.3 Held in third person (F5) each weapon sits in the hand as the NPC holds the same weapon (compare with an NPC of that faction); Gondor's sword and the dwarven war and short hammers show the steel model in their steel variant.
+- [ ] W1.4 First person: the weapon is visible and not through the camera; swings play (falx slash, axe chop, hammer blow, knife stab, spear thrust).
+- [ ] W1.5 Two-handed weapons (Orc poleaxe, Dwarven battleaxe and warhammer, Easterling halberd, Elven longsword, Captain's sword) hold their carry or guard pose between swings and chop with the two-handed chop, as a human, a dwarf and an elf player (LOTR Races and Classes bodies).
+- [ ] W1.6 Damage on a test NPC or animal matches the copied game weapon: iron sword 5, steel 5.25 (as the iron/steel falx); axes 3/4; knives 3.5/4; spears 4.2/4.4. Durability drops by one per hit.
+- [ ] W1.7 Spears throw (hold right click, release): the thrown spear flies tip first at about its in-hand size, sticks, and can be picked up again.
+- [ ] W1.8 With Combat Overhaul installed: note whether the weapons swing at all, and with what (vanilla swing or none). The CO patch is the next build.
+- [ ] W1.9 Axes chop wood; knives harvest (they copy the felling axe and the knife).

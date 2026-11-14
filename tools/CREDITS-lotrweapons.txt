@@ -1,0 +1,6 @@
+LOTR Weapons
+
+The weapon models and their textures were provided by the server's owner (the same models the LOTR NPCs mod's
+NPCs carry). Parts without one of those textures use vanilla Vintage Story textures. The three animations of
+our own (poleaxechop, poleaxehold, greatswordhold) were made for the LOTR NPCs mod from the game's own
+axehit and holdbothhands.

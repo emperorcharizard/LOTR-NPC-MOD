@@ -1,5 +1,6 @@
 """One-command build of the lotrnpcs test zip (0.0.112): DLL, generated assets, bundled LRC races, both offline test
-suites, then releases/lotrnpcs_<version>-test.zip. Runs on Windows and Linux (GitHub Actions).
+suites, then releases/lotrnpcs_<version>-test.zip. Also builds and checks the second mod, LOTR Weapons, into
+releases/lotrweapons_<version>-test.zip (its --publish is not wired up: ask the owner first). Runs on Windows and Linux (GitHub Actions).
 
     python tools/build.py              build, test, zip
     python tools/build.py --no-zip     build and test only (CI)
@@ -20,6 +21,7 @@ BUILD = os.path.join(ROOT, "build")          # scratch, ignored by git
 GEN = os.path.join(BUILD, "gen")
 LRC = os.path.join(BUILD, "lrc")
 LRC_ZIP = os.path.join(ROOT, "build-inputs", "lrc-0.4.1.zip")
+LW = os.path.join(BUILD, "lotrweapons")
 
 
 def dotnet():
@@ -113,6 +115,10 @@ def main():
     # bundle_lrc writes our own body shapes (with the poleaxe and greatsword animations).
     run([sys.executable, os.path.join(ROOT, "tools", "bundle_lrc.py"), os.path.join(LRC, "assets", "lrc"), os.path.join(GEN, "assets", "lotrnpcs")])
     dedupe_skins(os.path.join(GEN, "assets", "lotrnpcs"))
+    # The second mod, LOTR Weapons (lotrweapons, 2026-11-14): the NPCs' custom weapons as player items, from the same
+    # weapon catalog. Its checks compare its hand transforms with the lotrnpcs items just generated.
+    run([sys.executable, os.path.join(ROOT, "tools", "gen_lotrweapons.py"), LW])
+    run([sys.executable, os.path.join(ROOT, "tools", "tests", "lotrweapons", "check.py"), LW, GEN])
     entities = os.path.join(GEN, "assets", "lotrnpcs", "entities")
 
     fac = os.path.join(ROOT, "tools", "tests", "factions")
@@ -145,6 +151,16 @@ def main():
                 # Forward slashes: the game can't read zip entries with backslashes.
                 z.writestr(os.path.relpath(path, GEN).replace(os.sep, "/"), packed(path), zipfile.ZIP_DEFLATED, 9)
     print("wrote", out)
+    lw_version = json.load(open(os.path.join(LW, "modinfo.json"), encoding="utf-8"))["version"]
+    lw_out = os.path.join(ROOT, "releases", f"lotrweapons_{lw_version}-test.zip")
+    with zipfile.ZipFile(lw_out, "w", zipfile.ZIP_DEFLATED) as z:
+        z.write(os.path.join(LW, "modinfo.json"), "modinfo.json")
+        z.write(os.path.join(ROOT, "tools", "CREDITS-lotrweapons.txt"), "CREDITS.txt")
+        for folder, _, files in os.walk(os.path.join(LW, "assets")):
+            for name in sorted(files):
+                path = os.path.join(folder, name)
+                z.writestr(os.path.relpath(path, LW).replace(os.sep, "/"), packed(path), zipfile.ZIP_DEFLATED, 9)
+    print("wrote", lw_out)
 
     if opts.publish:
         gh = shutil.which("gh") or r"C:\Program Files\GitHub CLI\gh.exe"

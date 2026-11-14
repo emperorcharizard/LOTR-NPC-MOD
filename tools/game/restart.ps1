@@ -7,9 +7,15 @@ $repo = Split-Path (Split-Path $PSScriptRoot)
 & "$o\focus.ps1" | Out-Null; Start-Sleep -Milliseconds 300; & "$o\click.ps1" 727 578 | Out-Null; Start-Sleep -Seconds 2
 & "$o\click.ps1" 110 523 | Out-Null; Start-Sleep -Seconds 8
 if (Get-Process Vintagestory -ErrorAction SilentlyContinue) { "still running"; return }
-$zip = Get-ChildItem "$repo\releases" -Filter "lotrnpcs_*-test.zip" | Sort-Object LastWriteTime | Select-Object -Last 1
-Get-ChildItem "C:\Users\Mason\AppData\Roaming\VintagestoryData\Mods" -Filter "lotrnpcs_*.zip" | Where-Object Name -ne $zip.Name | Remove-Item
-Copy-Item $zip.FullName "C:\Users\Mason\AppData\Roaming\VintagestoryData\Mods\" -Force
+# Both mods (lotrweapons since 2026-11-14): the newest zip of each replaces the installed one.
+$names = @()
+foreach ($mod in @("lotrnpcs", "lotrweapons")) {
+    $zip = Get-ChildItem "$repo\releases" -Filter "$($mod)_*-test.zip" | Sort-Object LastWriteTime | Select-Object -Last 1
+    if (-not $zip) { continue }
+    Get-ChildItem "C:\Users\Mason\AppData\Roaming\VintagestoryData\Mods" -Filter "$($mod)_*.zip" | Where-Object Name -ne $zip.Name | Remove-Item
+    Copy-Item $zip.FullName "C:\Users\Mason\AppData\Roaming\VintagestoryData\Mods\" -Force
+    $names += $zip.Name
+}
 Start-Process "C:\Users\Mason\AppData\Roaming\Vintagestory\Vintagestory.exe"; Start-Sleep -Seconds 25
 & "$o\focus.ps1" | Out-Null; Start-Sleep -Milliseconds 400; & "$o\click.ps1" 110 280 | Out-Null; Start-Sleep -Seconds 2; & "$o\click.ps1" 700 116 | Out-Null; Start-Sleep -Seconds 60
-"relaunched with " + $zip.Name
+"relaunched with " + ($names -join ", ")
