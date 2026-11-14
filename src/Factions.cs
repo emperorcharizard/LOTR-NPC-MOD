@@ -457,11 +457,28 @@ namespace LotrNpcs
             perCaptain <= 0 ? int.MaxValue : Math.Max(1, (int)Math.Floor(roster / (double)perCaptain + 0.25 + 1e-9));
         /// <summary>The health of this faction's NPCs of this rank (0.0.91), or null: the type's own (a faction the
         /// config doesn't know, a rank without an entry, a rankless NPC).</summary>
-        public float? HealthFor(string faction, string rank) =>
-            rank != null && Def(faction)?.Health is Dictionary<string, float> table && (table.TryGetValue(rank, out float v) || table.TryGetValue(Promotion.StatRank(rank), out v)) ? v : (float?)null;
+        public float? HealthFor(string faction, string rank) => StatFor(Def(faction), Def(faction)?.Health, rank, 0);
         /// <summary>The damage of one hit (before the spread) of this faction's NPCs of this rank, or null: the type's.</summary>
-        public float? DamageFor(string faction, string rank) =>
-            rank != null && Def(faction)?.Damage is Dictionary<string, float> table && (table.TryGetValue(rank, out float v) || table.TryGetValue(Promotion.StatRank(rank), out v)) ? v : (float?)null;
+        public float? DamageFor(string faction, string rank) => StatFor(Def(faction), Def(faction)?.Damage, rank, 2);
+
+        /// <summary>0.0.130 (owner, 2026-11-14: riders "dont seem to be able to hold their own in a fight against a large
+        /// group of warriors"): a rider costs a captain's price but fought with a warrior's numbers, about 1/2.5 of its
+        /// coin's worth. Unless the config lists a rider entry, its health and damage are the warrior's times
+        /// RiderScale: (captain price / warrior price) ^ RiderStatExponent, which the simulator (tools/balance/riders130.py)
+        /// puts near even against the warriors the same coin buys (2.0 to 2.4 for the shipped prices).</summary>
+        public const double RiderStatExponent = 0.82, DefaultRiderScale = 2.2;
+
+        public static float RiderScale(FactionDef def) =>
+            def?.HirePrices != null && def.HirePrices.TryGetValue("captain", out int c) && def.HirePrices.TryGetValue("warrior", out int w) && c > 0 && w > 0
+                ? (float)Math.Pow(c / (double)w, RiderStatExponent) : (float)DefaultRiderScale;
+
+        static float? StatFor(FactionDef def, Dictionary<string, float> table, string rank, int digits)
+        {
+            if (rank == null || table == null) return null;
+            if (table.TryGetValue(rank, out float v)) return v;
+            if (rank == "rider" && table.TryGetValue("warrior", out float w)) return (float)Math.Round(w * RiderScale(def), digits);
+            return table.TryGetValue(Promotion.StatRank(rank), out v) ? v : (float?)null;
+        }
         /// <summary>The spread on every NPC hit (0.0.91), 0 to 0.9.</summary>
         public double Spread => double.IsNaN(DamageSpread) ? DefaultDamageSpread : GameMath.Clamp(DamageSpread, 0, 0.9);
         /// <summary>How much bigger this faction's wild groups are than the baseline's: its follow limit over the
@@ -1589,6 +1606,8 @@ namespace LotrNpcs
         float sinceScan;
         double pushX, pushZ, scanSpacing, enemySpacing, brake, headX, headZ;
         bool lookAhead;
+        // 0.0.130: neighbours within BattleSpacing.ContactScan at the last scan, kept out of this NPC's body every tick.
+        readonly List<Entity> contacts = new List<Entity>(8);
         // 0.0.82: the turn toward the NPC it fights, at most FaceRadPerSec, while standing within FaceRange of it.
         public const double FaceRange = 4, FaceRadPerSec = 6;
         long scanTarget;
@@ -1709,6 +1728,7 @@ namespace LotrNpcs
                 sinceScan = 0;
                 Scan(now, fighting, walking);
             }
+            KeepApart();
             if ((pushX == 0 && pushZ == 0 && brake == 0) || !entity.OnGround) return;
             double k = BattleSpacing.PushImpulse(dt);
             entity.Pos.Motion.X += pushX * k;
@@ -1723,6 +1743,25 @@ namespace LotrNpcs
                     entity.Pos.Motion.X -= headX * cut;
                     entity.Pos.Motion.Z -= headZ * cut;
                 }
+            }
+        }
+
+        // 0.0.130: hard bodies. Each tick the NPC steps out of any overlap with a neighbour from its last scan, by half
+        // the overlap (the neighbour does the same on its own tick), never into a wall or off a ledge. Riders and
+        // mounts are left out (a rider sits inside its mount); players keep the game's own push.
+        void KeepApart()
+        {
+            if (contacts.Count == 0 || (entity as EntityAgent)?.MountedOn != null) return;
+            double x = entity.Pos.X, z = entity.Pos.Z;
+            foreach (Entity e in contacts)
+            {
+                if (!e.Alive || (e as EntityAgent)?.MountedOn != null || Math.Abs(e.Pos.InternalY - entity.Pos.InternalY) > 1.5) continue;
+                if (BattleSpacing.ContactShift(x - e.Pos.X, z - e.Pos.Z, entity.EntityId, out double sx, out double sz)) { x += sx; z += sz; }
+            }
+            if ((x != entity.Pos.X || z != entity.Pos.Z) && CanStepTo(entity.World.BlockAccessor, x, entity.Pos.InternalY, z))
+            {
+                entity.Pos.X = x;
+                entity.Pos.Z = z;
             }
         }
 
@@ -1750,6 +1789,7 @@ namespace LotrNpcs
         void Scan(long now, bool fighting, bool walking)
         {
             pushX = pushZ = 0; brake = 0;
+            contacts.Clear();
             BattleSpacing spacing = factions.Spacing;
             // 0.0.82: enemies, the one it fights included, may come as close as the duel minimum; only its own side
             // keeps CombatSpacing (before, every NPC but its target did, which shoved fighters out of reach). 0.0.104:
@@ -1766,7 +1806,7 @@ namespace LotrNpcs
             partitions ??= entity.Api.ModLoader.GetModSystem<EntityPartitioning>();
             if (partitions == null) return;
             onNeighbor ??= OnNeighbor;
-            double radius = walking ? Math.Max(scanSpacing + 0.5, BattleSpacing.LookAhead) : scanSpacing + 0.5;
+            double radius = Math.Max(walking ? Math.Max(scanSpacing + 0.5, BattleSpacing.LookAhead) : scanSpacing + 0.5, BattleSpacing.ContactScan);
             partitions.WalkEntities(entity.Pos.X, entity.Pos.InternalY, entity.Pos.Z, radius, onNeighbor, null, EnumEntitySearchType.Creatures);
             double length = Math.Sqrt(pushX * pushX + pushZ * pushZ);
             if (length < 1e-6) { pushX = pushZ = 0; return; }
@@ -1784,6 +1824,7 @@ namespace LotrNpcs
             bool target = e.EntityId == scanTarget;
             // Cheap distance check first: most neighbours of a 5-block look-ahead scan are neither close nor ahead.
             double d2 = dx * dx + dz * dz;
+            if (d2 < BattleSpacing.ContactScan * BattleSpacing.ContactScan && contacts.Count < 8) contacts.Add(e);
             bool near = d2 < scanSpacing * scanSpacing;
             bool ahead = lookAhead && !target && d2 < BattleSpacing.LookAhead * BattleSpacing.LookAhead && dx * headX + dz * headZ < 0;
             if (!near && !ahead) return true;

@@ -28,6 +28,8 @@ And (owner): "not too many conflicting paths": one system decides where a fighti
 
 **Balance (owner, 2026-11-13 late):** chose "Leave balance as it is" after 0.0.129's 38 v 26 from single spawn spots went 26-21 to the goblins (matches the sim; equal coin is close to even; Uruk-hai ~0.58, dwarves ~0.44 left as they are). Stage future battle tests with each army on one spot. Latest build 0.0.129 (archers ignore join calls when they can shoot, 0.0.128; every NPC starting a fight calls idle allies, 0.0.129). 0.0.127 gear-detail strip showed no measurable FPS gain.
 
+**0.0.130:** riders' health and damage are the warrior's times (captain price / warrior price)^0.82 (about 2.2; they cost a captain's price), and NPCs have hard bodies (`KeepApart`, 0.7 blocks, half the overlap each tick). Checklist 130, not yet in game.
+
 **Open problems:**
 1. **110.1, lines fold into a blob at contact.** Within ~10 s of meeting, both lines collapse into one blob; up to 7 orcs hit one Dunlending in 20 s. The 38 orc v 26 Dunlending fight ended 24-4 for the orcs (110.1 wants it closer than 26-2). Look at what the front and the extras do at contact: front members take the nearest free enemy and hold their side (`HoldsFront`); extras wrap round (`HoldSlot` returns false once the line has met). Staging: batches of 5, columns 40 blocks apart, player at 1500 30 300 (see the "Staged" entries in lotrnpcs-0113.md).
 2. Checklist items still open in 110-119: 110.1, 112.2 (needs a second player), 112.6, 112.8 (weapons and shields in hand, by eye), 113.5, 113.8, 113.9, 114.8, 116.2, 117.6 (needs Teapot's Giant Boar), 117.8 (needs Feverstone Wilds removed), 119.2 (recruits in two formations).

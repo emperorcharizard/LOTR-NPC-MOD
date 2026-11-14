@@ -314,6 +314,27 @@ namespace LotrNpcs
         /// farther, growing to 1 as they overlap. Two NPCs in exactly the same spot split in a direction picked from
         /// the entity id, so the two go opposite ways. True if the neighbor was too close.
         /// </summary>
+        /// <summary>0.0.130 (owner, 2026-11-14: "the mobs dont intersect each other, like they have a solid surface"):
+        /// how close two NPCs' centers may come (blocks, horizontally). The game has no creature-to-creature collision,
+        /// only soft pushes the AI walks through.</summary>
+        public const double BodyContact = 0.7, ContactScan = 1.3;
+
+        /// <summary>The step that takes this NPC out of an overlap with one neighbour, (dx, dz) from the neighbour to
+        /// it: half the overlap (the neighbour takes the other half on its own tick), nothing at BodyContact or
+        /// farther. Two in exactly one spot split by entity id. False when they don't overlap.</summary>
+        public static bool ContactShift(double dx, double dz, long tieBreak, out double sx, out double sz)
+        {
+            sx = sz = 0;
+            double d2 = dx * dx + dz * dz;
+            if (d2 >= BodyContact * BodyContact) return false;
+            double d = Math.Sqrt(d2), nx, nz;
+            if (d < 1e-4) { double a = (tieBreak % 360) * Math.PI / 180; nx = Math.Sin(a); nz = Math.Cos(a); }
+            else { nx = dx / d; nz = dz / d; }
+            double step = (BodyContact - d) / 2;
+            sx = nx * step; sz = nz * step;
+            return true;
+        }
+
         public static bool AddPush(ref double px, ref double pz, double dx, double dz, double spacing, long tieBreak)
         {
             double d2 = dx * dx + dz * dz;

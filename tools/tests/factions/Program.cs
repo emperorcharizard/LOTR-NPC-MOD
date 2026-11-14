@@ -856,6 +856,11 @@ public static class Program {
         Check(armed.All(c => JToken.DeepEquals(HeldWeapon(entityFiles[c], "server"), HeldWeapon(entityFiles[c], "client")) && HeldWeapon(entityFiles[c], "server")["weapons"].Count() == 6), "...with the same six weapons listed on both sides");
         var bodyShape = JObject.Parse(File.ReadAllText(Path.Combine(assets, "shapes", "entity", "humanoid", "seraph-faceless.json")));
         var bodyAnims = new HashSet<string>(bodyShape["animations"].Select(a => (string)a["code"]));
+        // 0.0.130 solid bodies.
+        Check(!BattleSpacing.ContactShift(0.8, 0, 1, out _, out _) && BattleSpacing.ContactShift(0.5, 0, 1, out double csx, out double csz) && Math.Abs(csx - 0.1) < 1e-9 && csz == 0
+            && BattleSpacing.ContactShift(0, 0, 90, out double ctx, out double ctz) && Math.Abs(Math.Sqrt(ctx * ctx + ctz * ctz) - BattleSpacing.BodyContact / 2) < 1e-9
+            && BattleSpacing.ContactScan > BattleSpacing.BodyContact,
+            "0.0.130: two NPCs closer than 0.7 blocks each step out by half the overlap, along the line between them (one spot: a direction from the id); none at 0.7 or more");
         // 0.0.127 gear detail: only tiny leaves go; parents, attachment points, step parent targets and roots stay.
         ShapeElement gdBox(string name, double sx, double sy, double sz, string stepParent = null, params ShapeElement[] children) =>
             new ShapeElement { Name = name, From = new double[] { 0, 0, 0 }, To = new double[] { sx, sy, sz }, StepParentName = stepParent, Children = children.Length > 0 ? children : null };
@@ -1171,9 +1176,18 @@ public static class Program {
                 "0.0.117: riders for Men of the West on horses, Shadow orcs on dire wolves, elves on elk and dwarves on giant boars, each with the rider behavior and its mounts");
             var riderConfig = new FactionConfig { Version = FactionConfig.CurrentVersion }; riderConfig.FillDefaults();
             Check(Promotion.StatRank("rider") == "warrior" && Promotion.PriceRank("rider") == "captain" && Promotion.StatRank("guard") == "warrior" && Promotion.PriceRank("shock") == "warrior"
-                && riderConfig.HealthFor("rohan", "rider") == riderConfig.HealthFor("rohan", "warrior") && riderConfig.DamageFor("rohan", "rider") == riderConfig.DamageFor("rohan", "warrior")
                 && HiringSystem.PriceFor(new FactionDef { HirePrices = new Dictionary<string, int> { ["captain"] = 40, ["warrior"] = 15 } }, "rider") == 40,
-                "0.0.117: a rider fights with its faction's warrior numbers and costs a captain's price unless the config lists its own");
+                "0.0.117: a rider costs a captain's price unless the config lists its own");
+            {
+                FactionDef rohanDef = riderConfig.Def("rohan");
+                float scale = FactionConfig.RiderScale(rohanDef), wh = riderConfig.HealthFor("rohan", "warrior") ?? 0, wd = riderConfig.DamageFor("rohan", "warrior") ?? 0;
+                double expect = Math.Pow(rohanDef.HirePrices["captain"] / (double)rohanDef.HirePrices["warrior"], FactionConfig.RiderStatExponent);
+                var own = new FactionDef { Health = new Dictionary<string, float> { ["warrior"] = 34, ["rider"] = 50 }, Damage = new Dictionary<string, float> { ["warrior"] = 4 } };
+                Check(Math.Abs(scale - expect) < 1e-4 && scale > 2 && scale < 2.5 && riderConfig.HealthFor("rohan", "rider") == (float)Math.Round(wh * scale)
+                    && Math.Abs((riderConfig.DamageFor("rohan", "rider") ?? 0) - wd * scale) < 0.006 && riderConfig.HealthFor("rohan", "guard") == riderConfig.HealthFor("rohan", "guard")
+                    && FactionConfig.RiderScale(null) == (float)FactionConfig.DefaultRiderScale && FactionConfig.RiderScale(own) == (float)FactionConfig.DefaultRiderScale,
+                    "0.0.130: a rider's health and damage are its faction's warrior's times (captain price / warrior price)^0.82, about 2.2 (worth its coin in warriors), unless the config lists its own");
+            }
             Check(!Riders.CanHaveMount(null, null) && Riders.AvailableMounts(null, null).Length == 0, "0.0.117: no world or no type means no mount (the rank isn't offered)");
             var rr = new Random(3);
             var withRider = SpawnZoneSystem.WithRider(new List<string> { "recruit", "warrior", "warrior" }, rr, 1);

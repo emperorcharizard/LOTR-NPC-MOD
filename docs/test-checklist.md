@@ -455,3 +455,12 @@ Install `lotrnpcs_0.0.127-test.zip`; restart fully.
 Install `lotrnpcs_0.0.128-test.zip`; restart fully.
 
 - [ ] 128.1 Spawn 5 Gondor archers and 5 Gondor warriors together, and 5 goblin warriors about 20 blocks away: the archers walk in only until about 16 blocks, then shoot from there while their warriors charge. They don't follow the warriors into the melee unless an enemy comes within about 2 blocks.
+
+## 130. Riders worth their price, solid NPCs (0.0.130)
+
+Install `lotrnpcs_0.0.130-test.zip`; restart fully. Stage each side on one spot, battle log on.
+
+- [ ] 130.1 A Rohan rider (creative tab) has about 76 health (a warrior 34; promotion card or `/entity` info). 3 Rohan riders against 120 coins of enemy warriors of similar strength win about half the time, and riders no longer die about 14 s into a crowd.
+- [ ] 130.2 In a 38 v 26 blob no two NPCs stand inside each other: walking in or fighting, their bodies stay about 0.7 blocks apart (look from above), and none are pushed into walls or off ledges.
+- [ ] 130.3 Riders still sit on their mounts (rider and mount aren't shoved apart), and the player can still walk among NPCs (the game's push).
+- [ ] 130.4 `/recruits bench 200`: the server still holds about 29 ticks/s.
