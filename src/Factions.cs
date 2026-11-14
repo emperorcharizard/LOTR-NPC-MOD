@@ -2149,7 +2149,10 @@ namespace LotrNpcs
         void CallIdleAllies(long now)
         {
             if (factions == null || targetEntity == null || !targetEntity.Alive || Recruit.OwnerUidOf(entity) != null || now - lastCallMs < CallAlliesEveryMs) return;
-            if (Member?.Fighting(now) == true) return; // already in the fight: it called when it started
+            // 0.0.129: no "already fighting" check here. ShouldExecute marks the NPC fighting before StartExecute runs, so
+            // that check stopped every NPC that found its own target from calling (only called-in ones called on), which
+            // is why 14 of 38 orcs still sat out in the 0.0.124 run. The per-NPC CallAlliesEveryMs limit and AnswersCall
+            // (only allies that aren't fighting) keep the calls few.
             lastCallMs = now;
             float range = factions.Config.JoinFightRange;
             if (range <= 0) return;
