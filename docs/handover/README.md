@@ -14,6 +14,7 @@ Every non-empty battle log so far (`/recruits battlelog on|off` writes them to `
 - `20261113-173336`: 0.0.122, wild NPCs without battle lines (WildBattleLines false), MaxAttackersPerTarget 4; Dunlendings won 24-7.
 - `20261113-174429`: 0.0.123 (call for help), same staging; 27 of 38 orcs appear, Dunlendings won 26-10.
 - `20261113-175145`: 0.0.124 (JoinFightRange 32), same staging; Dunlendings won 24-2.
+- `20261113-180516` / `-180644`: 0.0.125 rider tests (3 Rohan riders v 3 goblin warriors; the second log is empty).
 
 ## game-config/
 The owner's `%APPDATA%\VintagestoryData\ModConfig` files as of 2026-11-13:

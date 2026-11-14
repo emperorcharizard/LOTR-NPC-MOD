@@ -1,0 +1,8 @@
+﻿ms,event,attacker,attackerFaction,attackerRank,target,targetFaction,targetRank,damage,result,targetHealth
+34,melee,9118,mistymountains,warrior,9114,rohan,rider,2.61,landed,10.55
+992,melee,9120,mistymountains,warrior,9114,rohan,rider,3.17,landed,7.38
+1743,melee,9111,mistymountains,warrior,9114,rohan,rider,3.34,landed,4.05
+1847,melee,9110,mistymountains,warrior,9114,rohan,rider,2.27,landed,1.78
+2734,melee,9114,rohan,rider,9110,mistymountains,warrior,4.28,landed,7.36
+3006,death,9118,mistymountains,warrior,9114,rohan,rider,0,died,0
+3006,melee,9118,mistymountains,warrior,9114,rohan,rider,2.69,kill,0
