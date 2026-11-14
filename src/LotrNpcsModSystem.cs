@@ -310,7 +310,20 @@ namespace LotrNpcs
             Weapon?.Lower();
             startedMs = entity.World.ElapsedMilliseconds;
             swingStarted = false;
+            struck = false;
+            Riders.SwingStarted(entity, startedMs);
+            RiderLog("swing at " + (targetEntity?.EntityId ?? 0));
             base.StartExecute();
+        }
+
+        bool struck;
+
+        // 0.0.139: with DebugCommands on, a mounted rider's swings go to the server log (start, blow, end).
+        void RiderLog(string what)
+        {
+            if ((entity as EntityAgent)?.MountedOn == null || factions?.Config?.DebugCommands != true) return;
+            entity.Api.Logger.Notification("[lotrnpcs] rider {0} melee: {1} ({2} ms, charge state {3})", entity.EntityId, what,
+                entity.World.ElapsedMilliseconds - startedMs, Riders.ChargeOf(entity).Phase);
         }
 
         // 0.0.99 swing sync (owner chose "Swing sync + weapon wind-ups"): vanilla counts down to the blow from when the
@@ -321,17 +334,23 @@ namespace LotrNpcs
         // active animations by their shape animation (animMeta.Animation, e.g. "axehit"), not the config code.
         public override bool ContinueExecute(float dt)
         {
-            if (!swingStarted)
+            // 0.0.139: a seated rider can't turn in the saddle, so it doesn't wait to face its target (the blow fell after
+            // its mount had carried it past).
+            if (!swingStarted && (entity as EntityAgent)?.MountedOn == null)
             {
                 long now = entity.World.ElapsedMilliseconds;
                 if (animMeta != null && entity.AnimManager?.IsAnimationActive(animMeta.Animation) == true) swingStarted = true;
                 else if (now - startedMs <= MaxTurnWaitMs) lastCheckOrAttackMs = now;
             }
-            return base.ContinueExecute(dt);
+            bool go = base.ContinueExecute(dt);
+            if (!go) RiderLog(struck ? "done" : "ended without a blow (ContinueExecute false)");
+            return go;
         }
 
         public override void FinishExecute(bool cancelled)
         {
+            if (cancelled && !struck) RiderLog("cancelled before the blow");
+            Riders.SwingDone(entity);
             base.FinishExecute(cancelled);
             Weapon?.Raise();
         }
@@ -353,6 +372,9 @@ namespace LotrNpcs
 
         protected override void attackTarget()
         {
+            struck = true;
+            Riders.SwingDone(entity);
+            RiderLog("blow" + (targetEntity != null && hasDirectContact(targetEntity, minDist, minVerDist) ? "" : " (out of reach)"));
             // 0.0.98: the hit lands now, which is later than booked if the NPC was still turning to face its target.
             if (factions != null && targetEntity != null) factions.Spacing.BookHit(targetEntity.EntityId, entity.World.ElapsedMilliseconds, 0);
             if (!hasDirectContact(targetEntity, minDist, minVerDist))

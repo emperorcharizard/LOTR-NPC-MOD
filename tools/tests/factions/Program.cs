@@ -870,6 +870,8 @@ public static class Program {
                 && Riders.ChargeDamageMultiplier == 2f && Riders.ChargeMax <= Riders.FocusRange && !Riders.IsChargeHit(null),
                 "0.0.133: a rider standing 5-16 blocks from its focus charges, closer it rides out first; a charge ends on a pass (hit, behind, or within 1.5) and rides on 7 blocks, or less when its orders hold it, then charges again; boxed in it stands and fights");
         }
+        Check(Riders.NextPhase(Riders.ChargePhase.RideOut, 12.5, 2, false, false, false) == Riders.ChargePhase.Charge && Riders.NextPhase(Riders.ChargePhase.RideOut, 11, 2, false, false, false) == Riders.ChargePhase.RideOut && Riders.SwingPending(1000, 1500) && !Riders.SwingPending(1000, 1600) && !Riders.SwingPending(0, 100) && !Riders.IsChargeHit(Npc("test-rohan-rider")),
+            "0.0.139: a ride-out turns back 12 blocks from the focus; a rider's swing holds its mount on the target for at most 0.6 s, and only a mounted rider's swing begun at a charge is a charge hit");
         // 0.0.137 back hits: the rear cone and the stacking.
         {
             float north = (float)Math.Atan2(0, 1); // facing +z

@@ -114,6 +114,9 @@ namespace LotrNpcs
         /// BoxedMove blocks in BoxedMs, then it holds for BoxedHoldMs. Followers ride out at most FollowerLeash blocks
         /// from their leader, guards and holders stay in their post's area.</summary>
         public const double ChargeMin = 5, ChargeMax = 16, RideOutDistance = 7, PassDistance = 1.5, BoxedMove = 0.3, FollowerLeash = 12;
+        /// <summary>0.0.139 (the 103125 test: riders ended up more than 100 blocks away, past Synergy's freeze): a ride-out
+        /// turns back once the focus is this far.</summary>
+        public const double RideOutMax = 12;
         public const long BoxedMs = 1500, BoxedHoldMs = 3000;
         /// <summary>A blow landed at a gallop: damage times this, and the target is pushed along the mount's heading
         /// (ChargeKnockback blocks a tick of motion, about 1.5 blocks on the ground; NPCs only, a player's motion is
@@ -132,7 +135,7 @@ namespace LotrNpcs
                 case ChargePhase.Charge:
                     return passed ? ChargePhase.RideOut : foeDistance > ChargeMax ? ChargePhase.Hold : ChargePhase.Charge;
                 case ChargePhase.RideOut:
-                    return rodeOut >= RideOutDistance || outOfBounds || foeDistance >= ChargeMax ? ChargePhase.Charge : ChargePhase.RideOut;
+                    return rodeOut >= RideOutDistance || outOfBounds || foeDistance >= RideOutMax ? ChargePhase.Charge : ChargePhase.RideOut;
                 default:
                     if (foeDistance > ChargeMax) return ChargePhase.Hold;
                     return foeDistance >= ChargeMin ? ChargePhase.Charge : outOfBounds ? ChargePhase.Hold : ChargePhase.RideOut;
@@ -145,6 +148,8 @@ namespace LotrNpcs
             public ChargePhase Phase;
             public double Speed, HeadX, HeadZ, StartX, StartZ, CheckX, CheckZ;
             public long CheckMs, BoxedUntilMs;
+            // 0.0.139: the swing in progress: when it started (0: none) and whether it started at a charge.
+            public long SwingMs; public bool SwingCharge;
             public bool HitThisPass;
         }
 
@@ -154,7 +159,27 @@ namespace LotrNpcs
 
         /// <summary>Whether a blow this rider lands now is a charge hit: mounted, charging, at a gallop.</summary>
         public static bool IsChargeHit(Entity rider) =>
-            (rider as EntityAgent)?.MountedOn != null && charges.TryGetValue(rider, out ChargeState c) && c.Phase == ChargePhase.Charge && c.Speed >= SprintSpeed;
+            (rider as EntityAgent)?.MountedOn != null && charges.TryGetValue(rider, out ChargeState c) && c.SwingCharge;
+
+        /// <summary>0.0.139 (rider test 2026-11-14 103125: riders galloped past mid-swing and never struck): while a swing
+        /// hasn't struck, for at most SwingHoldMs, the mount rides straight at its target instead of riding out.</summary>
+        public const long SwingHoldMs = 600;
+        public static bool SwingPending(long swingMs, long now) => swingMs > 0 && now - swingMs < SwingHoldMs;
+
+        /// <summary>The rider's melee task started a swing: remember whether it started at a charge (at gallop).</summary>
+        public static void SwingStarted(Entity rider, long now)
+        {
+            if ((rider as EntityAgent)?.MountedOn == null) return;
+            ChargeState c = ChargeOf(rider);
+            c.SwingMs = now;
+            c.SwingCharge = c.Phase == ChargePhase.Charge && c.Speed >= SprintSpeed;
+        }
+
+        /// <summary>The swing struck or ended.</summary>
+        public static void SwingDone(Entity rider)
+        {
+            if (rider != null && charges.TryGetValue(rider, out ChargeState c)) c.SwingMs = 0;
+        }
 
         /// <summary>A charge hit landed: the target is pushed along the mount's heading (NPCs only) and the pass ends.</summary>
         public static void ChargeHitLanded(Entity rider, Entity target)
@@ -445,6 +470,13 @@ namespace LotrNpcs
             Riders.ChargeState cs = Riders.ChargeOf(rider);
             long now = rider.World.ElapsedMilliseconds;
             if (kept == null) { cs.Phase = Riders.ChargePhase.Hold; cs.HitThisPass = false; }
+            else if (cs.Phase != Riders.ChargePhase.Hold && Riders.SwingPending(cs.SwingMs, now) && swing?.TargetEntity is Entity struck)
+            {
+                // 0.0.139: swing first: straight at the one it swings at until the blow falls.
+                mount.Pos.Yaw = Riders.TurnToward(mount.Pos.Yaw, (float)Math.Atan2(struck.Pos.X - mount.Pos.X, struck.Pos.Z - mount.Pos.Z), Riders.TurnRate * dt);
+                speed = cs.Speed > 0 ? cs.Speed : Riders.SprintSpeed;
+                holding = false;
+            }
             else
             {
                 double fx = kept.Pos.X - mount.Pos.X, fz = kept.Pos.Z - mount.Pos.Z;

@@ -530,3 +530,11 @@ Install `lotrnpcs_0.0.138-test.zip`; restart fully.
 - [ ] 138.2 With 3 warriors following, 2 recruits can still follow (Follow me in the orders menu or the talk menu), a 3rd recruit or a 4th warrior can't; 5 recruits can all follow. The roster header shows "Following: 3 of 3 ranked places, 2 of 2 recruit places".
 - [ ] 138.3 Promote a following recruit while 3 ranked followers follow: it is promoted, stays on the roster, guards where it stands, and the chat says why; dismissing a warrior then lets you call it from the roster.
 - [ ] 138.4 lotrnpcs-factions.json is version 32 with MaxCaptains 1 and RecruitExtraFollowers 2, no RosterPerCaptain, and #Instructions explain both.
+
+## 139. Riders strike while charging (0.0.139)
+
+Install `lotrnpcs_0.0.139-test.zip`; restart fully. DebugCommands on, battle log on.
+
+- [ ] 139.1 3 Rohan riders v 10 Dunlending warriors (riders at z 126, Dunlendings at z 142), twice: the CSV has rider melee rows (landed, some nocontact), the summary shows rohan charge hits, and riders kill some Dunlendings.
+- [ ] 139.2 server-main.log has "[lotrnpcs] rider ... melee:" lines: most swings end in "blow", few "ended without a blow" or "cancelled before the blow".
+- [ ] 139.3 Riders stay within about 20 blocks of the fight (none found more than 30 blocks away afterwards).
