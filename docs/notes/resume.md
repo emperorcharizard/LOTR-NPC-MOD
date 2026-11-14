@@ -22,6 +22,8 @@ And (owner): "not too many conflicting paths": one system decides where a fighti
 
 **Owner, 2026-11-13 evening:** fine with a blob if it makes fights simpler; the one requirement is that NPCs never pass through each other (solid bodies). Lag research doc: https://claude.ai/artifact/3KeDXfgY6VNmL21Z75dF9s (proposed 0.0.127: wild NPCs skip line/surround code, a hard contact rule replacing repulseagents between our NPCs, idle scan 2.5 s). Waiting on the owner's go.
 
+**Owner, 2026-11-14 (supersedes the no-blob goal above):** "I am now fine with the blob if that makes fights simpler, my only request is that the mobs dont intersect each other, like they have a solid surface that doesnt let other npcs phase through", plus: research the laggiest parts of the mod. Findings and plan: the 2026-11-14 section of `lotrnpcs-performance.md`.
+
 **Open problems:**
 1. **110.1, lines fold into a blob at contact.** Within ~10 s of meeting, both lines collapse into one blob; up to 7 orcs hit one Dunlending in 20 s. The 38 orc v 26 Dunlending fight ended 24-4 for the orcs (110.1 wants it closer than 26-2). Look at what the front and the extras do at contact: front members take the nearest free enemy and hold their side (`HoldsFront`); extras wrap round (`HoldSlot` returns false once the line has met). Staging: batches of 5, columns 40 blocks apart, player at 1500 30 300 (see the "Staged" entries in lotrnpcs-0113.md).
 2. Checklist items still open in 110-119: 110.1, 112.2 (needs a second player), 112.6, 112.8 (weapons and shields in hand, by eye), 113.5, 113.8, 113.9, 114.8, 116.2, 117.6 (needs Teapot's Giant Boar), 117.8 (needs Feverstone Wilds removed), 119.2 (recruits in two formations).

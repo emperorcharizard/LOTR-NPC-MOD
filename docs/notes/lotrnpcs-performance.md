@@ -67,3 +67,22 @@ Mid-fight screenshots at 20 blocks looked normal (walking, shields, bows). In re
 
 In-game checks at the 10-block default (2026-11-12): 116.3 passed (lotrnpcs-client.json written on first start; `.npcanimlod off` writes false, `.npcanimlod 10` writes true/10, and the value holds across a restart). 116.2 seen but left for the owner's eye: a 100-NPC bench watched from about 45 blocks ran at 201.4 FPS average (1% low 81.8, worst 41 ms; the same bench viewed up close before the LOD was about 95), and in screenshots a fraction of a second apart far NPCs changed pose and moved, nothing frozen or sliding.
 A one-off .NET "Internal CLR error (0x80131506)" crashed the spawnzones test run once during tools/build.py; the rerun passed. Not seen again.
+
+## 2026-11-14: research for "optimize the laggiest aspects" and "NPCs don't intersect" (Claude, read only)
+
+Owner: blob is fine now; NPCs must not pass through each other. Nothing built yet.
+
+Where the time goes (from the measurements above and the game's IL):
+- Client frames are the limit, not the server: 200 fighting NPCs held 29.2-29.3 server ticks/s (bench, superflat), while the client went from 153 FPS at 50 NPCs to 56 at 200. Per visible NPC about 30 us of animation a frame (esr-afteranim), proportional to its shape's elements: the body is 20 elements, each armor piece from the armor mods 18-43 (Isengard Dunlending heavier helmet 43, Orc heavier leggings 40), so a geared NPC is about 80-120 elements. Animation LOD (0.0.116, 10 blocks) already halves or quarters the far ones.
+- Vsync (setting 1, 60 Hz) turns any frame over 16.7 ms into 33.3 ms (30 FPS): a settings change, free.
+- Server costs that grow with a blob (not yet measured separately; the bench is open superflat): FactionSeek's target search runs Sight.CanSee (2 to 4 block ray traces up to 24 blocks) for every enemy that passes the cheap checks, once a second per searching NPC; the spacing scan (EntityPartitioning.WalkEntities, 4 a second for walking/fighting NPCs, radius up to 5 for the look-ahead); the claims and surround rings (BattleSpacing) and BattleLines.Update (recruits only since 0.0.122).
+
+Why NPCs pass through each other: the game has no entity-to-entity collision. Vanilla `repulseagents` (VSEssentials EntityBehaviorRepulseAgents) only adds a soft push to Motion (1 - d/touchDist, x3 on the ground, clamped to +-3 then /30 a tick), and ours (`Separate`, Factions.cs) adds up to PushSpeed 1.2 blocks/s. The AI's path follower sets motion toward its target every tick and wins, so walking or attacking NPCs overlap. `ICustomRepulseBehavior` (VSSurvivalMod) lets a repulse behavior replace the push, but it is still a push.
+
+Plan offered to the owner:
+1. Solid bodies: in `Separate`, keep the neighbours found by the existing 4 Hz scan, and every tick move the NPC itself out of any same-or-enemy NPC closer than one body width (about 0.7 blocks, centers): half the overlap each, position not motion, never into a wall or off a ledge (CanStepTo), mounts and their riders skipped. That is a hard constraint, cheap (only already-found neighbours), and needs no new scans.
+2. With the blob accepted, drop the parts that only shaped it: the surround ring spots and claims beyond a simple attacker cap, the 5-block look-ahead steering and braking, and the duel band push. Fewer systems steering one NPC, less work per tick.
+3. Sight: check line of sight only for the nearest enemy that passes the cheap checks (and the next if blocked), or cache the answer per pair for a second, instead of for every candidate.
+4. Client: optionally a far LOD step (beyond about 48 blocks animate every 8th frame), and recommend vsync off or a higher max FPS. Element counts belong to the armor mods.
+5. Measure before and after with `/recruits bench 200` on real terrain, not only superflat, and the server tick numbers it prints.
+
