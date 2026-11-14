@@ -522,14 +522,14 @@ Install `lotrnpcs_0.0.137-test.zip`; restart fully. Battle log on.
 - [ ] 137.3 On Retreat, followers turn and run (no stepping back); riders never step back.
 - [ ] 137.4 lotrnpcs-factions.json has BackHitMultiplier 1.5 and BackArcDegrees 120, and #Instructions explain them.
 
-## 138. One captain, two extra recruit places (0.0.138)
+## 138. One captain, recruit-only places (0.0.138; 1 recruit place since the owner's change)
 
 Install `lotrnpcs_0.0.138-test.zip`; restart fully.
 
 - [ ] 138.1 With one captain hired, hiring or promoting a second captain is refused ("captains full"); riders don't count.
-- [ ] 138.2 With 3 warriors following, 2 recruits can still follow (Follow me in the orders menu or the talk menu), a 3rd recruit or a 4th warrior can't; 5 recruits can all follow. The roster header shows "Following: 3 of 3 ranked places, 2 of 2 recruit places".
+- [ ] 138.2 With 3 warriors following, 1 recruit can still follow (Follow me in the orders menu or the talk menu), a 2nd recruit or a 4th warrior can't; 4 recruits can all follow. The roster header shows "Following: 3 of 3 ranked places, 1 of 1 recruit places". (Owner 2026-11-14: "maybe just 1 recruit place"; RecruitExtraFollowers 1.)
 - [ ] 138.3 Promote a following recruit while 3 ranked followers follow: it is promoted, stays on the roster, guards where it stands, and the chat says why; dismissing a warrior then lets you call it from the roster.
-- [ ] 138.4 lotrnpcs-factions.json is version 32 with MaxCaptains 1 and RecruitExtraFollowers 2, no RosterPerCaptain, and #Instructions explain both.
+- [ ] 138.4 lotrnpcs-factions.json is version 32 with MaxCaptains 1 and RecruitExtraFollowers 1, no RosterPerCaptain, and #Instructions explain both.
 
 ## 139. Riders strike while charging (0.0.139)
 
@@ -545,3 +545,10 @@ Install `lotrnpcs_0.0.140-test.zip`; restart fully. Battle log on.
 
 - [ ] 140.1 9 Gondor warriors v 9 Mordor orc warriors, three times (as on 2026-11-14: Gondor at z 128 / Mordor at z 142, swapped, side by side): about even (Mordor wins at least one), not 3 of 3 to Gondor.
 - [ ] 140.2 Axes and hammers swing visibly faster than on 0.0.139 and spears and knives a little slower, but the blade still meets the target when the hit lands (no hit before the blow).
+
+## 141. Mounts stop when their rider stops steering (0.0.141)
+
+Install `lotrnpcs_0.0.141-test.zip`; restart fully. DebugCommands on.
+
+- [ ] 141.1 After the 139 rider tests, `/entity cmd e[type=lotrnpcs:test-rohan-rider,range=60] kill` finds all the riders still alive (none ran off beyond 60 blocks); no riderless-looking horse gallops on in a straight line.
+- [ ] 141.2 Fly about 60 blocks away from a rider fight (past Synergy's 48-block freeze) for 20 s and come back: the riders' horses stand where they were frozen instead of having galloped off.

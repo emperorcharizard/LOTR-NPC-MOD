@@ -166,6 +166,13 @@ namespace LotrNpcs
         public const long SwingHoldMs = 600;
         public static bool SwingPending(long swingMs, long now) => swingMs > 0 && now - swingMs < SwingHoldMs;
 
+        /// <summary>0.0.141 (rider test 2026-11-14 103125: riders ended more than 100 blocks away and the fight stalled): a
+        /// mount is driven only by its rider's behavior, which sets its controls every 100 ms. When the rider stops ticking
+        /// (Synergy freezes creatures far from players, the chunk unloads) the mount kept its last gallop and ran on in a
+        /// straight line. A mount whose rider hasn't steered it for this long stops.</summary>
+        public const long MountStaleMs = 500;
+        public static bool MountStale(long lastSteerMs, long now) => now - lastSteerMs > MountStaleMs;
+
         /// <summary>The rider's melee task started a swing: remember whether it started at a charge (at gallop).</summary>
         public static void SwingStarted(Entity rider, long now)
         {
@@ -320,6 +327,8 @@ namespace LotrNpcs
         ICoreServerAPI sapi;
         // Mounts whose rider died: they run off for a few seconds and are gone (owner: "mount runs off").
         readonly Dictionary<long, (Entity Mount, double AwayX, double AwayZ, long UntilMs)> runningOff = new Dictionary<long, (Entity, double, double, long)>();
+        // 0.0.141: mounts our riders steer, and when they last did (Riders.MountStale).
+        readonly Dictionary<long, (Entity Mount, long LastMs)> steered = new Dictionary<long, (Entity, long)>();
 
         public override void Start(ICoreAPI api)
         {
@@ -334,7 +343,7 @@ namespace LotrNpcs
         public override void StartServerSide(ICoreServerAPI api)
         {
             sapi = api;
-            api.Event.RegisterGameTickListener(_ => TickRunningOff(), 100);
+            api.Event.RegisterGameTickListener(_ => { TickRunningOff(); TickStale(); }, 100);
         }
 
         public override void Dispose()
@@ -357,6 +366,32 @@ namespace LotrNpcs
             double dx = mount.Pos.X - from.X, dz = mount.Pos.Z - from.Z, len = Math.Sqrt(dx * dx + dz * dz);
             if (len < 1e-3) { double a = sapi.World.Rand.NextDouble() * GameMath.TWOPI; dx = Math.Sin(a); dz = Math.Cos(a); len = 1; }
             runningOff[mount.EntityId] = (mount, dx / len, dz / len, sapi.World.ElapsedMilliseconds + 8000);
+        }
+
+        /// <summary>0.0.141: a rider steered its mount just now.</summary>
+        public void Steered(Entity mount, long now)
+        {
+            if (mount != null) steered[mount.EntityId] = (mount, now);
+        }
+
+        // 0.0.141: stop mounts whose rider stopped steering them (see Riders.MountStale).
+        void TickStale()
+        {
+            if (steered.Count == 0) return;
+            long now = sapi.World.ElapsedMilliseconds;
+            foreach (var kv in steered.ToList())
+            {
+                (Entity mount, long last) = kv.Value;
+                if (!mount.Alive || runningOff.ContainsKey(kv.Key)) { steered.Remove(kv.Key); continue; }
+                if (!Riders.MountStale(last, now)) continue;
+                steered.Remove(kv.Key);
+                if (mount is EntityAgent agent)
+                {
+                    agent.Controls.WalkVector.Set(0, 0, 0);
+                    agent.Controls.Forward = agent.Controls.Sprint = false;
+                }
+                mount.GetBehavior<EntityBehaviorGait>()?.SetIdle();
+            }
         }
 
         void TickRunningOff()
@@ -435,6 +470,7 @@ namespace LotrNpcs
                 return;
             }
             double speed = Steer(rider, mount, dt);
+            entity.Api.ModLoader.GetModSystem<RiderSystem>()?.Steered(mount, now);
             // With the testing commands on (DebugCommands), one line a second per rider to the server log.
             if (now - lastLogMs >= 1000 && entity.Api.ModLoader.GetModSystem<FactionSystem>()?.Config?.DebugCommands == true)
             {
