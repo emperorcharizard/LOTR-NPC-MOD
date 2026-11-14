@@ -135,3 +135,7 @@ metadata:
 - Client config (lotrnpcs-client.json, rewritten each start so new fields show): `StripTinyGearDetail` true, `TinyGearSize` 0.5 (0.1 to 4). `.npcgeardetail on|off|<size>` saves it and rebuilds our NPCs' shapes (MarkShapeModified). VerboseDebug line once per item code with how many pieces went.
 - Expected gain is small at 0.5: about 1% of all gear elements (counts in gear-pieces.md 4b); 1.0 voxel is 9%, 1.5 is 20%, 2.0 is 27%, with visible loss growing. Offline: all pass. Untested in game (checklist 127).
 
+
+## 0.0.127 bench and 0.0.128 archers (2026-11-13, Claude, cloud session)
+- 0.0.127 bench in game (`/recruits bench 200`, player flying at 1500 8 300 facing east, vsync 1): gear detail off 69.2 FPS (1% low 28.5), at 1.5 voxels 98.2 (47.6), off again 96.3 (42.1); server 29.2 ticks/s throughout. The two "off" runs differ by 27 FPS, so the bench's own spread is larger than any gain from stripping; no measurable gain shown.
+- 0.0.128 (owner: "the archers seem to rush into the melee even when they start at range"): AiTaskFactionSeek.Notify refuses joinLine/joinFight/seekEntity calls for a target the archer can already shoot from where it stands (CanShootFromHere). Cause, read from code, not yet seen in game: each ally that starts fighting calls idle allies (0.0.123), and every call restarted an archer's chase for up to SpotSeconds (0.5 s) before ContinueExecute noticed it could shoot, so a stream of calls walked archers into the melee. Offline: all pass. Untested in game.

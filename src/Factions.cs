@@ -2225,6 +2225,11 @@ namespace LotrNpcs
         // NPC onto an enemy NPC that already has its share.
         public override bool Notify(string key, object data)
         {
+            // 0.0.128 (owner, 2026-11-13: "the archers seem to rush into the melee even when they start at range"): every
+            // ally starting a fight calls the others (joinFight, call for help), and each call restarted an archer's chase
+            // for up to SpotSeconds before it noticed it could shoot from where it stood, so repeated calls walked it
+            // into the melee. An archer that can already shoot the target from here stays put; its shoot task fights.
+            if ((key == "joinLine" || key == "joinFight" || key == "seekEntity") && data is Entity heard && CanShootFromHere(heard)) return false;
             // 0.0.119: rallied into its side's battle line (BattleLineSystem.Rally), which already counted it in, so
             // no crowd or sight check: it takes its slot like any member. A recruit still never turns on its side.
             if ((key == "joinLine" || key == "joinFight") && data is Entity rallyTarget)

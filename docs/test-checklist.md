@@ -449,3 +449,9 @@ Install `lotrnpcs_0.0.127-test.zip`; restart fully.
 - [ ] 127.2 Angmar and Haradrim warriors up close look the same with `.npcgeardetail on` and `.npcgeardetail off` (the command rebuilds them at once); your own worn armor never changes.
 - [ ] 127.3 `/recruits bench 200` with `.npcgeardetail off`, then `on`, then `1.5`: note the FPS of each, and whether 1.5 visibly loses studs or buckles.
 
+
+## 128. Archers hold their range when allies call them in (0.0.128)
+
+Install `lotrnpcs_0.0.128-test.zip`; restart fully.
+
+- [ ] 128.1 Spawn 5 Gondor archers and 5 Gondor warriors together, and 5 goblin warriors about 20 blocks away: the archers walk in only until about 16 blocks, then shoot from there while their warriors charge. They don't follow the warriors into the melee unless an enemy comes within about 2 blocks.
