@@ -429,8 +429,8 @@ Install `lotrnpcs_0.0.120-test.zip`; restart fully.
 
 Install `lotrnpcs_0.0.125-test.zip`; restart fully. Needs Feverstone Wilds.
 
-- [ ] 125.1 A Rohan rider (creative tab) walking, running and standing on its horse: its legs hold the riding pose (rideelk) and never play the walk or run cycle. On foot after its horse dies, it walks normally again.
-- [ ] 125.2 Spawn about ten Rohan or Gondor riders: most hold a spear (spears weigh 3 times their foot weight).
+- [x] 125.1 A Rohan rider (creative tab) walking, running and standing on its horse: its legs hold the riding pose (rideelk) and never play the walk or run cycle. On foot after its horse dies, it walks normally again.
+- [x] 125.2 Spawn about ten Rohan or Gondor riders: most hold a spear (spears weigh 3 times their foot weight).
 - [ ] 125.3 A rider fights a goblin warrior on foot from the saddle and lands hits without riding on top of it (reach is now a block past the foot reach, plus the seat height).
 
 ## 126. Riders walk when wandering and close in to fight (0.0.126)
@@ -438,6 +438,6 @@ Install `lotrnpcs_0.0.125-test.zip`; restart fully. Needs Feverstone Wilds.
 Install `lotrnpcs_0.0.126-test.zip`; restart fully. Clear leftover test NPCs first (explicit types and a range).
 
 - [ ] 126.1 Spawn 5 Rohan riders with no enemies around: they wander at a walk and stay within about 20 blocks for a minute (in 0.0.125 they galloped 30-50 blocks off).
-- [ ] 126.2 Spawn 3 goblin warriors 15 blocks from them: the riders ride in, the horses walk up to each goblin and the riders land hits; no rider stands off out of reach for more than a few seconds.
+- [x] 126.2 Spawn 3 goblin warriors 15 blocks from them: the riders ride in, the horses walk up to each goblin and the riders land hits; no rider stands off out of reach for more than a few seconds.
 - [ ] 126.3 A hired rider on Follow still keeps up when you sprint away (its horse runs when the rider runs).
 
