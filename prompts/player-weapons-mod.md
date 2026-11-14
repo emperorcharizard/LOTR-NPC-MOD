@@ -102,26 +102,37 @@ faction armor mods ("To Rule Them All") ship vanilla items plus a Combat Overhau
 
 ---
 
-## Decisions to ask the owner first (one AskUserQuestion call, recommendations first)
+## The owner's decisions (2026-11-14), settled: don't ask again
 
-1. **Mod id and name.** Recommended: `lotrweapons`, "LOTR Weapons". Code mod only if needed; a content-only (JSON)
-   mod if vanilla classes are enough (prefer that: less to maintain).
-2. **Combat system.** (a) Vanilla item classes, plus a JSON patch with `dependsOn` Combat Overhaul that turns them into
-   CO weapons on the server (recommended, the faction armor mods' pattern, works with and without CO); (b) CO only;
-   (c) vanilla only.
-3. **Stats.** Recommended: each weapon copies the stats of its nearest vanilla/CO equivalent in its metal (scimitar,
-   swords, Morgul blade = falx; axes = bearded/battle axe; hammers = club/warhammer; daggers and knives = knife; spears
-   = spear; two-handed axes, halberd, warhammer, great swords = the CO two-handed equivalents). Any extra (Morgul blade
-   effects, steel above iron) only if the owner asks.
-4. **Material.** Recommended: one metal per model, as the owner authored it (iron unless the name says steel; orc
-   gear iron). Alternative: metal variants of every weapon (needs texture variants the owner hasn't made).
-5. **Scope of the first version.** Recommended: the 32 melee weapons first; shields second; bows third (the pulled
-   string needs per-stage shapes).
-6. **Where the mod lives.** Recommended: this repo, folder `lotrweapons/` (its own modinfo, lang, version, notes), built
-   by `tools/build.py --mod weapons` (or a sibling script) into `releases/lotrweapons_<version>-test.zip`, sharing the
-   weapon catalog and the converter. A separate repo is possible but splits the source of truth.
+1. **Mod id and name:** `lotrweapons`, "LOTR Weapons". A content-only (JSON) mod if vanilla classes are enough
+   (prefer that: less to maintain); a code mod only if something needs it.
+2. **Combat system:** vanilla item classes, plus a JSON patch with `dependsOn` Combat Overhaul that turns them into CO
+   weapons when CO is installed (the faction armor mods' pattern). Owner: "so it can still be used without the mod".
+   The mod must load and work with no CO installed.
+3. **Stats:** each weapon copies its nearest game weapon, in the same metal (scimitar, swords, Morgul blade = falx;
+   one-handed axes = bearded/battle axe; hammers = club/warhammer; daggers and knives = knife; spears = spear;
+   two-handed axes, poleaxe, halberd, warhammer, great swords = the game's/CO's two-handed equivalents). Write the
+   table of which game item each one copies into the notes. No extras (Morgul blade effects and so on) unless asked.
+4. **Tiers: iron and steel only.** Every melee weapon comes in exactly two variants, **iron** and **steel**
+   (`variantgroups` `metal: ["iron", "steel"]`), each with the stats of its game equivalent in that metal. No bronze,
+   no meteoric iron.
+   - **Looks:** "the skin difference can be solved later". For now both variants use the weapon's one model and
+     texture, except where the owner already made both: the Gondorian sword (`gdsword` / `gdsteelsword`), the dwarven
+     warhammer (`dwwarhammer` / `dwwarhammersteel`) and shorthammer (`dwshorthammer` / `dwshorthammersteel`) each
+     become **one** weapon whose iron variant uses the iron model and steel variant the steel model
+     (`shapeByType` / `texturesByType`). The Black Numenorean steel sword's model serves both its variants. That makes
+     29 melee weapons, 58 items. Keep the per-variant shape and texture in one place so the owner's steel skins drop in
+     later with a one-line change each.
+   - **Shields and bows: iron only**, one item each (12 shields, 2 bows), no metal variant group.
 
-Don't ask about anything you can find in the code, vanilla assets or the notes.
+**Still open** (ask with AskUserQuestion when you reach them, recommendation first; don't ask about anything you can
+find in the code, vanilla assets or the notes):
+
+5. **Order of work.** Recommended: the melee weapons first, shields second, bows third (the pulled string needs
+   per-stage shapes). All three are in scope.
+6. **Where the mod lives.** Recommended: this repo, folder `lotrweapons/` (its own modinfo, lang, version, notes),
+   built by `tools/build.py --mod weapons` (or a sibling script) into `releases/lotrweapons_<version>-test.zip`,
+   sharing the weapon catalog and the converter. A separate repo is possible but splits the source of truth.
 
 ---
 
@@ -152,9 +163,11 @@ Don't ask about anything you can find in the code, vanilla assets or the notes.
 For each weapon in scope, write `itemtypes/<code>.json`, the shape (from the catalog, through the same converter, the
 same atlas texture), and the lang entry.
 
-- **Codes:** readable and smithing-friendly, e.g. `lotrweapons:sword-gondor-steel`, `axe-orc-iron`,
-  `poleaxe-orc-iron`, `spear-haradrim-iron`, with the catalog key kept in one mapping table. Never reuse
-  `orcweapon-*`.
+- **Codes:** readable and smithing-friendly, one itemtype per weapon with the metal as its last variant:
+  `lotrweapons:sword-gondor-{iron,steel}`, `axe-orc-{iron,steel}`, `poleaxe-orc-{iron,steel}`,
+  `spear-haradrim-{iron,steel}`; shields and bows without a metal part (`shield-gondor`, `bow-orc`). The catalog key
+  maps to the code in one table. Never reuse `orcweapon-*`. Lang: "Gondorian sword (iron)" / "(steel)" or the game's
+  own pattern for metal names, whichever vanilla uses for its falx.
 - **Third person:** `tpHandTransform` is **exactly** the NPC's transform from the catalog (same grip, rotation,
   scale). The player's seraph has the same `RightHand` attachment point as the NPC body, so the weapon sits the same.
   Check it on the LRC race bodies too (dwarf, elf, hobbit, orc), since players use them.
@@ -195,7 +208,9 @@ is an animation played between swings. Players need the same look.
 
 ## Phase 5: combat
 
-- Stats per decision 3, in one table (catalog or the new mod's own data), with the vanilla/CO item each one copies.
+- Stats per decisions 3 and 4, in one table (catalog or the new mod's own data): for each weapon, the game item it
+  copies and that item's iron and steel numbers (durability, damage, tier, attack range, speed). Vanilla values in the
+  item JSON; CO values in the CO patch (in CO, metal sets only the tier, per `combat-overhaul-numbers.md`).
 - Two-handed weapons: whatever vanilla/CO does for its two-handed weapons (off hand blocked, reach, speed). Spears:
   thrown or not, as vanilla's spear does; if thrown, the projectile uses the same shape.
 - Test that a player hit with each weapon does what its equivalent does, with and without CO (damage log; CO's
@@ -203,9 +218,11 @@ is an animation played between swings. Players need the same look.
 
 ## Phase 6: shields, then bows (after the owner tries the melee weapons)
 
-- **Shields:** vanilla shield class and attributes (block chance, damage absorption) copied from the nearest vanilla
-  shield; `tpOffHandTransform` = the catalog's solved off-hand transform; check it on the player's left arm.
-- **Bows:** vanilla bow class; the rest and drawn holds from the catalog; the pulled-string stages as the bow's draw
+- **Shields (iron only):** vanilla shield class and attributes (block chance, damage absorption) copied from the
+  nearest iron-tier vanilla shield; `tpOffHandTransform` = the catalog's solved off-hand transform; check it on the
+  player's left arm.
+- **Bows (iron tier only):** stats copied from the nearest game bow (game bows have no metal; under CO, give them
+  the iron tier the CO bows use for that level, and ask the owner if no game bow is a clear match); vanilla bow class; the rest and drawn holds from the catalog; the pulled-string stages as the bow's draw
   shapes if vanilla bows support per-stage shapes (check `bow.json`), else the drawn shape only, and tell the owner.
 
 ## Phase 7 (later, after the owner has used the weapons in game): forging on the anvil
@@ -222,8 +239,9 @@ Don't start until the owner says so. Then:
   draft pattern plus a preview image, so the owner sees what they'll forge. Long weapons and two-handed heads: check
   vanilla's largest patterns and the voxels-per-ingot rule, and scale or split so the cost lands near the equivalent
   vanilla weapon's.
-- **Materials:** only metals that exist (iron, meteoric iron, steel, and bronzes if the owner wants orc gear cheaper),
-  smithing temperature and work rules from vanilla.
+- **Materials:** iron and steel ingots only, matching the weapons' two variants, so one recipe per weapon with
+  `ingot-{metal}` limited to iron and steel and the output `...-{metal}` (vanilla's wildcard recipes do this).
+  Shields' metal parts and any bow fittings: iron only. Smithing temperature and work rules from vanilla.
 - **Handbook:** each weapon's page shows its recipe (vanilla does this when the recipe and output exist).
 - **Tests:** every pattern is 16 wide, every layer the same size, ingredient and output codes exist, every weapon in
   scope has exactly one recipe chain, each output resolves.
@@ -236,6 +254,9 @@ Don't start until the owner says so. Then:
 Add a suite for the new mod, and keep the NPC suites passing:
 
 - Every item in scope has a shape, its textures exist in the zip, its lang name exists and matches the catalog.
+- Every melee weapon has exactly the variants iron and steel, the steel variant's stats are its game equivalent's
+  steel stats (and iron's iron), and the three owner-made pairs use their steel models for steel. Shields and bows
+  have no metal variants.
 - Every animation an item names exists on the player body shapes it can be used with (vanilla seraph, and each LRC
   race when LRC is present).
 - Each item's `tpHandTransform` equals the NPC item's (same catalog entry).
