@@ -477,5 +477,5 @@ Install `lotrnpcs_0.0.131-test.zip`; restart fully. Battle log on, each side on 
 
 Install `lotrnpcs_0.0.132-test.zip`; restart fully. Battle log on, each side on one spot.
 
-- [ ] 132.1 3 Rohan riders v 10 Dunlending warriors (riders at z 126, Dunlendings at z 142), twice: in the CSV each rider's hits go to one Dunlending until it dies, then the next; more kills than 0.0.131's 1 (the simulator expects about 8 of 10 with focus).
+- [x] 132.1 3 Rohan riders v 10 Dunlending warriors (riders at z 126, Dunlendings at z 142), twice: in the CSV each rider's hits go to one Dunlending until it dies, then the next; more kills than 0.0.131's 1 (the simulator expects about 8 of 10 with focus).
 - [ ] 132.2 A rider whose target runs more than 6 blocks off takes a new one; a rider never stands still for long while enemies hit it.
