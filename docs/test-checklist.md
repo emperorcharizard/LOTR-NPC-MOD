@@ -492,3 +492,13 @@ Install `lotrnpcs_0.0.133-test.zip`; restart fully. Battle log on, each side on 
 ## 134: smaller mod file (packaging only)
 - [ ] 134.1 Every race still shows its skins (dwarves, elves, hobbits, Men of each faction, orcs): the 25 duplicate skin pictures now point at one shared copy.
 - [ ] 134.2 No new "texture not found" or JSON parse lines for lotrnpcs in client-main.log / server-main.log.
+
+## 135. Equal stats, 3 followers, longer NPC fights (0.0.135)
+
+Install `lotrnpcs_0.0.135-test.zip`; restart fully. Battle log on, each side on one spot.
+
+- [ ] 135.1 `/recruits faction list`: every faction shows follow 3, roster 16, health 22/34/48/35/43/27, damage 3.15/3.95/7/3.05/3.16/4.94; ModConfig/lotrnpcs-factions.json is Version 31 with NpcVsNpcDamageMultiplier 0.5.
+- [ ] 135.2 9 Gondor warriors v 9 Mordor warriors, twice: about even (each side wins some), and the fight lasts roughly twice as long as a 0.0.134 fight of the same size (battle log damage per NPC hit about half the warrior's 3.95, so about 1.6-2.4).
+- [ ] 135.3 A warrior hitting you does its full damage (not halved), and your hits on NPCs are unchanged.
+- [ ] 135.4 The hire menu shows 3 followers for every faction, and a third follower of any faction fills the band.
+- [ ] 135.5 Wild zone groups of orcs or goblins are no bigger than men's.

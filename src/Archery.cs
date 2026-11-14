@@ -343,7 +343,7 @@ namespace LotrNpcs
             factions?.Log.Attacked(entity, entity.World.ElapsedMilliseconds);
             // 0.0.91: the faction's archer damage, varied by DamageSpread, read at each shot (the tier stays).
             FactionConfig config = factions?.Config;
-            projectile.Damage = FactionTiers.Spread(config?.DamageFor(faction, rank) ?? damage, config?.Spread ?? 0, entity.World.Rand.NextDouble());
+            projectile.Damage = FactionTiers.Spread(config?.DamageFor(faction, rank) ?? damage, config?.Spread ?? 0, entity.World.Rand.NextDouble()) * (config?.HitScaleFor(target) ?? 1); // 0.0.135: NpcVsNpcDamageMultiplier
             projectile.DamageTier = damageTier;
             projectile.DamageType = damageType;
             projectile.DropOnImpactChance = 0;

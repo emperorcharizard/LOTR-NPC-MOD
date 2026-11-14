@@ -12,7 +12,7 @@ from multiprocessing import Pool
 SRC = sys.argv[1]; RUNS = int(sys.argv[2]) if len(sys.argv) > 2 else 1000
 RANKS = ("recruit", "warrior", "captain", "archer")
 TIERS = {}
-for m in re.finditer(r'FactionTier (\w+) = T\("\w+", (\d+), (\d+), [\d.]+f, [\d.]+f, R\(([^)]*)\), R\(([^)]*)\), (\d+), (\d+), (\d+), (\d+)', open(SRC).read()):
+for m in re.finditer(r'FactionTier (\w+) = T\("\w+", (\d+), (\d+), [\d.]+f, [\d.]+f, R\(([^)]*)\), R\(([^)]*)\), (\d+), (\d+), (\d+), (\d+)', open(SRC).read().replace("MenHealth", "R(22, 34, 48, 35)").replace("MenDamage", "R(3.15f, 3.95f, 7f, 3.05f)").replace("EqualFollowers", "3").replace("EqualRoster", "16")):
     name, fol, ros, hp, dm, *price = m.groups()
     hp = [float(x.strip().rstrip("f")) for x in hp.split(",")]; dm = [float(x.strip().rstrip("f")) for x in dm.split(",")]
     TIERS[name] = dict(followers=int(fol), roster=int(ros), hp=dict(zip(RANKS, hp)), dmg=dict(zip(RANKS, dm)), price=dict(zip(RANKS, map(int, price))))

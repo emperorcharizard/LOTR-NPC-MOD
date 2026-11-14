@@ -340,21 +340,21 @@ public static class Program {
             (int, int) Escort(string f) { var gs = Many(f, true); return (gs.Min(g => g.Count) - 1, gs.Max(g => g.Count) - 1); }
             var menG = Many("gondor", false); var orcG = Many("mordor", false);
             Console.WriteLine($"   > largest groups: men {MaxSize("gondor")}, levy {MaxSize("dunlendings")}, orcs {MaxSize("mordor")}, goblins {MaxSize("mistymountains")}, elves {MaxSize("elves")}, dwarves {MaxSize("dwarves")}; average men {menG.Average(g => g.Count):F2}, orcs {orcG.Average(g => g.Count):F2}");
-            Check(MaxSize("gondor") == 5 && MaxSize("isengard") == 5 && MaxSize("dunlendings") == 6 && MaxSize("mordor") == 6 && MaxSize("mistymountains") == 8 && MaxSize("elves") == 4 && MaxSize("dwarves") == 4 && MaxSize("shire") == 5,
-                "wild groups are up to 5 men or Uruks, 6 Dunlendings, 6 orcs (0.0.107), 8 goblins, 4 elves or dwarves");
-            Check(orcG.Average(g => g.Count) > menG.Average(g => g.Count) * 1.1 && menG.All(g => g[0] == "recruit") && orcG.All(g => g[0] == "recruit")
+            Check(new[] { "gondor", "isengard", "dunlendings", "mordor", "mistymountains", "elves", "dwarves", "shire" }.All(f => MaxSize(f) == 5),
+                "wild groups are up to 5 for every faction (0.0.135: everyone follows 3, so every group scale is 1)");
+            Check(Math.Abs(orcG.Average(g => g.Count) - menG.Average(g => g.Count)) < 0.15 && menG.All(g => g[0] == "recruit") && orcG.All(g => g[0] == "recruit")
                 && menG.Concat(Many("gondor", true)).All(g => g.All(r => Array.IndexOf(Promotion.Branches, r) < 0)),
-                "orc groups are bigger on average than men's, and every group still starts with a recruit; no wild guards or shock troops (0.0.113, players only)");
-            Check(Escort("gondor") == (1, 3) && Escort("mordor") == (1, 4) && Escort("mistymountains") == (1, 5) && Escort("elves") == (1, 2),
-                "a captain's escort is 1 to 3 for men, 1 to 4 for orcs, 1 to 5 for goblins, 1 to 2 for elves");
-            Check(Math.Abs(fc.GroupScaleOf("mordor") - 1.2) < 1e-9 && Math.Abs(1 / fc.GroupScaleOf("mistymountains") - 0.625) < 1e-9 && Math.Abs(1 / fc.GroupScaleOf("elves") - 1.25) < 1e-9 && fc.GroupScaleOf("nobody") == 1,
-                "in MaxNearby an orc counts 5/6 (0.0.107), a goblin 5/8 and an elf 5/4 of a man; an unknown faction counts as one");
-            // Eight goblins nearby weigh 5, under MaxNearby 8: another group may still come. Eight elves weigh 10: none.
+                "orc groups are as big as men's on average (0.0.135), and every group still starts with a recruit; no wild guards or shock troops (0.0.113, players only)");
+            Check(new[] { "gondor", "mordor", "mistymountains", "elves" }.All(f => Escort(f) == (1, 3)),
+                "a captain's escort is 1 to 3 for every faction (0.0.135)");
+            Check(new[] { "mordor", "mistymountains", "elves", "nobody" }.All(f => Math.Abs(fc.GroupScaleOf(f) - 1) < 1e-9),
+                "in MaxNearby every NPC counts as one (0.0.135: every faction follows 3, the baseline)");
+            // 0.0.135: every faction weighs one.
             typeof(SpawnZoneSystem).GetField("groupScale", F).SetValue(sys, (System.Func<string, double>)(f => fc.GroupScaleOf(f)));
             var weight = typeof(SpawnZoneSystem).GetMethod("Weight", F);
             double W(string f) => (double)weight.Invoke(sys, new object[] { f });
-            Check(Math.Abs(8 * W("mistymountains") - 5) < 1e-9 && 8 * W("elves") >= 8 && Math.Abs(W("gondor") - 1) < 1e-9,
-                "eight goblins nearby still leave room for another group (they weigh 5 of 8); eight elves don't (10)");
+            Check(Math.Abs(W("mistymountains") - 1) < 1e-9 && Math.Abs(W("elves") - 1) < 1e-9 && Math.Abs(W("gondor") - 1) < 1e-9,
+                "every faction's NPCs weigh one in MaxNearby (0.0.135)");
             Check(SpawnConfig.InstructionText.Any(l => l.StartsWith("GroupSizeAvg") && l.Contains("orcs up to 7")) && SpawnConfig.InstructionText.Any(l => l.StartsWith("MaxNearby") && l.Contains("5/8")),
                 "#Instructions explain the scaled groups and the weighted MaxNearby");
         }

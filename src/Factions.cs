@@ -160,17 +160,39 @@ namespace LotrNpcs
             return health ? Round(warrior * scale) : (float)Math.Round(warrior * scale, 2);
         }
 
-        public static readonly FactionTier Men = T("men", 5, 16, 1f, 1f, R(22, 34, 48, 35), R(3.15f, 3.95f, 7f, 3.05f), 5, 15, 40, 15, 10, 10, 30);
-        public static readonly FactionTier Uruk = T("uruk", 5, 15, 1.05f, 1.03f, R(23, 32, 48, 36), R(3f, 4.3f, 7.1f, 3f), 4, 15, 41, 16, 11, 11, 33);
-        public static readonly FactionTier Levy = T("levy", 6, 19, 0.85f, 0.85f, R(18, 28, 41, 28), R(2.85f, 3.6f, 6.1f, 2.8f), 4, 12, 35, 11, 8, 8, 25);
+        // 0.0.135 (owner, 2026-11-14: "Equal stats, everyone 3", for PvP of 10 v 10 players with their followers): every
+        // tier has the Men's per-rank numbers, 3 followers and a roster of 16; hire prices are the Men's too (the
+        // coordinator's call, so equal coin stays fair; easy to undo with Tables134 below). Tiers stay apart for their
+        // gear, names and the 0.0.90 history the old config steps compare against.
+        static Dictionary<string, float> MenHealth => R(22, 34, 48, 35);
+        static Dictionary<string, float> MenDamage => R(3.15f, 3.95f, 7f, 3.05f);
+        public const int EqualFollowers = 3, EqualRoster = 16;
+        public static readonly FactionTier Men = T("men", EqualFollowers, EqualRoster, 1f, 1f, MenHealth, MenDamage, 5, 15, 40, 15, 10, 10, 30);
+        public static readonly FactionTier Uruk = T("uruk", EqualFollowers, EqualRoster, 1.05f, 1.03f, MenHealth, MenDamage, 5, 15, 40, 15, 11, 11, 33);
+        public static readonly FactionTier Levy = T("levy", EqualFollowers, EqualRoster, 0.85f, 0.85f, MenHealth, MenDamage, 5, 15, 40, 15, 8, 8, 25);
         // 0.0.103 (owner, 2026-11-09: "Maybe the stats only need to be slightly different instead of vastly"; chose
         // "Narrow orcs to ~0.78 of a Man"): health x damage per rank went from about 0.55 of the Men's to about 0.78,
         // roughly even per coin (orcs hire for about 0.75 of a Man). Config version 25 moves unchanged 0.0.91 tables.
         public static readonly Dictionary<string, float> OrcHealth091 = R(15, 27, 31, 22), OrcDamage091 = R(2.5f, 2.8f, 5.95f, 2.45f);
-        public static readonly FactionTier Orc = T("orc", 6, 22, 0.66f, 0.85f, R(19, 30, 40, 30), R(2.7f, 3.35f, 6.2f, 2.65f), 5, 12, 29, 12, 7, 7, 21);
-        public static readonly FactionTier Goblin = T("goblin", 8, 26, 0.57f, 0.73f, R(17, 22, 32, 22), R(1.85f, 2.8f, 4.7f, 2.2f), 3, 9, 25, 10, 6, 6, 19);
-        public static readonly FactionTier Elf = T("elf", 4, 13, 1.14f, 1.35f, R(27, 37, 51, 36), R(3.7f, 5.3f, 9.7f, 4.3f), 6, 19, 50, 20, 13, 13, 38);
-        public static readonly FactionTier Dwarf = T("dwarf", 4, 13, 1.33f, 1.15f, R(31, 47, 63, 47), R(3.2f, 4.15f, 7.8f, 3.3f), 6, 19, 50, 19, 13, 13, 38);
+        public static readonly FactionTier Orc = T("orc", EqualFollowers, EqualRoster, 0.66f, 0.85f, MenHealth, MenDamage, 5, 15, 40, 15, 7, 7, 21);
+        public static readonly FactionTier Goblin = T("goblin", EqualFollowers, EqualRoster, 0.57f, 0.73f, MenHealth, MenDamage, 5, 15, 40, 15, 6, 6, 19);
+        public static readonly FactionTier Elf = T("elf", EqualFollowers, EqualRoster, 1.14f, 1.35f, MenHealth, MenDamage, 5, 15, 40, 15, 13, 13, 38);
+        public static readonly FactionTier Dwarf = T("dwarf", EqualFollowers, EqualRoster, 1.33f, 1.15f, MenHealth, MenDamage, 5, 15, 40, 15, 13, 13, 38);
+
+        /// <summary>0.0.130 to 0.0.134 as shipped, for config version 31: tables, hire prices, follow limit and roster
+        /// (at the old baseline of 5 followers) that are still exactly these move to the 0.0.135 ones.</summary>
+        public static readonly Dictionary<string, (Dictionary<string, float> Health, Dictionary<string, float> Damage, int[] Hire, int Followers, int Roster)> Tables134 =
+            new Dictionary<string, (Dictionary<string, float>, Dictionary<string, float>, int[], int, int)>
+        {
+            ["men"] = (R(22, 34, 48, 35), R(3.15f, 3.95f, 7f, 3.05f), new[] { 5, 15, 40, 15 }, 5, 16),
+            ["uruk"] = (R(23, 32, 48, 36), R(3f, 4.3f, 7.1f, 3f), new[] { 4, 15, 41, 16 }, 5, 15),
+            ["levy"] = (R(18, 28, 41, 28), R(2.85f, 3.6f, 6.1f, 2.8f), new[] { 4, 12, 35, 11 }, 6, 19),
+            ["orc"] = (R(19, 30, 40, 30), R(2.7f, 3.35f, 6.2f, 2.65f), new[] { 5, 12, 29, 12 }, 6, 22),
+            ["goblin"] = (R(17, 22, 32, 22), R(1.85f, 2.8f, 4.7f, 2.2f), new[] { 3, 9, 25, 10 }, 8, 26),
+            ["elf"] = (R(27, 37, 51, 36), R(3.7f, 5.3f, 9.7f, 4.3f), new[] { 6, 19, 50, 20 }, 4, 13),
+            ["dwarf"] = (R(31, 47, 63, 47), R(3.2f, 4.15f, 7.8f, 3.3f), new[] { 6, 19, 50, 19 }, 4, 13),
+        };
+        public const int OldDefaultMaxFollowers134 = 5;
 
         // 0.0.107 (owner chose "Orcs to 6 followers + refit all"): orcs follow 6 (was 7), and every tier's per-rank
         // health and damage refitted with tools/balance/fit105.py under the 0.0.105 rules (hit turns, the attacker cap of
@@ -271,7 +293,7 @@ namespace LotrNpcs
         // Format of the file. 0 = written by 0.0.31, 1 = by 0.0.32, 2 = by 0.0.33, 3 = by 0.0.34, 4 = by 0.0.35 to
         // 0.0.38, 5 = by 0.0.39 and 0.0.40, 6 = by 0.0.41 to 0.0.43, 7 = by 0.0.44 to 0.0.47, 8 = by 0.0.48 to 0.0.50, 9 = by 0.0.51 and 0.0.52, 10 = by 0.0.53, 11 = by 0.0.54, 12 = by 0.0.55 to 0.0.58, 13 = by 0.0.59 to 0.0.61, 14 = by 0.0.62 to 0.0.73, 15 = by 0.0.74 and 0.0.75, 16 = by 0.0.76 to 0.0.81, 17 = by 0.0.82 to 0.0.84, 18 = by 0.0.85 to 0.0.89, 19 = by 0.0.90, 20 = by 0.0.91, 21 = by 0.0.92, 22 = by 0.0.93, 23 = by 0.0.94 to 0.0.101, 24 = by 0.0.102, 25 = by 0.0.103, 26 = by 0.0.104 to 0.0.106, 27 = by 0.0.107, 28 = by 0.0.108 to 0.0.111, 29 = by 0.0.112;
         // Migrate() updates older files once and then stores them.
-        public const int CurrentVersion = 30;
+        public const int CurrentVersion = 31;
         public int Version;
         public Dictionary<string, FactionDef> Factions;
         public List<FactionRelationDef> Relations;
@@ -284,7 +306,7 @@ namespace LotrNpcs
         // Most NPCs one player may have hired at once, and how many of them may follow at a time (user, 2026-11-03:
         // hire more at a time, but only 5 may follow at once; hire cap 15, was 5 for both).
         // 0.0.51 (user, 2026-11-03): the hire cap is 16.
-        public const int DefaultMaxRecruits = 16, DefaultMaxFollowers = 5;
+        public const int DefaultMaxRecruits = 16, DefaultMaxFollowers = FactionTiers.EqualFollowers; // 0.0.135: 3 (was 5)
         public int MaxRecruits = DefaultMaxRecruits;
         public int MaxFollowers = DefaultMaxFollowers;
         // 0.0.104 (owner, 2026-11-09: "limit the ranks of units per cap. Like 1-2 captains only"; chose "1 captain per 8
@@ -339,6 +361,14 @@ namespace LotrNpcs
         // target. Players keep the window. Off by default (the 0.0.98 staggered swings).
         // 0.0.112 (owner: "keep the i-frames off for now"): on by default; version 29 turns an old false on once.
         public bool NpcHitsIgnoreHurtWindow = true;
+        // 0.0.135 (owner, 2026-11-14: "the average fight time should be increased, because it feels like all the units
+        // die within 30 seconds to a minute"): every hit this mod's NPCs land on anything but a player is this times its
+        // damage (melee, arrows, charge hits after their x2), so NPC fights last about twice as long; players take and
+        // deal what they did. A file without it gets 0.5.
+        public const float DefaultNpcVsNpcDamageMultiplier = 0.5f;
+        public float NpcVsNpcDamageMultiplier = DefaultNpcVsNpcDamageMultiplier;
+        /// <summary>The multiplier for a hit on target: NpcVsNpcDamageMultiplier (0 to 10) on non-players, 1 on players.</summary>
+        public float HitScaleFor(Entity target) => target is EntityPlayer ? 1f : (float.IsNaN(NpcVsNpcDamageMultiplier) ? DefaultNpcVsNpcDamageMultiplier : GameMath.Clamp(NpcVsNpcDamageMultiplier, 0, 10));
         // 0.0.115 (owner: debugging features off before release, a config option turns them back on): the testing
         // commands (ModCommands.DebugOnly). A file without it gets false.
         public bool DebugCommands = false;
@@ -463,14 +493,12 @@ namespace LotrNpcs
 
         /// <summary>0.0.130 (owner, 2026-11-14: riders "dont seem to be able to hold their own in a fight against a large
         /// group of warriors"): a rider costs a captain's price but fought with a warrior's numbers, about 1/2.5 of its
-        /// coin's worth. Unless the config lists a rider entry, its health and damage are the warrior's times
-        /// RiderScale: (captain price / warrior price) ^ RiderStatExponent, which the simulator (tools/balance/riders130.py)
-        /// puts near even against the warriors the same coin buys (2.0 to 2.4 for the shipped prices).</summary>
-        public const double RiderStatExponent = 0.82, DefaultRiderScale = 2.2;
+        /// coin's worth. Unless the config lists a rider entry, its health and damage are the warrior's times RiderScale.
+        /// 0.0.135: one scale for every faction, the Men's 2.24 from 0.0.130 (which used (captain price / warrior price)
+        /// ^ 0.82 and left orc riders at 2.03 and Dunlending riders at 2.41; docs/balance/matchups-2026-11-14.md).</summary>
+        public const double DefaultRiderScale = 2.24;
 
-        public static float RiderScale(FactionDef def) =>
-            def?.HirePrices != null && def.HirePrices.TryGetValue("captain", out int c) && def.HirePrices.TryGetValue("warrior", out int w) && c > 0 && w > 0
-                ? (float)Math.Pow(c / (double)w, RiderStatExponent) : (float)DefaultRiderScale;
+        public static float RiderScale(FactionDef def) => (float)DefaultRiderScale;
 
         static float? StatFor(FactionDef def, Dictionary<string, float> table, string rank, int digits)
         {
@@ -537,8 +565,9 @@ namespace LotrNpcs
             "HireCoin and HirePrices: what hiring one of the faction's NPCs costs, as a number of coins per rank (recruit, warrior, captain) and for archers (archer). HireCoin is the item code of the coin, game:gear-rusty (the game's rusty gear) by default since 0.0.94 (it was coinage:planchet-silver-lg, a large silver planchet). Rankless NPCs cost a recruit's price, and a price of 0 makes hiring free. The shipped prices (since 0.0.108) are fitted so the same coins spent on any two factions buy forces that win about as often as each other.",
             "PromotePrices: what promoting a recruit costs in HireCoin, by the rank it becomes (warrior, guard, shock, archer, captain). By default it is the faction's hire price for that rank less 3 coins, or less 4 for a captain (Men: 12 to warrior or archer, 36 to captain); a rank left out gets that default (guard and shock, which can't be hired: the warrior's promotion price). A hired recruit or warrior earns 1 XP for each NPC of this mod that dies within 10 seconds of its hit: at 15 XP a recruit can become a warrior, guard, shock trooper or archer, at 40 XP a warrior, guard or shock trooper can become a captain. The owner promotes it in its talk menu. 0 makes it free.",
             "Hiring: right-click an NPC to talk. Members of its faction, and members of an allied faction whose alliance has ShareFriends, can hire it, paying from their hotbar and backpack.",
-            "MaxFollowers and MaxRecruits (in each faction): how many of the faction's recruits can follow a player at once, and how many a player can have. Each recruit uses a share: 1/MaxFollowers of the following and 1/MaxRecruits of the roster, and a player's shares must add up to no more than 1, so factions can be mixed (3 Gondor men and 2 Mordor orcs use 3/5 + 2/7 of the following). Past the following, a new recruit guards where it was hired and the rest hold or guard. A player over the limits when they join (after an admin lowers them) loses the most recently hired recruits until they fit. The MaxFollowers and MaxRecruits at the top of the file are the baseline (the Men's, 5 and 16) and count for a faction without its own.",
-            "Health and Damage (in each faction, by rank: recruit, warrior, captain, archer, and since 0.0.113 the promotion-only guard and shock, which a file without them gets as the warrior's health x1.25 and damage x0.8 (guard) or health x0.8 and damage x1.25 (shock)): the health and the damage of one hit of the faction's NPCs of that rank, in place of their unit's own (health is a whole number; an archer's damage is its arrow's, and its shove). The shipped tables were fitted so that at each rank a full band of each faction wins about half its fights against the others (the Uruk-hai a little more): for example Mordor orc recruits 19 health and 2.7 damage, Gondor recruits 22 and 3.15, elf captains 51 and 9.7. Damage tiers don't change. Wild groups grow with MaxFollowers too (see the spawning file).",
+            "MaxFollowers and MaxRecruits (in each faction): how many of the faction's recruits can follow a player at once, and how many a player can have. Each recruit uses a share: 1/MaxFollowers of the following and 1/MaxRecruits of the roster, and a player's shares must add up to no more than 1, so factions can be mixed (3 Gondor men and 2 Mordor orcs use 3/5 + 2/7 of the following). Past the following, a new recruit guards where it was hired and the rest hold or guard. A player over the limits when they join (after an admin lowers them) loses the most recently hired recruits until they fit. The MaxFollowers and MaxRecruits at the top of the file are the baseline (3 and 16 since 0.0.135, every faction alike) and count for a faction without its own.",
+            "Health and Damage (in each faction, by rank: recruit, warrior, captain, archer, and since 0.0.113 the promotion-only guard and shock, which a file without them gets as the warrior's health x1.25 and damage x0.8 (guard) or health x0.8 and damage x1.25 (shock)): the health and the damage of one hit of the faction's NPCs of that rank, in place of their unit's own (health is a whole number; an archer's damage is its arrow's, and its shove). Since 0.0.135 every faction ships the same numbers (health 22, 34, 48 and 35, damage 3.15, 3.95, 7 and 3.05 for recruit, warrior, captain and archer), with the same 3 followers, roster of 16 and prices, so fights between factions are decided by numbers and tactics. A rider without its own entry has its warrior's health and damage times 2.24. Damage tiers don't change. Wild groups grow with MaxFollowers over the baseline (1 for every faction now; see the spawning file).",
+            "NpcVsNpcDamageMultiplier (0.5 by default, since 0.0.135; 0 to 10): every hit this mod's NPCs land on anything that isn't a player is this times its damage (melee, arrows, and charge hits after their x2), so fights between NPCs last longer. Hits on players, and players' hits, don't change.",
             "DamageSpread: every NPC hit, melee and arrows, deals its damage times a random 1 - DamageSpread to 1 + DamageSpread (0.2 = 80% to 120%), so fights aren't decided by whole numbers of hits. 0 turns it off; at most 0.9.",
             "WildBodyLoot and HiredBodyLoot (by rank: recruit, warrior, captain, archer): what a dead wild NPC's body and a dead recruit's body hold for a player with a knife, as a list of { Code, Min, Max } (item code, and a random count from Min to Max). By default rusty gears (recruit 0-1, warrior and archer 1-2, captain 3-5) and up to one piece of cloth (recruits) or leather (the rest); armor and weapons are never dropped. Rankless NPCs use the recruit list; an empty list leaves an empty body. Bodies rot away after 3 in-game hours.",
             "SpawnSafeRadius (64 by default, 0 = off): within this many blocks of the world spawn, recruits (guards, aggressive and raiding ones alike) never attack a player on sight. They still fight back against a player who attacks them, their owner or their group.",
@@ -686,6 +715,36 @@ namespace LotrNpcs
                     if (kv.Value == null || FactionTiers.Of(kv.Key) != FactionTiers.Orc) continue;
                     if (SameTable(kv.Value.Health, FactionTiers.OrcHealth091)) kv.Value.Health = new Dictionary<string, float>(FactionTiers.Orc.Health);
                     if (SameTable(kv.Value.Damage, FactionTiers.OrcDamage091)) kv.Value.Damage = new Dictionary<string, float>(FactionTiers.Orc.Damage);
+                }
+            }
+            // 0.0.135 (version 31, owner: "Equal stats, everyone 3"): a baseline follow limit still at the old 5 becomes 3;
+            // each faction's follow limit, roster, health and damage tables and hire prices still exactly as 0.0.130 to
+            // 0.0.134 shipped them take the equal ones, and promotion prices still derived from the old hire prices follow.
+            // Values the admin chose stay.
+            if (Version < 31 && Version > 0)
+            {
+                int oldBase = Math.Max(1, MaxFollowers);
+                if (MaxFollowers == FactionTiers.OldDefaultMaxFollowers134) MaxFollowers = DefaultMaxFollowers;
+                int baseRecruits = Math.Max(1, MaxRecruits);
+                foreach (KeyValuePair<string, FactionDef> kv in Factions)
+                {
+                    if (kv.Value == null) continue;
+                    FactionTier tier = FactionTiers.Of(kv.Key);
+                    if (!FactionTiers.Tables134.TryGetValue(tier.Name, out var old)) continue;
+                    FactionDef def = kv.Value;
+                    if (def.MaxFollowers == FactionTiers.Round(old.Followers * (double)oldBase / FactionTiers.OldDefaultMaxFollowers134))
+                        def.MaxFollowers = FactionTiers.Round(tier.Followers * (double)Math.Max(1, MaxFollowers) / DefaultMaxFollowers);
+                    if (def.MaxRecruits == FactionTiers.Round(old.Roster * (double)baseRecruits / DefaultMaxRecruits))
+                        def.MaxRecruits = FactionTiers.Round(tier.Roster * (double)baseRecruits / DefaultMaxRecruits);
+                    if (SameTable(def.Health, old.Health)) def.Health = new Dictionary<string, float>(tier.Health);
+                    if (SameTable(def.Damage, old.Damage)) def.Damage = new Dictionary<string, float>(tier.Damage);
+                    var oldHire = new Dictionary<string, int> { ["recruit"] = old.Hire[0], ["warrior"] = old.Hire[1], ["captain"] = old.Hire[2], ["archer"] = old.Hire[3] };
+                    if (SamePrices(def.HirePrices, oldHire))
+                    {
+                        bool derived = SamePrices(def.PromotePrices, FactionTiers.PromoteFor(oldHire));
+                        def.HirePrices = new Dictionary<string, int>(tier.Hire);
+                        if (derived) def.PromotePrices = FactionTiers.WithBranchPrices(FactionTiers.PromoteFor(def.HirePrices));
+                    }
                 }
             }
             // 0.0.102 (version 24, owner: "Implement it again, do 4 per though"): the unchanged no-limit 0 becomes 4.
