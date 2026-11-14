@@ -57,3 +57,32 @@ Full plan: `prompts/player-weapons-mod.md`.
     etc., CollidersLib colliders). So under CO the swing is CO's animation, not the NPC's: "same animations" holds only
     without CO. Next build: the CO patch, copying CO's falx/spear/club/axe stances per kind (CO metal sets tier only:
     falx iron tier 5, steel 7, damage 4).
+- 0.0.2 built (2026-11-14, owner: "build as much as you can without need for ingame testing", "increase the damage
+  to be slightly better than vanilla", and sent Not Only Spear Expansion 0.4.1 and Maltiez Swords 1.1.0 "as a
+  comparison for stats"). Not in game yet. Maltiez Swords is client-side sword models only (no stats), unused.
+  - Damage x1.1 (BETTER) on every attack power, thrown spear damage, shield absorption and bow damage, and on CO damage.
+  - Stats: war axes (Orc, Dwarven, Rohirric axe) and the Dwarven battleaxe now copy NOSE's bartka (5/850, 6/2150),
+    hammers its mace (5.5/1000, 6/2350), the warhammer its polehammer (5/1100, 6/2000, reach 3.5), poleaxe and
+    halberd its halberd (5/1100, 6/2000, reach 3.5), the great swords its claymore (5.5/1200, 6.2/2400, reach 3).
+    Swords, knives and spears stay the game's. NOSE is not a dependency: numbers only (credited).
+  - CO patch (patches/combatoverhaul.json, dependsOn combatoverhaul, side Server, as NOSE's): class
+    CombatOverhaul:MeleeWeapon, OneHandedStance and TwoHandedStance (two-handed weapons use their two-handed swing in
+    both), damage per metal x1.1 with "Tier" (CO source) and "Strength" (NOSE's name) both set, hit line from the grip
+    to the end of the head. First person: CO's own animations (falx slash; club 1h for axes and maces, CO has no axe
+    swings; club 2h for polearms, battleaxe, warhammer; great-sword slash; spear thrusts 1h/2h). Third person:
+    AttackTpAnimation = the NPC swing. Knives, shields and bows: no CO patch (CO leaves the game's knife alone, its
+    own shield patch is disabled, and its bow class needs its animated bow model).
+    Risk: the server runs a CO fork 0.18.9; the stance format was read from maltiez2/CombatOverhaul (2026-04) and
+    NOSE 0.4.1. Untested.
+  - Shields (12, iron only): ItemShield as the game's iron metal shield (450 + 60 durability, absorb 5 / projectiles
+    10, x1.1), the NPC off-hand transform, icon from the shape (face plate toward the viewer). Recipe: iron boss, hoop
+    and plate (the game's metal shield).
+  - Bows (2, iron only): ItemBow as the game's recurve (damage 4 x1.1, accuracy +0.3, 600), the NPCs' full-draw
+    transform, aim animation bowaim, the three pulled-string stages as draw shapes. Recipe: the game's recurve bow
+    recipe without the bowyer trait.
+  - Forging: head-<code>-<metal> items (the whole weapon model, as the game's falx blade; Quenchable, forgable),
+    anvil recipe = the head's outline (boxes past the grip on the heavier side, shaft pieces left out for hafted
+    weapons) fitted to 16 x 8 and <= 42 voxels (one ingot, like every game and NOSE head), grid: head over one stick
+    (two for spears, polearms, battleaxe, warhammer, great swords), applyquenchablebuffs. Outlines are drafts:
+    previews/lotrweapons-anvil-0.0.2.txt.
+  - Shield and bow data moved into tools/weapon_catalog.py (lotrnpcs output byte-identical).

@@ -68,9 +68,14 @@ for p in load(os.path.join(A, "patches", "combatoverhaul.json")):
 
 lang = load(os.path.join(A, "lang", "en.json"))
 items = 0
+heads = {}
+weapons = set()
 for name in sorted(os.listdir(os.path.join(A, "itemtypes"))):
     item = load(os.path.join(A, "itemtypes", name))
     code = item["code"]
+    if "headOf" in item["attributes"].get("lotrweapons", {}):
+        heads[code] = item
+        continue
     if item["class"] in ("ItemShield", "ItemBow"):
         # Shields and bows: iron only (no metal variants), held as the NPCs hold them (a shield's off-hand transform,
         # a bow's full-draw item), no Combat Overhaul patch.
@@ -122,6 +127,7 @@ for name in sorted(os.listdir(os.path.join(A, "itemtypes"))):
     npc_item = os.path.join(NA, "itemtypes", f"orcweapon-{catalog}.json")
     if load(npc_item)["tpHandTransform"] != item["tpHandTransform"]:
         errors.append(f"{code}: hand transform differs from the NPC's {catalog}")
+    weapons.add(code)
     power = item["attackpowerByType"]
     if power["*-steel"] < power["*-iron"]:
         errors.append(f"{code}: steel hits softer than iron")
@@ -146,6 +152,35 @@ for name in sorted(os.listdir(os.path.join(A, "itemtypes"))):
         errors.append(f"{code}: spear class and thrown entity don't match")
     if entity and not os.path.exists(os.path.join(A, "entities", entity.split(":", 1)[1].replace("-{metal}", "") + ".json")):
         errors.append(f"{code}: thrown entity {entity} missing")
+
+# Forging: every weapon has a head (iron and steel, a name each), an anvil recipe for it (one ingot: at most 42
+# voxels, at most 16 x 16, rows of one length) and a grid recipe joining it to sticks; shields and bows a grid recipe.
+smithing = {f[:-5]: load(os.path.join(A, "recipes", "smithing", f)) for f in os.listdir(os.path.join(A, "recipes", "smithing"))}
+grid = {f[:-5]: load(os.path.join(A, "recipes", "grid", f)) for f in os.listdir(os.path.join(A, "recipes", "grid"))}
+for code in sorted(weapons):
+    head = f"head-{code}"
+    if head not in heads or heads[head]["variantgroups"] != [{"code": "metal", "states": ["iron", "steel"]}]:
+        errors.append(f"{code}: no iron/steel head item")
+    elif any(f"item-{head}-{m}" not in lang for m in ("iron", "steel")):
+        errors.append(f"{head}: no name")
+    r = smithing.get(code)
+    if not r:
+        errors.append(f"{code}: no anvil recipe")
+        continue
+    rows = [row for layer in r["pattern"] for row in layer]
+    voxels = sum(row.count("#") for row in rows)
+    if not 1 <= voxels <= 42 or any(len(row) != len(rows[0]) or len(row) > 16 or set(row) - {"#", "_"} for row in rows) or len(rows) > 16:
+        errors.append(f"{code}: anvil pattern bad ({voxels} voxels)")
+    if r["ingredient"]["code"] != "ingot-*" or r["ingredient"]["allowedVariants"] != ["iron", "steel"] \
+            or r["output"]["code"] != f"lotrweapons:{head}-{{metal}}":
+        errors.append(f"{code}: anvil recipe ingredient or output wrong")
+    g = grid.get(code)
+    if not g or g["output"]["code"] != f"lotrweapons:{code}-{{metal}}" or g["ingredients"]["H"]["code"] != f"lotrweapons:{head}-*" \
+            or g["ingredients"]["S"]["code"] != "game:stick" or len(g["ingredientPattern"].replace(",", "")) != g["width"] * g["height"]:
+        errors.append(f"{code}: grid recipe wrong")
+for code in sorted(set(grid) - weapons):
+    if not os.path.exists(os.path.join(A, "itemtypes", code + ".json")) or grid[code]["output"]["code"] != f"lotrweapons:{code}":
+        errors.append(f"grid recipe {code} makes no item of ours")
 
 for root, label, other in ((A, "lotrweapons", "lotrnpcs"), (NA, "lotrnpcs", "lotrweapons")):
     for folder, _, files in os.walk(root):

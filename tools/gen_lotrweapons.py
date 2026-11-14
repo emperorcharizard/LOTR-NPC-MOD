@@ -11,7 +11,7 @@ import os
 import shutil
 import sys
 
-VERSION = "0.0.1"
+VERSION = "0.0.2"
 DOMAIN = "lotrweapons"
 FOLDER = "weapon"  # assets/lotrweapons/shapes/item/weapon, textures/item/weapon
 METALS = ["iron", "steel"]
@@ -215,14 +215,13 @@ assert set(CO_KINDS) == set(KINDS) - {"knife"}
 CO_FP_ANIMS = {a for f in _FP.values() for a in f["attack"] + [f["ready"], f["idle"]]}
 
 
-def blade_line(w, shape):
-    """CO's hit line for a weapon, in model blocks: from the grip to the far end of the weapon along its longest
-    side (CO's falx: [0, 0, 0.5, 1.2, 0, 0.05], along its blade)."""
-    lo, hi = bounds(shape)
+def blade_line(w, shape, hafted):
+    """CO's hit line for a weapon, in model blocks: from the grip along the weapon's long side to the far end of its
+    head or blade (CO's falx: [0, 0, 0.5, 1.2, 0, 0.05], along its blade)."""
+    axis, forward, head = head_boxes(w, shape, hafted)
     grip = [w["grip"][0] / 16, w["grip"][1] / 16, w["grip"][2] / 16 if len(w["grip"]) > 2 else 0.5]
-    axis = max(range(3), key=lambda i: hi[i] - lo[i])
     tip = list(grip)
-    tip[axis] = hi[axis] if hi[axis] - grip[axis] >= grip[axis] - lo[axis] else lo[axis]
+    tip[axis] = max(b[1][axis] for b in head) if forward else min(b[0][axis] for b in head)
     return [round(v, 3) for v in grip + tip]
 
 
@@ -246,7 +245,7 @@ def write_co_patch(shapes):
         if not ck:
             continue
         w = C.MELEE[key]
-        line = blade_line(w, shapes[key])
+        line = blade_line(w, shapes[key], kind in HAFTED)
         # A two-handed weapon gets its two-handed swing in both stances (one hand when the other holds something).
         one = ck.get("one") or ck["two"]
         two = ck.get("two") or ck["one"]
@@ -431,7 +430,9 @@ def write_items():
             lang[f"item-{code}-{m}"] = f"{m.capitalize()} {name[0].lower() + name[1:] if name.startswith(('Orc', 'Captain')) else name}"
     write("lang/en.json", lang)
     write_co_patch(shapes)
-    return lang
+    patterns = write_forging(lang, shapes)
+    write("lang/en.json", lang)
+    return patterns
 
 
 def shield_icon(shape):
@@ -517,6 +518,115 @@ def write_bows(own, bundled, lang):
         lang[f"item-{code}"] = name
 
 
+# Forging (owner, 2026-11-14: "begin creating recipes and forge items on anvil"), as the game makes its falx and
+# spear: an ingot is smithed on the anvil into the weapon's head or blade (lotrweapons:head-<code>-<metal>, iron or
+# steel), which the crafting grid joins to a stick. Like the game's falx blade, the head item reuses the whole
+# weapon's model. The anvil pattern is the head's outline: the model's boxes past the grip, less the shaft (pieces as
+# narrow as the handle), seen across their widest side, fitted to at most 16 x 8 and 42 voxels (one ingot is 42 voxels; every vanilla and Not Only Spear
+# Expansion weapon head costs one ingot or less). Long weapons (spears, polearms, two-handed) take two sticks.
+LONG_KINDS = {"spear", "halberd", "polehammer", "battleaxe", "claymore"}
+PATTERN_MAX = (16, 8)  # columns (along the weapon) x rows
+INGOT_VOXELS = 42
+
+
+HAFTED = {"spear", "axe", "battleaxe", "mace", "polehammer", "halberd"}
+
+
+def head_boxes(w, shape, hafted):
+    """The weapon's head or blade: (long axis, the boxes past the grip on its working side). The working side is the
+    side of the grip with more material (a butt spike or pommel is smaller than the head). For hafted weapons the
+    shaft is left out: pieces as narrow as the handle at the grip and 4 units long or more."""
+    boxes = visible_boxes(shape)
+    lo, hi = bounds(shape)
+    axis = max(range(3), key=lambda i: hi[i] - lo[i])
+    grip = (w["grip"][axis] if axis < len(w["grip"]) else 8) / 16
+    unit = 1 / 16
+    across = [i for i in range(3) if i != axis]
+    width = lambda b: max(b[1][i] - b[0][i] for i in across)
+    at_grip = [b for b in boxes if b[0][axis] - unit <= grip <= b[1][axis] + unit] or boxes
+    handle = min(width(b) for b in at_grip)
+    shaft = lambda b: hafted and width(b) <= handle + unit / 2 and b[1][axis] - b[0][axis] >= 4 * unit
+    area = lambda bs: sum((b[1][axis] - b[0][axis]) * width(b) for bs_ in [bs] for b in bs_)
+    ahead = [b for b in boxes if b[0][axis] >= grip + unit and not shaft(b)]
+    behind = [b for b in boxes if b[1][axis] <= grip - unit and not shaft(b)]
+    forward = area(ahead) >= area(behind)
+    head = (ahead if forward else behind) or [b for b in boxes if ((b[0][axis] + b[1][axis]) / 2 > grip) == forward]
+    return axis, forward, head
+
+
+def head_pattern(w, shape, hafted):
+    axis, forward, head = head_boxes(w, shape, hafted)
+    unit = 1 / 16
+    side = max((i for i in range(3) if i != axis), key=lambda i: max(b[1][i] for b in head) - min(b[0][i] for b in head))
+    a0, a1 = min(b[0][axis] for b in head), max(b[1][axis] for b in head)
+    s0, s1 = min(b[0][side] for b in head), max(b[1][side] for b in head)
+    scale = min(1.0, PATTERN_MAX[0] / ((a1 - a0) * 16), PATTERN_MAX[1] / max((s1 - s0) * 16, 1e-6))
+    while True:
+        cell = unit / scale
+        cols, rows = max(1, math.ceil((a1 - a0) / cell - 1e-6)), max(1, math.ceil((s1 - s0) / cell - 1e-6))
+
+        def filled(c, r):
+            # The cell's span overlaps a box (so a blade thinner than a cell still leaves a line of voxels).
+            ca0, ca1 = a0 + c * cell, a0 + (c + 1) * cell
+            cs0, cs1 = s0 + r * cell, s0 + (r + 1) * cell
+            return any(b[0][axis] < ca1 and b[1][axis] > ca0 and b[0][side] < cs1 and b[1][side] > cs0 for b in head)
+        grid = [[filled(c if forward else cols - 1 - c, rows - 1 - r) for c in range(cols)] for r in range(rows)]
+        voxels = sum(map(sum, grid))
+        if voxels <= INGOT_VOXELS:
+            return ["".join("#" if v else "_" for v in row) for row in grid], voxels
+        scale *= 0.9
+
+
+def write_forging(lang, shapes):
+    patterns = {}
+    for key, (code, kind, name) in WEAPONS.items():
+        w = C.MELEE[key]
+        rows, voxels = head_pattern(w, shapes[key], kind in HAFTED)
+        patterns[code] = (rows, voxels)
+        head = f"head-{code}"
+        weapon = json.load(open(os.path.join(A, "itemtypes", f"{code}.json")))
+        texture_key = next(iter(shapes[key]["textures"]))
+        write(f"itemtypes/{head}.json", {
+            "code": head, "variantgroups": [{"code": "metal", "states": METALS}], "maxstacksize": 4,
+            "shape": weapon.get("shape"), "shapeByType": weapon.get("shapeByType"),
+            "behaviors": [{"name": "Quenchable"}, {"name": "GroundStorable", "properties": {
+                "layout": "SingleCenter", "collisionBox": {"x1": 0, "y1": 0, "z1": 0, "x2": 1, "y2": 0.125, "z2": 1}}}],
+            "heldTpUseAnimation": "interactstatic", "particlesTextureCode": texture_key,
+            "attributes": {"forgable": True, "handbook": {"groupBy": [head + "-*"]}, "lotrweapons": {"catalog": key, "headOf": code}},
+            "creativeinventory": {"general": ["*"], "items": ["*"], "lotrweapons": ["*"]},
+            "guiTransform": weapon["guiTransform"], "groundTransform": weapon["groundTransform"],
+            "tpHandTransform": weapon["tpHandTransform"],
+        })
+        for m in METALS:
+            lang[f"item-{head}-{m}"] = f"{m.capitalize()} {name[0].lower() + name[1:] if name.startswith(('Orc', 'Captain')) else name} head"
+        write(f"recipes/smithing/{code}.json", {
+            "ingredient": {"type": "item", "code": "ingot-*", "name": "metal", "allowedVariants": METALS},
+            "pattern": [rows], "name": name, "output": {"type": "item", "code": f"{DOMAIN}:{head}-{{metal}}"}})
+        long = kind in LONG_KINDS
+        write(f"recipes/grid/{code}.json", {
+            "ingredientPattern": "H,S,S" if long else "H,S", "width": 1, "height": 3 if long else 2,
+            "ingredients": {"H": {"type": "item", "code": f"{DOMAIN}:{head}-*", "name": "metal", "allowedVariants": METALS},
+                            "S": {"type": "item", "code": "game:stick"}},
+            "output": {"type": "item", "code": f"{DOMAIN}:{code}-{{metal}}", "quantity": 1,
+                       "recipeAttributes": {"applyquenchablebuffs": True}}})
+    # Shields: the game's all-metal shield recipe in iron (boss, hoop, plate). Bows: the game's recurve bow recipe,
+    # without its "bowyer" trait (LOTR Races and Classes' classes may not have it).
+    for _, (code, _) in SHIELDS.items():
+        write(f"recipes/grid/{code}.json", {
+            "ingredientPattern": "_H_,PBP", "width": 3, "height": 2,
+            "ingredients": {"B": {"type": "item", "code": "game:boss-iron"}, "H": {"type": "item", "code": "game:hoop-iron"},
+                            "P": {"type": "item", "code": "game:metalplate-iron"}},
+            "output": {"type": "item", "code": f"{DOMAIN}:{code}", "quantity": 1}})
+    for _, (code, *_rest) in BOWS.items():
+        write(f"recipes/grid/{code}.json", {
+            "ingredientPattern": "MFT,BLT,MFT", "width": 3, "height": 3,
+            "ingredients": {"B": {"type": "item", "code": "game:bowstave-recurve-dry"}, "T": {"type": "item", "code": "game:flaxtwine"},
+                            "L": {"type": "item", "code": "game:leather-normal-plain"}, "F": {"type": "item", "code": "game:bone"},
+                            "M": {"type": "item", "code": "game:bushmeat-raw"}},
+            "output": {"type": "item", "code": f"{DOMAIN}:{code}", "quantity": 1}})
+    return patterns
+
+
 def write_thrown_spear(code, key, w, centre):
     """A thrown spear, as the game's (survival/entities/nonliving/projectile/spear.json): the same shape, flying tip
     first along +X. The game draws its thrown spear at full size, 1.25 times its in-hand size; ours keeps that ratio."""
@@ -537,7 +647,11 @@ def write_thrown_spear(code, key, w, centre):
 
 def main():
     shutil.rmtree(out, ignore_errors=True)
-    write_items()
+    patterns = write_items()
+    if "--patterns" in sys.argv:
+        for code, (rows, voxels) in patterns.items():
+            print(f"{code}: {voxels} voxels")
+            print("\n".join("    " + r for r in rows))
     write_animation_patches()
     with open(os.path.join(out, "modinfo.json"), "w") as f:
         json.dump({

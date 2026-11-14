@@ -4,3 +4,8 @@ The weapon models and their textures were provided by the server's owner (the sa
 NPCs carry). Parts without one of those textures use vanilla Vintage Story textures. The three animations of
 our own (poleaxechop, poleaxehold, greatswordhold) were made for the LOTR NPCs mod from the game's own
 axehit and holdbothhands.
+
+Weapon stats: swords, knives, spears, shields and bows copy Vintage Story's own; war axes, maces, the
+polehammer, halberds and two-handed swords copy the numbers of Not Only Spear Expansion by Kanahaku (its
+bartka, mace, polehammer, halberd and claymore), and the Combat Overhaul patch follows Combat Overhaul's
+falx and Not Only Spear Expansion's Combat Overhaul patches. Only numbers are copied, no files.
