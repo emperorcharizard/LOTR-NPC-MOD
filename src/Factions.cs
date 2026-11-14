@@ -293,7 +293,7 @@ namespace LotrNpcs
         // Format of the file. 0 = written by 0.0.31, 1 = by 0.0.32, 2 = by 0.0.33, 3 = by 0.0.34, 4 = by 0.0.35 to
         // 0.0.38, 5 = by 0.0.39 and 0.0.40, 6 = by 0.0.41 to 0.0.43, 7 = by 0.0.44 to 0.0.47, 8 = by 0.0.48 to 0.0.50, 9 = by 0.0.51 and 0.0.52, 10 = by 0.0.53, 11 = by 0.0.54, 12 = by 0.0.55 to 0.0.58, 13 = by 0.0.59 to 0.0.61, 14 = by 0.0.62 to 0.0.73, 15 = by 0.0.74 and 0.0.75, 16 = by 0.0.76 to 0.0.81, 17 = by 0.0.82 to 0.0.84, 18 = by 0.0.85 to 0.0.89, 19 = by 0.0.90, 20 = by 0.0.91, 21 = by 0.0.92, 22 = by 0.0.93, 23 = by 0.0.94 to 0.0.101, 24 = by 0.0.102, 25 = by 0.0.103, 26 = by 0.0.104 to 0.0.106, 27 = by 0.0.107, 28 = by 0.0.108 to 0.0.111, 29 = by 0.0.112;
         // Migrate() updates older files once and then stores them.
-        public const int CurrentVersion = 31;
+        public const int CurrentVersion = 32;
         public int Version;
         public Dictionary<string, FactionDef> Factions;
         public List<FactionRelationDef> Relations;
@@ -313,7 +313,18 @@ namespace LotrNpcs
         // roster places"): one captain per RosterPerCaptain places of a faction's roster, rounded so that 13 places
         // give 1, 16 give 2 and 22 give 3 (CaptainsOf). 0 turns the limit off.
         public const int DefaultRosterPerCaptain = 8;
+        // 0.0.138 (owner, 2026-11-14: "there should still be the 1 captain"): the captain limit is MaxCaptains per player
+        // (0 = none). RosterPerCaptain is only read from older files (version 32 turns it into MaxCaptains) and no
+        // longer written.
         public int RosterPerCaptain = DefaultRosterPerCaptain;
+        public bool ShouldSerializeRosterPerCaptain() => false;
+        public const int DefaultMaxCaptains = 1;
+        public int MaxCaptains = DefaultMaxCaptains;
+        // 0.0.138 (owner: "for recruits, maybe they can have an additional follower or two"): followers past the 3
+        // ranked places, for recruits only (0 to 10).
+        public const int DefaultRecruitExtraFollowers = 2;
+        public int RecruitExtraFollowers = DefaultRecruitExtraFollowers;
+        public int RecruitExtra => GameMath.Clamp(RecruitExtraFollowers, 0, 10);
         // Out-of-combat healing (user, 2026-11-03: "increase the regen of the npcs", then "just a bit faster"), as a
         // multiple of vanilla's creature regeneration of 0.01 health a second: 30 heals a recruit (22 health since
         // 0.0.43) in about 1.2 minutes and a captain (48) in about 2.7. In a fight, and for RegenDelaySeconds after the
@@ -492,7 +503,7 @@ namespace LotrNpcs
         public int RosterOf(string faction) => Def(faction)?.MaxRecruits ?? Math.Max(1, MaxRecruits);
         /// <summary>How many captains a player may lead of this faction alone (0.0.104): roster / RosterPerCaptain,
         /// a fraction of .75 or more rounding up, at least 1; int.MaxValue with the limit off.</summary>
-        public int CaptainsOf(string faction) => CaptainsFor(RosterOf(faction), RosterPerCaptain);
+        public int CaptainsOf(string faction) => MaxCaptains <= 0 ? int.MaxValue : MaxCaptains;
         public static int CaptainsFor(int roster, int perCaptain) =>
             perCaptain <= 0 ? int.MaxValue : Math.Max(1, (int)Math.Floor(roster / (double)perCaptain + 0.25 + 1e-9));
         /// <summary>The health of this faction's NPCs of this rank (0.0.91), or null: the type's own (a faction the
@@ -587,7 +598,8 @@ namespace LotrNpcs
             "Relations: how two factions treat each other. Relation is \"ally\", \"enemy\" or \"neutral\", and two factions without an entry are enemies. No factions are allies by default. Allies never fight and come to help each other; neutral factions leave each other's NPCs alone.",
             "ShareFriends (allies only): true makes each faction's members safe from the other's NPCs too, and lets them hire the other's NPCs. Otherwise a player is safe only from their own factions and hires only from them.",
             "MonsterCodes: creatures every faction attacks on sight (* is a wildcard). GrudgeSeconds: how long NPCs fight someone who hurt them or an ally. CallForHelpRange: how many blocks away allies come to help. JoinFightRange (32 by default, since 0.0.124): how far a wild NPC that starts a fight calls idle wild NPCs of its faction to join it; they call in turn, so a spread-out army joins. 0 turns it off.",
-            "RosterPerCaptain: one captain per this many places of a faction's roster (8 by default: Men 2, orcs and goblins 3, elves and dwarves 1, Uruk-hai and Dunlendings 2). Hiring or promoting past it is refused; captains a player already has stay. With several factions on one roster each captain counts its share. 0 means no limit.",
+            "MaxCaptains (1 by default, since 0.0.138; it replaces RosterPerCaptain): how many captains a player may have, whatever their faction. Hiring or promoting past it is refused; captains a player already has stay. 0 means no limit. Riders don't count.",
+            "RecruitExtraFollowers (2 by default, since 0.0.138; 0 to 10): places in a player's following for recruits only, past the MaxFollowers places every rank shares. So a band is up to 3 followers of any rank and 2 more recruits. A following recruit that is promoted while the ranked places are full stays on the roster but guards where it stands until a place frees.",
             "MaxAttackersPerTarget: how many NPCs may fight one NPC at a time. 4 by default; 0 means no limit. With a limit, the rest look for another enemy, wait one step behind in a battle line, or, outside a line, join a full enemy anyway when there is no other within reach. Either way an NPC takes an enemy nobody is fighting before one already being fought. Players are never limited, and an NPC always strikes back at whoever hits it.",
             "CombatSpacing: how far apart, in blocks, fighting NPCs of the same side keep from each other, and the gap between neighbours in a battle line (0.8 to 4, 1.5 by default). Enemies only keep DuelDistanceMin apart. As many attackers as fit round an enemy this far apart (5 by default) fight it; the others take another enemy with room first, or else wait in a second ring one CombatSpacing farther out and step in when a place opens.",
             "DuelDistanceMin and DuelDistanceMax: how far from the center of the NPC it fights an attacker stands (1.0 to 1.6 blocks by default): it closes in when farther, steps back when closer, and stands and fights in between. Players are approached the vanilla way.",
@@ -729,6 +741,10 @@ namespace LotrNpcs
                     if (SameTable(kv.Value.Damage, FactionTiers.OrcDamage091)) kv.Value.Damage = new Dictionary<string, float>(FactionTiers.Orc.Damage);
                 }
             }
+            // 0.0.138 (version 32, owner: "there should still be the 1 captain"): the roster-based captain count becomes
+            // MaxCaptains: the default 8 gives 1, 0 (no limit) stays none, another value keeps what it gave a roster of 16.
+            if (Version < 32 && Version > 0)
+                MaxCaptains = RosterPerCaptain == DefaultRosterPerCaptain ? DefaultMaxCaptains : RosterPerCaptain <= 0 ? 0 : CaptainsFor(MaxRecruits, RosterPerCaptain);
             // 0.0.135 (version 31, owner: "Equal stats, everyone 3"): a baseline follow limit still at the old 5 becomes 3;
             // each faction's follow limit, roster, health and damage tables and hire prices still exactly as 0.0.130 to
             // 0.0.134 shipped them take the equal ones, and promotion prices still derived from the old hire prices follow.

@@ -195,3 +195,25 @@ metadata:
 - Stepping back: when its walk direction is more than 100 degrees off that facing (`BattleSpacing.Backing`) it walks at most 0.02 a tick, never sprints, stops the sprint animation and plays `lotrnpcs-walkback` (the seraph walkback, weight 10 over the controls' walk); otherwise it stops it.
 - Not checked: whether the client's own walk (triggered by the Move control) shows through the walkback weight; whether the vanilla melee task's turn toward its target fights the facing when the claimed target and the melee target differ. Offline: all pass. Untested in game (checklist 137).
 - Owner, 2026-11-14 (after the 0.0.137 balance check, docs/balance/check-0.0.137.md): "Leave the ladder as it is". Riders stay 76 / 8.83 (warrior x 2.24) and don't count toward the captain limit; per follower slot rider > captain > warrior > recruit, and the better ranks simply cost more.
+
+## 0.0.138: one captain, two extra places for recruits (2026-11-14, Claude)
+- Owner: "there should still be the 1 captain, and for recruits, maybe they can have an additional follower or two, but once ranked up they cant follow/ go into the roster". Coordinator's reading, built as is.
+- Captains: config `MaxCaptains` (1; 0 = no limit) replaces the roster-based RosterPerCaptain (`FactionConfig.CaptainsOf`). RosterPerCaptain is still read from old files but no longer written; config version 32 turns it into MaxCaptains (the default 8 -> 1, 0 -> 0, another value -> what it gave a roster of 16). Riders don't count (owner kept the ladder).
+- Band: `MaxFollowers` (3) places for any rank plus `RecruitExtraFollowers` (2, 0 to 10) places for recruits only (`HiringSystem.BandFits`, `FollowFits`: up to that many recruits ride free, the rest use their share as before, so mixed-faction shares keep working). Every follow check uses it: the orders menu's Follow (ranked first, then recruits), the talk menu's Follow and borrow, hiring (past the band a new recruit guards), roster Call, loading. The room line counts the ranked places left; the roster header adds "Following: x of 3 ranked places, y of 2 recruit places".
+- Promotion: a following recruit promoted while the ranked places are full stays on the roster but guards where it stands (`HiringSystem.Replace`), with a chat line saying why; it can be called back from the roster when a place frees.
+- Bands in the simulator (`tools/balance/bands138.py`, 10 players a side, equal stats, NPC v NPC x0.5, back hits): the 2 extra recruits beat the same band without them every time; a band of riders still beats everything (owner's ladder).
+
+Row's win rate against the column, 10 players a side (average fight length in brackets, from contact)
+
+| | captain+2 warriors+2 recruits | 3 warriors+2 recruits | 3 riders+2 recruits | captain+2 riders+2 recruits | 5 recruits | old: captain+2 warriors | old: 3 warriors | old: 3 riders |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| captain+2 warriors+2 recruits | 0.47 (33 s) | 1.00 | 0.00 | 0.00 | 1.00 | 1.00 | 1.00 | 0.00 |
+| 3 warriors+2 recruits | 0.00 | 0.50 (32 s) | 0.00 | 0.00 | 1.00 | 1.00 | 1.00 | 0.00 |
+| 3 riders+2 recruits | 1.00 | 1.00 | 0.48 (36 s) | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
+| captain+2 riders+2 recruits | 1.00 | 1.00 | 0.00 | 0.48 (36 s) | 1.00 | 1.00 | 1.00 | 1.00 |
+| 5 recruits | 0.00 | 0.00 | 0.00 | 0.00 | 0.50 (26 s) | 0.00 | 1.00 | 0.00 |
+| old: captain+2 warriors | 0.00 | 0.00 | 0.00 | 0.00 | 0.99 | 0.43 (32 s) | 1.00 | 0.00 |
+| old: 3 warriors | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.53 (30 s) | 0.00 |
+| old: 3 riders | 1.00 | 1.00 | 0.00 | 0.00 | 1.00 | 1.00 | 1.00 | 0.53 (30 s) |
+
+Offline: all pass. Untested in game (checklist 138).

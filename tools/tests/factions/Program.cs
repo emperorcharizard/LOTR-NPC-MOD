@@ -165,7 +165,7 @@ public static class Program {
 
         // migrating older files
         var freshCfg = FactionConfig.FromFile(null, out bool storeFresh);
-        Check(storeFresh && freshCfg.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 31 && json.Contains("\"Version\": 31") && json.Contains("\"NpcVsNpcDamageMultiplier\": 0.5") && json.Contains("\"RosterPerCaptain\": 8") && !json.Contains("MaxHirelings") && json.Contains("\"ShieldChance\": 0.5") && json.Contains("\"HelmetChance\": 0.6") && json.Contains("\"CaptainsAlwaysHelmeted\": false") && json.Contains("\"MaxAttackersPerTarget\": 4") && json.Contains("\"CombatSpacing\": 1.5") && json.Contains("\"BattleLines\": true") && json.Contains("\"DuelDistanceMin\": 1.0") && json.Contains("\"DuelDistanceMax\": 1.6") && json.Contains("\"LineHoldRange\": 6.0") && json.Contains("\"MaxRecruits\": 16") && json.Contains("\"MaxFollowers\": 3") && json.Contains("\"GuardRadius\": 16") && json.Contains("\"HealthRegenSpeed\": 30.0") && json.Contains("\"ShareFriends\": false") && json.Contains("\"Relation\": \"enemy\"") && !freshCfg.Relations.Any(r => r.Relation == "ally") && freshCfg.Relations.Count == 1, "a new file is written with version 31 (no MaxHirelings, no alliance), the example entry, the battle spacing, helmet and shield settings, the regen settings, the guard radius and the hire and follow caps");
+        Check(storeFresh && freshCfg.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 32 && json.Contains("\"Version\": 32") && json.Contains("\"NpcVsNpcDamageMultiplier\": 0.5") && !json.Contains("\"RosterPerCaptain\":") && json.Contains("\"MaxCaptains\": 1") && json.Contains("\"RecruitExtraFollowers\": 2") && !json.Contains("MaxHirelings") && json.Contains("\"ShieldChance\": 0.5") && json.Contains("\"HelmetChance\": 0.6") && json.Contains("\"CaptainsAlwaysHelmeted\": false") && json.Contains("\"MaxAttackersPerTarget\": 4") && json.Contains("\"CombatSpacing\": 1.5") && json.Contains("\"BattleLines\": true") && json.Contains("\"DuelDistanceMin\": 1.0") && json.Contains("\"DuelDistanceMax\": 1.6") && json.Contains("\"LineHoldRange\": 6.0") && json.Contains("\"MaxRecruits\": 16") && json.Contains("\"MaxFollowers\": 3") && json.Contains("\"GuardRadius\": 16") && json.Contains("\"HealthRegenSpeed\": 30.0") && json.Contains("\"ShareFriends\": false") && json.Contains("\"Relation\": \"enemy\"") && !freshCfg.Relations.Any(r => r.Relation == "ally") && freshCfg.Relations.Count == 1, "a new file is written with version 32 (no MaxHirelings, no alliance), the example entry, the battle spacing, helmet and shield settings, the regen settings, the guard radius and the hire and follow caps");
         var current = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(json.Replace("\"Stance\": \"aggressive\"", "\"Stance\": \"defensive\"")), out bool storeCurrent);
         Check(!storeCurrent && current.Factions["gondor"].Stance == "defensive", "a current file is left alone, even with defensive factions");
         // 0.0.112: files before version 19 are no longer converted step by step (both servers run 0.0.108 or later).
@@ -919,7 +919,7 @@ public static class Program {
             v30["Factions"]["elves"]["MaxFollowers"] = 7; v30["Factions"]["mordor"]["Health"]["captain"] = 55; v30["Factions"]["isengard"]["HirePrices"]["warrior"] = 20;
             var m30 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v30.ToString()), out bool store30);
             string T5(Dictionary<string, float> t) => string.Join("/", FactionTiers.Ranks.Select(rk => t[rk].ToString(System.Globalization.CultureInfo.InvariantCulture)));
-            Check(store30 && m30.Version == 31 && m30.MaxFollowers == 3 && m30.Factions["mistymountains"].MaxFollowers == 3 && m30.Factions["mistymountains"].MaxRecruits == 16
+            Check(store30 && m30.Version == FactionConfig.CurrentVersion && m30.MaxFollowers == 3 && m30.Factions["mistymountains"].MaxFollowers == 3 && m30.Factions["mistymountains"].MaxRecruits == 16
                 && T5(m30.Factions["mistymountains"].Health) == "22/34/48/35" && T5(m30.Factions["dwarves"].Damage) == "3.15/3.95/7/3.05" && m30.Factions["dwarves"].HirePrices["captain"] == 40 && m30.Factions["dwarves"].PromotePrices["captain"] == 36
                 && m30.Factions["elves"].MaxFollowers == 7 && T5(m30.Factions["mordor"].Health) == "19/30/55/30" && m30.Factions["isengard"].HirePrices["warrior"] == 20 && m30.Factions["isengard"].HirePrices["captain"] == 41
                 && m30.NpcVsNpcDamageMultiplier == 0.5f,
@@ -2102,16 +2102,26 @@ public static class Program {
             AddRecruit(1, "gondor", true); AddRecruit(2, "gondor", false); AddRecruit(3, "gondor", false);
             bool oneMore = hC.CaptainFits("capuid", "gondor");
             AddRecruit(4, "gondor", true);
-            Check(oneMore && !hC.CaptainFits("capuid", "gondor") && !hC.CaptainFits("capuid", "elves"), "a Gondor player with one captain may take a second, not a third (warriors and recruits don't count), and then no elf captain either");
-            capOwner.Recruits.Remove(4);
+            Check(!oneMore && !hC.CaptainFits("capuid", "elves"), "0.0.138: a Gondor player with one captain may take no second (MaxCaptains 1; warriors and recruits don't count), nor an elf captain");
+            capOwner.Recruits.Remove(4); capOwner.Recruits.Remove(1);
             Check(hC.CaptainFits("capuid", "gondor"), "a captain who died or was dismissed frees the place");
             var orcOwner = new HiringOwner { Name = "Orc" }; hC.SetOwner("orcuid", orcOwner);
             foreach (long id in new long[] { 11, 12 }) { orcOwner.Recruits.Add(id); orcOwner.RecruitFactions[id] = "mordor"; orcOwner.Captains.Add(id); }
-            bool third = hC.CaptainFits("orcuid", "mordor");
-            orcOwner.Recruits.Add(13); orcOwner.RecruitFactions[13] = "mordor"; orcOwner.Captains.Add(13);
-            Check(!third && !hC.CaptainFits("orcuid", "mordor") && FactionConfig.InstructionText.Any(l => l.StartsWith("RosterPerCaptain")), "a Mordor player may lead 2 captains like everyone (roster 16 since 0.0.135); #Instructions explain RosterPerCaptain");
-            var offC = new FactionConfig { RosterPerCaptain = 0 }; SetLegacy(fsC, offC);
-            Check(hC.CaptainFits("orcuid", "mordor") && hC.CaptainFits("capuid", "elves"), "RosterPerCaptain 0 turns the limit off");
+            Check(!hC.CaptainFits("orcuid", "mordor") && FactionConfig.InstructionText.Any(l => l.StartsWith("MaxCaptains")) && !FactionConfig.InstructionText.Any(l => l.StartsWith("RosterPerCaptain")),
+                "a Mordor player with captains already has no room for another (MaxCaptains 1 since 0.0.138); #Instructions explain MaxCaptains");
+            var offC = new FactionConfig { MaxCaptains = 0 }; SetLegacy(fsC, offC);
+            Check(hC.CaptainFits("orcuid", "mordor") && hC.CaptainFits("capuid", "elves"), "MaxCaptains 0 turns the limit off");
+            // 0.0.138: a version 31 file's RosterPerCaptain becomes MaxCaptains (8 -> 1, 0 -> 0, 4 -> what it gave 16 places: 4).
+            int Migrated(int rpc) { var j = Newtonsoft.Json.Linq.JObject.FromObject(FactionConfig.FromFile(null, out _)); j["Version"] = 31; j["RosterPerCaptain"] = rpc; return FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(j.ToString()), out _).MaxCaptains; }
+            Check(Migrated(8) == 1 && Migrated(0) == 0 && Migrated(4) == 4, "0.0.138: a version 31 file's RosterPerCaptain becomes MaxCaptains (the default 8 gives 1, 0 stays no limit, others keep their count at 16 places)");
+            // 0.0.138: the band: 3 ranked places plus 2 for recruits only.
+            var third3 = 1.0 / 3;
+            (double, bool) Rk(bool recruit) => (third3, recruit);
+            Check(HiringSystem.BandFits(new[] { Rk(false), Rk(false), Rk(false), Rk(true), Rk(true) }, 2) && !HiringSystem.BandFits(new[] { Rk(false), Rk(false), Rk(false), Rk(false) }, 2)
+                && HiringSystem.BandFits(Enumerable.Repeat(Rk(true), 5), 2) && !HiringSystem.BandFits(Enumerable.Repeat(Rk(true), 6), 2) && !HiringSystem.BandFits(new[] { Rk(false), Rk(false), Rk(false), Rk(true), Rk(true), Rk(true) }, 2)
+                && !HiringSystem.BandFits(new[] { Rk(false), Rk(false), Rk(false), Rk(true) }, 0) && new FactionConfig().RecruitExtra == 2 && new FactionConfig { RecruitExtraFollowers = 50 }.RecruitExtra == 10
+                && FactionConfig.InstructionText.Any(l => l.StartsWith("RecruitExtraFollowers")) && lang["promote-guards"] != null && lang["roster-band"] != null,
+                "0.0.138: a band is up to 3 followers of any rank plus 2 recruits (5 recruits fit, a 4th ranked or 6th body doesn't); #Instructions, the promotion and roster lines are there");
 
             // Lines: one front place per enemy; at contact the front holds its side, the extras go round.
             var lsC = new BattleLineSystem(fsC); BattleLineSystem.WildLines = true;
@@ -2188,7 +2198,7 @@ public static class Program {
             }
             v27["Factions"]["angmar"]["HirePrices"]["captain"] = 30; v27["Factions"]["isengard"]["PromotePrices"]["warrior"] = 20; v27["Factions"]["elves"]["Damage"]["captain"] = 12;
             var m27 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v27.ToString()), out bool store27);
-            Check(store27 && m27.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 31
+            Check(store27 && m27.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 32
                 && H4(m27.Factions["mordor"].HirePrices) == "5/15/40/15" && P3(m27.Factions["mordor"].PromotePrices) == "12/12/36" && T4(m27.Factions["mordor"].Health) == "22/34/48/35"
                 && H4(m27.Factions["angmar"].HirePrices) == "4/11/30/11" && P3(m27.Factions["angmar"].PromotePrices) == "8/8/25" && T4(m27.Factions["angmar"].Damage) == "3.15/3.95/7/3.05"
                 && H4(m27.Factions["isengard"].HirePrices) == "5/15/40/15" && P3(m27.Factions["isengard"].PromotePrices) == "20/14/40"

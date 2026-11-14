@@ -1898,6 +1898,8 @@ TALK = {
     "cmd-follow-full": "Recruits following you: {0}. {1} stayed behind because your band is full. {2}",
     "cmd-hold": "Recruits holding position: {0}",
     "cmd-move": "Recruits on the move: {0}",
+    "promote-guards": "{0} is promoted, but your ranked places are full, so it guards where it stands. Call it from the roster when a place frees.",
+    "roster-band": "Following: {0} of {1} ranked places, {2} of {3} recruit places.",
     "cmd-retreat": "Recruits falling back to you: {0}. They start no fights for {1} seconds.",
     "cmd-charge": "Recruits charging: {0}",
     "cmd-charge-none": "No enemy there to charge. Look at one (up to 48 blocks), or have one near you.",
@@ -2095,7 +2097,7 @@ with open(os.path.join(out, "modinfo.json"), "w") as f:
         "type": "code",
         "modid": "lotrnpcs",
         "name": "LOTR NPCs",
-        "version": "0.0.137",
+        "version": "0.0.138",
         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Race models from "
                        "LOTR Races and Classes by Dango Dango Dango, Shakgriig and Buggoi, used with their permission.",

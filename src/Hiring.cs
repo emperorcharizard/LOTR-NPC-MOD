@@ -454,6 +454,24 @@ namespace LotrNpcs
         public double FollowShare(string faction) => 1.0 / Math.Max(1, Factions?.Config.FollowersOf(faction) ?? FactionConfig.DefaultMaxFollowers);
         public double RosterShare(string faction) => 1.0 / Math.Max(1, Factions?.Config.RosterOf(faction) ?? FactionConfig.DefaultMaxRecruits);
         public static bool Fits(double used, double share) => used + share <= 1 + ShareSlack;
+
+        /// <summary>0.0.138: does a band fit? Members are (share, is a recruit). Up to extra recruits ride free in the
+        /// recruit-only places (the biggest shares first); every other member uses its share of the ranked places.</summary>
+        public static bool BandFits(IEnumerable<(double Share, bool Recruit)> members, int extra) => Over(BandUsed(members, extra)) == false;
+
+        /// <summary>The ranked places a band uses (see BandFits).</summary>
+        public static double BandUsed(IEnumerable<(double Share, bool Recruit)> members, int extra)
+        {
+            var list = members.ToList();
+            return list.Where(m => !m.Recruit).Sum(m => m.Share) + list.Where(m => m.Recruit).Select(m => m.Share).OrderByDescending(x => x).Skip(Math.Max(0, extra)).Sum();
+        }
+
+        int RecruitExtra => Factions?.Config.RecruitExtra ?? FactionConfig.DefaultRecruitExtraFollowers;
+        (double Share, bool Recruit) Member(Entity e) => (FollowShare(FactionSystem.FactionOf(e)), RankOf(e) == "recruit");
+
+        /// <summary>0.0.138: would candidate fit the player's following (its followers but except, plus candidate)?</summary>
+        public bool FollowFits(string uid, Entity candidate, Entity except = null) =>
+            BandFits(Followers(uid).Where(e => e != except && e != candidate).Append(candidate).Select(Member), RecruitExtra);
         public static bool Over(double used) => used > 1 + ShareSlack;
 
         /// <summary>How much of the player's roster their recruits use. A recruit whose faction isn't known yet (hired
@@ -477,7 +495,7 @@ namespace LotrNpcs
         public List<RoomEntry> Room(string uid, string faction)
         {
             List<EntityAgent> following = Followers(uid);
-            double used = following.Sum(e => FollowShare(FactionSystem.FactionOf(e)));
+            double used = BandUsed(following.Select(Member), RecruitExtra);
             List<string> shown = new List<string>();
             if (faction != null) shown.Add(faction);
             foreach (EntityAgent e in following)
@@ -785,7 +803,7 @@ namespace LotrNpcs
                     {
                         if (state.Mode != "shared") return state;
                         // 0.0.90: a borrowed guard takes its faction's share of the borrower's following.
-                        if (!Fits(FollowUsed(player.PlayerUID), FollowShare(FactionSystem.FactionOf(npc)))) return StateFor(npc, player, "talk-followfull");
+                        if (!FollowFits(player.PlayerUID, npc)) return StateFor(npc, player, "talk-followfull");
                         Recruit.Lend(npc, player.PlayerUID, player.PlayerName);
                         Recruit.SetOrder(npc, Recruit.Follow);
                         Recruit.SetFollowSlot(npc, null);
@@ -800,8 +818,7 @@ namespace LotrNpcs
                 case Recruit.GuardShared:
                     {
                         if (state.Mode != "own" && state.Mode != "borrowed") return state;
-                        if (action == Recruit.Follow && !Followers(player.PlayerUID).Contains(npc)
-                            && !Fits(FollowUsed(player.PlayerUID), FollowShare(FactionSystem.FactionOf(npc))))
+                        if (action == Recruit.Follow && !Followers(player.PlayerUID).Contains(npc) && !FollowFits(player.PlayerUID, npc))
                             return StateFor(npc, player, "talk-followfull");
                         bool guard = action == Recruit.Guard || action == Recruit.GuardShared;
                         string reply = "talk-" + action;
@@ -904,6 +921,10 @@ namespace LotrNpcs
             string room = (RoomText(Room(uid, null), L) + " " + RosterText(RosterRoom(uid, null), L)).Trim();
             if (room.Length > 0) state.Header.Add(room);
             if (owner.Captains != null && owner.Captains.Count > 0) state.Header.Add(L("roster-captains", new object[] { Percent(CaptainsUsed(uid)) }));
+            // 0.0.138: ranked places and recruit-only places in use.
+            List<EntityAgent> band = Followers(uid);
+            int recruits = band.Count(e => RankOf(e) == "recruit"), extra = RecruitExtra, inExtra = Math.Min(recruits, extra);
+            state.Header.Add(L("roster-band", new object[] { band.Count - inExtra, MaxFollowers, inExtra, extra }));
             return state;
         }
 
@@ -921,7 +942,7 @@ namespace LotrNpcs
                     {
                         if (!loaded || player.Entity == null) return L("roster-notloaded");
                         if (Recruit.OrderOf(npc) == Recruit.Follow && Recruit.BorrowerUidOf(npc) == null) return L("roster-already", Recruit.TitleInSentence(npc, player.LanguageCode));
-                        if (!Fits(FollowUsed(uid, npc), FollowShare(FactionSystem.FactionOf(npc)))) return L("roster-call-full");
+                        if (!FollowFits(uid, npc)) return L("roster-call-full");
                         string borrower = Recruit.BorrowerUidOf(npc);
                         // As Follow me in the talk menu: the owner's word takes a lent guard back.
                         Recruit.ClearBorrower(npc);
@@ -990,7 +1011,7 @@ namespace LotrNpcs
             if (Pay(player, state.Coin, state.Price) is string poor) { state.Reply = poor; return state; }
 
             // Past the follow share, a new recruit guards the spot where it was hired instead of following.
-            bool guards = !Fits(FollowUsed(player.PlayerUID, npc), FollowShare(faction));
+            bool guards = !FollowFits(player.PlayerUID, npc);
             Recruit.Bind(npc, player.PlayerUID, player.PlayerName);
             // A name befitting its race (0.0.54), unless it already has one.
             Looks.NameOnHire(npc, sapi.World.Rand);
@@ -1050,6 +1071,14 @@ namespace LotrNpcs
             owner.Summaries?.Remove(old.EntityId);
             Learn(owner, next);
             Promotion.SyncOwnerGroups(next, owner.Groups);
+            // 0.0.138 (owner: "once ranked up they cant follow"): past the ranked places it stays on the roster but guards.
+            if (Recruit.OrderOf(next) == Recruit.Follow && !FollowFits(uid, next, old))
+            {
+                Recruit.SetGuardAt(next, next.Pos.XYZ);
+                Recruit.SetFollowSlot(next, null);
+                if (sapi?.World.PlayerByUid(uid) is IServerPlayer told)
+                    told.SendMessage(GlobalConstants.GeneralChatGroup, Lang.GetL(told.LanguageCode, "lotrnpcs:promote-guards", Recruit.TitleInSentence(next, told.LanguageCode)), EnumChatType.Notification);
+            }
             if (sapi?.World.PlayerByUid(uid)?.Entity is EntityPlayer by) RefreshFollowSlots(owner, by);
         }
 
@@ -1209,7 +1238,7 @@ namespace LotrNpcs
                 EnforceLimits(uid, id => sapi?.World.GetEntityById(id) as EntityAgent, e => e.Code.ToShortString());
             string leader = Recruit.LeaderUidOf(npc);
             // Whether or not the game lists it among the loaded entities yet: would it fit beside the others?
-            if (npc.Alive && Recruit.OrderOf(npc) == Recruit.Follow && leader != null && !Fits(FollowUsed(leader, npc), FollowShare(FactionSystem.FactionOf(npc))))
+            if (npc.Alive && Recruit.OrderOf(npc) == Recruit.Follow && leader != null && !FollowFits(leader, npc))
             {
                 if (Recruit.BorrowerUidOf(npc) != null) Recruit.ClearBorrower(npc);
                 Recruit.SetGuardAt(npc, npc.Pos.XYZ);
@@ -1557,15 +1586,15 @@ namespace LotrNpcs
                         // following stay with the owner; the others are tried nearest first, each joining if its share
                         // fits (so a goblin may still join after an elf didn't), and the rest keep their orders.
                         List<EntityAgent> following = Followers(player.PlayerUID);
-                        double used = following.Sum(e => FollowShare(FactionSystem.FactionOf(e)));
-                        List<EntityAgent> joining = crew.Where(e => !following.Contains(e)).OrderBy(e => e.Pos.SquareDistanceTo(by.Pos)).ToList();
+                        // 0.0.138: ranked recruits take the ranked places first, then recruits fill the recruit-only ones.
+                        List<EntityAgent> joining = crew.Where(e => !following.Contains(e)).OrderBy(e => RankOf(e) == "recruit").ThenBy(e => e.Pos.SquareDistanceTo(by.Pos)).ToList();
                         List<EntityAgent> coming = following.Where(crew.Contains).ToList();
+                        List<EntityAgent> band = new List<EntityAgent>(following);
                         int joined = 0, left = 0;
                         string firstLeft = null;
                         foreach (EntityAgent npc in joining)
                         {
-                            double share = FollowShare(FactionSystem.FactionOf(npc));
-                            if (Fits(used, share)) { used += share; coming.Add(npc); joined++; }
+                            if (BandFits(band.Append(npc).Select(Member), RecruitExtra)) { band.Add(npc); coming.Add(npc); joined++; }
                             else { left++; firstLeft ??= FactionSystem.FactionOf(npc); }
                         }
                         OwnOrder(coming);

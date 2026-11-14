@@ -521,3 +521,12 @@ Install `lotrnpcs_0.0.137-test.zip`; restart fully. Battle log on.
 - [ ] 137.2 In a 9 v 9 warrior fight, NPCs keep their faces toward the nearest enemy; when one backs off (spacing, hiding) it steps back facing the enemy with the walk-back animation, at a walk, not moonwalking in place or sliding.
 - [ ] 137.3 On Retreat, followers turn and run (no stepping back); riders never step back.
 - [ ] 137.4 lotrnpcs-factions.json has BackHitMultiplier 1.5 and BackArcDegrees 120, and #Instructions explain them.
+
+## 138. One captain, two extra recruit places (0.0.138)
+
+Install `lotrnpcs_0.0.138-test.zip`; restart fully.
+
+- [ ] 138.1 With one captain hired, hiring or promoting a second captain is refused ("captains full"); riders don't count.
+- [ ] 138.2 With 3 warriors following, 2 recruits can still follow (Follow me in the orders menu or the talk menu), a 3rd recruit or a 4th warrior can't; 5 recruits can all follow. The roster header shows "Following: 3 of 3 ranked places, 2 of 2 recruit places".
+- [ ] 138.3 Promote a following recruit while 3 ranked followers follow: it is promoted, stays on the roster, guards where it stands, and the chat says why; dismissing a warrior then lets you call it from the roster.
+- [ ] 138.4 lotrnpcs-factions.json is version 32 with MaxCaptains 1 and RecruitExtraFollowers 2, no RosterPerCaptain, and #Instructions explain both.
