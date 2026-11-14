@@ -96,3 +96,9 @@ Full plan: `prompts/player-weapons-mod.md`.
   (blade.json "*") applied after hand(falx)^-1 * hand(ours), so each weapon's grip lands where the falx's does
   (self-check: the falx maps back onto its own transforms). Long weapons may poke out of a rack.
   Shields and bows too, from the game's round shield and recurve bow (same method, their hand transforms).
+- Steel skins, looked into (not built): the owner's three iron/steel pairs change warm brown-grey iron (hue 0.04-0.12,
+  saturation 0.04-0.16) to near-neutral lighter grey (lightness 0.389 l + 0.348, saturation 0.017); wood, leather
+  and cloth stay. Applied blindly to the other atlases it fits the owner's pairs (mean colour error 6-14 vs 23-29
+  untouched) but changes nothing on about half the weapons (already neutral grey) and greys some wood (Easterling
+  scimitar handle). Proposal sheet: previews/lotrweapons-steel-skins-proposal.png (each pair: iron, auto steel).
+  Owner to decide: own steel skins, auto rule for chosen weapons only, or leave both metals alike.
