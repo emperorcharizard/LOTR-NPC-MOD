@@ -557,6 +557,7 @@ First without Combat Overhaul (W1-W5), then with it (W6). Nothing here has been 
 ## LOTR Weapons W2. Shields and bows (lotrweapons 0.0.2)
 
 - [ ] W2.1 Each of the 12 shields hangs on the left arm as the NPCs carry it (compare with a shielded NPC), blocks (right click) with metal sounds, durability 510.
+- [ ] W2.3 Shields and bows go on a tool rack and stand on the ground (Ctrl + right click) where the game's round shield and recurve bow would.
 - [ ] W2.2 Both bows draw with the string pulling back in three stages, shoot vanilla arrows (damage 4.4), hold like an NPC archer's drawn bow.
 
 ## LOTR Weapons W3. Forging (lotrweapons 0.0.2)

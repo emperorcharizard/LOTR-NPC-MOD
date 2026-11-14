@@ -408,9 +408,34 @@ def as_transform(a):
             "origin": {"x": 0, "y": 0, "z": 0}, "scale": round(s, 4)}
 
 
-def like_the_falx(hand_tf, falx_tf):
-    into_falx = compose(invert(affine(FALX_HAND_TF, hand=True)), affine(hand_tf, hand=True))
-    return as_transform(compose(affine(falx_tf), into_falx))
+def like_the_falx(hand_tf, falx_tf, ref_hand=FALX_HAND_TF):
+    """falx_tf (a transform of the reference item, the falx unless ref_hand names another) for an item held with
+    hand_tf where the reference is held with ref_hand."""
+    into_ref = compose(invert(affine(ref_hand, hand=True)), affine(hand_tf, hand=True))
+    return as_transform(compose(affine(falx_tf), into_ref))
+
+
+# The same for shields (the game's round shield: tpOffHandTransform, toolrackTransform, groundStorageTransform in
+# roundshield.json) and bows (the recurve: tpHandTransform, toolrack and ground storage "*" in bow.json).
+ROUND_SHIELD = {"hand": {"translation": {"x": -0.13, "y": 0.01, "z": -0.01}, "rotation": {"x": -4, "y": 173, "z": 0},
+                         "origin": {"x": 0.5, "y": 0, "z": 0.5}, "scale": 1},
+                "rack": {"translation": {"x": 0.3, "y": -0.62, "z": -0.625}, "rotation": {"x": 91, "y": -6, "z": -90}, "scale": 1.5},
+                "ground": {"translation": {"x": -0.42, "y": -0.45, "z": -0.105}, "rotation": {"x": 21, "y": 179, "z": -90}, "scale": 1}}
+RECURVE = {"hand": {"translation": {"x": -0.56, "y": 0.01, "z": -0.54}, "rotation": {"x": 107, "y": 11, "z": 10},
+                    "origin": {"x": 0.5, "y": 0, "z": 0.5}, "scale": 0.93},
+           "rack": {"translation": {"x": 0.14, "y": 0.93}, "rotation": {"x": 2, "y": 5, "z": 0}, "scale": 1.76},
+           "ground": {"translation": {"x": -0.4, "y": 0.1, "z": 0.28}, "rotation": {"x": 20, "y": -180, "z": -90}, "scale": 0.83}}
+
+
+def stored_like(hand_tf, ref, wall_off_y):
+    """Tool rack and ground storage attributes and the GroundStorable behaviour, as the reference item has them."""
+    attributes = {"rackable": True, "toolrackTransform": like_the_falx(hand_tf, ref["rack"], ref["hand"]),
+                  "groundStorageTransform": like_the_falx(hand_tf, ref["ground"], ref["hand"])}
+    behavior = {"name": "GroundStorable", "properties": {
+        "layout": "WallHalves", "wallOffY": wall_off_y, "ctrlKey": True,
+        "selectionBox": {"x1": 0, "y1": 0, "z1": 0, "x2": 1, "y2": 0.1, "z2": 1},
+        "collisionBox": {"x1": 0, "y1": 0, "z1": 0, "x2": 0, "y2": 0, "z2": 0}}}
+    return attributes, behavior
 
 
 def display_transforms(rotation, shape, ref="falx"):
@@ -534,6 +559,7 @@ def write_shields(own, bundled, lang):
         write(f"shapes/item/{FOLDER}/{key}.json", shape)
         gui, ground = shield_icon(shape)
         k = SHIELD_STATS
+        stored, ground_storable = stored_like(w["hand"], ROUND_SHIELD, 1)
         write(f"itemtypes/{code}.json", {
             "code": code, "class": "ItemShield", "storageFlags": 257, "maxstacksize": 1,
             "tags": ["weapon", "shield"],
@@ -544,7 +570,8 @@ def write_shields(own, bundled, lang):
                            "protectionChance": k["protectionChance"],
                            "damageAbsorption": better(k["absorb"]), "projectileDamageAbsorption": better(k["absorbProjectile"])},
                 "handbook": {"groupBy": ["shield-*"]},
-                "lotrweapons": {"catalog": key, "copies": k["copies"]}},
+                "lotrweapons": {"catalog": key, "copies": k["copies"]}} | stored,
+            "behaviors": [ground_storable],
             "creativeinventory": {"general": ["*"], "items": ["*"], "tools": ["*"], "lotrweapons": ["*"]},
             "tpHandTransform": w["hand"], "tpOffHandTransform": w["hand"],
             "guiTransform": gui, "groundTransform": ground,
@@ -563,13 +590,15 @@ def write_bows(own, bundled, lang):
             write(f"shapes/item/{FOLDER}/{pull}.json", stage)
         gui, ground, _ = display_transforms(drawn["hand"]["rotation"], shape, "recurve")
         k = BOW_STATS
+        stored, ground_storable = stored_like(drawn["hand"], RECURVE, 2)
         write(f"itemtypes/{code}.json", {
             "code": code, "class": "ItemBow", "tags": ["weapon", "weapon-ranged", "weapon-bow"], "maxstacksize": 1,
             "tool": "bow", "durability": k["durability"],
             "shape": {"base": base, "alternates": [{"base": f"{DOMAIN}:item/{FOLDER}/{pull}"} for pull in pulls]},
             "attributes": {"heldItemPitchFollow": 1, "aimAnimation": "bowaim", "damage": better(k["damage"]),
                            "damageTier": k["damageTier"], "statModifier": {"rangedWeaponsAcc": k["accuracy"]},
-                           "handbook": {"groupBy": ["bow-*"]}, "lotrweapons": {"catalog": key, "copies": k["copies"]}},
+                           "handbook": {"groupBy": ["bow-*"]}, "lotrweapons": {"catalog": key, "copies": k["copies"]}} | stored,
+            "behaviors": [ground_storable],
             "creativeinventory": {"general": ["*"], "items": ["*"], "tools": ["*"], "lotrweapons": ["*"]},
             "tpHandTransform": drawn["hand"], "guiTransform": gui, "groundTransform": ground,
         })

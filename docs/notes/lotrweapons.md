@@ -95,3 +95,4 @@ Full plan: `prompts/player-weapons-mod.md`.
   Ground storage (GroundStorable WallHalves, Ctrl + right click) and tool racks (rackable): transforms are the falx's
   (blade.json "*") applied after hand(falx)^-1 * hand(ours), so each weapon's grip lands where the falx's does
   (self-check: the falx maps back onto its own transforms). Long weapons may poke out of a rack.
+  Shields and bows too, from the game's round shield and recurve bow (same method, their hand transforms).
