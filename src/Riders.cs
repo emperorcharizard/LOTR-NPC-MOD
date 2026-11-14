@@ -76,6 +76,33 @@ namespace LotrNpcs
         /// the enemy out of reach (battle logs 233500, 233700: riders went 10-17 s without a hit while surrounded).</summary>
         public const double HoldFightDistance = 3.5;
 
+        /// <summary>0.0.132: a mounted rider keeps its melee target (its focus) while that target lives and is within this
+        /// many blocks (centers, horizontally), instead of hitting whichever enemy is nearest or struck it last. In 0.0.131
+        /// three riders dealt 134 damage to ten 28-health Dunlendings but killed one: the hits were spread.</summary>
+        public const double FocusRange = 6;
+
+        sealed class Focus { public Entity Target; }
+        static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Entity, Focus> focus = new System.Runtime.CompilerServices.ConditionalWeakTable<Entity, Focus>();
+
+        /// <summary>Whether a rider keeps a focus this far away (dead targets are dropped).</summary>
+        public static bool KeepsFocus(bool alive, double distance) => alive && distance <= FocusRange;
+
+        static double Flat(Entity a, Entity b) => Math.Sqrt((a.Pos.X - b.Pos.X) * (a.Pos.X - b.Pos.X) + (a.Pos.Z - b.Pos.Z) * (a.Pos.Z - b.Pos.Z));
+
+        /// <summary>The rider's focus if it still holds (alive, same dimension, within FocusRange), else null.</summary>
+        public static Entity FocusOf(Entity rider)
+        {
+            if (rider == null || !focus.TryGetValue(rider, out Focus f) || f.Target == null) return null;
+            Entity t = f.Target;
+            if (t.Pos.Dimension != rider.Pos.Dimension || !KeepsFocus(t.Alive, Flat(rider, t))) { f.Target = null; return null; }
+            return t;
+        }
+
+        public static void SetFocus(Entity rider, Entity target)
+        {
+            if (rider != null) focus.GetValue(rider, _ => new Focus()).Target = target;
+        }
+
         /// <summary>Whether the mount holds for the fight instead of following the path.</summary>
         public static bool HoldsForFight(double enemyDistance, bool swinging) => swinging || enemyDistance <= HoldFightDistance;
 
@@ -328,9 +355,11 @@ namespace LotrNpcs
             EntityBehaviorGait gait = mount.GetBehavior<EntityBehaviorGait>();
             var active = rider.GetBehavior<EntityBehaviorTaskAI>()?.TaskManager?.ActiveTasksBySlot;
             AiTaskChestMeleeAttack swing = active?.OfType<AiTaskChestMeleeAttack>().FirstOrDefault(t => t.TargetEntity != null && t.TargetEntity.Alive);
-            Entity foe = swing?.TargetEntity ?? active?.OfType<AiTaskBaseTargetable>().Select(t => t.TargetEntity).FirstOrDefault(e => e != null && e.Alive);
+            // 0.0.132: the rider's focus first, so the mount stays with the enemy it is finishing.
+            Entity kept = Riders.FocusOf(rider);
+            Entity foe = kept ?? swing?.TargetEntity ?? active?.OfType<AiTaskBaseTargetable>().Select(t => t.TargetEntity).FirstOrDefault(e => e != null && e.Alive);
             double foeDist = foe == null ? double.MaxValue : Math.Sqrt((foe.Pos.X - mount.Pos.X) * (foe.Pos.X - mount.Pos.X) + (foe.Pos.Z - mount.Pos.Z) * (foe.Pos.Z - mount.Pos.Z));
-            bool holding = foe != null && Riders.HoldsForFight(foeDist, swing != null);
+            bool holding = foe != null && (kept != null || Riders.HoldsForFight(foeDist, swing != null));
             if (speed > 0 && !holding) mount.Pos.Yaw = Riders.TurnToward(mount.Pos.Yaw, (float)Math.Atan2(tx, tz), Riders.TurnRate * dt);
             else if (foe != null)
             {

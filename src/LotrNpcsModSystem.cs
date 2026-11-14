@@ -252,6 +252,18 @@ namespace LotrNpcs
                     if (partner != null && partner.Alive && hasDirectContact(partner, minDist, minVerDist)) targetEntity = partner;
                 }
             }
+            // 0.0.132: a mounted rider finishes its focus (Riders.FocusOf) before striking anyone else; while the focus is
+            // out of reach it waits (its mount walks it in), and a new focus is taken only when the old one is gone.
+            if ((entity as EntityAgent)?.MountedOn != null && targetEntity != null)
+            {
+                Entity kept = Riders.FocusOf(entity);
+                if (kept == null) Riders.SetFocus(entity, targetEntity);
+                else if (kept != targetEntity)
+                {
+                    if (!hasDirectContact(kept, minDist, minVerDist)) { targetEntity = null; return false; }
+                    targetEntity = kept;
+                }
+            }
             // 0.0.99: this weapon's own wind-up (gen HIT_MS), set before the turn check below, which uses it.
             int weaponHitMs = Weapon?.HitMs ?? 0;
             damagePlayerAtMs = weaponHitMs > 0 ? weaponHitMs : baseHitMs;

@@ -472,3 +472,10 @@ Install `lotrnpcs_0.0.131-test.zip`; restart fully. Battle log on, each side on 
 - [ ] 131.1 3 Rohan riders v 10 Dunlending warriors (14-20 blocks apart), twice: the horses stop when they reach the enemy and turn to face it instead of walking around; riders swing about every 3 s (about as often as a Dunlending) and win or come close (0.0.130: 0-3 and 4-3).
 - [ ] 131.2 The CSV has few `nocontact` melee rows for riders, and the `/recruits battlelog` summary shows "out of reach when the blow fell" only rarely.
 - [ ] 131.3 Riders still chase an enemy that backs off (beyond 3.5 blocks they follow the path again).
+
+## 132. Riders finish one enemy at a time (0.0.132)
+
+Install `lotrnpcs_0.0.132-test.zip`; restart fully. Battle log on, each side on one spot.
+
+- [ ] 132.1 3 Rohan riders v 10 Dunlending warriors (riders at z 126, Dunlendings at z 142), twice: in the CSV each rider's hits go to one Dunlending until it dies, then the next; more kills than 0.0.131's 1 (the simulator expects about 8 of 10 with focus).
+- [ ] 132.2 A rider whose target runs more than 6 blocks off takes a new one; a rider never stands still for long while enemies hit it.
