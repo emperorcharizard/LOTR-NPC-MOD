@@ -428,9 +428,9 @@ def write_items():
         write(f"itemtypes/{code}.json", {k2: v for k2, v in item.items() if v is not None})
         for m in METALS:
             lang[f"item-{code}-{m}"] = f"{m.capitalize()} {name[0].lower() + name[1:] if name.startswith(('Orc', 'Captain')) else name}"
-    write("lang/en.json", lang)
     write_co_patch(shapes)
     patterns = write_forging(lang, shapes)
+    write_descriptions(lang)
     write("lang/en.json", lang)
     return patterns
 
@@ -625,6 +625,31 @@ def write_forging(lang, shapes):
                             "M": {"type": "item", "code": "game:bushmeat-raw"}},
             "output": {"type": "item", "code": f"{DOMAIN}:{code}", "quantity": 1}})
     return patterns
+
+
+# Handbook lines (itemdesc-<code>): who carries the weapon, one or two hands, and how it is made.
+PEOPLE = {"mordor": "the orcs of Mordor", "mistymountains": "the orcs of the Misty Mountains", "elven": "the Elves",
+          "dwarven": "the Dwarves", "gondor": "the men of Gondor", "rohan": "the Rohirrim", "blacknumenorean": "the Black Numenoreans",
+          "numenorean": "the Black Numenoreans", "easterling": "the Easterlings", "haradrim": "the Haradrim",
+          "morgulblade": "the servants of Minas Morgul"}
+
+
+def people_of(code):
+    return PEOPLE[code.split("-")[-1] if "-" in code else code]
+
+
+def write_descriptions(lang):
+    for key, (code, kind, name) in WEAPONS.items():
+        hands = "Two-handed" if C.MELEE[key].get("twoHanded") else "One-handed"
+        sticks = "two sticks" if kind in LONG_KINDS else "a stick"
+        for m in METALS:
+            lang[f"itemdesc-{code}-{m}"] = (f"{hands}, as carried by {people_of(code)}. Smith its head on the anvil from "
+                                            f"one {m} ingot, then join it to {sticks}.")
+            lang[f"itemdesc-head-{code}-{m}"] = f"Join to {sticks} in the crafting grid to make the {name[0].lower() + name[1:]}."
+    for code, name in SHIELDS.values():
+        lang[f"itemdesc-{code}"] = f"Carried by {people_of(code)}. Made from an iron boss, an iron hoop and an iron plate."
+    for code, *_ in BOWS.values():
+        lang[f"itemdesc-{code}"] = f"Carried by {people_of(code)}. Made like a recurve bow."
 
 
 def write_thrown_spear(code, key, w, centre):

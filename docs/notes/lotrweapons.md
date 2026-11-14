@@ -86,3 +86,9 @@ Full plan: `prompts/player-weapons-mod.md`.
     (two for spears, polearms, battleaxe, warhammer, great swords), applyquenchablebuffs. Outlines are drafts:
     previews/lotrweapons-anvil-0.0.2.txt.
   - Shield and bow data moved into tools/weapon_catalog.py (lotrnpcs output byte-identical).
+- After 0.0.2 (same day, "take this as far as you can"): tools/tests/lotrweapons/patches.py applies every patch to
+  its target (our items, LRC's bodies from build-inputs; the game's player.json and seraph-faceless when given a game
+  assets folder: checked once against the 1.22.7 mirror, all 70 apply) and checks the three custom animations only
+  move parts each body has. Run by build.py. Handbook lines (itemdesc-*) for every weapon, head, shield and bow.
+  Under CO, spears are CO melee weapons (thrust, no throw): CO's own throwing needs its projectile behaviour and
+  entity, not copied.

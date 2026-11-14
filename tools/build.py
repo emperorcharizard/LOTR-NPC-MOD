@@ -119,6 +119,7 @@ def main():
     # weapon catalog. Its checks compare its hand transforms with the lotrnpcs items just generated.
     run([sys.executable, os.path.join(ROOT, "tools", "gen_lotrweapons.py"), LW])
     run([sys.executable, os.path.join(ROOT, "tools", "tests", "lotrweapons", "check.py"), LW, GEN])
+    run([sys.executable, os.path.join(ROOT, "tools", "tests", "lotrweapons", "patches.py"), LW, LRC_ZIP])
     entities = os.path.join(GEN, "assets", "lotrnpcs", "entities")
 
     fac = os.path.join(ROOT, "tools", "tests", "factions")
