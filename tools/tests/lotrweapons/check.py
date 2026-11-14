@@ -4,7 +4,7 @@
 
 Every weapon: iron and steel variants with stats for both, its shapes and their textures in the mod, a name per metal,
 swing and hold animations that exist on every player body, and the same hand transform as the NPC's copy of the weapon
-(lotrnpcs' orcweapon-<catalog key>). Spears have their thrown entity. Shields are iron only and hang on the arm as the NPC's do. Every weapon but the knives has a Combat Overhaul
+(lotrnpcs' orcweapon-<catalog key>). Spears have their thrown entity. Shields and bows are iron only and held as the NPC's are. Every weapon but the knives has a Combat Overhaul
 patch (class and both stances, gated on combatoverhaul) using CO's own first-person animations and our third-person
 swing. Neither mod names the other's domain.
 """
@@ -71,21 +71,28 @@ items = 0
 for name in sorted(os.listdir(os.path.join(A, "itemtypes"))):
     item = load(os.path.join(A, "itemtypes", name))
     code = item["code"]
-    if item["class"] == "ItemShield":
-        # Shields: iron only (no metal variants), the NPC's left-arm hold, no Combat Overhaul patch.
+    if item["class"] in ("ItemShield", "ItemBow"):
+        # Shields and bows: iron only (no metal variants), held as the NPCs hold them (a shield's off-hand transform,
+        # a bow's full-draw item), no Combat Overhaul patch.
         items += 1
         catalog = item["attributes"]["lotrweapons"]["catalog"]
-        npc_item = load(os.path.join(NA, "itemtypes", f"orcweapon-{catalog}.json"))
+        shield = item["class"] == "ItemShield"
+        npc_item = load(os.path.join(NA, "itemtypes", f"orcweapon-{catalog if shield else catalog + '-drawn'}.json"))
+        held = "tpOffHandTransform" if shield else "tpHandTransform"
         if "variantgroups" in item or f"item-{code}" not in lang or item.get("durability", 0) <= 0:
-            errors.append(f"{code}: shield variants, name or durability wrong")
-        if npc_item["tpOffHandTransform"] != item["tpOffHandTransform"]:
-            errors.append(f"{code}: off-hand transform differs from the NPC's {catalog}")
+            errors.append(f"{code}: variants, name or durability wrong")
+        if npc_item[held] != item[held]:
+            errors.append(f"{code}: {held} differs from the NPC's {catalog}")
         if code in co_class or code in co_attr:
-            errors.append(f"{code}: shields get no Combat Overhaul patch")
-        shape = asset(item["shape"]["base"], "shapes", ".json")
-        if not os.path.exists(shape) or any(t.startswith("lotrweapons:") and not os.path.exists(asset(t, "textures", ".png"))
-                                            for t in load(shape)["textures"].values()):
-            errors.append(f"{code}: shape or texture missing")
+            errors.append(f"{code}: shields and bows get no Combat Overhaul patch")
+        shapes = [item["shape"]["base"]] + [a["base"] for a in item["shape"].get("alternates", [])]
+        if not shield and len(shapes) != 4:
+            errors.append(f"{code}: a bow needs its three draw shapes")
+        for base in shapes:
+            path = asset(base, "shapes", ".json")
+            if not os.path.exists(path) or any(t.startswith("lotrweapons:") and not os.path.exists(asset(t, "textures", ".png"))
+                                               for t in load(path)["textures"].values()):
+                errors.append(f"{code}: shape {base} or its texture missing")
         continue
     if item["variantgroups"] != [{"code": "metal", "states": ["iron", "steel"]}]:
         errors.append(f"{code}: metals {item['variantgroups']}")

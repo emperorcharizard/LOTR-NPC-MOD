@@ -139,6 +139,16 @@ assert set(SHIELDS) == set(C.SHIELDS), sorted(set(SHIELDS) ^ set(C.SHIELDS))
 SHIELD_STATS = {"copies": "game:shield-metal (iron)", "durability": 450 + 60, "absorb": 5, "absorbProjectile": 10,
                 "protectionChance": {"passive-projectile": 0.2, "active-projectile": 1, "passive": 0.2, "active": 0.9}}
 
+# The owner's two bows, iron tier only (owner, 2026-11-14), as the game's recurve bow, its best (bow.json: arrow damage
+# 4 times BETTER, accuracy +0.3, durability 600). Held as the NPCs hold a drawn bow (the catalog's full-draw transform,
+# solved against the game's bowaim, which is the aim animation here too); the three pulled-string stages the NPCs show
+# are the bow's draw shapes ("alternates", as the game's charge1-3). Combat Overhaul's bow class needs its own animated
+# bow model, so with CO these stay the game's bow (no CO patch).
+BOWS = {
+    "bow": ("bow-mordor", "Orc bow", C.BOW, C.BOW_DRAWN, C.BOW_PULL_ITEMS),
+    "mmbow": ("bow-mistymountains", "Misty Mountains orc bow", C.MM_BOW, C.MM_BOW_DRAWN, C.MM_BOW_PULL_ITEMS),
+}
+BOW_STATS = {"copies": "game:bow-recurve", "durability": 600, "damage": 4, "damageTier": 0, "accuracy": 0.3}
 
 # The three animations of our own (tools/anims) go onto every body a player can have: the game's seraph and LOTR Races
 # and Classes' seraph, dwarf and elf bodies (its customplayermodels use those three). Their settings copy the vanilla
@@ -343,6 +353,10 @@ def bounds(shape):
 
 
 REFERENCES = {
+    # The game's recurve bow, held with rotation (107, 11, 10); 1.91 blocks long; icon (-129, 25, 41) at scale 1.36,
+    # ground scale 4.8 (bow.json).
+    "recurve": {"hand": {"x": 107, "y": 11 - 180, "z": 10}, "gui": {"x": -129, "y": 25, "z": 41}, "ground": {},
+                "length": 1.91, "guiScale": 1.36, "groundScale": 4.8},
     "falx": {"hand": FALX_HAND, "gui": FALX_GUI, "ground": {}, "length": FALX_LENGTH, "guiScale": FALX_GUI_SCALE,
              "groundScale": FALX_GROUND_SCALE},
 }
@@ -373,6 +387,7 @@ def write_items():
         write(f"shapes/item/{FOLDER}/{key}.json", shapes[key])
     lang = {"tabname-lotrweapons": "LOTR Weapons"}
     write_shields(own, bundled, lang)
+    write_bows(own, bundled, lang)
     C.copy_own_textures(bundled, own, A, FOLDER)
     for key, (code, kind, name) in WEAPONS.items():
         w, k = C.MELEE[key], KINDS[kind]
@@ -474,6 +489,30 @@ def write_shields(own, bundled, lang):
             "creativeinventory": {"general": ["*"], "items": ["*"], "tools": ["*"], "lotrweapons": ["*"]},
             "tpHandTransform": w["hand"], "tpOffHandTransform": w["hand"],
             "guiTransform": gui, "groundTransform": ground,
+        })
+        lang[f"item-{code}"] = name
+
+
+def write_bows(own, bundled, lang):
+    for key, (code, name, bow, drawn, pulls) in BOWS.items():
+        base = f"{DOMAIN}:item/{FOLDER}/{key}"
+        shape = C.weapon_shape(key, bow, own, bundled, DOMAIN, A, FOLDER)
+        write(f"shapes/item/{FOLDER}/{key}.json", shape)
+        for pull, item in pulls.items():
+            stage = C.weapon_shape(pull, item, own, bundled, DOMAIN, A, FOLDER)
+            C.pull_string(stage, item["pull"], item.get("apexX"))
+            write(f"shapes/item/{FOLDER}/{pull}.json", stage)
+        gui, ground, _ = display_transforms(drawn["hand"]["rotation"], shape, "recurve")
+        k = BOW_STATS
+        write(f"itemtypes/{code}.json", {
+            "code": code, "class": "ItemBow", "tags": ["weapon", "weapon-ranged", "weapon-bow"], "maxstacksize": 1,
+            "tool": "bow", "durability": k["durability"],
+            "shape": {"base": base, "alternates": [{"base": f"{DOMAIN}:item/{FOLDER}/{pull}"} for pull in pulls]},
+            "attributes": {"heldItemPitchFollow": 1, "aimAnimation": "bowaim", "damage": better(k["damage"]),
+                           "damageTier": k["damageTier"], "statModifier": {"rangedWeaponsAcc": k["accuracy"]},
+                           "handbook": {"groupBy": ["bow-*"]}, "lotrweapons": {"catalog": key, "copies": k["copies"]}},
+            "creativeinventory": {"general": ["*"], "items": ["*"], "tools": ["*"], "lotrweapons": ["*"]},
+            "tpHandTransform": drawn["hand"], "guiTransform": gui, "groundTransform": ground,
         })
         lang[f"item-{code}"] = name
 
