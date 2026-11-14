@@ -479,3 +479,12 @@ Install `lotrnpcs_0.0.132-test.zip`; restart fully. Battle log on, each side on 
 
 - [x] 132.1 3 Rohan riders v 10 Dunlending warriors (riders at z 126, Dunlendings at z 142), twice: in the CSV each rider's hits go to one Dunlending until it dies, then the next; more kills than 0.0.131's 1 (the simulator expects about 8 of 10 with focus).
 - [ ] 132.2 A rider whose target runs more than 6 blocks off takes a new one; a rider never stands still for long while enemies hit it.
+
+## 133. Riders charge and wheel away (0.0.133)
+
+Install `lotrnpcs_0.0.133-test.zip`; restart fully. Battle log on, each side on one spot.
+
+- [ ] 133.1 3 Rohan riders v 10 Dunlending warriors (riders at z 126, Dunlendings at z 142), twice: the riders gallop in, strike, ride on several blocks, wheel and charge the same enemy again; the `/recruits battlelog` summary shows charge hits for rohan.
+- [ ] 133.2 A charge hit visibly shoves the Dunlending back about a block or two (not flung far).
+- [ ] 133.3 No rider stays stuck: one boxed in by enemies stands and fights, then charges again when there's room. Riders stay within about 20 blocks of the fight.
+- [ ] 133.4 A hired rider on Guard stays inside its guard area while charging; one on Follow doesn't ride more than about 12 blocks from you.

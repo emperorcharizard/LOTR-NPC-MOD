@@ -79,7 +79,7 @@ namespace LotrNpcs
         /// <summary>0.0.132: a mounted rider keeps its melee target (its focus) while that target lives and is within this
         /// many blocks (centers, horizontally), instead of hitting whichever enemy is nearest or struck it last. In 0.0.131
         /// three riders dealt 134 damage to ten 28-health Dunlendings but killed one: the hits were spread.</summary>
-        public const double FocusRange = 6;
+        public const double FocusRange = 16; // 0.0.133: 16 (was 6), so ride-outs keep it
 
         sealed class Focus { public Entity Target; }
         static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Entity, Focus> focus = new System.Runtime.CompilerServices.ConditionalWeakTable<Entity, Focus>();
@@ -101,6 +101,87 @@ namespace LotrNpcs
         public static void SetFocus(Entity rider, Entity target)
         {
             if (rider != null) focus.GetValue(rider, _ => new Focus()).Target = target;
+        }
+
+        // ---- 0.0.133 (owner chose "Charge and wheel away"): approach, charge, ride through, wheel, repeat ----
+
+        /// <summary>What a mounted rider's mount is doing in a fight: Hold (the 0.0.131 standing fight), Charge (gallop
+        /// straight at the focus) or RideOut (gallop on along the charge's heading, then wheel back).</summary>
+        public enum ChargePhase { Hold, Charge, RideOut }
+
+        /// <summary>Charge when the focus is ChargeMin to ChargeMax blocks off; ride out RideOutDistance blocks past it; a
+        /// pass is over within PassDistance or once the focus is behind; boxed in when a galloping mount moved under
+        /// BoxedMove blocks in BoxedMs, then it holds for BoxedHoldMs. Followers ride out at most FollowerLeash blocks
+        /// from their leader, guards and holders stay in their post's area.</summary>
+        public const double ChargeMin = 5, ChargeMax = 16, RideOutDistance = 7, PassDistance = 1.5, BoxedMove = 0.3, FollowerLeash = 12;
+        public const long BoxedMs = 1500, BoxedHoldMs = 3000;
+        /// <summary>A blow landed at a gallop: damage times this, and the target is pushed along the mount's heading
+        /// (ChargeKnockback blocks a tick of motion, about 1.5 blocks on the ground; NPCs only, a player's motion is
+        /// its own client's).</summary>
+        public const float ChargeDamageMultiplier = 2f;
+        public const double ChargeKnockback = 0.45;
+
+        /// <summary>The next phase. foeDistance: to the focus (centers, horizontally); rodeOut: blocks since the
+        /// ride-out began; passed: the focus is behind, within PassDistance or was hit on this pass; outOfBounds: the
+        /// rider's orders don't let it go farther; boxed: it couldn't gallop lately.</summary>
+        public static ChargePhase NextPhase(ChargePhase phase, double foeDistance, double rodeOut, bool passed, bool outOfBounds, bool boxed)
+        {
+            if (boxed) return ChargePhase.Hold;
+            switch (phase)
+            {
+                case ChargePhase.Charge:
+                    return passed ? ChargePhase.RideOut : foeDistance > ChargeMax ? ChargePhase.Hold : ChargePhase.Charge;
+                case ChargePhase.RideOut:
+                    return rodeOut >= RideOutDistance || outOfBounds || foeDistance >= ChargeMax ? ChargePhase.Charge : ChargePhase.RideOut;
+                default:
+                    if (foeDistance > ChargeMax) return ChargePhase.Hold;
+                    return foeDistance >= ChargeMin ? ChargePhase.Charge : outOfBounds ? ChargePhase.Hold : ChargePhase.RideOut;
+            }
+        }
+
+        /// <summary>One rider's charge state (server side).</summary>
+        public sealed class ChargeState
+        {
+            public ChargePhase Phase;
+            public double Speed, HeadX, HeadZ, StartX, StartZ, CheckX, CheckZ;
+            public long CheckMs, BoxedUntilMs;
+            public bool HitThisPass;
+        }
+
+        static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Entity, ChargeState> charges = new System.Runtime.CompilerServices.ConditionalWeakTable<Entity, ChargeState>();
+
+        public static ChargeState ChargeOf(Entity rider) => charges.GetValue(rider, _ => new ChargeState());
+
+        /// <summary>Whether a blow this rider lands now is a charge hit: mounted, charging, at a gallop.</summary>
+        public static bool IsChargeHit(Entity rider) =>
+            (rider as EntityAgent)?.MountedOn != null && charges.TryGetValue(rider, out ChargeState c) && c.Phase == ChargePhase.Charge && c.Speed >= SprintSpeed;
+
+        /// <summary>A charge hit landed: the target is pushed along the mount's heading (NPCs only) and the pass ends.</summary>
+        public static void ChargeHitLanded(Entity rider, Entity target)
+        {
+            if (!charges.TryGetValue(rider, out ChargeState c)) return;
+            c.HitThisPass = true;
+            Entity mount = (rider as EntityAgent)?.MountedOn?.Entity;
+            if (target == null || target is EntityPlayer || mount == null) return;
+            target.Pos.Motion.X += Math.Sin(mount.Pos.Yaw) * ChargeKnockback;
+            target.Pos.Motion.Z += Math.Cos(mount.Pos.Yaw) * ChargeKnockback;
+            target.Pos.Motion.Y += 0.1;
+        }
+
+        /// <summary>Whether a recruit rider's orders keep it from riding farther: a guard or holder outside its post's
+        /// area, a follower more than FollowerLeash blocks from its leader. Wild riders: never.</summary>
+        public static bool OutOfBounds(Entity rider, FactionSystem factions)
+        {
+            if (Recruit.OwnerUidOf(rider) == null) return false;
+            string order = Recruit.OrderOf(rider);
+            if (order == Recruit.Guard || order == Recruit.Hold)
+            {
+                if (!Recruit.TryGetPost(rider, out double px, out double py, out double pz)) return false;
+                double r = order == Recruit.Guard ? (factions?.GuardRadius ?? 8) : AiTaskFactionHide.HoldLeash;
+                return (rider.Pos.X - px) * (rider.Pos.X - px) + (rider.Pos.Z - pz) * (rider.Pos.Z - pz) > r * r;
+            }
+            Entity leader = Recruit.OnlineLeader(rider);
+            return leader != null && leader.Pos.Dimension == rider.Pos.Dimension && Flat(rider, leader) > FollowerLeash;
         }
 
         /// <summary>Whether the mount holds for the fight instead of following the path.</summary>
@@ -360,8 +441,43 @@ namespace LotrNpcs
             Entity foe = kept ?? swing?.TargetEntity ?? active?.OfType<AiTaskBaseTargetable>().Select(t => t.TargetEntity).FirstOrDefault(e => e != null && e.Alive);
             double foeDist = foe == null ? double.MaxValue : Math.Sqrt((foe.Pos.X - mount.Pos.X) * (foe.Pos.X - mount.Pos.X) + (foe.Pos.Z - mount.Pos.Z) * (foe.Pos.Z - mount.Pos.Z));
             bool holding = foe != null && (kept != null || Riders.HoldsForFight(foeDist, swing != null));
-            if (speed > 0 && !holding) mount.Pos.Yaw = Riders.TurnToward(mount.Pos.Yaw, (float)Math.Atan2(tx, tz), Riders.TurnRate * dt);
-            else if (foe != null)
+            // 0.0.133: charge and wheel away while the rider has a focus.
+            Riders.ChargeState cs = Riders.ChargeOf(rider);
+            long now = rider.World.ElapsedMilliseconds;
+            if (kept == null) { cs.Phase = Riders.ChargePhase.Hold; cs.HitThisPass = false; }
+            else
+            {
+                double fx = kept.Pos.X - mount.Pos.X, fz = kept.Pos.Z - mount.Pos.Z;
+                bool galloping = cs.Phase != Riders.ChargePhase.Hold && cs.Speed >= Riders.SprintSpeed;
+                if (!galloping || now - cs.CheckMs >= Riders.BoxedMs)
+                {
+                    double moved = Math.Sqrt((mount.Pos.X - cs.CheckX) * (mount.Pos.X - cs.CheckX) + (mount.Pos.Z - cs.CheckZ) * (mount.Pos.Z - cs.CheckZ));
+                    if (galloping && moved < Riders.BoxedMove) cs.BoxedUntilMs = now + Riders.BoxedHoldMs;
+                    cs.CheckMs = now; cs.CheckX = mount.Pos.X; cs.CheckZ = mount.Pos.Z;
+                }
+                bool passed = cs.HitThisPass || foeDist <= Riders.PassDistance || (cs.Phase == Riders.ChargePhase.Charge && fx * Math.Sin(mount.Pos.Yaw) + fz * Math.Cos(mount.Pos.Yaw) < 0);
+                double rodeOut = Math.Sqrt((mount.Pos.X - cs.StartX) * (mount.Pos.X - cs.StartX) + (mount.Pos.Z - cs.StartZ) * (mount.Pos.Z - cs.StartZ));
+                Riders.ChargePhase next = Riders.NextPhase(cs.Phase, foeDist, rodeOut, passed, Riders.OutOfBounds(rider, rider.Api.ModLoader.GetModSystem<FactionSystem>()), now < cs.BoxedUntilMs);
+                if (next == Riders.ChargePhase.RideOut && cs.Phase != Riders.ChargePhase.RideOut)
+                {
+                    // Ride on the way the charge went (from standing: straight away from the focus).
+                    double hx = cs.Phase == Riders.ChargePhase.Charge ? Math.Sin(mount.Pos.Yaw) : -fx, hz = cs.Phase == Riders.ChargePhase.Charge ? Math.Cos(mount.Pos.Yaw) : -fz, hl = Math.Sqrt(hx * hx + hz * hz);
+                    cs.HeadX = hl < 1e-6 ? Math.Sin(mount.Pos.Yaw) : hx / hl; cs.HeadZ = hl < 1e-6 ? Math.Cos(mount.Pos.Yaw) : hz / hl;
+                    cs.StartX = mount.Pos.X; cs.StartZ = mount.Pos.Z;
+                }
+                if (next == Riders.ChargePhase.Charge && cs.Phase != Riders.ChargePhase.Charge) cs.HitThisPass = false;
+                cs.Phase = next;
+                if (next != Riders.ChargePhase.Hold)
+                {
+                    double wx = next == Riders.ChargePhase.Charge ? fx : cs.HeadX, wz = next == Riders.ChargePhase.Charge ? fz : cs.HeadZ;
+                    mount.Pos.Yaw = Riders.TurnToward(mount.Pos.Yaw, (float)Math.Atan2(wx, wz), Riders.TurnRate * dt);
+                    speed = Riders.SprintSpeed;
+                    holding = false;
+                }
+            }
+            bool charging = cs.Phase != Riders.ChargePhase.Hold;
+            if (!charging && speed > 0 && !holding) mount.Pos.Yaw = Riders.TurnToward(mount.Pos.Yaw, (float)Math.Atan2(tx, tz), Riders.TurnRate * dt);
+            else if (!charging && foe != null)
             {
                 // Standing in a fight: face the enemy, since a rider turns only a little in the saddle and melee contact
                 // is measured from just ahead of the rider (AiTaskBaseTargetable.hasDirectContact); 0.0.126: and walk in to reach it.
@@ -380,6 +496,7 @@ namespace LotrNpcs
                 agent.Controls.Forward = speed > 0;
                 agent.Controls.Sprint = speed >= Riders.SprintSpeed;
             }
+            Riders.ChargeOf(rider).Speed = speed;
             return speed;
         }
 

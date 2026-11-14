@@ -28,7 +28,7 @@ namespace LotrNpcs
             public int Swings, SwingsLanded, SwingsLostWindow, SwingsLostOther, SwingsNoContact;
             public int Arrows, ArrowsLanded, ArrowsLostWindow, ArrowsLostOther;
             public double DamageDealt;
-            public int Kills, Deaths, TurnWaits;
+            public int Kills, Deaths, TurnWaits, ChargeHits;
             public double IdleSeconds;
             /// <summary>0.0.111: idle seconds by what the NPC was doing (IdleReason).</summary>
             public readonly Dictionary<string, double> IdleBy = new Dictionary<string, double>();
@@ -123,6 +123,13 @@ namespace LotrNpcs
         {
             if (!On || attacker == null) return;
             lastAttackMs[attacker.EntityId] = now;
+        }
+
+        /// <summary>0.0.133: a rider's charge hit landed.</summary>
+        public void ChargeHit(Entity attacker)
+        {
+            if (!On || attacker == null) return;
+            Of(FactionSystem.FactionOf(attacker)).ChargeHits++;
         }
 
         public void TurnWait(Entity attacker)
@@ -230,6 +237,7 @@ namespace LotrNpcs
                     sb.Append(" (").Append(string.Join(", ", t.IdleBy.OrderByDescending(k => k.Value).Take(3)
                         .Select(k => k.Key + " " + (k.Value / t.IdleSeconds * 100).ToString("0", CultureInfo.InvariantCulture) + "%"))).Append(')');
                 if (t.TurnWaits > 0) sb.Append("; waited for a turn ").Append(t.TurnWaits).Append(" times");
+                if (t.ChargeHits > 0) sb.Append("; ").Append(t.ChargeHits).Append(" charge hits");
             }
             return sb.ToString();
         }

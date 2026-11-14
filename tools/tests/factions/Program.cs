@@ -859,8 +859,17 @@ public static class Program {
         Check(Riders.HoldsForFight(3, false) && Riders.HoldsForFight(20, true) && !Riders.HoldsForFight(5, false) && Riders.HoldFightDistance > Riders.CloseInDistance
             && Riders.CloseInSpeed(3) == Riders.WalkSpeed && Riders.CloseInSpeed(2) == 0,
             "0.0.131: a rider's mount stops following the path within 3.5 blocks of its melee target or while it swings, and only walks in past 2.5");
-        Check(Riders.KeepsFocus(true, 5.9) && !Riders.KeepsFocus(true, 6.1) && !Riders.KeepsFocus(false, 1) && Riders.FocusOf(null) == null && Riders.FocusRange > Riders.HoldFightDistance,
-            "0.0.132: a rider keeps its melee target while it lives and is within 6 blocks, then takes a new one");
+        Check(Riders.KeepsFocus(true, 15.9) && !Riders.KeepsFocus(true, 16.1) && !Riders.KeepsFocus(false, 1) && Riders.FocusOf(null) == null && Riders.FocusRange > Riders.HoldFightDistance,
+            "0.0.132: a rider keeps its melee target while it lives and is within 16 blocks (0.0.133, was 6), then takes a new one");
+        {
+            var H = Riders.ChargePhase.Hold; var C = Riders.ChargePhase.Charge; var O = Riders.ChargePhase.RideOut;
+            Check(Riders.NextPhase(H, 10, 0, false, false, false) == C && Riders.NextPhase(H, 3, 0, false, false, false) == O && Riders.NextPhase(H, 3, 0, false, true, false) == H
+                && Riders.NextPhase(H, 20, 0, false, false, false) == H && Riders.NextPhase(C, 8, 0, false, false, false) == C && Riders.NextPhase(C, 1, 0, true, false, false) == O
+                && Riders.NextPhase(C, 20, 0, false, false, false) == H && Riders.NextPhase(O, 6, 3, false, false, false) == O && Riders.NextPhase(O, 8, 7.5, false, false, false) == C
+                && Riders.NextPhase(O, 6, 2, false, true, false) == C && Riders.NextPhase(C, 8, 0, false, false, true) == H && Riders.NextPhase(O, 8, 1, false, false, true) == H
+                && Riders.ChargeDamageMultiplier == 2f && Riders.ChargeMax <= Riders.FocusRange && !Riders.IsChargeHit(null),
+                "0.0.133: a rider standing 5-16 blocks from its focus charges, closer it rides out first; a charge ends on a pass (hit, behind, or within 1.5) and rides on 7 blocks, or less when its orders hold it, then charges again; boxed in it stands and fights");
+        }
         // 0.0.130 solid bodies.
         Check(!BattleSpacing.ContactShift(0.8, 0, 1, out _, out _) && BattleSpacing.ContactShift(0.5, 0, 1, out double csx, out double csz) && Math.Abs(csx - 0.1) < 1e-9 && csz == 0
             && BattleSpacing.ContactShift(0, 0, 90, out double ctx, out double ctz) && Math.Abs(Math.Sqrt(ctx * ctx + ctz * ctz) - BattleSpacing.BodyContact / 2) < 1e-9

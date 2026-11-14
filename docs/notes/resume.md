@@ -34,6 +34,8 @@ And (owner): "not too many conflicting paths": one system decides where a fighti
 
 **0.0.132:** a mounted rider keeps its melee target (focus) while it lives within 6 blocks; the mount steers by it. 0.0.131 in game: contact fixed (0 nocontact), riders 1-3 v 10 Dunlendings, hits spread. Owner choosing a charge, about 3x stats, or riders as they are. Checklist 132, not yet in game.
 
+**0.0.133:** riders charge and wheel away (owner's choice): with a focus 5-16 blocks off they gallop at it, a blow at a gallop is a charge hit (x2 damage, knockback), they ride on 7 blocks and wheel back; boxed in they stand and fight; orders bound the ride-out. 0.0.132 in game: focus works, 3 and 5 kills but riders still lose 3 v 10. Checklist 133, not yet in game (owner: don't test yet).
+
 **Open problems:**
 1. **110.1, lines fold into a blob at contact.** Within ~10 s of meeting, both lines collapse into one blob; up to 7 orcs hit one Dunlending in 20 s. The 38 orc v 26 Dunlending fight ended 24-4 for the orcs (110.1 wants it closer than 26-2). Look at what the front and the extras do at contact: front members take the nearest free enemy and hold their side (`HoldsFront`); extras wrap round (`HoldSlot` returns false once the line has met). Staging: batches of 5, columns 40 blocks apart, player at 1500 30 300 (see the "Staged" entries in lotrnpcs-0113.md).
 2. Checklist items still open in 110-119: 110.1, 112.2 (needs a second player), 112.6, 112.8 (weapons and shields in hand, by eye), 113.5, 113.8, 113.9, 114.8, 116.2, 117.6 (needs Teapot's Giant Boar), 117.8 (needs Feverstone Wilds removed), 119.2 (recruits in two formations).
