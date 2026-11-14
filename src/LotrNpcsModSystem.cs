@@ -343,7 +343,11 @@ namespace LotrNpcs
         {
             // 0.0.98: the hit lands now, which is later than booked if the NPC was still turning to face its target.
             if (factions != null && targetEntity != null) factions.Spacing.BookHit(targetEntity.EntityId, entity.World.ElapsedMilliseconds, 0);
-            if (!hasDirectContact(targetEntity, minDist, minVerDist)) return;
+            if (!hasDirectContact(targetEntity, minDist, minVerDist))
+            {
+                if (targetEntity != null) factions?.Log.Attack(entity, targetEntity, false, 0, BattleLog.Result.NoContact, false, entity.World.ElapsedMilliseconds);
+                return;
+            }
             // 0.0.109: vanilla's attackTarget, done here so the hit can skip the hurt window (IgnoresWindow) and the
             // battle log learns how it went. A player is struck in the chest under Combat Overhaul (0.0.14).
             Entity target = targetEntity;

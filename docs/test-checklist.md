@@ -464,3 +464,11 @@ Install `lotrnpcs_0.0.130-test.zip`; restart fully. Stage each side on one spot,
 - [ ] 130.2 In a 38 v 26 blob no two NPCs stand inside each other: walking in or fighting, their bodies stay about 0.7 blocks apart (look from above), and none are pushed into walls or off ledges.
 - [ ] 130.3 Riders still sit on their mounts (rider and mount aren't shoved apart), and the player can still walk among NPCs (the game's push).
 - [ ] 130.4 `/recruits bench 200`: the server still holds about 29 ticks/s.
+
+## 131. Riders hold still to fight (0.0.131)
+
+Install `lotrnpcs_0.0.131-test.zip`; restart fully. Battle log on, each side on one spot.
+
+- [ ] 131.1 3 Rohan riders v 10 Dunlending warriors (14-20 blocks apart), twice: the horses stop when they reach the enemy and turn to face it instead of walking around; riders swing about every 3 s (about as often as a Dunlending) and win or come close (0.0.130: 0-3 and 4-3).
+- [ ] 131.2 The CSV has few `nocontact` melee rows for riders, and the `/recruits battlelog` summary shows "out of reach when the blow fell" only rarely.
+- [ ] 131.3 Riders still chase an enemy that backs off (beyond 3.5 blocks they follow the path again).

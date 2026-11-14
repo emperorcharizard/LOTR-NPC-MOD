@@ -856,6 +856,9 @@ public static class Program {
         Check(armed.All(c => JToken.DeepEquals(HeldWeapon(entityFiles[c], "server"), HeldWeapon(entityFiles[c], "client")) && HeldWeapon(entityFiles[c], "server")["weapons"].Count() == 6), "...with the same six weapons listed on both sides");
         var bodyShape = JObject.Parse(File.ReadAllText(Path.Combine(assets, "shapes", "entity", "humanoid", "seraph-faceless.json")));
         var bodyAnims = new HashSet<string>(bodyShape["animations"].Select(a => (string)a["code"]));
+        Check(Riders.HoldsForFight(3, false) && Riders.HoldsForFight(20, true) && !Riders.HoldsForFight(5, false) && Riders.HoldFightDistance > Riders.CloseInDistance
+            && Riders.CloseInSpeed(3) == Riders.WalkSpeed && Riders.CloseInSpeed(2) == 0,
+            "0.0.131: a rider's mount stops following the path within 3.5 blocks of its melee target or while it swings, and only walks in past 2.5");
         // 0.0.130 solid bodies.
         Check(!BattleSpacing.ContactShift(0.8, 0, 1, out _, out _) && BattleSpacing.ContactShift(0.5, 0, 1, out double csx, out double csz) && Math.Abs(csx - 0.1) < 1e-9 && csz == 0
             && BattleSpacing.ContactShift(0, 0, 90, out double ctx, out double ctz) && Math.Abs(Math.Sqrt(ctx * ctx + ctz * ctz) - BattleSpacing.BodyContact / 2) < 1e-9

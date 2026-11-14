@@ -25,7 +25,7 @@ namespace LotrNpcs
         public class Totals
         {
             public readonly HashSet<long> Npcs = new HashSet<long>();
-            public int Swings, SwingsLanded, SwingsLostWindow, SwingsLostOther;
+            public int Swings, SwingsLanded, SwingsLostWindow, SwingsLostOther, SwingsNoContact;
             public int Arrows, ArrowsLanded, ArrowsLostWindow, ArrowsLostOther;
             public double DamageDealt;
             public int Kills, Deaths, TurnWaits;
@@ -88,7 +88,9 @@ namespace LotrNpcs
 
         /// <summary>The result of a hit: landed, lost to the target's hurt window, or lost otherwise (target already
         /// dead, or the damage refused).</summary>
-        public enum Result { Landed, LostWindow, LostOther }
+        /// <summary>0.0.131: NoContact, a melee blow whose target was out of reach when it fell (e.g. a rider's mount
+        /// moved on during the swing).</summary>
+        public enum Result { Landed, LostWindow, LostOther, NoContact }
 
         /// <summary>How a hit on target went, read before the hit (window, alive) and from ReceiveDamage's answer.</summary>
         public static Result Classify(bool received, bool aliveBefore, bool windowBefore) =>
@@ -109,11 +111,11 @@ namespace LotrNpcs
             else
             {
                 t.Swings++;
-                if (result == Result.Landed) t.SwingsLanded++; else if (result == Result.LostWindow) t.SwingsLostWindow++; else t.SwingsLostOther++;
+                if (result == Result.Landed) t.SwingsLanded++; else if (result == Result.LostWindow) t.SwingsLostWindow++; else if (result == Result.NoContact) t.SwingsNoContact++; else t.SwingsLostOther++;
             }
             if (result == Result.Landed) t.DamageDealt += damage;
             if (killed) t.Kills++;
-            Write(now, arrow ? "arrow" : "melee", attacker, target, damage, result == Result.Landed ? (killed ? "kill" : "landed") : result == Result.LostWindow ? "lostwindow" : "lost");
+            Write(now, arrow ? "arrow" : "melee", attacker, target, damage, result == Result.Landed ? (killed ? "kill" : "landed") : result == Result.LostWindow ? "lostwindow" : result == Result.NoContact ? "nocontact" : "lost");
         }
 
         /// <summary>An NPC started a swing or loosed an arrow (the idle count restarts).</summary>
@@ -214,6 +216,7 @@ namespace LotrNpcs
                 {
                     sb.Append("; melee ").Append(t.SwingsLanded).Append('/').Append(t.Swings).Append(" landed");
                     if (t.SwingsLostWindow > 0) sb.Append(" (").Append(t.SwingsLostWindow).Append(" lost to hurt window)");
+                    if (t.SwingsNoContact > 0) sb.Append(" (").Append(t.SwingsNoContact).Append(" out of reach when the blow fell)");
                 }
                 if (t.Arrows > 0)
                 {

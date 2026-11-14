@@ -70,6 +70,15 @@ namespace LotrNpcs
         public static double SpeedFor(double waypointDistance, bool riderSprints, float taskSpeed) =>
             waypointDistance <= StopDistance ? 0 : taskSpeed < RunTaskSpeed ? WalkSpeed : riderSprints || waypointDistance > 3 ? SprintSpeed : WalkSpeed;
 
+        /// <summary>0.0.131: within this many blocks of its melee target (centers, horizontally), or while it swings,
+        /// a rider's mount stops following the seek path and only turns to the enemy (walking in past CloseInDistance).
+        /// Until 0.0.130 the mount kept walking about 4 blocks a second during the swing, so the blow often fell with
+        /// the enemy out of reach (battle logs 233500, 233700: riders went 10-17 s without a hit while surrounded).</summary>
+        public const double HoldFightDistance = 3.5;
+
+        /// <summary>Whether the mount holds for the fight instead of following the path.</summary>
+        public static bool HoldsForFight(double enemyDistance, bool swinging) => swinging || enemyDistance <= HoldFightDistance;
+
         /// <summary>Standing in a fight: walk toward the enemy while it is farther than CloseInDistance.</summary>
         public static double CloseInSpeed(double enemyDistance) => enemyDistance > CloseInDistance ? WalkSpeed : 0;
 
@@ -317,8 +326,13 @@ namespace LotrNpcs
             double tx = target == null ? 0 : target.X - mount.Pos.X, tz = target == null ? 0 : target.Z - mount.Pos.Z;
             double speed = target == null ? 0 : Riders.SpeedFor(Math.Sqrt(tx * tx + tz * tz), rider.Controls.Sprint, taskSpeedOf(path));
             EntityBehaviorGait gait = mount.GetBehavior<EntityBehaviorGait>();
-            if (speed > 0) mount.Pos.Yaw = Riders.TurnToward(mount.Pos.Yaw, (float)Math.Atan2(tx, tz), Riders.TurnRate * dt);
-            else if (rider.GetBehavior<EntityBehaviorTaskAI>()?.TaskManager?.ActiveTasksBySlot?.OfType<AiTaskBaseTargetable>().Select(t => t.TargetEntity).FirstOrDefault(e => e != null && e.Alive) is Entity foe)
+            var active = rider.GetBehavior<EntityBehaviorTaskAI>()?.TaskManager?.ActiveTasksBySlot;
+            AiTaskChestMeleeAttack swing = active?.OfType<AiTaskChestMeleeAttack>().FirstOrDefault(t => t.TargetEntity != null && t.TargetEntity.Alive);
+            Entity foe = swing?.TargetEntity ?? active?.OfType<AiTaskBaseTargetable>().Select(t => t.TargetEntity).FirstOrDefault(e => e != null && e.Alive);
+            double foeDist = foe == null ? double.MaxValue : Math.Sqrt((foe.Pos.X - mount.Pos.X) * (foe.Pos.X - mount.Pos.X) + (foe.Pos.Z - mount.Pos.Z) * (foe.Pos.Z - mount.Pos.Z));
+            bool holding = foe != null && Riders.HoldsForFight(foeDist, swing != null);
+            if (speed > 0 && !holding) mount.Pos.Yaw = Riders.TurnToward(mount.Pos.Yaw, (float)Math.Atan2(tx, tz), Riders.TurnRate * dt);
+            else if (foe != null)
             {
                 // Standing in a fight: face the enemy, since a rider turns only a little in the saddle and melee contact
                 // is measured from just ahead of the rider (AiTaskBaseTargetable.hasDirectContact); 0.0.126: and walk in to reach it.
