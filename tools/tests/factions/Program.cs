@@ -1169,8 +1169,12 @@ public static class Program {
             Check(withRider.SequenceEqual(new[] { "recruit", "rider", "warrior" }) && noRider.SequenceEqual(new[] { "recruit", "warrior" }) && noWarrior.SequenceEqual(new[] { "recruit", "recruit" }),
                 "0.0.117: a wild group's first warrior rides at RiderChance; a group without warriors gets no rider");
             Check(Math.Abs(Riders.TurnToward(0, 2, 0.5f) - 0.5f) < 1e-4 && Math.Abs(Riders.TurnToward(0, -2, 0.5f) + 0.5f) < 1e-4 && Riders.TurnToward(1, 1.2f, 0.5f) == 1.2f
-                && Riders.SpeedFor(0.5, true) == 0 && Riders.SpeedFor(2, false) == Riders.WalkSpeed && Riders.SpeedFor(2, true) == Riders.SprintSpeed && Riders.SpeedFor(5, false) == Riders.SprintSpeed,
-                "0.0.117: a mount turns toward its rider's next waypoint at a limited rate, stands within a block of it, walks to near ones and runs to far ones or when the rider sprints");
+                && Riders.SpeedFor(0.5, true, 0.03f) == 0 && Riders.SpeedFor(2, false, 0.03f) == Riders.WalkSpeed && Riders.SpeedFor(2, true, 0.03f) == Riders.SprintSpeed && Riders.SpeedFor(5, false, 0.03f) == Riders.SprintSpeed,
+                "0.0.117: a mount turns toward its rider's next waypoint at a limited rate, stands within half a block of it (0.0.126), walks to near ones and runs to far ones or when the rider sprints");
+            Check(Riders.SpeedFor(20, false, 0.012f) == Riders.WalkSpeed && Riders.SpeedFor(20, true, 0.02f) == Riders.WalkSpeed && Riders.SpeedFor(20, false, 0.027f) == Riders.WalkSpeed
+                && Riders.SpeedFor(20, false, 0.04f) == Riders.SprintSpeed && Riders.SpeedFor(0.8, false, 0.012f) == Riders.WalkSpeed
+                && Riders.CloseInSpeed(4) == Riders.WalkSpeed && Riders.CloseInSpeed(2) == 0 && Riders.CloseInDistance < 2 + Riders.MountedExtraReach,
+                "0.0.126: a wandering, patrolling or walking-follow rider walks its mount however far the waypoint (only seek, hide or a running follow may run); in a fight a standing mount walks in until its enemy is within the rider's reach");
             Check(EntityBehaviorHeldWeapon.PickWeapon(Looks.NoWeapon, new[] { new NpcWeapon { Item = "lotrnpcs:orcweapon-axe" } }, new Random(1)) == Looks.NoWeapon, "an orc whose weapon was taken away stays unarmed after a reload");
             Check(!Looks.NameOnHire(lnpc, new Random(1)) && Looks.NameOf(lnpc) == "Ugrath", "a recruit its owner named keeps its name when hired again");
 

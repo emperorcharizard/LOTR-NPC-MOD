@@ -54,9 +54,24 @@ namespace LotrNpcs
             return Math.Abs(diff) <= maxStep ? want : yaw + (float)(Math.Sign(diff) * maxStep);
         }
 
-        /// <summary>Walk or run: run while the rider sprints or its next waypoint is more than 3 blocks off.</summary>
-        public static double SpeedFor(double waypointDistance, bool riderSprints) =>
-            waypointDistance <= 1 ? 0 : riderSprints || waypointDistance > 3 ? SprintSpeed : WalkSpeed;
+        /// <summary>0.0.126: the rider task move speed from which a mount may run. Wander (0.012), patrol (0.02) and a
+        /// recruit's walking follow (0.027) walk the mount; seek (0.03), hide (0.04) and a running follow (0.055) may run.
+        /// Until 0.0.125 a wandering rider galloped off at about 8 blocks a second and out of Synergy's range.</summary>
+        public const float RunTaskSpeed = 0.029f;
+        /// <summary>How close the mount comes to a waypoint before it stands (0.0.126: half a block, was a block, which
+        /// parked it a block short of a waypoint the path follower was still waiting for).</summary>
+        public const double StopDistance = 0.5;
+        /// <summary>0.0.126: in a fight with no path to follow, the mount walks in until its enemy is this close
+        /// (centers, horizontally), inside a rider's reach from the saddle (MountedReach), instead of parking out of reach.</summary>
+        public const double CloseInDistance = 2.5;
+
+        /// <summary>Stand, walk or run: stand at the waypoint, walk for slow tasks (taskSpeed below RunTaskSpeed), else
+        /// run while the rider sprints or its next waypoint is more than 3 blocks off.</summary>
+        public static double SpeedFor(double waypointDistance, bool riderSprints, float taskSpeed) =>
+            waypointDistance <= StopDistance ? 0 : taskSpeed < RunTaskSpeed ? WalkSpeed : riderSprints || waypointDistance > 3 ? SprintSpeed : WalkSpeed;
+
+        /// <summary>Standing in a fight: walk toward the enemy while it is farther than CloseInDistance.</summary>
+        public static double CloseInSpeed(double enemyDistance) => enemyDistance > CloseInDistance ? WalkSpeed : 0;
 
         /// <summary>The extra horizontal reach from the saddle. 0.0.125 (owner, 2026-11-13: "a bit longer attack range to
         /// compensate for the height difference"): a block (was half a block, the mount's body only).</summary>
@@ -291,20 +306,25 @@ namespace LotrNpcs
             }
         }
 
+        // The speed the rider's current task asked the path follower for (protected in the game's PathTraverserBase).
+        static readonly AccessTools.FieldRef<PathTraverserBase, float> taskSpeedOf = AccessTools.FieldRefAccess<PathTraverserBase, float>("movingSpeed");
+
         // Toward the rider's AI path-follower target (a mounted entity's own walk vector stays 0), turning at TurnRate.
         static double Steer(EntityAgent rider, Entity mount, float dt)
         {
             PathTraverserBase path = rider.GetBehavior<EntityBehaviorTaskAI>()?.PathTraverser;
             Vec3d target = path != null && path.Active ? path.CurrentTarget : null;
             double tx = target == null ? 0 : target.X - mount.Pos.X, tz = target == null ? 0 : target.Z - mount.Pos.Z;
-            double speed = target == null ? 0 : Riders.SpeedFor(Math.Sqrt(tx * tx + tz * tz), rider.Controls.Sprint);
+            double speed = target == null ? 0 : Riders.SpeedFor(Math.Sqrt(tx * tx + tz * tz), rider.Controls.Sprint, taskSpeedOf(path));
             EntityBehaviorGait gait = mount.GetBehavior<EntityBehaviorGait>();
             if (speed > 0) mount.Pos.Yaw = Riders.TurnToward(mount.Pos.Yaw, (float)Math.Atan2(tx, tz), Riders.TurnRate * dt);
             else if (rider.GetBehavior<EntityBehaviorTaskAI>()?.TaskManager?.ActiveTasksBySlot?.OfType<AiTaskBaseTargetable>().Select(t => t.TargetEntity).FirstOrDefault(e => e != null && e.Alive) is Entity foe)
             {
                 // Standing in a fight: face the enemy, since a rider turns only a little in the saddle and melee contact
-                // is measured from just ahead of the rider (AiTaskBaseTargetable.hasDirectContact).
-                mount.Pos.Yaw = Riders.TurnToward(mount.Pos.Yaw, (float)Math.Atan2(foe.Pos.X - mount.Pos.X, foe.Pos.Z - mount.Pos.Z), Riders.TurnRate * dt);
+                // is measured from just ahead of the rider (AiTaskBaseTargetable.hasDirectContact); 0.0.126: and walk in to reach it.
+                double fx = foe.Pos.X - mount.Pos.X, fz = foe.Pos.Z - mount.Pos.Z;
+                mount.Pos.Yaw = Riders.TurnToward(mount.Pos.Yaw, (float)Math.Atan2(fx, fz), Riders.TurnRate * dt);
+                speed = Riders.CloseInSpeed(Math.Sqrt(fx * fx + fz * fz));
             }
             if (gait != null)
             {
