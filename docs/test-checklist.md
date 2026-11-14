@@ -538,3 +538,10 @@ Install `lotrnpcs_0.0.139-test.zip`; restart fully. DebugCommands on, battle log
 - [ ] 139.1 3 Rohan riders v 10 Dunlending warriors (riders at z 126, Dunlendings at z 142), twice: the CSV has rider melee rows (landed, some nocontact), the summary shows rohan charge hits, and riders kill some Dunlendings.
 - [ ] 139.2 server-main.log has "[lotrnpcs] rider ... melee:" lines: most swings end in "blow", few "ended without a blow" or "cancelled before the blow".
 - [ ] 139.3 Riders stay within about 20 blocks of the fight (none found more than 30 blocks away afterwards).
+
+## 140. One blow time for every melee weapon (0.0.140)
+
+Install `lotrnpcs_0.0.140-test.zip`; restart fully. Battle log on.
+
+- [ ] 140.1 9 Gondor warriors v 9 Mordor orc warriors, three times (as on 2026-11-14: Gondor at z 128 / Mordor at z 142, swapped, side by side): about even (Mordor wins at least one), not 3 of 3 to Gondor.
+- [ ] 140.2 Axes and hammers swing visibly faster than on 0.0.139 and spears and knives a little slower, but the blade still meets the target when the hit lands (no hit before the blow).

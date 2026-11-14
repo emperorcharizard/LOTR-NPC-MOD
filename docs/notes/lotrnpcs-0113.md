@@ -240,3 +240,8 @@ Offline: all pass. Untested in game (checklist 138).
 - 134 skins: six races' recruits (Haradrim, Black Númenórean, Easterling, dwarf, elf, tormented elf) plus Gondor/Mordor/Dunlendings rendered with their skins, no missing textures seen.
 - Not done: 135.1/135.3-5, 136, 137.1 player hits, 137.2-4, 138 (needs hiring), 139.
 - Owner, 16:44Z: "Install but dont retest": 0.0.139 installed, not tested.
+
+## 0.0.140: one blow time for every melee weapon (2026-11-14, Claude)
+- Owner (card, 2026-11-14 18:23Z): "Same blow time for every weapon", after Gondor beat Mordor in 3 of 3 equal-stat 9 v 9s on 0.0.138 (same swing rate; the orcs' blows landed about 100 ms later on average, see the in-game section above).
+- gen: `HIT_MS` is empty, so every melee swing strikes at `DAMAGE_AT_MS` (400 ms) and each swing's animation plays at impact / 30 / 0.4 (axehit 1.875x, hammerhit 1.417x, knifestab and spearhit 0.833x, as before 0.0.99); no weapon carries `hitMs`, so the melee task's damagePlayerAtMs 400 applies. Swing rate, damage and the 0.0.99 swing sync (the blow waits for the swing animation) are unchanged. Undoes the 0.0.99 per-weapon wind-ups.
+- Built in the cloud: offline tests all pass (656). Zip releases/lotrnpcs_0.0.140-test.zip, not installed. Untested in game (checklist 140).

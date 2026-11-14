@@ -52,7 +52,12 @@ DAMAGE_AT_MS = 400
 # 1.9x, hammerhit 1.4x, knifestab and spearhit 0.8x). Now each swing strikes when it naturally would, close to its own
 # speed: light thrusts first, heavy chops last. Only the first blow of a fight comes later; the time between blows
 # (attack plus cooldown) is unchanged, so damage per second stays the same. A swing not listed keeps DAMAGE_AT_MS.
-HIT_MS = {"knifestab": 350, "spearhit": 350, "falx": 420, "poleaxechop": 500, "hammerhit": 550, "axehit": 600}
+# 0.0.140 (owner, 2026-11-14, card "Same blow time for every weapon", after Gondor beat Mordor in 3 of 3 equal-stat
+# 9 v 9s: same swing rate, but the orcs' axes/hammers/poleaxes struck about 100 ms later than Gondor's spears): every
+# melee weapon strikes at DAMAGE_AT_MS again. Each swing keeps its own animation, played faster or slower so its impact
+# frame lands at DAMAGE_AT_MS. The 0.0.99 wind-ups were knifestab/spearhit 350, falx 420, poleaxechop 500, hammerhit 550,
+# axehit 600.
+HIT_MS = {}
 
 
 def hit_ms(w):
@@ -2097,7 +2102,7 @@ with open(os.path.join(out, "modinfo.json"), "w") as f:
         "type": "code",
         "modid": "lotrnpcs",
         "name": "LOTR NPCs",
-        "version": "0.0.139",
+        "version": "0.0.140",
         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Race models from "
                        "LOTR Races and Classes by Dango Dango Dango, Shakgriig and Buggoi, used with their permission.",
