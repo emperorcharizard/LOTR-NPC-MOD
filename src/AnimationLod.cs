@@ -17,9 +17,13 @@ namespace LotrNpcs
             "LOTR NPCs, settings for this computer only (not the server).",
             "FarAnimationLod (true by default; the chat command .npcanimlod on / off / <blocks> changes it in game): NPCs of this mod farther than AnimationFullRateWithin blocks from you animate every 2nd frame, past twice that every 3rd and past three times that every 4th, so big battles cost less frame time. Up close nothing changes. false animates every NPC every frame, as the game does.",
             "AnimationFullRateWithin (10 by default since 0.0.116 testing, owner 2026-11-12; 4 to 256): how many blocks around you NPCs always animate every frame.",
+            "StripTinyGearDetail (true by default, 0.0.127; the chat command .npcgeardetail on / off / <size> changes it in game): the worn gear of this mod's NPCs leaves out its tiny pieces (rivets, studs, every side under TinyGearSize voxels), which the game would otherwise pose every frame. Players and other mods' creatures keep every piece. false keeps every piece.",
+            "TinyGearSize (0.5 by default; 0.1 to 4): below what size in voxels, on every side, a gear piece counts as tiny.",
         };
         public bool FarAnimationLod = true;
         public double AnimationFullRateWithin = AnimationLod.DefaultFullRateWithin;
+        public bool StripTinyGearDetail = true;
+        public double TinyGearSize = GearDetail.DefaultTinySize;
     }
 
     /// <summary>
@@ -74,6 +78,7 @@ namespace LotrNpcs
         {
             if (harmony != null) return;
             config = Load(api);
+            GearDetail.Apply(api, config);
             enabled = config.FarAnimationLod;
             near = Math.Clamp(config.AnimationFullRateWithin, MinFullRateWithin, MaxFullRateWithin);
             capi = api;
@@ -93,11 +98,10 @@ namespace LotrNpcs
             ClientConfig config = null;
             try { config = api.LoadModConfig<ClientConfig>(ClientConfig.File); }
             catch (Exception e) { api.Logger.Warning("[lotrnpcs] Could not read ModConfig/{0}, using the defaults: {1}", ClientConfig.File, e.Message); }
-            if (config == null)
-            {
-                config = new ClientConfig();
-                try { api.StoreModConfig(config, ClientConfig.File); } catch (Exception) { }
-            }
+            // Written back every start, so settings added in a newer version (0.0.127: StripTinyGearDetail) show up in the file.
+            config ??= new ClientConfig();
+            config.Instructions = new ClientConfig().Instructions;
+            try { api.StoreModConfig(config, ClientConfig.File); } catch (Exception) { }
             return config;
         }
 
@@ -127,6 +131,7 @@ namespace LotrNpcs
             harmony = null;
             capi = null;
             config = null;
+            GearDetail.Remove();
         }
 
         // Harmony prefix: false skips this frame's animation. Players and other mods' entities always pass.

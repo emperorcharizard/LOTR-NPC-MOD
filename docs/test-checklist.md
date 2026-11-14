@@ -441,3 +441,11 @@ Install `lotrnpcs_0.0.126-test.zip`; restart fully. Clear leftover test NPCs fir
 - [x] 126.2 Spawn 3 goblin warriors 15 blocks from them: the riders ride in, the horses walk up to each goblin and the riders land hits; no rider stands off out of reach for more than a few seconds.
 - [ ] 126.3 A hired rider on Follow still keeps up when you sprint away (its horse runs when the rider runs).
 
+## 127. Tiny gear pieces left out (0.0.127)
+
+Install `lotrnpcs_0.0.127-test.zip`; restart fully.
+
+- [ ] 127.1 ModConfig/lotrnpcs-client.json now has `StripTinyGearDetail: true` and `TinyGearSize: 0.5`, and client-debug.log has "[lotrnpcs] gear ...: left out N tiny pieces" lines (once per item).
+- [ ] 127.2 Angmar and Haradrim warriors up close look the same with `.npcgeardetail on` and `.npcgeardetail off` (the command rebuilds them at once); your own worn armor never changes.
+- [ ] 127.3 `/recruits bench 200` with `.npcgeardetail off`, then `on`, then `1.5`: note the FPS of each, and whether 1.5 visibly loses studs or buckles.
+

@@ -64,7 +64,38 @@ Every outfit is one helmet, one body armor and one leg armor (2 sets have none, 
 
 ## 4. Tiny decorations
 
-Elements with any side under 0.5 voxel (rivets, trims, flat plates and edges): **1361 of the 1944 elements (70%) of the 15 heaviest items.** Per item they are in the "tiny" column of table 1. They still cost a full element each per frame.
+Correction (0.0.127): the first count above ("tiny" column) counted elements with **any** side under 0.5 voxel. Most of those are thin plates (one side near 0, the others large: 3774 of the 10760 elements of all worn items), which are visible surfaces, not decorations. Elements with **every** side under 0.5 voxel are few.
+
+## 4b. What 0.0.127's strip leaves out (expected counts)
+
+0.0.127 (`GearDetail.Strip`, client only, our NPCs only) leaves out leaf elements with every side under TinyGearSize voxels that have no attachment points, no step parent of their own and aren't a step parent target, never the attached top-level elements. Counted with `tools/research/gear_strip_counts.py <out.json>` on the same shapes:
+
+| item | elements | stripped at 0.5 | after |
+| --- | --- | --- | --- |
+| `norc:armor-body-tierfiveplate-norcarmorheavier-norcarmorheavier-none` | 192 | 0 | 192 |
+| `mord:armor-body-tierfourplate-servantarmororcheavy-servantarmororcheavyred-none` | 184 | 0 | 184 |
+| `mord:armor-body-tierfourplate-servantarmororcheavy-servantarmororcheavyblack-none` | 184 | 0 | 184 |
+| `dwarf:armor-body-tierfiveplate-evildwarfarmorheavier-evildwarfarmorheavier-none` | 140 | 2 | 138 |
+| `gundabad:armor-body-tierthreebrig-gundabadbonearmor-gundabadbonearmor-none` | 131 | 0 | 131 |
+| `lotrnpcs:orcweapon-kiteshield` | 128 | 0 | 128 |
+| `angmar:armor-body-tierfiveplate-angmararmorheavier-angmararmorheavier-none` | 122 | 40 | 82 |
+| `wlel:armor-body-tierfivescale-woodlandarmorheavier-woodlandarmorheavier-none` | 117 | 0 | 117 |
+| `gundabad:armor-legs-tierthreebrig-gundabadboneleggings-gundabadboneleggings-none` | 114 | 0 | 114 |
+| `arnor:armor-head-tierfourplate-arnorhelmetheavy-arnorhelmetheavy-none` | 113 | 0 | 113 |
+| `dwarf:armor-body-tierfourplate-dwarfarmorheavy-dwarfarmorheavy-none` | 111 | 1 | 110 |
+| `gundabad:armor-head-tierfourplate-gundabadhelmetone-gundabadhelmetone-none` | 108 | 6 | 102 |
+| `wlel:armor-body-tierthreescale-woodlandarmormedium-woodlandarmormedium-none` | 104 | 1 | 103 |
+| `wlel:armor-body-tierfourscale-woodlandarmorheavy-woodlandarmorheavy-none` | 99 | 0 | 99 |
+| `haradrimarmor:armor-body-tierthreechain-haradriminfantryarmor-haradriminfantryarmor-none` | 97 | 12 | 85 |
+
+Total for these 15: 62 of 1944 elements left out (3%).
+All 273 worn items: 155 of 10760 elements (1%).
+size 1.0: 970 of 10760 (9%)
+size 1.5: 2136 of 10760 (20%)
+size 2.0: 2895 of 10760 (27%)
+leaves 9235 thin plates (one side <0.5, others bigger) 3774
+
+So at the default 0.5 the saving is about 1% of all gear elements (3% of the heaviest 15, mostly Angmar heavier armor 40, Haradrim infantry armor 12, Gundabad helmet 6). A bigger TinyGearSize removes more but starts taking visible studs, buckles and trims: test by eye with `.npcgeardetail 1` / `1.5` before changing the default.
 
 ## Options (nothing built)
 1. Lighter variants per rank (our own choice, no other mod touched): give recruits and warriors the lighter sets and keep the 100-190 element pieces for captains, guards and riders only. Biggest single wins: Misty Mountains' Orc heavier body armor (192), the Mordor heavy servant armor (184), the evil dwarf heavier armor (140), Gundabad bone armor and leggings (131 + 114), the Arnor heavy helmet (113), our own kite shield (128).

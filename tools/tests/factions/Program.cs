@@ -856,6 +856,19 @@ public static class Program {
         Check(armed.All(c => JToken.DeepEquals(HeldWeapon(entityFiles[c], "server"), HeldWeapon(entityFiles[c], "client")) && HeldWeapon(entityFiles[c], "server")["weapons"].Count() == 6), "...with the same six weapons listed on both sides");
         var bodyShape = JObject.Parse(File.ReadAllText(Path.Combine(assets, "shapes", "entity", "humanoid", "seraph-faceless.json")));
         var bodyAnims = new HashSet<string>(bodyShape["animations"].Select(a => (string)a["code"]));
+        // 0.0.127 gear detail: only tiny leaves go; parents, attachment points, step parent targets and roots stay.
+        ShapeElement gdBox(string name, double sx, double sy, double sz, string stepParent = null, params ShapeElement[] children) =>
+            new ShapeElement { Name = name, From = new double[] { 0, 0, 0 }, To = new double[] { sx, sy, sz }, StepParentName = stepParent, Children = children.Length > 0 ? children : null };
+        var gdRivet = gdBox("rivet", 0.3, 0.3, 0.3); var gdStrip = gdBox("strip", 0.3, 0.3, 2); var gdHolder = gdBox("holder", 0.2, 0.2, 0.2, null, gdBox("inner", 2, 2, 2));
+        var gdSocket = gdBox("socket", 0.2, 0.2, 0.2); gdSocket.AttachmentPoints = new[] { new AttachmentPoint { Code = "x" } };
+        var gdTarget = gdBox("plume-base", 0.2, 0.2, 0.2); var gdRider = gdBox("plume", 0.2, 0.2, 0.2, "plume-base");
+        var gdRoot = gdBox("plate", 0.2, 0.2, 0.2, "Torso", gdRivet, gdStrip, gdHolder, gdSocket, gdTarget, gdBox("stud", 0.49, 0.1, 0.4), gdRider);
+        var gdGearShape = new Shape { Elements = new[] { gdRoot } };
+        int gdStripped = GearDetail.Strip(gdGearShape, 0.5);
+        var gdLeft = gdRoot.Children.Select(c => c.Name).ToArray();
+        Check(gdStripped == 2 && gdLeft.SequenceEqual(new[] { "strip", "holder", "socket", "plume-base", "plume" }) && gdGearShape.Elements.Single() == gdRoot && gdHolder.Children.Length == 1
+            && GearDetail.Strip(new Shape { Elements = new[] { gdBox("p", 1, 1, 1, "Torso", gdBox("r", 0.3, 0.3, 0.3)) } }, 0.2) == 0 && GearDetail.Strip(null, 0.5) == 0,
+            "0.0.127: gear leaves out only leaves under 0.5 voxels on every side; parents, attachment points, step parents and their targets, and the attached roots stay; a smaller size keeps more");
         // 0.0.125 riders: spears weigh PREFER (3) times their foot weight, the rest stay; seated riders keep only the riding pose.
         float MountWeaponWeight(string code, string item) => HeldWeapon(entityFiles[code], "server")["weapons"].Where(w => ((string)w["item"]).Contains(item)).Select(w => (float?)w["weight"] ?? 1f).Single();
         Check(MountWeaponWeight("test-rohan-rider", "rhspear") == 3 && MountWeaponWeight("test-rohan-rider", "rhsword") == 1 && MountWeaponWeight("test-rohan-warrior", "rhspear") == 1
