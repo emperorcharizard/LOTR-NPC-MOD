@@ -124,12 +124,11 @@ faction armor mods ("To Rule Them All") ship vanilla items plus a Combat Overhau
      29 melee weapons, 58 items. Keep the per-variant shape and texture in one place so the owner's steel skins drop in
      later with a one-line change each.
    - **Shields and bows: iron only**, one item each (12 shields, 2 bows), no metal variant group.
+5. **Order of work:** melee weapons first (owner: "Do melee weapons first"), then shields, then bows.
 
 **Still open** (ask with AskUserQuestion when you reach them, recommendation first; don't ask about anything you can
 find in the code, vanilla assets or the notes):
 
-5. **Order of work.** Recommended: the melee weapons first, shields second, bows third (the pulled string needs
-   per-stage shapes). All three are in scope.
 6. **Where the mod lives.** Recommended: this repo, folder `lotrweapons/` (its own modinfo, lang, version, notes),
    built by `tools/build.py --mod weapons` (or a sibling script) into `releases/lotrweapons_<version>-test.zip`,
    sharing the weapon catalog and the converter. A separate repo is possible but splits the source of truth.
