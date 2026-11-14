@@ -117,6 +117,28 @@ WEAPONS = {
 STEEL_MODEL = {"gdsword": "gdsteelsword", "dwwarhammer": "dwwarhammersteel", "dwshorthammer": "dwshorthammersteel"}
 assert set(WEAPONS) | set(STEEL_MODEL.values()) == set(C.MELEE), sorted(set(C.MELEE) ^ (set(WEAPONS) | set(STEEL_MODEL.values())))
 
+# The owner's shields, iron only (owner, 2026-11-14), as the game's iron metal shield (roundshield.json shield-metal:
+# 450 durability plus 60 for iron, absorbs 5 damage and 10 from projectiles), absorption times BETTER. They hang on
+# the left arm exactly as the NPCs carry them (the catalog's off-hand transform). Combat Overhaul leaves the game's
+# shields as they are (its shield patch is switched off), so these get no CO patch.
+SHIELDS = {
+    "shield": ("shield-mordor", "Orc shield"),
+    "mmshield": ("shield-mistymountains", "Misty Mountains orc shield"),
+    "kiteshield": ("kiteshield-numenorean", "Numenorean shield"),
+    "bnshield": ("shield-blacknumenorean", "Black Numenorean shield"),
+    "dwtowershield": ("towershield-dwarven", "Dwarven tower shield"),
+    "dwshield": ("shield-dwarven", "Dwarven shield"),
+    "eastshield": ("shield-easterling", "Easterling shield"),
+    "gondorshield": ("shield-gondor", "Gondorian shield"),
+    "boromirshield": ("roundshield-gondor", "Gondorian round shield"),
+    "elfshield": ("shield-elven", "Elven shield"),
+    "hdlightshield": ("lightshield-haradrim", "Haradrim light shield"),
+    "hdheavyshield": ("heavyshield-haradrim", "Haradrim heavy shield"),
+}
+assert set(SHIELDS) == set(C.SHIELDS), sorted(set(SHIELDS) ^ set(C.SHIELDS))
+SHIELD_STATS = {"copies": "game:shield-metal (iron)", "durability": 450 + 60, "absorb": 5, "absorbProjectile": 10,
+                "protectionChance": {"passive-projectile": 0.2, "active-projectile": 1, "passive": 0.2, "active": 0.9}}
+
 
 # The three animations of our own (tools/anims) go onto every body a player can have: the game's seraph and LOTR Races
 # and Classes' seraph, dwarf and elf bodies (its customplayermodels use those three). Their settings copy the vanilla
@@ -284,9 +306,9 @@ FALX_GUI = {"x": -53, "y": 118, "z": -5}
 FALX_LENGTH, FALX_GUI_SCALE, FALX_GROUND_SCALE, FALX_HAND_SCALE = 1.33, 1.65, 3.4, 0.8
 
 
-def bounds(shape):
-    """Min and max corner, in blocks, of the shape's visible boxes (with a texture on some face), each turned by its
-    own and its parents' rotations as the game does (ShapeElement.GetLocalTransformMatrix)."""
+def visible_boxes(shape):
+    """The shape's visible boxes (a texture on some face) as (min corner, max corner) in model blocks, each turned by
+    its own and its parents' rotations as the game does (ShapeElement.GetLocalTransformMatrix)."""
     def matmul(a, b):
         return [[sum(a[i][k] * b[k][j] for k in range(4)) for j in range(4)] for i in range(4)]
 
@@ -296,7 +318,7 @@ def bounds(shape):
     def turn(e):
         r = rot({"x": e.get("rotationX") or 0, "y": e.get("rotationY") or 0, "z": e.get("rotationZ") or 0})
         return [r[0] + [0], r[1] + [0], r[2] + [0], [0, 0, 0, 1]]
-    lo, hi = [1e9] * 3, [-1e9] * 3
+    out = []
 
     def walk(elements, parent):
         for e in elements:
@@ -306,27 +328,39 @@ def bounds(shape):
             faces = e.get("faces") or {}
             if any(isinstance(fc, dict) and fc.get("texture") and fc.get("enabled", True) is not False for fc in faces.values()):
                 size = [t[i] - f[i] for i in range(3)]
-                for c in range(8):
-                    v = [size[0] if c & 4 else 0, size[1] if c & 2 else 0, size[2] if c & 1 else 0, 1]
-                    p = [sum(m[i][k] * v[k] for k in range(4)) for i in range(3)]
-                    for i in range(3):
-                        lo[i], hi[i] = min(lo[i], p[i]), max(hi[i], p[i])
+                pts = [[sum(m[i][k] * v[k] for k in range(4)) for i in range(3)]
+                       for v in ([size[0] if c & 4 else 0, size[1] if c & 2 else 0, size[2] if c & 1 else 0, 1] for c in range(8))]
+                out.append(([min(p[i] for p in pts) for i in range(3)], [max(p[i] for p in pts) for i in range(3)]))
             walk(e.get("children") or [], m)
     walk(shape["elements"], move(0, 0, 0))
-    return lo, hi
+    return out
 
 
-def display_transforms(w, shape):
+def bounds(shape):
+    """Min and max corner, in blocks, of the shape's visible boxes."""
+    boxes = visible_boxes(shape)
+    return [min(b[0][i] for b in boxes) for i in range(3)], [max(b[1][i] for b in boxes) for i in range(3)]
+
+
+REFERENCES = {
+    "falx": {"hand": FALX_HAND, "gui": FALX_GUI, "ground": {}, "length": FALX_LENGTH, "guiScale": FALX_GUI_SCALE,
+             "groundScale": FALX_GROUND_SCALE},
+}
+
+
+def display_transforms(rotation, shape, ref="falx"):
+    """Icon and ground transforms for a model held with this in-hand rotation, laid as the reference item lies."""
+    r = REFERENCES[ref]
     lo, hi = bounds(shape)
     centre = {a: round((lo[i] + hi[i]) / 2, 3) for i, a in enumerate("xyz")}
-    # The icon and the ground show the model unscaled, so each weapon gets the falx's on-screen length.
-    size = FALX_LENGTH / max(max(hi[i] - lo[i] for i in range(3)), 0.1)
-    ours = dict(w["rotation"], y=w["rotation"].get("y", 0) - 180)
-    align = mul(transpose(rot(FALX_HAND)), rot(ours))
-    gui = {"translation": {"x": 0, "y": 0, "z": 0}, "rotation": euler_xyz(mul(rot(FALX_GUI), align)),
-           "origin": centre, "scale": round(FALX_GUI_SCALE * size, 3)}
-    ground = {"translation": {"x": 0, "y": 0, "z": 0}, "rotation": euler_xyz(align), "origin": centre,
-              "scale": round(FALX_GROUND_SCALE * size, 3)}
+    # The icon and the ground show the model unscaled, so each item gets the reference's on-screen size.
+    size = r["length"] / max(max(hi[i] - lo[i] for i in range(3)), 0.1)
+    ours = dict(rotation, y=rotation.get("y", 0) - 180)
+    align = mul(transpose(rot(r["hand"])), rot(ours))
+    gui = {"translation": {"x": 0, "y": 0, "z": 0}, "rotation": euler_xyz(mul(rot(r["gui"]), align)),
+           "origin": centre, "scale": round(r["guiScale"] * size, 3)}
+    ground = {"translation": {"x": 0, "y": 0, "z": 0}, "rotation": euler_xyz(mul(rot(r["ground"]), align)), "origin": centre,
+              "scale": round(r["groundScale"] * size, 3)}
     return gui, ground, centre
 
 
@@ -337,11 +371,12 @@ def write_items():
     for key in list(WEAPONS) + list(STEEL_MODEL.values()):
         shapes[key] = C.weapon_shape(key, C.MELEE[key], own, bundled, DOMAIN, A, FOLDER)
         write(f"shapes/item/{FOLDER}/{key}.json", shapes[key])
-    C.copy_own_textures(bundled, own, A, FOLDER)
     lang = {"tabname-lotrweapons": "LOTR Weapons"}
+    write_shields(own, bundled, lang)
+    C.copy_own_textures(bundled, own, A, FOLDER)
     for key, (code, kind, name) in WEAPONS.items():
         w, k = C.MELEE[key], KINDS[kind]
-        gui, ground, centre = display_transforms(w, shapes[key])
+        gui, ground, centre = display_transforms(w["rotation"], shapes[key])
         shape = {"base": f"{DOMAIN}:item/{FOLDER}/{key}"}
         item = {
             "code": code, "class": k["class"], "tags": ["weapon", "weapon-melee"], "damagedby": k["damagedby"],
@@ -382,6 +417,65 @@ def write_items():
     write("lang/en.json", lang)
     write_co_patch(shapes)
     return lang
+
+
+def shield_icon(shape):
+    """Icon and ground transforms for a shield, from its shape: the face plate (the box with the largest area across
+    the shield's thinnest side) toward the viewer, the grip side away, the shield's length upright tipped 15 degrees,
+    as big on screen as the game's round shield (0.69 blocks across at icon scale 1.8, ground scale 5)."""
+    boxes = visible_boxes(shape)
+    lo, hi = bounds(shape)
+    ext = [hi[i] - lo[i] for i in range(3)]
+    thin = min(range(3), key=lambda i: ext[i])
+    along = max((i for i in range(3) if i != thin), key=lambda i: ext[i])
+    side = 3 - thin - along
+    area = lambda b: (b[1][along] - b[0][along]) * (b[1][side] - b[0][side])
+    plate = max(boxes, key=area)
+    plate_mid = (plate[0][thin] + plate[1][thin]) / 2
+    rest = [(b[0][thin] + b[1][thin]) / 2 for b in boxes if b is not plate] or [plate_mid]
+    front = 1 if plate_mid >= sum(rest) / len(rest) else -1
+    tip = 15 * D
+    # Columns: where the model's axes go on screen (x right, y up, z toward the viewer).
+    to_screen = {thin: [0, 0, front], along: [-math.sin(tip), math.cos(tip), 0]}
+    a, b = to_screen[thin], to_screen[along]
+    cross = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]
+    # The third axis completes a right-handed turn whichever order the axes come in.
+    to_screen[side] = cross if (thin, along, side) in ((0, 1, 2), (1, 2, 0), (2, 0, 1)) else [-v for v in cross]
+    m = [[to_screen[j][i] for j in range(3)] for i in range(3)]
+    if abs(sum(m[0][i] * (m[1][(i + 1) % 3] * m[2][(i + 2) % 3] - m[1][(i + 2) % 3] * m[2][(i + 1) % 3]) for i in range(3)) - 1) > 1e-6:
+        raise SystemExit("shield icon rotation is not a rotation")
+    centre = {a2: round((lo[i] + hi[i]) / 2, 3) for i, a2 in enumerate("xyz")}
+    size = 0.69 / max(ext[along], ext[side], 0.1)
+    gui = {"translation": {"x": 0, "y": 0, "z": 0}, "rotation": euler_xyz(m), "origin": centre, "scale": round(1.8 * size, 3)}
+    # On the ground it lies face up: the face toward +Y.
+    flat = mul([[1, 0, 0], [0, 0, -1], [0, 1, 0]], m)
+    ground = {"translation": {"x": 0, "y": 0, "z": 0}, "rotation": euler_xyz(flat), "origin": centre, "scale": round(5 * size, 3)}
+    return gui, ground
+
+
+def write_shields(own, bundled, lang):
+    for key, (code, name) in SHIELDS.items():
+        w = C.SHIELDS[key]
+        shape = C.weapon_shape(key, w, own, bundled, DOMAIN, A, FOLDER)
+        write(f"shapes/item/{FOLDER}/{key}.json", shape)
+        gui, ground = shield_icon(shape)
+        k = SHIELD_STATS
+        write(f"itemtypes/{code}.json", {
+            "code": code, "class": "ItemShield", "storageFlags": 257, "maxstacksize": 1,
+            "tags": ["weapon", "shield"],
+            "shape": {"base": f"{DOMAIN}:item/{FOLDER}/{key}"},
+            "durability": k["durability"],
+            "attributes": {
+                "shield": {"blockSoundLight": "held/shieldblock-metal-light", "blockSoundHeavy": "held/shieldblock-metal-heavy",
+                           "protectionChance": k["protectionChance"],
+                           "damageAbsorption": better(k["absorb"]), "projectileDamageAbsorption": better(k["absorbProjectile"])},
+                "handbook": {"groupBy": ["shield-*"]},
+                "lotrweapons": {"catalog": key, "copies": k["copies"]}},
+            "creativeinventory": {"general": ["*"], "items": ["*"], "tools": ["*"], "lotrweapons": ["*"]},
+            "tpHandTransform": w["hand"], "tpOffHandTransform": w["hand"],
+            "guiTransform": gui, "groundTransform": ground,
+        })
+        lang[f"item-{code}"] = name
 
 
 def write_thrown_spear(code, key, w, centre):

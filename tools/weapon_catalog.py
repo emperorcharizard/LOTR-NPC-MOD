@@ -5,7 +5,9 @@ the writer that turns a model into a game shape with its textures. One table for
 Loaded by path (the generators run with python -I, so tools/ isn't on sys.path). Shields and bows still live in
 gen_testnpcs.py; they move here when lotrweapons gets them.
 """
+import copy
 import json
+import math
 import os
 import shutil
 import sys
@@ -227,6 +229,262 @@ GONDOR_WEAPONS = {
 }
 # Every melee weapon made from the owner's own models (the NPCs' game stand-ins are in gen_testnpcs.py).
 MELEE = {**WEAPONS, **MM_WEAPONS, **ELF_WEAPONS, **DWARF_WEAPONS, **HARADRIM_WEAPONS, **GONDOR_WEAPONS, **NEW_WEAPONS}
+
+
+# Shields and bows (moved from gen_testnpcs.py for lotrweapons, 2026-11-14; unchanged).
+# The Mordor orcs' shield (0.0.55, user, 2026-11-03: "Take this shield model for the mordor orcs. its also a visual
+# thing, and its a toggle-able accessory. properly rig it, it cant be used in conjunction with the poleaxe."). The
+# user's model, unchanged in tools/weapons/orc_shield.json, a kite shield along +X (point at -X) with its face to +Z
+# and a grip bar behind it. Held in the left hand at the grip bar's middle (3.7, 0.75, 6) like a weapon's handle, so
+# the shield lies across the forearm and turns with it (user, 0.0.56: "The shield should rotate with their arm ... it
+# is parallel with the arm instead of perpendicular"): with the arm hanging, top forward, point back, face out to the
+# left, at the weapons' 0.6 scale. Solved and checked offline from four sides and
+# in the swing and walk poses (tools/preview); the numbers come from that solve.
+# 0.0.58 (user, 2026-11-03: "There is an issue with the shield clipping with the npc"): the 0.0.56 solve used the bare
+# body, where the shield's back sat within a pixel of the forearm. 0.0.58 slid it 2.5 pixels out along its face,
+# which left the grip bar 1.2 pixels off the hand (user, 0.0.58: "the mordor orc shield now floats off of the body").
+# 0.0.59: slid 1.0 pixel instead, same rotation. The grip bar rests on the hand's surface, and the shield clears the
+# bare arm and side in every idle, walk and sprint frame, with half a pixel of armor allowed for (checked offline,
+# tools/preview/shieldmeasure.py; previews/shield-0.0.59.png). Was (0.2359, 0.0682, -0.3688), then (0.2314, 0.0591, -0.1086).
+# 0.0.71: the owner's morc_shield.json and "Mordor Orc Shield Texture.png" (one packed texture, same geometry as the
+# 0.0.55 orc_shield.json, so the same hold).
+SHIELD = {"model": "morc_shield.json", "atlas": "Mordor Orc Shield Texture.png", "name": "Orc shield",
+          "hand": {"translation": {"x": 0.2341, "y": 0.0646, "z": -0.2647}, "rotation": {"x": 2.0, "y": 179.0, "z": -177.9},
+                   "origin": {"x": 0, "y": 0, "z": 0}, "scale": WEAPON_SCALE}}
+
+
+# The Misty Mountains orcs' shield (0.0.71, the owner's misty_mountain_orc_shield.json). 0.0.72: the owner re-exported
+# it against the packed "Moria Orc Shield Texture.png" (same geometry), so it draws from that one texture. Same hold as
+# the Mordor shield, moved to this model's grip (3.25, 2.4, 6.3) instead of (3.7, 0.75, 6.0), with 0.0.59's 1 px offset.
+MM_SHIELD = {"model": "misty_mountain_orc_shield.json", "atlas": "Moria Orc Shield Texture.png", "name": "Orc shield",
+             "hand": {"translation": {"x": 0.2025, "y": 0.1673, "z": -0.2804}, "rotation": {"x": 2.0, "y": 179.0, "z": -177.9},
+                      "origin": {"x": 0, "y": 0, "z": 0}, "scale": WEAPON_SCALE}}
+
+
+def place_grip(hand, old_grip, new_grip, rotation):
+    """A held item's transform turned to rotation and moved so new_grip lands where old_grip did under hand."""
+    def rot(v, r):
+        rx, ry, rz = (math.radians(r.get(a, 0)) for a in "xyz")
+        ry -= math.pi  # the hand attachment points' rotationY of -180
+        x, y, z = v
+        x, y = x * math.cos(rz) - y * math.sin(rz), x * math.sin(rz) + y * math.cos(rz)
+        x, z = x * math.cos(ry) + z * math.sin(ry), -x * math.sin(ry) + z * math.cos(ry)
+        y, z = y * math.cos(rx) - z * math.sin(rx), y * math.sin(rx) + z * math.cos(rx)
+        return x, y, z
+    a = rot(tuple(v / 16 for v in old_grip), hand["rotation"])
+    b = rot(tuple(v / 16 for v in new_grip), rotation)
+    t = hand["translation"]
+    return dict(hand, rotation={k: round(v, 2) for k, v in rotation.items()},
+                translation={k: round(t[k] + a[i] - b[i], 4) for i, k in enumerate("xyz")})
+
+
+# 0.0.76 shields (owner's Blockbench models): upright, face +Z, straps on the back, so turned -90 degrees about Z on
+# top of the Mordor shield's hold (their long axis is Y where the Mordor shield's is X, point or bottom to -X) and moved
+# so their handle lands where the Mordor grip bar does. Handles measured on the converted models: the kite shield's two
+# upright straps (x 5.4 to 10.6), held between them on the centreline; the tower shield's handle bar; the iron shield's
+# grip bar on its two posts.
+MORDOR_GRIP = (3.7, 0.75, 6.0)
+
+
+# Their straps sit closer to the shield than the Mordor grip post, so each is slid out along its face by SHIELD_OUT px
+# to clear the forearm with half a pixel of armor, as the Mordor shield does (tools/preview/shieldmeasure.py).
+SHIELD_OUT = 1.4
+
+
+# 0.0.96 (owner, 2026-11-07, screenshot of a dwarf recruit: "move the dwarven shields a little bit closer to their
+# models, same with the elven shields, and the gondor shields"): SHIELD_OUT kept every point clear of the forearm with
+# half a pixel of sleeve, but on each of these a small part on the back (the tower shield's lower strap, the iron
+# shield's grip posts, the curved shield's rim, the round shield's handle, the elven shield's bar posts) touched first,
+# leaving the plate itself about a pixel off the arm. These are moved in by SHIELD_IN px (model units, x0.6 in the
+# world): the plate then sits on the sleeve, and those back parts sink into the arm, hidden behind the shield.
+# Measured with the race's own body (dwarf, elf, human). The curved Gondor shield's sides wrap toward the arm, so it
+# moves less.
+# 0.0.100 (owner, 2026-11-08: "make sure the positioning of all the weapons seems correct on your end, with no floating
+# gaps"): measured every held item against the hand (bottom 3 px of the lower arm) on the human, dwarf and elf bodies.
+# The Numenorean kite, Easterling and Gondorian shields' grips stopped 0.46 to 0.65 px short of the hand (the left hand
+# visibly not touching the handle). Moved in like the others: kite and Easterling 1.0, Gondor 0.75 -> 1.75. Now every
+# shield touches the hand; their backs sink at most 0.44 px into the forearm (Mordor's 0.38, Haradrim's 0.69, hidden
+# behind the shield) and 0.31 into the upper arm (the dwarven tower shield's 0.25).
+SHIELD_IN = {"dwtowershield": 1.0, "dwshield": 1.0, "elfshield": 1.0, "boromirshield": 1.0, "gondorshield": 1.75,
+             "kiteshield": 1.0, "eastshield": 1.0}
+
+
+_NEW_SHIELD_ROT = dict(SHIELD["hand"]["rotation"], z=SHIELD["hand"]["rotation"]["z"] - 90)
+
+
+KITE_SHIELD = {"model": "numenorean_kite_shield.json", "atlas": "numenorean_kite_shield.png", "name": "Numenorean shield",
+               "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (8.0, 21.9, 12.8 - SHIELD_OUT + SHIELD_IN["kiteshield"]), _NEW_SHIELD_ROT)}
+
+
+DW_TOWER_SHIELD = {"model": "dwarven_tower_shield.json", "atlas": "dwarven_tower_shield.png", "name": "Dwarven tower shield",
+                   "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (5.25, 18.0, 7.3 - SHIELD_OUT + SHIELD_IN["dwtowershield"]), _NEW_SHIELD_ROT)}
+
+
+DW_IRON_SHIELD = {"model": "dwarven_iron_shield.json", "atlas": "dwarven_iron_shield.png", "name": "Dwarven shield",
+                  "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (7.0, 17.85, 4.9 - SHIELD_OUT + SHIELD_IN["dwshield"]), _NEW_SHIELD_ROT)}
+
+
+# 0.0.77 (owner: "here is a model for the easterling shield", easternlingshieldV1.bbmodel, kept as
+# tools/weapons/source/easterling_shield.bbmodel): built like the tower shield, with the same upright handle bar on the
+# back (x 6 to 6.5, y 15 to 17, z 6.78 to 7.98 on the converted model), so the tower shield's hold at that bar's middle.
+EASTERLING_SHIELD = {"model": "easterling_shield.json", "atlas": "easterling_shield.png", "name": "Easterling shield",
+                     "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (6.25, 16.0, 7.38 - SHIELD_OUT + SHIELD_IN["eastshield"]), _NEW_SHIELD_ROT)}
+
+
+# 0.0.94 (owner's models, 2026-11-05/06, converted at build time from tools/weapons/source): all three are upright
+# with the face to +Z and the handle behind, like the tower shield, so the same hold at their own handle, slid out by
+# SHIELD_OUT. Gondor's curved shield (gondorianshieldV2) has a flat grip plate behind the middle (x 4.5 to 10.5, y 13.7
+# to 19.7, z 7.8 to 8): held at its middle, as the tower shield's handle sits 0.5 behind its plate. Boromir's round
+# shield (boromir_v6): its handle bar (4.5 to 7.5, 8.5 to 9.5, z 2 to 3). The elven shield: the bar on two posts
+# behind it (x 7.5 to 8.5, y 18.5 to 30.5, z 0 to 1); it is the tallest shield (39 units, 1.48 blocks: tower 32).
+# tools/preview/shieldmeasure.py: Gondor's as the tower shield (worst 0.40 px into a 1 px armor margin), Boromir's and
+# the elven one clear. Lowest point while walking or running: Gondor's at the feet' level, the elven one 1 px below.
+GONDOR_SHIELD = {"source": "gondorian_shield.bbmodel", "name": "Gondorian shield",
+                 "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (7.5, 16.68, 7.3 - SHIELD_OUT + SHIELD_IN["gondorshield"]), _NEW_SHIELD_ROT)}
+
+
+BOROMIR_SHIELD = {"source": "boromir_shield.bbmodel", "name": "Gondorian round shield",
+                  "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (6.0, 9.0, 2.5 - SHIELD_OUT + SHIELD_IN["boromirshield"]), _NEW_SHIELD_ROT)}
+
+
+ELF_SHIELD = {"source": "elven_shield.bbmodel", "name": "Elven shield",
+              "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (8.0, 24.5, 0.5 - SHIELD_OUT + SHIELD_IN["elfshield"]), _NEW_SHIELD_ROT)}
+
+
+# 0.0.97 (owner, 2026-11-07: haradrim_light_shield.bbmodel and haradrim_heavy_shield.bbmodel, no notes): both face +Z
+# with the grip and a forearm strap behind. Each turned so it stands along the forearm with the strap toward the
+# elbow (checked offline: the forearm runs from the grip toward the strap): the light shield (upright, long axis Y,
+# strap below the grip) on the Mordor shield's own rotation, the heavy wicker shield (long axis X, strap at x 7.6)
+# a quarter turn further (+90). Held at the grip's middle: light (10, 4.75, 5.9), heavy (16, 0.75, 5.55). Moved in
+# toward the arm until the back rests on the sleeve (0.0.96's rule; tools: shieldfit-style measurement on the human
+# body): light 0.6 px (crosspiece and back rim sink at most 0.45), heavy 0.5 px (battens at most 0.15; the grips and
+# straps sit on the hand and forearm as modelled).
+HD_LIGHT_SHIELD = {"source": "haradrim_light_shield.bbmodel", "name": "Haradrim light shield",
+                   "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (10.0, 4.75, 5.9 + 0.6), SHIELD["hand"]["rotation"])}
+
+
+HD_HEAVY_SHIELD = {"source": "haradrim_heavy_shield.bbmodel", "name": "Haradrim heavy shield",
+                   "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (16.0, 0.75, 5.55 + 0.5),
+                                      dict(SHIELD["hand"]["rotation"], z=SHIELD["hand"]["rotation"]["z"] + 90))}
+
+
+# 0.0.112 (owner, 2026-11-09: "replace the black numenorean shield with the new one"; black nemenorian shield.bbmodel):
+# a flat plate with a rim and a red emblem on its +Y face, point toward +Z, and no strap or handle. Held as the kite
+# shield: first turned x 90 (face +Y to the kite's +Z, point +Z to its -Y), folded into one rotation (solved offline,
+# hold @ Rx(90) = Rx(x) Ry(y - 180) Rz(z)); the grip on the centreline the kite's share of the length below the top
+# (z 9.96), 0.1 behind the rim's back (y 16.0) as the kite's grip is behind its straps. Checked offline against the
+# human body over idle, walk, sprint and attack poses (shieldfit): at most 0.34 px into a 1 px torso / 0.5 px arm armor
+# margin (the kite shield: 0.55).
+BN_SHIELD = {"source": "black_numenorean_shield.bbmodel", "name": "Black Numenorean shield",
+             "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (8.0, 16.0, 9.96), {"x": -62.55, "y": 267.67, "z": 154.53})}
+
+
+SHIELDS = {"shield": SHIELD, "mmshield": MM_SHIELD, "kiteshield": KITE_SHIELD, "bnshield": BN_SHIELD, "dwtowershield": DW_TOWER_SHIELD,
+           "dwshield": DW_IRON_SHIELD, "eastshield": EASTERLING_SHIELD, "gondorshield": GONDOR_SHIELD,
+           "boromirshield": BOROMIR_SHIELD, "elfshield": ELF_SHIELD, "hdlightshield": HD_LIGHT_SHIELD,
+           "hdheavyshield": HD_HEAVY_SHIELD}
+
+
+# The archers' bow (0.0.55): our own simple model (tools/weapons/orc_bow.json, dark wood, leather grip, iron nocks),
+# since no bow model was supplied; the owner can send one to replace it. Held in the right hand as vanilla holds bows,
+# grip at (0, 0, 8). 0.0.59 (user, 2026-11-03: "update the animations of the bow to be at rest until it is drawn to
+# fire. then an animation to draw back and fire"): two items with the same model. The rest bow is in the hand of the
+# idling, walking arm. 0.0.61 (user, 2026-11-03: "for the bow do option C", of three holds in
+# previews/bow-idle-options.png; 0.0.59's upright hold read as a thin stick in game): carried level at the side, front
+# end tipped 20 degrees down, string up, turned 15 degrees so the back end swings clear of the leg, grip in the hand
+# (tools/preview/bowrest.py <body> <bow> 20 trail 15: clear of the legs and torso in every idle, walk and sprint
+# frame; previews/bow-rest-0.0.61.png). Was upright along the leg: rotation (178.7, -161.1, -104.2). The drawn bow, shown only while drawing and for the first moment of the release (DRAWN_WHILE), has
+# the 0.0.55 full-draw transform: stave upright with the string toward the archer (vanilla's bowaim pose). Until
+# 0.0.58 the archer held the bow out in front between shots (holdinglanternrighthand), which is gone.
+# 0.0.71 (user, 2026-11-04: "why do they still have the test bow. I gave you a json file called orc_bow"): the owner's
+# own orc_bow model (86 elements, 37 px, grip at (2.6, 0.9, 8), limbs and string on -Y), with the nine textures it
+# names copied from the owner's texture pack (the bundled "Mordor Orc Bow Texture.png" is a packed sheet whose matching
+# JSON wasn't sent; pelt and string are vanilla). Same holds as before, re-solved for its grip and string side:
+# rest = bowrest.py 20 trail 15 with BOW_GRIP=2.6,0.9,8 BOW_STRING=-1; drawn = 0.0.55's rotation rolled 180 degrees
+# about the stave, translated to the new grip.
+BOW = {"model": "orc_bow.json", "name": "Orc bow",
+       "hand": {"translation": {"x": 0.1628, "y": 0.0973, "z": -0.4936}, "rotation": {"x": -1.9, "y": 176.1, "z": -157.9},
+                "origin": {"x": 0, "y": 0, "z": 0}, "scale": WEAPON_SCALE}}
+
+
+BOW_DRAWN = {"model": "orc_bow.json", "name": "Orc bow", "shape": "bow",
+             "hand": {"translation": {"x": 0.2316, "y": 0.1989, "z": -0.4317}, "rotation": {"x": 14.1, "y": 170.1, "z": -168.4},
+                      "origin": {"x": 0, "y": 0, "z": 0}, "scale": WEAPON_SCALE}}
+
+
+# The string pulled back (0.0.73, user, 2026-11-04: "whenever the bow is drawn back, can the string on it change to a
+# pulled back state?"). Measured offline (the bow on the seraph body, its full-draw hold, vanilla bowaim over DRAW_MS):
+# the draw hand reaches the string at frame 9 and pulls it straight back, in the string's plane near the grip's middle,
+# to y -16.0 at frame 15, where the pose holds. Three bows show the string as two segments from the tips to the apex at
+# x 2.2, z 8, each from the frame the hand gets that far: a third (y -8.5, frame 11), two thirds (-12.3, frame 13) and
+# the full draw (-16.0, frame 15). The release and the shove show the straight drawn bow (the string snaps back).
+DRAW_MS_FOR_POSES = 1100  # = DRAW_MS below (asserted)
+
+
+BOW_STRING_APEX_X = 2.2
+
+
+BOW_PULLS = [("bow-pull1", -8.5, 11), ("bow-pull2", -12.3, 13), ("bow-pull3", -16.0, 15)]
+
+
+BOW_PULL_ITEMS = {name: {"model": "orc_bow.json", "name": "Orc bow", "pull": y, "hand": BOW_DRAWN["hand"]} for name, y, _ in BOW_PULLS}
+
+
+# The Misty Mountains archers' bow (0.0.75, the owner's moria_bow.json, packed against "Moria Bow Texture.png"): 47 px
+# long, grip at (3.25, 0.8, 8), string on -Y at y -9.2 (deeper than the Mordor bow's -5.8). Same rest and full-draw
+# holds as the Mordor bow, moved to this grip (move_grip, the way the Misty Mountains shield was moved in 0.0.71). The
+# draw hand is where it is for the Mordor bow, so the pulled string follows it from where it reaches this deeper
+# string (frame 11.3 of 16): the apex at x 2.85 (2.2 moved by the grip) and y -10.5, -13.3, -16.1 at frames 12, 13.5
+# and 15 (the Mordor bow's hand positions, moved by the grip, read between its measured frames 11, 13 and 15).
+MM_BOW_GRIP, ORC_BOW_GRIP = (3.25, 0.8, 8.0), (2.6, 0.9, 8.0)
+
+
+def move_grip(hand, old_grip, new_grip):
+    """A held item's transform with the item moved so new_grip lands where old_grip did (same rotation)."""
+    rx, ry, rz = (math.radians(hand["rotation"].get(a, 0)) for a in "xyz")
+    ry -= math.pi
+    x, y, z = ((o - n) / 16 for o, n in zip(old_grip, new_grip))
+    x, y = x * math.cos(rz) - y * math.sin(rz), x * math.sin(rz) + y * math.cos(rz)
+    x, z = x * math.cos(ry) + z * math.sin(ry), -x * math.sin(ry) + z * math.cos(ry)
+    y, z = y * math.cos(rx) - z * math.sin(rx), y * math.sin(rx) + z * math.cos(rx)
+    t = hand["translation"]
+    return dict(hand, translation={"x": round(t["x"] + x, 4), "y": round(t["y"] + y, 4), "z": round(t["z"] + z, 4)})
+
+
+MM_BOW = {"model": "moria_bow.json", "atlas": "Moria Bow Texture.png", "name": "Orc bow",
+          "hand": move_grip(BOW["hand"], ORC_BOW_GRIP, MM_BOW_GRIP)}
+
+
+MM_BOW_DRAWN = {"model": "moria_bow.json", "name": "Orc bow", "shape": "mmbow",
+                "hand": move_grip(BOW_DRAWN["hand"], ORC_BOW_GRIP, MM_BOW_GRIP)}
+
+
+MM_BOW_APEX_X = round(BOW_STRING_APEX_X + MM_BOW_GRIP[0] - ORC_BOW_GRIP[0], 2)
+
+
+MM_BOW_PULLS = [("mmbow-pull1", -10.5, 12), ("mmbow-pull2", -13.3, 13.5), ("mmbow-pull3", -16.1, 15)]
+
+
+MM_BOW_PULL_ITEMS = {name: {"model": "moria_bow.json", "atlas": "Moria Bow Texture.png", "name": "Orc bow", "pull": y,
+                            "apexX": MM_BOW_APEX_X, "atlasName": "mmbow", "hand": MM_BOW_DRAWN["hand"]} for name, y, _ in MM_BOW_PULLS}
+
+
+def pull_string(shape, apex_y, apex_x=None):
+    """The model's straight "bowstring" replaced by two segments from its ends to the apex (x apex_x, by default
+    BOW_STRING_APEX_X, and z 8)."""
+    apex_x = BOW_STRING_APEX_X if apex_x is None else apex_x
+    string = next(e for e in shape["elements"] if e["name"] == "bowstring")
+    shape["elements"].remove(string)
+    y_mid = (string["from"][1] + string["to"][1]) / 2
+    half_t = (string["to"][1] - string["from"][1]) / 2
+    for name, tip_x in (("bowstring top", string["to"][0]), ("bowstring bottom", string["from"][0])):
+        dx, dy = apex_x - tip_x, apex_y - y_mid
+        length = math.hypot(dx, dy)
+        shape["elements"].append({
+            "name": name, "from": [tip_x, round(y_mid - half_t, 4), string["from"][2]],
+            "to": [round(tip_x + length, 4), round(y_mid + half_t, 4), string["to"][2]],
+            "rotationOrigin": [tip_x, round(y_mid, 4), 8], "rotationZ": round(math.degrees(math.atan2(dy, dx)), 2),
+            "faces": copy.deepcopy(string["faces"])})
 
 
 WEAPON_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "weapons")
