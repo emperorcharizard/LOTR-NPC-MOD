@@ -3,7 +3,7 @@ name: resume
 description: Where the lotrnpcs work stands and what's next; read first, update before stopping
 ---
 
-# Where we are (updated 2026-11-14, 0.0.141 built, 0.0.139 installed)
+# Where we are (updated 2026-11-15, 0.0.142 installed and tested)
 
 **Latest build:** 0.0.124 (idle wild allies within JoinFightRange, 32, join a fight in hops, `CallIdleAllies`; 0.0.123 used 16) on top of 0.0.122: wild NPCs fight without battle lines (`WildBattleLines`, false by default; recruits in formation keep lines), 0.0.120/0.0.121 pairing removed (owner chose "Back to 0.0.119 fighting"). In game (17:51): Dunlendings 24-2, only 24 of 38 orcs fought (0.0.123: 27, 26-10); 14 orcs stayed alive and never joined, so the call range isn't the cause (see lotrnpcs-0113.md 0.0.124). 0.0.121 (pair by position) ran 28-0 to the Dunlendings and is superseded. Before it, 0.0.119, GitHub release v0.0.119. Commits up to `1a1c32e` and later doc commits on `main`.
 
@@ -62,3 +62,5 @@ And (owner): "not too many conflicting paths": one system decides where a fighti
 3. Sections 1-109 of the checklist were never ticked, although many were tested back then (results in the older notes).
 
 **Test world:** "Emperorcharizars Superflat Place", creative, superflat. The battle area is around 1500 3 300. The owner's hired goblin Muckrot is in the roster; leave it alone.
+
+**2026-11-15 in game:** 0.0.142 installed. Riders now strike (all swings reach the blow; 6 and 9 kills v 10 Dunlendings, no losses) but chase up to ~55 blocks (139.3 open). 0.0.140 blow timing: Mordor won 1 of 3 v Gondor (was 0 of 3). 0.0.141 horses stayed close. Open: 135.1/135.3-5, 136, 137, 138 (needs hiring), 139.3.
