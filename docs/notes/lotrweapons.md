@@ -120,3 +120,12 @@ Full plan: `prompts/player-weapons-mod.md`.
   hold vs NPC, damage, throw, racks, shields, bows, forging. Left in the world: hotbar slot 6 holds the steel
   Gondorian sword (was Medium fertility soil), and a creative left click dug a small hole at about 1501 3 142.
 - 0.0.4: tab name in the game domain.
+- In game 2026-11-14 on 0.0.4: tab reads "LOTR Weapons" (W1.2 done). Ctrl+Shift+right click on open ground says
+  "Requires a solid wall to lean at" (the falx's WallHalves layout, so a wall is needed; not tried against one).
+  Haradrim heavy shield: durability 510, CO block tier 2 / parry tier 4, hangs on the left arm and raises to block
+  on right click. Misty Mountains orc bow: 4.4 piercing, +30% accuracy, held in the right hand; draw not seen (no
+  arrows; the hotbar is full). Still unchecked: steel skins by eye, third-person hold vs NPC, damage on an animal,
+  spear throw, racks, bow draw, forging (W3), CO W6.2. Driving the inventory by computer use stalls (the game's
+  pointer stops following the mouse), so these are better done by the owner. Left in the world: hotbar slot 6 holds
+  the Misty Mountains orc bow, the off-hand the Haradrim heavy shield (slot 6 was Medium fertility soil); a termite
+  mound block stands at about 1500 4 141. tools/game/placerc.ps1: held right click with Ctrl/Shift held.
