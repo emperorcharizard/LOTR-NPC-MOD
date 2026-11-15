@@ -19,6 +19,7 @@ Scripts in `tools/game/`:
 - `chat.ps1`: types chat commands into the game (`-cmds @("/cmd", "wait:500", "key:20")`).
 - `restart.ps1`: `/stop`, quit, installs the newest zip from `releases/`, relaunches and opens the world.
 - `focus.ps1`, `click.ps1` (held click, 1456x819 screenshot coordinates), `look.ps1` (turns the camera), `rc.ps1`, `holdrc.ps1`, `tpclick.ps1`, `hire.ps1`.
+- `install-weapons.ps1`: builds LOTR Weapons from a branch (temporary worktree, Python only) and installs the zip into the Mods folder.
 - `follow.ps1`: keeps the player over the middle of the test NPCs.
 
 Command replies appear in `%APPDATA%\VintagestoryData\Logs\client-chat.log`. Battle CSVs go to the same Logs folder (`/recruits battlelog on|off`, needs `"DebugCommands": true` in `ModConfig/lotrnpcs-factions.json`).
