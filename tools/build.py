@@ -5,6 +5,7 @@ releases/lotrweapons_<version>-test.zip (its --publish is not wired up: ask the 
     python tools/build.py              build, test, zip
     python tools/build.py --no-zip     build and test only (CI)
     python tools/build.py --publish    also upload the zip as GitHub release v<version> (needs `gh auth login` once)
+    python tools/build.py --weapons-only   only LOTR Weapons (no .NET needed)
 
 Run with plain `python`, not `python -I`: the generator needs Pillow, which may live in the user's site-packages.
 """
@@ -96,11 +97,41 @@ def packed(path):
         return data
 
 
+def build_weapons():
+    """LOTR Weapons: generated from the weapon catalog and checked against the lotrnpcs items in GEN."""
+    run([sys.executable, os.path.join(ROOT, "tools", "gen_lotrweapons.py"), LW])
+    run([sys.executable, os.path.join(ROOT, "tools", "tests", "lotrweapons", "check.py"), LW, GEN])
+    run([sys.executable, os.path.join(ROOT, "tools", "tests", "lotrweapons", "patches.py"), LW, LRC_ZIP])
+
+
+def zip_weapons():
+    version = json.load(open(os.path.join(LW, "modinfo.json"), encoding="utf-8"))["version"]
+    os.makedirs(os.path.join(ROOT, "releases"), exist_ok=True)
+    out = os.path.join(ROOT, "releases", f"lotrweapons_{version}-test.zip")
+    with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
+        z.write(os.path.join(LW, "modinfo.json"), "modinfo.json")
+        z.write(os.path.join(ROOT, "tools", "CREDITS-lotrweapons.txt"), "CREDITS.txt")
+        for folder, _, files in os.walk(os.path.join(LW, "assets")):
+            for name in sorted(files):
+                path = os.path.join(folder, name)
+                z.writestr(os.path.relpath(path, LW).replace(os.sep, "/"), packed(path), zipfile.ZIP_DEFLATED, 9)
+    print("wrote", out)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-zip", action="store_true")
     ap.add_argument("--publish", action="store_true")
+    ap.add_argument("--weapons-only", action="store_true",
+                    help="only LOTR Weapons (Python, no .NET): generate, check, releases/lotrweapons_<version>-test.zip")
     opts = ap.parse_args()
+    if opts.weapons_only:
+        shutil.rmtree(GEN, ignore_errors=True)
+        run([sys.executable, os.path.join(ROOT, "tools", "gen_testnpcs.py"), GEN])
+        build_weapons()
+        if not opts.no_zip:
+            zip_weapons()
+        return
     dn = dotnet()
 
     run([dn, "build", "-c", "Release", "-o", "out"], cwd=os.path.join(ROOT, "src"))
@@ -117,9 +148,7 @@ def main():
     dedupe_skins(os.path.join(GEN, "assets", "lotrnpcs"))
     # The second mod, LOTR Weapons (lotrweapons, 2026-11-14): the NPCs' custom weapons as player items, from the same
     # weapon catalog. Its checks compare its hand transforms with the lotrnpcs items just generated.
-    run([sys.executable, os.path.join(ROOT, "tools", "gen_lotrweapons.py"), LW])
-    run([sys.executable, os.path.join(ROOT, "tools", "tests", "lotrweapons", "check.py"), LW, GEN])
-    run([sys.executable, os.path.join(ROOT, "tools", "tests", "lotrweapons", "patches.py"), LW, LRC_ZIP])
+    build_weapons()
     entities = os.path.join(GEN, "assets", "lotrnpcs", "entities")
 
     fac = os.path.join(ROOT, "tools", "tests", "factions")
@@ -152,16 +181,7 @@ def main():
                 # Forward slashes: the game can't read zip entries with backslashes.
                 z.writestr(os.path.relpath(path, GEN).replace(os.sep, "/"), packed(path), zipfile.ZIP_DEFLATED, 9)
     print("wrote", out)
-    lw_version = json.load(open(os.path.join(LW, "modinfo.json"), encoding="utf-8"))["version"]
-    lw_out = os.path.join(ROOT, "releases", f"lotrweapons_{lw_version}-test.zip")
-    with zipfile.ZipFile(lw_out, "w", zipfile.ZIP_DEFLATED) as z:
-        z.write(os.path.join(LW, "modinfo.json"), "modinfo.json")
-        z.write(os.path.join(ROOT, "tools", "CREDITS-lotrweapons.txt"), "CREDITS.txt")
-        for folder, _, files in os.walk(os.path.join(LW, "assets")):
-            for name in sorted(files):
-                path = os.path.join(folder, name)
-                z.writestr(os.path.relpath(path, LW).replace(os.sep, "/"), packed(path), zipfile.ZIP_DEFLATED, 9)
-    print("wrote", lw_out)
+    zip_weapons()
 
     if opts.publish:
         gh = shutil.which("gh") or r"C:\Program Files\GitHub CLI\gh.exe"

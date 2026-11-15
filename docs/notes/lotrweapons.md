@@ -102,3 +102,11 @@ Full plan: `prompts/player-weapons-mod.md`.
   untouched) but changes nothing on about half the weapons (already neutral grey) and greys some wood (Easterling
   scimitar handle). Proposal sheet: previews/lotrweapons-steel-skins-proposal.png (each pair: iron, auto steel).
   Owner to decide: own steel skins, auto rule for chosen weapons only, or leave both metals alike.
+- Owner, 2026-11-15: in-game testing allowed (but Remote Control still won't serve the PC folder to cloud sessions:
+  "not_available", app version or folder location on DESKTOP-JR5ODSO); "Apply the automatic rule, can revise it
+  later"; leave the bowyer trait out; NPCs don't drop these; "It will be its own mod, I just need the zip".
+- 0.0.3: the steel rule applied (STEEL_RULE in gen_lotrweapons.py): 15 weapons get atlas/<key>-steel.png on their
+  steel variant (texturesByType, also on their heads and thrown spears), the boar spear the game's steel ingot,
+  3 keep the owner's steel models, 11 are unchanged (no warm iron in their texture: Dwarven axe, battleaxe, dagger,
+  Rohirric axe, sword, spear, Haradrim curved sword, sword, spear, Misty Mountains sword, Elven longsword).
+  build.py --weapons-only builds only this mod with Python (no .NET); the zip is sent to the owner directly.

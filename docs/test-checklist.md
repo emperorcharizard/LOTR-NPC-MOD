@@ -539,13 +539,14 @@ Install `lotrnpcs_0.0.139-test.zip`; restart fully. DebugCommands on, battle log
 - [ ] 139.2 server-main.log has "[lotrnpcs] rider ... melee:" lines: most swings end in "blow", few "ended without a blow" or "cancelled before the blow".
 - [ ] 139.3 Riders stay within about 20 blocks of the fight (none found more than 30 blocks away afterwards).
 
-## LOTR Weapons W1. Melee weapons as player items (lotrweapons 0.0.2)
+## LOTR Weapons W1. Melee weapons as player items (lotrweapons 0.0.3)
 
-Install `lotrweapons_0.0.2-test.zip` next to lotrnpcs (restart.ps1 installs both); restart fully. Creative world.
+Install `lotrweapons_0.0.3-test.zip` (also `python tools/build.py --weapons-only`, no .NET needed) next to lotrnpcs (restart.ps1 installs both); restart fully. Creative world.
 First without Combat Overhaul (W1-W5), then with it (W6). Nothing here has been in game yet.
 
 - [ ] W1.1 The game loads with no lotrweapons errors in client-main.log / server-main.log (patches "player-animations" and, with CO, "combatoverhaul" applied).
 - [ ] W1.2 The "LOTR Weapons" creative tab lists the 29 weapons in iron and steel ("Iron Gondorian sword" / "Steel Gondorian sword"), their 58 heads, 12 shields and 2 bows. Icons sit inside their slots (offline sheet: previews/lotrweapons-icons-0.0.2.png); fix any with `.tfedit` and note the values.
+- [ ] W1.10 Steel variants look steel: the owner's steel models for Gondor's sword and the dwarven hammers; 15 others re-coloured by the automatic rule (warm iron to light neutral grey, previews/lotrweapons-steel-skins-proposal.png); 11 whose metal is already grey look as their iron (note any that should differ, and any wood the rule greyed, e.g. the Easterling scimitar's handle).
 - [ ] W1.3 Held in third person (F5) each weapon sits in the hand as the NPC holds the same weapon (compare with an NPC of that faction); Gondor's sword and the dwarven war and short hammers show the steel model in their steel variant.
 - [ ] W1.4 First person: the weapon is visible and not through the camera; swings play (falx slash, axe chop, hammer blow, knife stab, spear thrust).
 - [ ] W1.5 Two-handed weapons (Orc poleaxe, Dwarven battleaxe and warhammer, Easterling halberd, Elven longsword, Captain's sword) hold their carry or guard pose between swings and chop with the two-handed chop, as a human, a dwarf and an elf player (LOTR Races and Classes bodies).
@@ -554,13 +555,13 @@ First without Combat Overhaul (W1-W5), then with it (W6). Nothing here has been 
 - [ ] W1.8 Axes chop wood; knives harvest.
 - [ ] W1.9 Each weapon hangs on a tool rack and stands on the ground or against a wall (Ctrl + right click) with its grip where a falx's grip would be; long weapons may poke out (note which).
 
-## LOTR Weapons W2. Shields and bows (lotrweapons 0.0.2)
+## LOTR Weapons W2. Shields and bows (lotrweapons 0.0.3)
 
 - [ ] W2.1 Each of the 12 shields hangs on the left arm as the NPCs carry it (compare with a shielded NPC), blocks (right click) with metal sounds, durability 510.
 - [ ] W2.3 Shields and bows go on a tool rack and stand on the ground (Ctrl + right click) where the game's round shield and recurve bow would.
 - [ ] W2.2 Both bows draw with the string pulling back in three stages, shoot vanilla arrows (damage 4.4), hold like an NPC archer's drawn bow.
 
-## LOTR Weapons W3. Forging (lotrweapons 0.0.2)
+## LOTR Weapons W3. Forging (lotrweapons 0.0.3)
 
 Survival or creative with a forge, anvil, hammer, iron and steel ingots, sticks; for shields an iron boss, hoop and plate.
 
@@ -569,7 +570,7 @@ Survival or creative with a forge, anvil, hammer, iron and steel ingots, sticks;
 - [ ] W3.3 Steel heads give steel weapons.
 - [ ] W3.4 Shields: iron boss, hoop and plate (as the game's metal shield); bows: the recurve bow recipe without the bowyer trait.
 
-## LOTR Weapons W6. With Combat Overhaul (lotrweapons 0.0.2)
+## LOTR Weapons W6. With Combat Overhaul (lotrweapons 0.0.3)
 
 - [ ] W6.1 Swords, axes, maces, polearms, great swords and spears are CO weapons: CO's first-person swings (falx slash, club strikes, great-sword slash, spear thrusts), the NPC swing in third person (another player watching), hits land along the blade.
 - [ ] W6.2 Knives, shields and bows behave as the game's own under CO (no CO patch for them).

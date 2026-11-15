@@ -120,6 +120,9 @@ for name in sorted(os.listdir(os.path.join(A, "itemtypes"))):
                     errors.append(f"{code}: texture {tex} missing")
             elif tex not in GAME_TEXTURES_OK:
                 errors.append(f"{code}: texture {tex} is not one of ours nor a known game texture")
+    for tex in (item.get("texturesByType") or {}).get("*-steel", {}).values():
+        if tex["base"].startswith("lotrweapons:") and not os.path.exists(asset(tex["base"], "textures", ".png")):
+            errors.append(f"{code}: steel texture {tex['base']} missing")
     for key in ("heldTpHitAnimation", "heldTpIdleAnimation", "heldRightReadyAnimation"):
         if key in item and item[key] not in anims_ok:
             errors.append(f"{code}: {key} {item[key]} is on no player body")

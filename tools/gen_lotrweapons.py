@@ -11,7 +11,7 @@ import os
 import shutil
 import sys
 
-VERSION = "0.0.2"
+VERSION = "0.0.3"
 DOMAIN = "lotrweapons"
 FOLDER = "weapon"  # assets/lotrweapons/shapes/item/weapon, textures/item/weapon
 METALS = ["iron", "steel"]
@@ -454,6 +454,46 @@ def display_transforms(rotation, shape, ref="falx"):
     return gui, ground, centre
 
 
+# Steel skins (owner, 2026-11-15: "Apply the automatic rule, can revise it later"). The owner's own iron/steel pairs
+# (Gondor's sword, the dwarven war and short hammers) turn warm brown-grey iron (hue 0.04-0.12, saturation
+# 0.04-0.16, lightness 0.2-0.6) into a lighter, nearly neutral grey: lightness 0.389 l + 0.348, saturation 0.017,
+# hue 0.125 (fitted on 5346 pixels, error 0.027); wood, leather and cloth stay. Every other weapon's steel variant
+# gets its texture put through that rule (atlas/<key>-steel.png) when the rule changes anything; a model painted
+# with the game's iron ingot gets the game's steel ingot. Known miss: some brown wood is greyed (Easterling scimitar).
+STEEL_RULE = {"hue": (0.04, 0.12), "saturation": (0.04, 0.16), "lightness": (0.2, 0.6), "slope": 0.389,
+              "offset": 0.348, "toSaturation": 0.017, "toHue": 0.125}
+GAME_IRON, GAME_STEEL = "game:block/metal/ingot/iron", "game:block/metal/ingot/steel"
+
+
+def steel_textures(key, shape):
+    """The steel variant's texture overrides for a weapon's shape ({} when the rule changes nothing)."""
+    import colorsys
+    from PIL import Image
+    out = {}
+    for code, path in shape["textures"].items():
+        if path == GAME_IRON:
+            out[code] = {"base": GAME_STEEL}
+        elif path.startswith(f"{DOMAIN}:item/{FOLDER}/atlas/"):
+            src = os.path.join(A, "textures", path.split(":", 1)[1] + ".png")
+            img = Image.open(src).convert("RGBA")
+            px, r, changed = img.load(), STEEL_RULE, 0
+            for y in range(img.height):
+                for x in range(img.width):
+                    red, green, blue, alpha = px[x, y]
+                    if not alpha:
+                        continue
+                    h, l, s = colorsys.rgb_to_hls(red / 255, green / 255, blue / 255)
+                    if r["hue"][0] <= h <= r["hue"][1] and r["saturation"][0] <= s <= r["saturation"][1] \
+                            and r["lightness"][0] <= l <= r["lightness"][1]:
+                        rgb = colorsys.hls_to_rgb(r["toHue"], r["slope"] * l + r["offset"], r["toSaturation"])
+                        px[x, y] = tuple(round(v * 255) for v in rgb) + (alpha,)
+                        changed += 1
+            if changed:
+                img.save(src[:-4] + "-steel.png", optimize=True)
+                out[code] = {"base": path + "-steel"}
+    return out
+
+
 def write_items():
     own = C.own_weapon_textures()
     bundled = set()
@@ -465,6 +505,7 @@ def write_items():
     write_shields(own, bundled, lang)
     write_bows(own, bundled, lang)
     C.copy_own_textures(bundled, own, A, FOLDER)
+    steel = {key: steel_textures(key, shapes[key]) for key in WEAPONS if key not in STEEL_MODEL}
     for key, (code, kind, name) in WEAPONS.items():
         w, k = C.MELEE[key], KINDS[kind]
         gui, ground, centre = display_transforms(w["rotation"], shapes[key])
@@ -474,6 +515,7 @@ def write_items():
             "code": code, "class": k["class"], "tags": ["weapon", "weapon-melee"], "damagedby": k["damagedby"],
             "variantgroups": [{"code": "metal", "states": METALS}],
             "shapeByType": {f"*-steel": {"base": f"{DOMAIN}:item/{FOLDER}/{STEEL_MODEL[key]}"}, "*": shape} if key in STEEL_MODEL else None,
+            "texturesByType": {"*-steel": steel[key]} if steel.get(key) else None,
             "shape": None if key in STEEL_MODEL else shape,
             "maxstacksize": 1,
             "attributes": {"heldItemPitchFollow": 0.9, "handbook": {"groupBy": [code + "-*"]}, "rackable": True,
@@ -507,7 +549,7 @@ def write_items():
             item["attributes"] |= {"damageByType": {f"*-{m}": better(k["thrown"][m]) for m in METALS},
                                    "damageTierByType": {f"*-{m}": k["thrownTier"][m] for m in METALS},
                                    "spearEntityCodeByType": {"*": f"{DOMAIN}:thrown-{code}-{{metal}}"}}
-            write_thrown_spear(code, key, w, centre)
+            write_thrown_spear(code, key, w, centre, steel.get(key))
         write(f"itemtypes/{code}.json", {k2: v for k2, v in item.items() if v is not None})
         for m in METALS:
             lang[f"item-{code}-{m}"] = f"{m.capitalize()} {name[0].lower() + name[1:] if name.startswith(('Orc', 'Captain')) else name}"
@@ -673,9 +715,9 @@ def write_forging(lang, shapes):
         head = f"head-{code}"
         weapon = json.load(open(os.path.join(A, "itemtypes", f"{code}.json")))
         texture_key = next(iter(shapes[key]["textures"]))
-        write(f"itemtypes/{head}.json", {
+        write(f"itemtypes/{head}.json", {k2: v for k2, v in {
             "code": head, "variantgroups": [{"code": "metal", "states": METALS}], "maxstacksize": 4,
-            "shape": weapon.get("shape"), "shapeByType": weapon.get("shapeByType"),
+            "shape": weapon.get("shape"), "shapeByType": weapon.get("shapeByType"), "texturesByType": weapon.get("texturesByType"),
             "behaviors": [{"name": "Quenchable"}, {"name": "GroundStorable", "properties": {
                 "layout": "SingleCenter", "collisionBox": {"x1": 0, "y1": 0, "z1": 0, "x2": 1, "y2": 0.125, "z2": 1}}}],
             "heldTpUseAnimation": "interactstatic", "particlesTextureCode": texture_key,
@@ -683,7 +725,7 @@ def write_forging(lang, shapes):
             "creativeinventory": {"general": ["*"], "items": ["*"], "lotrweapons": ["*"]},
             "guiTransform": weapon["guiTransform"], "groundTransform": weapon["groundTransform"],
             "tpHandTransform": weapon["tpHandTransform"],
-        })
+        }.items() if v is not None})
         for m in METALS:
             lang[f"item-{head}-{m}"] = f"{m.capitalize()} {name[0].lower() + name[1:] if name.startswith(('Orc', 'Captain')) else name} head"
         write(f"recipes/smithing/{code}.json", {
@@ -739,7 +781,7 @@ def write_descriptions(lang):
         lang[f"itemdesc-{code}"] = f"Carried by {people_of(code)}. Made like a recurve bow."
 
 
-def write_thrown_spear(code, key, w, centre):
+def write_thrown_spear(code, key, w, centre, steel=None):
     """A thrown spear, as the game's (survival/entities/nonliving/projectile/spear.json): the same shape, flying tip
     first along +X. The game draws its thrown spear at full size, 1.25 times its in-hand size; ours keeps that ratio."""
     physics = {"code": "passivephysics", "groundDragFactor": 1, "airDragFactor": 0.25, "gravityFactor": 0.75}
@@ -751,6 +793,7 @@ def write_thrown_spear(code, key, w, centre):
         "client": {"renderer": "Shape", "size": round(w.get("scale", C.WEAPON_SCALE) / FALX_HAND_SCALE, 3),
                    "shape": {"base": f"{DOMAIN}:item/{FOLDER}/{key}", "offsetX": -centre["x"]}
                    | ({"rotateY": turn["y"]} if turn.get("y") else {}),
+                   **({"texturesByType": {"*-steel": steel}} if steel else {}),
                    "behaviors": [physics, {"code": "interpolateposition"}]},
         "server": {"behaviors": [physics, {"code": "despawn", "minSeconds": 600}, {"code": "entitystatetags"}]},
         "sounds": {},
@@ -768,9 +811,10 @@ def main():
     with open(os.path.join(out, "modinfo.json"), "w") as f:
         json.dump({
             "type": "content", "modid": DOMAIN, "name": "LOTR Weapons", "version": VERSION,
-            "description": "Middle-earth weapons for players, in iron and steel: the swords, axes, hammers, spears and "
-                           "polearms of Mordor, the Misty Mountains, Gondor, Rohan, the dwarves, the elves, Harad, the "
-                           "Easterlings and the Black Numenoreans.",
+            "description": "Middle-earth weapons for players: the swords, axes, hammers, spears and polearms of Mordor, the "
+                           "Misty Mountains, Gondor, Rohan, the dwarves, the elves, Harad, the Easterlings and the Black "
+                           "Numenoreans in iron and steel, forged on the anvil, with their shields and orc bows. Works "
+                           "with or without Combat Overhaul.",
             "authors": ["Emperorcharizar"],
             "side": "Universal", "requiredOnClient": True, "requiredOnServer": True,
         }, f, indent=2)
