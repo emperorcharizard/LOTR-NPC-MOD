@@ -544,7 +544,7 @@ Install `lotrnpcs_0.0.139-test.zip`; restart fully. DebugCommands on, battle log
 Install `lotrweapons_0.0.3-test.zip` (also `python tools/build.py --weapons-only`, no .NET needed) next to lotrnpcs (restart.ps1 installs both); restart fully. Creative world.
 First without Combat Overhaul (W1-W5), then with it (W6). Nothing here has been in game yet.
 
-- [ ] W1.1 The game loads with no lotrweapons errors in client-main.log / server-main.log (patches "player-animations" and, with CO, "combatoverhaul" applied).
+- [x] W1.1 The game loads with no lotrweapons errors in client-main.log / server-main.log (patches "player-animations" and, with CO, "combatoverhaul" applied).
 - [ ] W1.2 The "LOTR Weapons" creative tab lists the 29 weapons in iron and steel ("Iron Gondorian sword" / "Steel Gondorian sword"), their 58 heads, 12 shields and 2 bows. Icons sit inside their slots (offline sheet: previews/lotrweapons-icons-0.0.2.png); fix any with `.tfedit` and note the values.
 - [ ] W1.10 Steel variants look steel: the owner's steel models for Gondor's sword and the dwarven hammers; 15 others re-coloured by the automatic rule (warm iron to light neutral grey, previews/lotrweapons-steel-skins-proposal.png); 11 whose metal is already grey look as their iron (note any that should differ, and any wood the rule greyed, e.g. the Easterling scimitar's handle).
 - [ ] W1.3 Held in third person (F5) each weapon sits in the hand as the NPC holds the same weapon (compare with an NPC of that faction); Gondor's sword and the dwarven war and short hammers show the steel model in their steel variant.

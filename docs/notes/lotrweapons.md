@@ -110,3 +110,13 @@ Full plan: `prompts/player-weapons-mod.md`.
   3 keep the owner's steel models, 11 are unchanged (no warm iron in their texture: Dwarven axe, battleaxe, dagger,
   Rohirric axe, sword, spear, Haradrim curved sword, sword, spear, Misty Mountains sword, Elven longsword).
   build.py --weapons-only builds only this mod with Python (no .NET); the zip is sent to the owner directly.
+- In game 2026-11-14 on 0.0.3 (with Combat Overhaul, the owner's modpack): loads clean (no lotrweapons errors or
+  warnings; the 33 patch errors are the armour mods' own co.json). Creative tab lists 130 items (58 weapons, 58 heads,
+  12 shields, 2 bows), icons inside their slots, names right ("Iron/Steel Dwarven battleaxe"), heads use the whole
+  weapon model as designed. Tab label read "tabname-lotrweapons": the key must be in the game domain, as lotrnpcs
+  learned (fix = 0.0.4). Under CO the steel Gondorian sword shows 4.4, tier 7 (matches W6.3); battleaxe 5.3 / 5.8.
+  First person the steel sword is visible, not through the camera, and swings with CO's slash. Ctrl+Shift+right
+  click on the ground did not place it (computer-use click may not count; owner to try). Not checked: third-person
+  hold vs NPC, damage, throw, racks, shields, bows, forging. Left in the world: hotbar slot 6 holds the steel
+  Gondorian sword (was Medium fertility soil), and a creative left click dug a small hole at about 1501 3 142.
+- 0.0.4: tab name in the game domain.

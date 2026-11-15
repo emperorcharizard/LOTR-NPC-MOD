@@ -11,7 +11,7 @@ import os
 import shutil
 import sys
 
-VERSION = "0.0.3"
+VERSION = "0.0.4"
 DOMAIN = "lotrweapons"
 FOLDER = "weapon"  # assets/lotrweapons/shapes/item/weapon, textures/item/weapon
 METALS = ["iron", "steel"]
@@ -501,7 +501,8 @@ def write_items():
     for key in list(WEAPONS) + list(STEEL_MODEL.values()):
         shapes[key] = C.weapon_shape(key, C.MELEE[key], own, bundled, DOMAIN, A, FOLDER)
         write(f"shapes/item/{FOLDER}/{key}.json", shapes[key])
-    lang = {"tabname-lotrweapons": "LOTR Weapons"}
+    # The creative tab's name is looked up in the game domain (in game 2026-11-14 the tab read "tabname-lotrweapons").
+    lang = {"game:tabname-lotrweapons": "LOTR Weapons", "tabname-lotrweapons": "LOTR Weapons"}
     write_shields(own, bundled, lang)
     write_bows(own, bundled, lang)
     C.copy_own_textures(bundled, own, A, FOLDER)
