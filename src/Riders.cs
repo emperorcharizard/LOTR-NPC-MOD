@@ -166,6 +166,9 @@ namespace LotrNpcs
         public const long SwingHoldMs = 600;
         public static bool SwingPending(long swingMs, long now) => swingMs > 0 && now - swingMs < SwingHoldMs;
 
+        /// <summary>0.0.142: a mounted rider's blow is due damageAtMs after its swing started (no facing needed).</summary>
+        public static bool BlowDue(long startedMs, long damageAtMs, long now) => startedMs > 0 && now - startedMs >= damageAtMs;
+
         /// <summary>0.0.141 (rider test 2026-11-14 103125: riders ended more than 100 blocks away and the fight stalled): a
         /// mount is driven only by its rider's behavior, which sets its controls every 100 ms. When the rider stops ticking
         /// (Synergy freezes creatures far from players, the chunk unloads) the mount kept its last gallop and ran on in a
@@ -506,6 +509,11 @@ namespace LotrNpcs
             Riders.ChargeState cs = Riders.ChargeOf(rider);
             long now = rider.World.ElapsedMilliseconds;
             if (kept == null) { cs.Phase = Riders.ChargePhase.Hold; cs.HitThisPass = false; }
+            else if (cs.Phase == Riders.ChargePhase.Hold && Riders.SwingPending(cs.SwingMs, now) && swing?.TargetEntity != null)
+            {
+                // 0.0.142 (in game 2026-11-15: 8 swings begun standing turned into a ride-out at once, the focus being
+                // within ChargeMin): a swing begun standing finishes standing; the mount faces the foe below.
+            }
             else if (cs.Phase != Riders.ChargePhase.Hold && Riders.SwingPending(cs.SwingMs, now) && swing?.TargetEntity is Entity struck)
             {
                 // 0.0.139: swing first: straight at the one it swings at until the blow falls.

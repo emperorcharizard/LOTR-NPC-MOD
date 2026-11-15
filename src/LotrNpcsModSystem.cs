@@ -342,6 +342,10 @@ namespace LotrNpcs
                 if (animMeta != null && entity.AnimManager?.IsAnimationActive(animMeta.Animation) == true) swingStarted = true;
                 else if (now - startedMs <= MaxTurnWaitMs) lastCheckOrAttackMs = now;
             }
+            // 0.0.142 (in game 2026-11-15: 58 of 66 rider swings ran their full 900 ms without a blow): the game's own
+            // blow needs the attacker to face its target, and a seated rider faces where its mount goes. A mounted
+            // rider's blow falls on time here instead; attackTarget checks reach and logs a miss as out of reach.
+            if (!struck && (entity as EntityAgent)?.MountedOn != null && Riders.BlowDue(startedMs, damagePlayerAtMs, entity.World.ElapsedMilliseconds)) attackTarget();
             bool go = base.ContinueExecute(dt);
             if (!go) RiderLog(struck ? "done" : "ended without a blow (ContinueExecute false)");
             return go;
@@ -372,6 +376,8 @@ namespace LotrNpcs
 
         protected override void attackTarget()
         {
+            // 0.0.142: one blow a swing (a rider's may already have fallen in ContinueExecute).
+            if (struck) return;
             struck = true;
             Riders.SwingDone(entity);
             RiderLog("blow" + (targetEntity != null && hasDirectContact(targetEntity, minDist, minVerDist) ? "" : " (out of reach)"));

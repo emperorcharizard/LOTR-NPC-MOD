@@ -552,3 +552,10 @@ Install `lotrnpcs_0.0.141-test.zip`; restart fully. DebugCommands on.
 
 - [ ] 141.1 After the 139 rider tests, `/entity cmd e[type=lotrnpcs:test-rohan-rider,range=60] kill` finds all the riders still alive (none ran off beyond 60 blocks); no riderless-looking horse gallops on in a straight line.
 - [ ] 141.2 Fly about 60 blocks away from a rider fight (past Synergy's 48-block freeze) for 20 s and come back: the riders' horses stand where they were frozen instead of having galloped off.
+
+## 142. Mounted riders' blows fall on time (0.0.142)
+
+Install `lotrnpcs_0.0.142-test.zip`; restart fully. DebugCommands on, battle log on.
+
+- [ ] 142.1 3 Rohan riders v 10 Dunlending warriors, twice: server-main.log "rider N melee:" lines mostly "blow" (not "ended without a blow"); the battle log shows rider melee rows several times the 4 of 2026-11-15 and some charge hits; riders kill Dunlendings.
+- [ ] 142.2 A rider swinging while standing next to its foe stays put until the blow (no ride-out mid-swing).
