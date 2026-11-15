@@ -535,27 +535,27 @@ Install `lotrnpcs_0.0.138-test.zip`; restart fully.
 
 Install `lotrnpcs_0.0.139-test.zip`; restart fully. DebugCommands on, battle log on.
 
-- [ ] 139.1 3 Rohan riders v 10 Dunlending warriors (riders at z 126, Dunlendings at z 142), twice: the CSV has rider melee rows (landed, some nocontact), the summary shows rohan charge hits, and riders kill some Dunlendings.
-- [ ] 139.2 server-main.log has "[lotrnpcs] rider ... melee:" lines: most swings end in "blow", few "ended without a blow" or "cancelled before the blow".
-- [ ] 139.3 Riders stay within about 20 blocks of the fight (none found more than 30 blocks away afterwards).
+- [x] 139.1 3 Rohan riders v 10 Dunlending warriors (riders at z 126, Dunlendings at z 142), twice: the CSV has rider melee rows (landed, some nocontact), the summary shows rohan charge hits, and riders kill some Dunlendings. *2026-11-15 on 0.0.142 (0.0.139-0.0.141 still failed): 47/72 and 61/82 rider rows landed, 14 and 19 charge hits, 6 and 9 kills, 0 rider deaths.*
+- [x] 139.2 server-main.log has "[lotrnpcs] rider ... melee:" lines: most swings end in "blow", few "ended without a blow" or "cancelled before the blow". *0.0.142: 77 and 88 swings, every one reached its blow (52+25 and 66+22 out of reach), none ended without one.*
+- [ ] 139.3 Riders stay within about 20 blocks of the fight (none found more than 30 blocks away afterwards). *0.0.142: farthest 56 and 53 blocks from the centre, while still fighting (chasing Dunlendings), not loose; 141 kept the horses from running off.*
 
 ## 140. One blow time for every melee weapon (0.0.140)
 
 Install `lotrnpcs_0.0.140-test.zip`; restart fully. Battle log on.
 
-- [ ] 140.1 9 Gondor warriors v 9 Mordor orc warriors, three times (as on 2026-11-14: Gondor at z 128 / Mordor at z 142, swapped, side by side): about even (Mordor wins at least one), not 3 of 3 to Gondor.
+- [x] 140.1 9 Gondor warriors v 9 Mordor orc warriors, three times (as on 2026-11-14: Gondor at z 128 / Mordor at z 142, swapped, side by side): about even (Mordor wins at least one), not 3 of 3 to Gondor. *2026-11-15: Mordor 9-5, Gondor 9-4, Gondor 9-3 (was 3 of 3 to Gondor); Mordor still took more back hits (26-35 v 20-38).*
 - [ ] 140.2 Axes and hammers swing visibly faster than on 0.0.139 and spears and knives a little slower, but the blade still meets the target when the hit lands (no hit before the blow).
 
 ## 141. Mounts stop when their rider stops steering (0.0.141)
 
 Install `lotrnpcs_0.0.141-test.zip`; restart fully. DebugCommands on.
 
-- [ ] 141.1 After the 139 rider tests, `/entity cmd e[type=lotrnpcs:test-rohan-rider,range=60] kill` finds all the riders still alive (none ran off beyond 60 blocks); no riderless-looking horse gallops on in a straight line.
+- [x] 141.1 After the 139 rider tests, `/entity cmd e[type=lotrnpcs:test-rohan-rider,range=60] kill` finds all the riders still alive (none ran off beyond 60 blocks); no riderless-looking horse gallops on in a straight line. *2026-11-15: every rider found within 40-60 blocks after each run.*
 - [ ] 141.2 Fly about 60 blocks away from a rider fight (past Synergy's 48-block freeze) for 20 s and come back: the riders' horses stand where they were frozen instead of having galloped off.
 
 ## 142. Mounted riders' blows fall on time (0.0.142)
 
 Install `lotrnpcs_0.0.142-test.zip`; restart fully. DebugCommands on, battle log on.
 
-- [ ] 142.1 3 Rohan riders v 10 Dunlending warriors, twice: server-main.log "rider N melee:" lines mostly "blow" (not "ended without a blow"); the battle log shows rider melee rows several times the 4 of 2026-11-15 and some charge hits; riders kill Dunlendings.
-- [ ] 142.2 A rider swinging while standing next to its foe stays put until the blow (no ride-out mid-swing).
+- [x] 142.1 3 Rohan riders v 10 Dunlending warriors, twice: server-main.log "rider N melee:" lines mostly "blow" (not "ended without a blow"); the battle log shows rider melee rows several times the 4 of 2026-11-15 and some charge hits; riders kill Dunlendings. *2026-11-15: see 139.1/139.2.*
+- [x] 142.2 A rider swinging while standing next to its foe stays put until the blow (no ride-out mid-swing). *2026-11-15: 16 and 29 swings begun standing reached their blow still standing.*
