@@ -774,7 +774,8 @@ Each side spends about 60 coins at its live hire prices (`/recruits faction list
 
 Owner, 2026-11-16, chose "Stronger captains overall" (so a captain beats a rider that beats 2 warriors). Captains have 96 health and 10.5 damage (were 48 and 7); config version 33 moves a captain still at 48 or 7. The captain x2.5 on riders from 0.0.152 is gone; riders keep x2 on archers.
 
-- [ ] 153.1 1 Rohan rider v 1 Dunlending captain: the captain wins.
+- [x] 153.1 1 Rohan rider v 1 Dunlending captain: the captain wins.
+  - 2026-11-16 on 0.0.153: captain dealt 32 (rider left on 2 of 34, then stood off), rider dealt 46 of the captain's 96, by 172 s (log 104729).
 - [ ] 153.2 1 Dunlending captain v 2 Dunlending warriors: the captain wins.
 - [ ] 153.3 A hired captain from before keeps its wounds and gets 96 max health after the update.
 
