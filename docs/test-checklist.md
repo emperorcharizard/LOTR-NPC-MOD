@@ -778,6 +778,7 @@ Owner, 2026-11-16, chose "Stronger captains overall" (so a captain beats a rider
   - 2026-11-16 on 0.0.153: captain dealt 32 (rider left on 2 of 34, then stood off), rider dealt 46 of the captain's 96, by 172 s (log 104729).
 - [ ] 153.2 1 Dunlending captain v 2 Dunlending warriors: the captain wins.
 - [ ] 153.3 0.0.155 (owner: "keep this within reason for players to be able to kill in equivalent armor and weapons", "Aka for captains, iron and steel"): captains are back to 48 health and 7 damage against players; config version 34 moves 96/10.5 back. A player in iron or steel armor with an iron or steel weapon can kill a captain one on one. Against NPCs the captain still hits x1.5 and takes x0.5 (redo 153.1 and 153.2 on 0.0.155).
+  - 2026-11-16 on 0.0.155, 1 rider v 1 captain: captain dealt 37 (rider 34 health) and took 19 of 48 by 153 s, captain wins (log 105929). Player side not tested yet.
 
 ## 154. Guard and shock recruits (0.0.154)
 

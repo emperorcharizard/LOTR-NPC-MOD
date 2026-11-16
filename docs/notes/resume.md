@@ -3,7 +3,9 @@ name: resume
 description: Where the lotrnpcs work stands and what's next; read first, update before stopping
 ---
 
-# Where we are (updated 2026-11-16, 0.0.150 being installed; Synergy activation range OFF for rider tests, turn it back ON after)
+# Where we are (updated 2026-11-16, 0.0.155 installed; Synergy activation range set back ON for the next game start)
+
+**2026-11-16 later (0.0.150-0.0.155):** owner's rider role: beat 2 warriors, lose to a captain, harass archers. Riders at a warrior's numbers (0.0.150), go for archers and hit them x2 (0.0.151/152), captains x1.5 dealt / x0.5 taken against NPCs only (0.0.155; 0.0.153's 96/10.5 reverted because players in iron/steel must be able to kill captains). In game: 1 rider beat 2 warriors; 3 riders beat 5 warriors + 3 archers 5-0 (archers first); captain beat rider on 0.0.153 and 0.0.155. 0.0.154 guard and shock recruits (hire menu + free "Train as"), untested in game: computer use can't hold right-click to open the talk menu, so the owner tries 154.1-154.4. Checklist 151 has every faction pair with a rank pairing (owner asked). Open: rider price (51, worth ~30), invisible iseng dunlendinghelmetheavier2 on Dunlending captains (empty step-parent in the Isengard mod's shape; drop it from gen picks?).
 
 **2026-11-16, riders (owner target "3 riders should beat 5-7 warriors"):** 0.0.149 (1.5x) still won 3 v 6 6-0 and 3 v 8 8-0 with no rider lost; 148.1 (horses gallop) passed. 0.0.150 sets RiderScale 1.0 (a warrior's numbers on a horse); next: test 150.1 (3 v 6, 3 v 8), set Synergy's activation range back ON, then ask the owner about the rider price (51, now worth about 30).
 
