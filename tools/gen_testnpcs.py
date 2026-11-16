@@ -1470,10 +1470,13 @@ TEST_NPCS = [
 # Riders.cs uses the first ones that exist in the world, and offers no rider rank when none do.
 HORSES = [f"feverstonewilds:horse-tamed-{g}-{t}" for t in ("quarter", "shire") for g in ("male", "female")]
 DIREWOLVES = [f"feverstonewilds:tame-direwolf-{g}" for g in ("male", "female")]
-ELK = [f"game:tameddeer-elk-{g}-adult" for g in ("male", "female")]
+# 0.0.156 (owner: "have them ride elk (male)"): bulls only.
+ELK = ["game:tameddeer-elk-male-adult"]
 GIANT_BOARS = [f"teapotsgiantboar:tame-giantboar-giant-{t}-male" for t in ("01", "02", "03", "04", "05")]     + [f"teapotsgiantboar:tame-giantboar-giant-{t}-female" for t in ("01", "02")]
 MOUNTS_OF = {"gondor": HORSES, "rohan": HORSES, "dale": HORSES, "arnor": HORSES,
              "uruk": DIREWOLVES, "mordororc": DIREWOLVES, "gundabadorc": DIREWOLVES, "angmarorc": DIREWOLVES,
+             # 0.0.156 (owner: "misty mountain orcs dont have a rider class"): goblins ride dire wolves too.
+             "goblin": DIREWOLVES,
              "elf": ELK, "dwarf": GIANT_BOARS}
 TEST_NPCS += [(code.removesuffix("-warrior") + "-rider", name.removesuffix(" warrior") + " rider", model, skin, gear)
               for code, name, model, skin, gear in list(TEST_NPCS)
@@ -1693,9 +1696,10 @@ def prefix_and_creature(name):
 TALK = {
     "talk-opt-hire": "I'd like to hire you. ({0} × {1})",
     "talk-opt-hire-free": "I'd like to hire you.",
-    "talk-opt-hire-as": "I'd like to hire you as a {2}. ({0} × {1})",
-    "talk-opt-hire-as-free": "I'd like to hire you as a {2}.",
-    "talk-opt-class": "Train as a {0} instead.",
+    "talk-opt-class-menu": "Let me change your class.",
+    "talk-opt-class": "Train as a {0}.",
+    "talk-opt-class-no": "Never mind, stay as you are.",
+    "talk-class-ask": "What should I train as?",
     "talk-opt-ask": "I have a question.",
     "talk-opt-follow": "Follow me.",
     "talk-opt-hold": "Hold your position here.",
@@ -2121,7 +2125,7 @@ with open(os.path.join(out, "modinfo.json"), "w") as f:
         "type": "code",
         "modid": "lotrnpcs",
         "name": "LOTR NPCs",
-        "version": "0.0.155",
+        "version": "0.0.156",
         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Race models from "
                        "LOTR Races and Classes by Dango Dango Dango, Shakgriig and Buggoi, used with their permission.",

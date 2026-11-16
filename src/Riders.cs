@@ -63,7 +63,7 @@ namespace LotrNpcs
         public const double StopDistance = 0.5;
         /// <summary>0.0.126: in a fight with no path to follow, the mount walks in until its enemy is this close
         /// (centers, horizontally), inside a rider's reach from the saddle (MountedReach), instead of parking out of reach.</summary>
-        public const double CloseInDistance = 2.5;
+        public const double CloseInDistance = 2.25;  // 0.0.156: inside the shorter reach (2 + MountedExtraReach)
 
         /// <summary>Stand, walk or run: stand at the waypoint, walk for slow tasks (taskSpeed below RunTaskSpeed), else
         /// run while the rider sprints or its next waypoint is more than 3 blocks off.</summary>
@@ -273,8 +273,10 @@ namespace LotrNpcs
         public static double CloseInSpeed(double enemyDistance) => enemyDistance > CloseInDistance ? WalkSpeed : 0;
 
         /// <summary>The extra horizontal reach from the saddle. 0.0.125 (owner, 2026-11-13: "a bit longer attack range to
-        /// compensate for the height difference"): a block (was half a block, the mount's body only).</summary>
-        public const float MountedExtraReach = 1f;
+        /// compensate for the height difference"): a block (was half a block, the mount's body only). 0.0.156 (owner,
+        /// 2026-11-16: foot soldiers "cannot get a swing off in time before the rider hits them, knocks them back then rides
+        /// off ... maybe their range is too long now"): half a block again.</summary>
+        public const float MountedExtraReach = 0.5f;
 
         /// <summary>How much farther (horizontally, vertically) a mounted NPC's melee reaches: MountedExtraReach, and the
         /// height its seat lifts it above the mount's feet. (0, 0) on foot.</summary>

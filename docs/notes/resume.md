@@ -3,7 +3,9 @@ name: resume
 description: Where the lotrnpcs work stands and what's next; read first, update before stopping
 ---
 
-# Where we are (updated 2026-11-16, 0.0.155 installed; Synergy activation range set back ON for the next game start)
+# Where we are (updated 2026-11-16, 0.0.155 installed, 0.0.156 built; Synergy activation range set back ON for the next game start)
+
+**0.0.156 (2026-11-16):** owner tested 154.1/154.2 by hand (work), then asked for one hire option and a "Let me change your class" page in the own menu; built, not installed. Owner also reported a broken shield texture on a Misty Mountains guard recruit (screenshot: kite shield with noisy black/white pattern).
 
 **2026-11-16 later (0.0.150-0.0.155):** owner's rider role: beat 2 warriors, lose to a captain, harass archers. Riders at a warrior's numbers (0.0.150), go for archers and hit them x2 (0.0.151/152), captains x1.5 dealt / x0.5 taken against NPCs only (0.0.155; 0.0.153's 96/10.5 reverted because players in iron/steel must be able to kill captains). In game: 1 rider beat 2 warriors; 3 riders beat 5 warriors + 3 archers 5-0 (archers first); captain beat rider on 0.0.153 and 0.0.155. 0.0.154 guard and shock recruits (hire menu + free "Train as"), untested in game: computer use can't hold right-click to open the talk menu, so the owner tries 154.1-154.4. Checklist 151 has every faction pair with a rank pairing (owner asked). Open: rider price (51, worth ~30), invisible iseng dunlendinghelmetheavier2 on Dunlending captains (empty step-parent in the Isengard mod's shape; drop it from gen picks?).
 

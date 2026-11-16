@@ -47,7 +47,7 @@ public static class Program {
         Check(!types["test-uruk"].Attributes["lotrnpcsRank"].Exists && !types["test-goblin"].Attributes["lotrnpcsRank"].Exists, "rankless NPCs have no rank (so zones never spawn them)");
         Check(types["test-hobbit"].Attributes["lotrnpcsRank"].AsString() == "recruit", "hobbits count as the Shire's recruits");
         Check(types.Values.All(t => FactionConfig.DefaultFactions().ContainsKey(t.Attributes["lotrnpcsFaction"].AsString())), "every NPC's faction is in the default config");
-        Check(!types.ContainsKey("test-gondor") && !types.ContainsKey("test-dwarf") && types.Count == 149, "the unarmored Gondor, Rohan, Dunlending, Easterling and Dwarf NPCs are replaced by ranked ones (" + types.Count + " NPCs)");
+        Check(!types.ContainsKey("test-gondor") && !types.ContainsKey("test-dwarf") && types.Count == 150, "the unarmored Gondor, Rohan, Dunlending, Easterling and Dwarf NPCs are replaced by ranked ones (" + types.Count + " NPCs)");
 
         TestAgent Npc(string code) { var e = new TestAgent(); e.SetProps(types[code]); SetCode(e, types[code].Code); return e; }
         long nextId = 1;
@@ -219,7 +219,7 @@ public static class Program {
         File.WriteAllText("factions-default.json", text);
 
         // ---- hiring (0.0.37) ----
-        Check(types.Count == 149, "every NPC has the recruit behavior on both sides and the follow task (checked per file above)");
+        Check(types.Count == 150, "every NPC has the recruit behavior on both sides and the follow task (checked per file above)");
         var lang = JObject.Parse(File.ReadAllText(Path.Combine(argv[0], "..", "lang", "en.json")));
         var factionIds = FactionConfig.DefaultFactions().Keys.ToList();
         Check(factionIds.All(f => lang["talk-greet-" + f + "-1"] != null && lang["talk-greet-" + f + "-2"] != null && lang["talk-hired-" + f] != null
@@ -964,8 +964,8 @@ public static class Program {
             "0.0.125: riders prefer spears (3x their weight on foot), warriors on foot are unchanged");
         Check(Riders.IsLegAnimation(new AnimationMetaData { Code = "sprint", Animation = "sprint" }) && Riders.IsLegAnimation(new AnimationMetaData { Code = "idle", Animation = "idle1" })
             && !Riders.IsLegAnimation(new AnimationMetaData { Code = "rideelk-walk", Animation = "rideelk-walk" }) && !Riders.IsLegAnimation(new AnimationMetaData { Code = "hit", Animation = "hit" })
-            && !Riders.IsLegAnimation(null) && new[] { "rideelk-idle", "rideelk-walk", "rideelk-run" }.All(bodyAnims.Contains) && Riders.MountedExtraReach == 1f && Riders.MountedReach(null) == (0f, 0f),
-            "0.0.125: a seated rider skips walk, run and idle (its body has the riding poses), and reaches a block farther from the saddle");
+            && !Riders.IsLegAnimation(null) && new[] { "rideelk-idle", "rideelk-walk", "rideelk-run" }.All(bodyAnims.Contains) && Riders.MountedExtraReach == 0.5f && Riders.MountedReach(null) == (0f, 0f),
+            "0.0.125: a seated rider skips walk, run and idle (its body has the riding poses), and reaches half a block farther from the saddle (a block in 0.0.125-0.0.155)");
         var weaponEntries = HeldWeapon(entityFiles["test-mordororc-warrior"], "server")["weapons"].ToList();
         var entityAnims = entityFiles["test-mordororc-warrior"]["client"]["animations"].ToDictionary(a => (string)a["code"]);
         bool animsOk = true, itemsOk = true, texturesOk = true;
@@ -1017,7 +1017,7 @@ public static class Program {
         bool speedsOk = weaponEntries.All(w => { var m = entityAnims[(string)w["attackAnimation"]]; return (string)m["blendMode"] == "Average" && (float)m["elementWeight"]["UpperArmR"] > (float)m["elementWeight"]["UpperFootR"] * 10; });
         Check(speedsOk, "swings take over the arms and torso but leave the legs to walking and running");
         var melee = entityFiles.Values.Select(e => e["server"]["behaviors"].First(b => (string)b["code"] == "taskai")["aitasks"].First(t => (string)t["code"] == "lotrnpcs:meleeattack")).ToList();
-        Check(melee.Count == 149 && melee.All(t => (int)t["mincooldown"] == 1700 && (int)t["maxcooldown"] == 2100 && (int)t["attackDurationMs"] == 900 && (int)t["damagePlayerAtMs"] == 400 && (string)t["animation"] == "hit"),
+        Check(melee.Count == 150 && melee.All(t => (int)t["mincooldown"] == 1700 && (int)t["maxcooldown"] == 2100 && (int)t["attackDurationMs"] == 900 && (int)t["damagePlayerAtMs"] == 400 && (string)t["animation"] == "hit"),
             "every NPC waits 1700 to 2100 ms between swings (0.0.108: 0.5 s less than 0.0.44), with the same swing length, hit timing and unarmed punch");
         Check(entityFiles["test-mordororc-captain"]["server"]["behaviors"].First(b => (string)b["code"] == "taskai")["aitasks"].First(t => (string)t["code"] == "lotrnpcs:meleeattack").Value<double>("damage") == 7
             && (int)melee.First()["damageTier"] > 0, "weapons change no damage numbers (captain still 7)");
@@ -1252,10 +1252,10 @@ public static class Program {
             // ---- 0.0.117 mounted riders ----
             string[] riderCodes = entityFiles.Keys.Where(c => c.EndsWith("-rider")).OrderBy(c => c).ToArray();
             string[] MountsOf(string code) => entityFiles[code]["attributes"]["lotrnpcsMounts"]?.Select(x => (string)x).ToArray() ?? Array.Empty<string>();
-            Check(riderCodes.SequenceEqual(new[] { "angmarorc", "arnor", "dale", "dwarf", "elf", "gondor", "gundabadorc", "mordororc", "rohan", "uruk" }.Select(r => "test-" + r + "-rider"))
+            Check(riderCodes.SequenceEqual(new[] { "angmarorc", "arnor", "dale", "dwarf", "elf", "goblin", "gondor", "gundabadorc", "mordororc", "rohan", "uruk" }.Select(r => "test-" + r + "-rider"))
                 && riderCodes.All(c => (string)entityFiles[c]["attributes"]["lotrnpcsRank"] == "rider" && entityFiles[c]["server"]["behaviors"].Any(b => (string)b["code"] == "lotrnpcs:rider") && MountsOf(c).Length > 0)
                 && MountsOf("test-rohan-rider").All(m => m.StartsWith("feverstonewilds:horse-tamed-")) && MountsOf("test-uruk-rider").All(m => m.StartsWith("feverstonewilds:tame-direwolf-"))
-                && MountsOf("test-elf-rider").All(m => m.StartsWith("game:tameddeer-elk-")) && MountsOf("test-dwarf-rider").All(m => m.StartsWith("teapotsgiantboar:tame-giantboar-")),
+                && MountsOf("test-elf-rider").SequenceEqual(new[] { "game:tameddeer-elk-male-adult" }) && MountsOf("test-goblin-rider").All(m => m.StartsWith("feverstonewilds:tame-direwolf-")) && MountsOf("test-dwarf-rider").All(m => m.StartsWith("teapotsgiantboar:tame-giantboar-")),
                 "0.0.117: riders for Men of the West on horses, Shadow orcs on dire wolves, elves on elk and dwarves on giant boars, each with the rider behavior and its mounts");
             var riderConfig = new FactionConfig { Version = FactionConfig.CurrentVersion }; riderConfig.FillDefaults();
             Check(Promotion.StatRank("rider") == "warrior" && Promotion.PriceRank("rider") == "captain" && Promotion.StatRank("guard") == "warrior" && Promotion.PriceRank("shock") == "warrior"

@@ -784,7 +784,18 @@ Owner, 2026-11-16, chose "Stronger captains overall" (so a captain beats a rider
 
 Owner, 2026-11-16: "Do the same for recruit", chose "Pick it when hiring", then "They should also still be able to be changed after hire". Guard recruit: 28 health, 2.4 damage, one-handed weapon and always a shield. Shock recruit: 18 health, 3.75 damage, two-handed weapon. Same price, XP and promotions as a recruit; wild recruits stay plain.
 
-- [ ] 154.1 Talking to a wild recruit of your faction offers "hire you" plus "hire you as a guard recruit" and "as a shock recruit", all at the recruit's price. Hiring as one closes the menu and the chat says the recruit became that class.
-- [ ] 154.2 Your own recruit's talk menu offers "Train as a ..." for the two other classes; picking one swaps it for free and keeps its XP, name, looks and orders.
+- [x] 154.1 (passed on 0.0.155, owner 2026-11-16: "It works"; replaced by 156.1) Talking to a wild recruit of your faction offers "hire you" plus "hire you as a guard recruit" and "as a shock recruit", all at the recruit's price. Hiring as one closes the menu and the chat says the recruit became that class.
+- [x] 154.2 (passed on 0.0.155, owner 2026-11-16; menu reworked in 156.2) Your own recruit's talk menu offers "Train as a ..." for the two other classes; picking one swaps it for free and keeps its XP, name, looks and orders.
 - [ ] 154.3 Guard and shock recruits count as recruits for the 2 recruit-only follower places, and promote to warrior, guard, shock or archer at 15 XP.
 - [ ] 154.4 The creative tab lists recruit, guard recruit, shock recruit before warrior in every faction.
+
+## 156. One hire option, class change behind its own menu (0.0.156)
+
+Owner, 2026-11-16, after testing 154.1-154.2: "I think though it should just be, let me hire you, then in the menu after they are hired it should say let me change your class".
+
+- [ ] 156.1 A wild recruit of your faction offers only "I'd like to hire you" (no guard/shock hire lines); hired, it is a plain recruit.
+- [ ] 156.2 Your own recruit's menu has one line "Let me change your class."; it asks "What should I train as?" and lists "Train as a ..." for the two other classes plus "Never mind, stay as you are." Picking a class swaps it for free (XP, name, looks, orders kept) and closes the menu; "Never mind" goes back to the normal menu.
+- [ ] 156.3 Warriors, guards, shock troops, captains and other ranks show no class line.
+- [ ] 156.4 Misty Mountains have a rider (Misty Mountains orc rider on a Feverstone dire wolf): in the creative tab after the captain, hireable/promotable like the other riders, and spawning wild in zones.
+- [ ] 156.5 Elf riders ride only male elk (bulls).
+- [ ] 156.6 Rider reach is half a block from the saddle again (was a block): recruits and warriors on foot get swings off at a charging rider before it hits them, instead of being knocked back first every time. Compare 3 riders v 5 warriors with 0.0.152's 5-0.
