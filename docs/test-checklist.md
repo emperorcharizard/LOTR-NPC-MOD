@@ -597,7 +597,7 @@ Install `lotrnpcs_0.0.147-test.zip`; restart fully.
 
 Install `lotrnpcs_0.0.148-test.zip`; restart fully.
 
-- [ ] 148.1 Owner, 2026-11-16: "The animals ride around without animations." Spawn 3 Rohan riders near goblins or Dunlendings: the horses play their walk and gallop animations while they move and stand idle when they stop (no sliding).
+- [x] 148.1 Owner, 2026-11-16: "The animals ride around without animations." Spawn 3 Rohan riders near goblins or Dunlendings: the horses play their walk and gallop animations while they move and stand idle when they stop (no sliding).
 - [ ] 148.2 Ride a horse yourself: walking, galloping and stopping still work with your keys as before.
 
 ## 149. Riders 1.5x a warrior, for about 50/50 at equal coin (0.0.149)
@@ -605,3 +605,10 @@ Install `lotrnpcs_0.0.148-test.zip`; restart fully.
 Install `lotrnpcs_0.0.149-test.zip`; restart fully. Synergy's activation range off for the test, back on after.
 
 - [ ] 149.1 Owner, 2026-11-16: "isnt the warriors supposed to be 50/50 with the riders?" A Rohan rider has 51 health and hits for about 5.9 (warrior 34 and 3.95). 3 Rohan riders v 13 Dunlending warriors (equal coin), a few runs: each side wins about half (on 0.0.147, 2.24x: riders 13-0 with no losses).
+  - 2026-11-16 on 0.0.149, owner's target changed to "3 riders should beat 5-7 warriors": 3 v 6 Dunlendings 6-0 (155 s, 0 rider deaths, riders 221 damage, Dunlendings 63); 3 v 8 8-0 (290 s, 0 rider deaths, 268 v 68 damage, 26 charge hits). Still too strong: superseded by 150.
+
+## 150. Riders at a warrior's numbers: 3 riders beat 5-7 warriors (0.0.150)
+
+Install `lotrnpcs_0.0.150-test.zip`; restart fully. Synergy's activation range off for the test, back on after.
+
+- [ ] 150.1 Owner, 2026-11-16: "3 riders should beat 5-7 warriors". A Rohan rider has a warrior's 34 health and 3.95 damage (x2 on charge hits). 3 Rohan riders beat 6 Dunlending warriors with losses, and 3 v 8 or 9 is about even.

@@ -3,7 +3,9 @@ name: resume
 description: Where the lotrnpcs work stands and what's next; read first, update before stopping
 ---
 
-# Where we are (updated 2026-11-16, 0.0.147 installed and tested; Synergy activation range back ON)
+# Where we are (updated 2026-11-16, 0.0.150 being installed; Synergy activation range OFF for rider tests, turn it back ON after)
+
+**2026-11-16, riders (owner target "3 riders should beat 5-7 warriors"):** 0.0.149 (1.5x) still won 3 v 6 6-0 and 3 v 8 8-0 with no rider lost; 148.1 (horses gallop) passed. 0.0.150 sets RiderScale 1.0 (a warrior's numbers on a horse); next: test 150.1 (3 v 6, 3 v 8), set Synergy's activation range back ON, then ask the owner about the rider price (51, now worth about 30).
 
 **2026-11-16, release work (release doc https://claude.ai/artifact/EzQti2A9DBbNxvuea6Vp9e):** 0.0.143 rider test done (143.1 partly met: out-of-reach Dunlending swings 55-65%, were 71-79%). 0.0.144 (`Riders.GoneByBlow`, replaces Outrunning: foot soldiers predict the rider's place at the blow from the horse's motion) built, not installed; next: install it, run 144.1 twice with Synergy's activation range off, then the release doc's step 3 groups.
 
