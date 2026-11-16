@@ -1482,8 +1482,9 @@ TEST_NPCS = [
 # Riders.cs uses the first ones that exist in the world, and offers no rider rank when none do.
 HORSES = [f"feverstonewilds:horse-tamed-{g}-{t}" for t in ("quarter", "shire") for g in ("male", "female")]
 DIREWOLVES = [f"feverstonewilds:tame-direwolf-{g}" for g in ("male", "female")]
-# 0.0.156 (owner: "have them ride elk (male)"): bulls only.
-ELK = ["game:tameddeer-elk-male-adult"]
+# 0.0.157 (owner: "a caribou sized to a horse, male, and with horns"): a caribou type added to the game's tamed deer by
+# tools/patches/caribou-mount.json (seat and gear points on the caribou shape, size 1.45, antlers nearly all year).
+CARIBOU = ["game:tameddeer-caribou-male-adult"]
 GIANT_BOARS = [f"teapotsgiantboar:tame-giantboar-giant-{t}-male" for t in ("01", "02", "03", "04", "05")]     + [f"teapotsgiantboar:tame-giantboar-giant-{t}-female" for t in ("01", "02")]
 MOUNTS_OF = {"gondor": HORSES, "rohan": HORSES, "dale": HORSES, "arnor": HORSES,
              "uruk": DIREWOLVES, "mordororc": DIREWOLVES, "gundabadorc": DIREWOLVES, "angmarorc": DIREWOLVES,
@@ -1493,7 +1494,7 @@ MOUNTS_OF = {"gondor": HORSES, "rohan": HORSES, "dale": HORSES, "arnor": HORSES,
              # Shire has no warriors, so no rider.
              "dunlending": HORSES, "haradrim": HORSES, "easterling": HORSES, "blacknumenorean": HORSES,
              "wickeddwarf": HORSES, "tormentedelf": HORSES,
-             "elf": ELK, "dwarf": GIANT_BOARS}
+             "elf": CARIBOU, "dwarf": GIANT_BOARS}
 TEST_NPCS += [(code.removesuffix("-warrior") + "-rider", name.removesuffix(" warrior") + " rider", model, skin, gear)
               for code, name, model, skin, gear in list(TEST_NPCS)
               if code.endswith("-warrior") and code.removeprefix("test-").removesuffix("-warrior") in MOUNTS_OF]
@@ -2141,7 +2142,7 @@ with open(os.path.join(out, "modinfo.json"), "w") as f:
         "type": "code",
         "modid": "lotrnpcs",
         "name": "LOTR NPCs",
-        "version": "0.0.156",
+        "version": "0.0.157",
         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Race models from "
                        "LOTR Races and Classes by Dango Dango Dango, Shakgriig and Buggoi, used with their permission.",
