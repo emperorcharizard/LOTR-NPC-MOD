@@ -1014,7 +1014,8 @@ WARRIOR_GEAR = ["game:armor-head-chain-iron", "game:armor-body-chain-iron", "gam
 # 0.0.43 (user, 2026-11-03: "reduce the health of all the npcs by 6"): 22, 34 and 48 (were 28, 40 and 54), and 19
 # for the two rankless leftovers (was 25). NPCs already in a world are brought down on load (Factions.cs).
 # Each entry is (health, rank armor tier, (melee damage, damage tier)); armor tier 0 leaves out lotrnpcs:rankarmor.
-RANK_STATS = {"recruit": (22, 0, (3, 8)), "warrior": (34, 0, (4, 9)), "captain": (48, 0, (7, 9)),
+RANK_STATS = {"recruit": (22, 0, (3, 8)), "warrior": (34, 0, (4, 9)), "captain": (96, 0, (10.5, 9)),  # 0.0.153: 96 and 10.5 (owner: "Stronger captains overall"; were 48 and 7)
+             
               # 0.0.55 archers (a unit, not a rank): a warrior's health, a recruit's shove when cornered.
               "archer": (34, 0, (3, 8)),
               # 0.0.113 promotion-only warrior branches (Promotion.Branches): guard health x1.25 and damage x0.8, shock
@@ -2108,7 +2109,7 @@ with open(os.path.join(out, "modinfo.json"), "w") as f:
         "type": "code",
         "modid": "lotrnpcs",
         "name": "LOTR NPCs",
-        "version": "0.0.152",
+        "version": "0.0.153",
         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Race models from "
                        "LOTR Races and Classes by Dango Dango Dango, Shakgriig and Buggoi, used with their permission.",

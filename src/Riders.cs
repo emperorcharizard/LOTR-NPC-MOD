@@ -192,14 +192,13 @@ namespace LotrNpcs
         /// <summary>0.0.151: the rider's focus moves to the archer its seek is riding for, unless it already finishes one.</summary>
         public static bool FocusOnHunted(bool huntedIsArcher, bool focusIsArcher) => huntedIsArcher && !focusIsArcher;
 
-        /// <summary>0.0.152 (owner, 2026-11-16: a rider should beat 2 warriors but "less than one captain"): captains are the
-        /// anti-cavalry rank. On 0.0.150 a rider beat 2 warriors and was beating a captain too, the captain swinging only
-        /// 6 times in 218 s while it chased; its hits on a mounted enemy do this much more.</summary>
-        public const float CaptainVsRiderMultiplier = 2.5f;
+        /// <summary>0.0.152 gave captains x2.5 on mounted enemies; 0.0.153 (owner chose "Stronger captains overall") takes it
+        /// out for stronger captains (FactionTiers.CaptainHealth/CaptainDamage).</summary>
+        public const float CaptainVsRiderMultiplier = 1f;
         /// <summary>0.0.152 (in game 2026-11-16, 0.0.151: three riders hit two archers 16 times for 41 damage and killed
         /// none while the archers shot two of them down): a mounted NPC's hits on an archer do this much more.</summary>
         public const float RiderVsArcherMultiplier = 2f;
-        /// <summary>0.0.152: the rank matchups, captain over rider over archer.</summary>
+        /// <summary>0.0.152: the rank matchups (0.0.153: only riders over archers now).</summary>
         public static float RankMatchup(string attackerRank, bool attackerMounted, bool targetIsArcher, bool targetMounted) =>
             (targetMounted && attackerRank == "captain" ? CaptainVsRiderMultiplier : 1f) * (attackerMounted && targetIsArcher ? RiderVsArcherMultiplier : 1f);
 

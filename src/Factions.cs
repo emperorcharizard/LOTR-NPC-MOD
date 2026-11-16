@@ -164,8 +164,11 @@ namespace LotrNpcs
         // tier has the Men's per-rank numbers, 3 followers and a roster of 16; hire prices are the Men's too (the
         // coordinator's call, so equal coin stays fair; easy to undo with Tables134 below). Tiers stay apart for their
         // gear, names and the 0.0.90 history the old config steps compare against.
-        static Dictionary<string, float> MenHealth => R(22, 34, 48, 35);
-        static Dictionary<string, float> MenDamage => R(3.15f, 3.95f, 7f, 3.05f);
+        // 0.0.153 (owner, 2026-11-16, chose "Stronger captains overall" so a captain beats a rider that beats 2 warriors):
+        // captains 96 health and 10.5 damage (were 48 and 7), about 3 times the health x damage. Config version 33.
+        public const float CaptainHealth152 = 48, CaptainDamage152 = 7, CaptainHealth = 96, CaptainDamage = 10.5f;
+        static Dictionary<string, float> MenHealth => R(22, 34, CaptainHealth, 35);
+        static Dictionary<string, float> MenDamage => R(3.15f, 3.95f, CaptainDamage, 3.05f);
         public const int EqualFollowers = 3, EqualRoster = 16;
         public static readonly FactionTier Men = T("men", EqualFollowers, EqualRoster, 1f, 1f, MenHealth, MenDamage, 5, 15, 40, 15, 10, 10, 30);
         public static readonly FactionTier Uruk = T("uruk", EqualFollowers, EqualRoster, 1.05f, 1.03f, MenHealth, MenDamage, 5, 15, 40, 15, 11, 11, 33);
@@ -293,7 +296,7 @@ namespace LotrNpcs
         // Format of the file. 0 = written by 0.0.31, 1 = by 0.0.32, 2 = by 0.0.33, 3 = by 0.0.34, 4 = by 0.0.35 to
         // 0.0.38, 5 = by 0.0.39 and 0.0.40, 6 = by 0.0.41 to 0.0.43, 7 = by 0.0.44 to 0.0.47, 8 = by 0.0.48 to 0.0.50, 9 = by 0.0.51 and 0.0.52, 10 = by 0.0.53, 11 = by 0.0.54, 12 = by 0.0.55 to 0.0.58, 13 = by 0.0.59 to 0.0.61, 14 = by 0.0.62 to 0.0.73, 15 = by 0.0.74 and 0.0.75, 16 = by 0.0.76 to 0.0.81, 17 = by 0.0.82 to 0.0.84, 18 = by 0.0.85 to 0.0.89, 19 = by 0.0.90, 20 = by 0.0.91, 21 = by 0.0.92, 22 = by 0.0.93, 23 = by 0.0.94 to 0.0.101, 24 = by 0.0.102, 25 = by 0.0.103, 26 = by 0.0.104 to 0.0.106, 27 = by 0.0.107, 28 = by 0.0.108 to 0.0.111, 29 = by 0.0.112;
         // Migrate() updates older files once and then stores them.
-        public const int CurrentVersion = 32;
+        public const int CurrentVersion = 33;
         public int Version;
         public Dictionary<string, FactionDef> Factions;
         public List<FactionRelationDef> Relations;
@@ -593,7 +596,7 @@ namespace LotrNpcs
             "PromotePrices: what promoting a recruit costs in HireCoin, by the rank it becomes (warrior, guard, shock, archer, captain). By default it is the faction's hire price for that rank less 3 coins, or less 4 for a captain (Men: 12 to warrior or archer, 36 to captain); a rank left out gets that default (guard and shock, which can't be hired: the warrior's promotion price). A hired recruit or warrior earns 1 XP for each NPC of this mod that dies within 10 seconds of its hit: at 15 XP a recruit can become a warrior, guard, shock trooper or archer, at 40 XP a warrior, guard or shock trooper can become a captain. The owner promotes it in its talk menu. 0 makes it free.",
             "Hiring: right-click an NPC to talk. Members of its faction, and members of an allied faction whose alliance has ShareFriends, can hire it, paying from their hotbar and backpack.",
             "MaxFollowers and MaxRecruits (in each faction): how many of the faction's recruits can follow a player at once, and how many a player can have. Each recruit uses a share: 1/MaxFollowers of the following and 1/MaxRecruits of the roster, and a player's shares must add up to no more than 1, so factions can be mixed (3 Gondor men and 2 Mordor orcs use 3/5 + 2/7 of the following). Past the following, a new recruit guards where it was hired and the rest hold or guard. A player over the limits when they join (after an admin lowers them) loses the most recently hired recruits until they fit. The MaxFollowers and MaxRecruits at the top of the file are the baseline (3 and 16 since 0.0.135, every faction alike) and count for a faction without its own.",
-            "Health and Damage (in each faction, by rank: recruit, warrior, captain, archer, and since 0.0.113 the promotion-only guard and shock, which a file without them gets as the warrior's health x1.25 and damage x0.8 (guard) or health x0.8 and damage x1.25 (shock)): the health and the damage of one hit of the faction's NPCs of that rank, in place of their unit's own (health is a whole number; an archer's damage is its arrow's, and its shove). Since 0.0.135 every faction ships the same numbers (health 22, 34, 48 and 35, damage 3.15, 3.95, 7 and 3.05 for recruit, warrior, captain and archer), with the same 3 followers, roster of 16 and prices, so fights between factions are decided by numbers and tactics. A rider without its own entry has its warrior's health and damage times 1.0 (1.5 in 0.0.149, 2.24 before). Damage tiers don't change. Wild groups grow with MaxFollowers over the baseline (1 for every faction now; see the spawning file).",
+            "Health and Damage (in each faction, by rank: recruit, warrior, captain, archer, and since 0.0.113 the promotion-only guard and shock, which a file without them gets as the warrior's health x1.25 and damage x0.8 (guard) or health x0.8 and damage x1.25 (shock)): the health and the damage of one hit of the faction's NPCs of that rank, in place of their unit's own (health is a whole number; an archer's damage is its arrow's, and its shove). Since 0.0.135 every faction ships the same numbers (health 22, 34, 96 and 35, damage 3.15, 3.95, 10.5 and 3.05 for recruit, warrior, captain and archer; captains 48 and 7 before 0.0.153), with the same 3 followers, roster of 16 and prices, so fights between factions are decided by numbers and tactics. A rider without its own entry has its warrior's health and damage times 1.0 (1.5 in 0.0.149, 2.24 before). Damage tiers don't change. Wild groups grow with MaxFollowers over the baseline (1 for every faction now; see the spawning file).",
             "BackHitMultiplier (1.5 by default, since 0.0.137; 0 to 10) and BackArcDegrees (120; 0 to 360): a hit on one of this mod's NPCs that comes from behind it, within a cone BackArcDegrees wide centred on its back, does BackHitMultiplier times the damage (on top of NpcVsNpcDamageMultiplier). Fighting NPCs keep turned toward the nearest enemy within 6 blocks and step backwards (at a walk) instead of turning their back.",
             "RetreatSeconds (10 by default, since 0.0.136; 1 to 60): after the Retreat order (combat page of the orders menu) your followers drop their fights, run back to you and start no fights for this many seconds; then they follow on as before. The Charge order sends them at the enemy you look at (within 48 blocks), out of formation, fighting like Aggressive, until no enemy is within 16 blocks of them for 5 seconds or 30 seconds have passed.",
             "NpcVsNpcDamageMultiplier (0.5 by default, since 0.0.135; 0 to 10): every hit this mod's NPCs land on anything that isn't a player is this times its damage (melee, arrows, and charge hits after their x2), so fights between NPCs last longer. Hits on players, and players' hits, don't change.",
@@ -747,6 +750,15 @@ namespace LotrNpcs
                     if (SameTable(kv.Value.Damage, FactionTiers.OrcDamage091)) kv.Value.Damage = new Dictionary<string, float>(FactionTiers.Orc.Damage);
                 }
             }
+            // 0.0.153 (version 33, owner chose "Stronger captains overall"): a captain still at the shipped 48 health or 7
+            // damage takes 96 or 10.5. Values the admin chose stay.
+            if (Version < 33 && Version > 0)
+                foreach (FactionDef def in Factions.Values)
+                {
+                    if (def == null) continue;
+                    if (def.Health != null && def.Health.TryGetValue("captain", out float h) && Math.Abs(h - FactionTiers.CaptainHealth152) < 1e-4) def.Health["captain"] = FactionTiers.CaptainHealth;
+                    if (def.Damage != null && def.Damage.TryGetValue("captain", out float d) && Math.Abs(d - FactionTiers.CaptainDamage152) < 1e-4) def.Damage["captain"] = FactionTiers.CaptainDamage;
+                }
             // 0.0.138 (version 32, owner: "there should still be the 1 captain"): the roster-based captain count becomes
             // MaxCaptains: the default 8 gives 1, 0 (no limit) stays none, another value keeps what it gave a roster of 16.
             if (Version < 32 && Version > 0)
