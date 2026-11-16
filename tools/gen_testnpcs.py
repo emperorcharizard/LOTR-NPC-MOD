@@ -484,7 +484,10 @@ SHIELD_OUT = 1.4
 SHIELD_IN = {"dwtowershield": 1.0, "dwshield": 1.0, "elfshield": 1.0, "boromirshield": 1.0, "gondorshield": 1.75,
              "kiteshield": 1.0, "eastshield": 1.0}
 _NEW_SHIELD_ROT = dict(SHIELD["hand"]["rotation"], z=SHIELD["hand"]["rotation"]["z"] - 90)
-KITE_SHIELD = {"model": "numenorean_kite_shield.json", "atlas": "numenorean_kite_shield.png", "name": "Numenorean shield",
+# 0.0.156 (owner, 2026-11-16: "whatever shield this is, has a messed up texture"): the kite shield's emblem is a mosaic of
+# tiny elements whose down faces carry it; the game draws a down face's UV flipped top to bottom against Blockbench, which
+# shreds the picture (big plain faces hide it). flipDown flips those UVs back. Untested guess (flip v, not rotate 180).
+KITE_SHIELD = {"model": "numenorean_kite_shield.json", "atlas": "numenorean_kite_shield.png", "name": "Numenorean shield", "flipDown": True,
                "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (8.0, 21.9, 12.8 - SHIELD_OUT + SHIELD_IN["kiteshield"]), _NEW_SHIELD_ROT)}
 DW_TOWER_SHIELD = {"model": "dwarven_tower_shield.json", "atlas": "dwarven_tower_shield.png", "name": "Dwarven tower shield",
                    "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (5.25, 18.0, 7.3 - SHIELD_OUT + SHIELD_IN["dwtowershield"]), _NEW_SHIELD_ROT)}
@@ -854,6 +857,15 @@ def write_weapons():
             textures[key] = fixed
         shape["textures"] = textures
         shape.pop("editor", None)
+        if w.get("flipDown"):
+            def flip_down(elements):
+                for e in elements:
+                    face = (e.get("faces") or {}).get("down")
+                    if isinstance(face, dict) and face.get("uv"):
+                        u0, v0, u1, v1 = face["uv"]
+                        face["uv"] = [u0, v1, u1, v0]
+                    flip_down(e.get("children") or [])
+            flip_down(shape["elements"])
         if "pull" in w:
             pull_string(shape, w["pull"], w.get("apexX"))
         write(f"shapes/item/orcweapon/{name}.json", shape)
@@ -1477,6 +1489,10 @@ MOUNTS_OF = {"gondor": HORSES, "rohan": HORSES, "dale": HORSES, "arnor": HORSES,
              "uruk": DIREWOLVES, "mordororc": DIREWOLVES, "gundabadorc": DIREWOLVES, "angmarorc": DIREWOLVES,
              # 0.0.156 (owner: "misty mountain orcs dont have a rider class"): goblins ride dire wolves too.
              "goblin": DIREWOLVES,
+             # 0.0.156 (owner: "add a rider to all of the factions, horses are the default unless otherwise stated"). The
+             # Shire has no warriors, so no rider.
+             "dunlending": HORSES, "haradrim": HORSES, "easterling": HORSES, "blacknumenorean": HORSES,
+             "wickeddwarf": HORSES, "tormentedelf": HORSES,
              "elf": ELK, "dwarf": GIANT_BOARS}
 TEST_NPCS += [(code.removesuffix("-warrior") + "-rider", name.removesuffix(" warrior") + " rider", model, skin, gear)
               for code, name, model, skin, gear in list(TEST_NPCS)

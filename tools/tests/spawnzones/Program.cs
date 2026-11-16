@@ -38,8 +38,8 @@ public static class Program {
         bool Rider(EntityProperties t) => t.Attributes["lotrnpcsRank"].AsString() == "rider";
         Check(types.Count(t => t.Attributes?["lotrnpcsFaction"].Exists == true && t.Attributes["lotrnpcsRank"].Exists && !Branch(t) && !Rider(t)) == 69
             && types.Count(t => t.Attributes?["lotrnpcsFaction"].Exists == true && t.Attributes["lotrnpcsRank"].Exists && Branch(t)) == 68
-            && types.Count(t => t.Attributes?["lotrnpcsFaction"].Exists == true && Rider(t)) == 11,
-            "69 zone NPC types (17 factions x 3 ranks with Gundabad, the Shire's hobbit recruits, and archers for every faction but the Shire), plus 0.0.113's guards and shock troops (and 0.0.154's guard and shock recruits) for the 17 armed factions and 0.0.117's riders for the 11 mounted ones (0.0.156: Misty Mountains)");
+            && types.Count(t => t.Attributes?["lotrnpcsFaction"].Exists == true && Rider(t)) == 17,
+            "69 zone NPC types (17 factions x 3 ranks with Gundabad, the Shire's hobbit recruits, and archers for every faction but the Shire), plus 0.0.113's guards and shock troops (and 0.0.154's guard and shock recruits) for the 17 armed factions and 0.0.117's riders for the 11 mounted ones (0.0.156: every armed faction, 17)");
         var rankedFactions = types.Where(t => t.Attributes?["lotrnpcsRank"].Exists == true).Select(t => t.Attributes["lotrnpcsFaction"].AsString()).Distinct().OrderBy(f => f).ToList();
         Check(rankedFactions.SequenceEqual(SpawnZoneSystem.Factions.OrderBy(f => f)) && SpawnZoneSystem.Factions.All(f => (f == "shire" ? new[] { "recruit" } : new[] { "recruit", "warrior", "captain", "archer" }).All(r => types.Any(t => t.Attributes?["lotrnpcsFaction"].AsString() == f && t.Attributes["lotrnpcsRank"].AsString() == r))), "every faction /lotrzone accepts has a recruit, warrior and captain (the Shire only recruits), and no other faction has ranks");
         Check(T("test-hobbit").Attributes["lotrnpcsFaction"].AsString() == "shire" && T("test-hobbit").Attributes["lotrnpcsRank"].AsString() == "recruit", "hobbits are the Shire's recruits");

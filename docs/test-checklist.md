@@ -797,5 +797,7 @@ Owner, 2026-11-16, after testing 154.1-154.2: "I think though it should just be,
 - [ ] 156.2 Your own recruit's menu has one line "Let me change your class."; it asks "What should I train as?" and lists "Train as a ..." for the two other classes plus "Never mind, stay as you are." Picking a class swaps it for free (XP, name, looks, orders kept) and closes the menu; "Never mind" goes back to the normal menu.
 - [ ] 156.3 Warriors, guards, shock troops, captains and other ranks show no class line.
 - [ ] 156.4 Misty Mountains have a rider (Misty Mountains orc rider on a Feverstone dire wolf): in the creative tab after the captain, hireable/promotable like the other riders, and spawning wild in zones.
-- [ ] 156.5 Elf riders ride only male elk (bulls).
+- [ ] 156.5 Elf riders ride only male elk (bulls). (Owner then asked for a horse-sized male caribou with antlers instead: in progress.)
 - [ ] 156.6 Rider reach is half a block from the saddle again (was a block): recruits and warriors on foot get swings off at a charging rider before it hits them, instead of being knocked back first every time. Compare 3 riders v 5 warriors with 0.0.152's 5-0.
+- [ ] 156.7 Every armed faction has a rider: Dunlendings, Haradrim, Easterlings, Black Numenoreans, wicked dwarves and tormented elves on Feverstone horses (owner: "horses are the default unless otherwise stated"); the Shire has none (no warriors).
+- [ ] 156.8 The Arnor kite shield shows the white tree and seven gold stars cleanly (its down faces' UVs are flipped top to bottom at build time; if it's still scrambled, try rotate 180 instead).
