@@ -564,22 +564,23 @@ Install `lotrnpcs_0.0.142-test.zip`; restart fully. DebugCommands on, battle log
 
 Install `lotrnpcs_0.0.143-test.zip`; restart fully. DebugCommands on, battle log on.
 
-- [ ] 143.1 3 Rohan riders v 10 Dunlending warriors, twice: the Dunlendings' "out of reach when the blow fell" is well under the 85 of 108 and 100 of 140 of 2026-11-15, without their landed blows dropping much (they still strike riders who stand or charge at them).
-  - 2026-11-16 (`211710`, `212122`, both stalled by Synergy after 1-2 min): out of reach 28 of 43 and 36 of 65 (55-65%, was 71-79%), landed about as often as on 0.0.142. Partly met; the rest were riders charging past, which 0.0.144 handles. Superseded by 144.1.
+- [x] 143.1 3 Rohan riders v 10 Dunlending warriors, twice: the Dunlendings' "out of reach when the blow fell" is well under the 85 of 108 and 100 of 140 of 2026-11-15, without their landed blows dropping much (they still strike riders who stand or charge at them).
+  - 2026-11-16 (`211710`, `212122`, both stalled by Synergy after 1-2 min): out of reach 28 of 43 and 36 of 65 (55-65%, was 71-79%), landed about as often as on 0.0.142. Partly met; superseded by 146.1 (pass).
 - [ ] 143.2 `/recruits mountspike` no longer exists.
 
 ## 144. Foot soldiers don't swing at riders who'll be gone when the blow falls (0.0.144)
 
 Install `lotrnpcs_0.0.144-test.zip`; restart fully. DebugCommands on, battle log on. Turn Synergy's `EntityActivationRangeEnabled` off for this test (rider fights drift past 48 blocks) and back on afterwards.
 
-- [ ] 144.1 3 Rohan riders v 10 Dunlending warriors, twice, 150 s each: the Dunlendings' "out of reach when the blow fell" is under a third of their melee swings (0.0.142: 71-79%, 0.0.143: 55-65%), and they still land blows on riders.
-  - 2026-11-16 (`212951`, Synergy off, 208 s, fight ran to the end): Dunlendings 41/88 landed, 47 out of reach (53%), 0 kills, 10 deaths; rohan 70/106 (36 out of reach), 383 damage, 10 kills, 0 deaths, 17 charge hits. Not met: the prediction barely changed it, so the cause isn't (only) horse speed. 0.0.145 logs why each blow missed (145.1).
+- [x] 144.1 3 Rohan riders v 10 Dunlending warriors, twice, 150 s each: the Dunlendings' "out of reach when the blow fell" is under a third of their melee swings (0.0.142: 71-79%, 0.0.143: 55-65%), and they still land blows on riders.
+  - 2026-11-16 (`212951`, Synergy off, 208 s, fight ran to the end): Dunlendings 41/88 landed, 47 out of reach (53%), 0 kills, 10 deaths; rohan 70/106 (36 out of reach), 383 damage, 10 kills, 0 deaths, 17 charge hits. Superseded by 146.1 (pass): the prediction barely changed it, so the cause isn't (only) horse speed. 0.0.145 logs why each blow missed (145.1).
 
 ## 145. Out-of-reach blows say why (0.0.145, debug)
 
-- [ ] 145.1 Same rider test with the battle log on: every `nocontact` row ends with `ms= swing= d=dist/minDist v=gap/minVerDist spd= yaw= mounted=`. Read the rows to find the cause.
+- [x] 145.1 Same rider test with the battle log on: every `nocontact` row ends with `ms= swing= d=dist/minDist v=gap/minVerDist spd= yaw= mounted=`. Read the rows to find the cause.
   - [x] 2026-11-16 (`213618`, 171 s, ran to the end): every Dunlending miss (22 of 45) was at a horse at 8.5-8.9 blocks a second with the soldier facing it (yaw 0), 0-4.9 blocks past reach (most under 1.5); blow 417-1300 ms after the decision. Rohan misses (26 of 86): yaw 13-122 degrees off, 0-2.9 past reach, the mount at 0-4 blocks a second. Cause for foot soldiers: the rider rides through the swing. 0.0.146.
 
 ## 146. A rider who rides through a foot soldier's swing is struck (0.0.146)
 
-- [ ] 146.1 Rider test (3 Rohan riders v 10 Dunlendings), twice: Dunlendings' out of reach well under 47 of 88 / 22 of 45, more landed blows on riders; riders still win clearly (owner: riders stay as they are).
+- [x] 146.1 Rider test (3 Rohan riders v 10 Dunlendings), twice: Dunlendings' out of reach well under 47 of 88 / 22 of 45, more landed blows on riders; riders still win clearly (owner: riders stay as they are).
+  - 2026-11-16 (Synergy off, both ran to the end): `214310` 147 s: Dunlendings 49/66 landed (17 out of reach, 26%), 96 damage, 10 deaths; rohan 65/83, 375 damage, 10 kills, 0 deaths, 20 charge hits. `214600` 158 s: Dunlendings 46/56 (10 out of reach, 18%), 93 damage, 10 deaths; rohan 59/84, 328 damage, 10 kills, 0 deaths, 18 charge hits. Out of reach down from 53-79% to 18-26%; Dunlending damage about doubled; riders still win 3 v 10 with no losses. Pass.
