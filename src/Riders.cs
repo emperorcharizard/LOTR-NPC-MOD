@@ -175,6 +175,11 @@ namespace LotrNpcs
             return px * px + pz * pz > reach * reach;
         }
 
+        /// <summary>0.0.146: a foot soldier's blow at a rider lands if the rider was in reach at most this long before it fell
+        /// (a galloping horse moves about 1.8 blocks in that time), so a rider riding through the swing is struck.</summary>
+        public const long PassWindowMs = 200;
+        public static bool PassedInReach(long lastContactMs, long now) => lastContactMs > 0 && now - lastContactMs <= PassWindowMs;
+
         /// <summary>Half the width of a rider's selection box, added to a foot soldier's reach (to the box) in GoneByBlow.</summary>
         public const double RiderHalfWidth = 0.4;
 

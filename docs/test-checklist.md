@@ -578,3 +578,8 @@ Install `lotrnpcs_0.0.144-test.zip`; restart fully. DebugCommands on, battle log
 ## 145. Out-of-reach blows say why (0.0.145, debug)
 
 - [ ] 145.1 Same rider test with the battle log on: every `nocontact` row ends with `ms= swing= d=dist/minDist v=gap/minVerDist spd= yaw= mounted=`. Read the rows to find the cause.
+  - [x] 2026-11-16 (`213618`, 171 s, ran to the end): every Dunlending miss (22 of 45) was at a horse at 8.5-8.9 blocks a second with the soldier facing it (yaw 0), 0-4.9 blocks past reach (most under 1.5); blow 417-1300 ms after the decision. Rohan misses (26 of 86): yaw 13-122 degrees off, 0-2.9 past reach, the mount at 0-4 blocks a second. Cause for foot soldiers: the rider rides through the swing. 0.0.146.
+
+## 146. A rider who rides through a foot soldier's swing is struck (0.0.146)
+
+- [ ] 146.1 Rider test (3 Rohan riders v 10 Dunlendings), twice: Dunlendings' out of reach well under 47 of 88 / 22 of 45, more landed blows on riders; riders still win clearly (owner: riders stay as they are).

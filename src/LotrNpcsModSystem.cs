@@ -194,7 +194,7 @@ namespace LotrNpcs
         // The task's own damagePlayerAtMs, used when the weapon has no wind-up of its own (0.0.99).
         readonly int baseHitMs;
         // 0.0.99 swing sync: when this attack started, and whether its swing animation has begun.
-        long startedMs, swingStartedMs;
+        long startedMs, swingStartedMs, riderContactMs;
         bool swingStarted;
         // Longest the damage timer waits for the NPC to turn to its target before the vanilla timing takes over (so
         // an attack on a target it can never face still ends).
@@ -322,6 +322,7 @@ namespace LotrNpcs
             startedMs = entity.World.ElapsedMilliseconds;
             swingStarted = false;
             swingStartedMs = 0;
+            riderContactMs = 0;
             struck = false;
             Riders.SwingStarted(entity, startedMs);
             RiderLog("swing at " + (targetEntity?.EntityId ?? 0));
@@ -358,6 +359,11 @@ namespace LotrNpcs
             // blow needs the attacker to face its target, and a seated rider faces where its mount goes. A mounted
             // rider's blow falls on time here instead; attackTarget checks reach and logs a miss as out of reach.
             if (!struck && (entity as EntityAgent)?.MountedOn != null && Riders.BlowDue(startedMs, damagePlayerAtMs, entity.World.ElapsedMilliseconds)) attackTarget();
+            // 0.0.146 (battle log 213618: every blow of a foot soldier that missed a rider was at a horse galloping ~9 blocks a
+            // second, the soldier facing it, 0-4.5 blocks past reach): a swing that the rider rode through is a hit. While
+            // the swing runs, the last moment a mounted target was in reach is kept; attackTarget accepts it (PassedInReach).
+            if (swingStarted && !struck && (entity as EntityAgent)?.MountedOn == null && (targetEntity as EntityAgent)?.MountedOn != null
+                && hasDirectContact(targetEntity, minDist, minVerDist)) riderContactMs = entity.World.ElapsedMilliseconds;
             bool go = base.ContinueExecute(dt);
             if (!go) RiderLog(struck ? "done" : "ended without a blow (ContinueExecute false)");
             return go;
@@ -413,7 +419,7 @@ namespace LotrNpcs
             RiderLog("blow" + (targetEntity != null && hasDirectContact(targetEntity, minDist, minVerDist) ? "" : " (out of reach)"));
             // 0.0.98: the hit lands now, which is later than booked if the NPC was still turning to face its target.
             if (factions != null && targetEntity != null) factions.Spacing.BookHit(targetEntity.EntityId, entity.World.ElapsedMilliseconds, 0);
-            if (!hasDirectContact(targetEntity, minDist, minVerDist))
+            if (!hasDirectContact(targetEntity, minDist, minVerDist) && !Riders.PassedInReach(riderContactMs, entity.World.ElapsedMilliseconds))
             {
                 if (targetEntity != null) factions?.Log.Attack(entity, targetEntity, false, 0, BattleLog.Result.NoContact, false, entity.World.ElapsedMilliseconds, factions.Log.On ? MissDetail() : null);
                 return;
