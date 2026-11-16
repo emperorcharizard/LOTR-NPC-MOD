@@ -165,7 +165,7 @@ public static class Program {
 
         // migrating older files
         var freshCfg = FactionConfig.FromFile(null, out bool storeFresh);
-        Check(storeFresh && freshCfg.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 33 && json.Contains("\"Version\": 33") && json.Contains("\"NpcVsNpcDamageMultiplier\": 0.5") && !json.Contains("\"RosterPerCaptain\":") && json.Contains("\"MaxCaptains\": 1") && json.Contains("\"RecruitExtraFollowers\": 1") && !json.Contains("MaxHirelings") && json.Contains("\"ShieldChance\": 0.5") && json.Contains("\"HelmetChance\": 0.6") && json.Contains("\"CaptainsAlwaysHelmeted\": false") && json.Contains("\"MaxAttackersPerTarget\": 4") && json.Contains("\"CombatSpacing\": 1.5") && json.Contains("\"BattleLines\": true") && json.Contains("\"DuelDistanceMin\": 1.0") && json.Contains("\"DuelDistanceMax\": 1.6") && json.Contains("\"LineHoldRange\": 6.0") && json.Contains("\"MaxRecruits\": 16") && json.Contains("\"MaxFollowers\": 3") && json.Contains("\"GuardRadius\": 16") && json.Contains("\"HealthRegenSpeed\": 30.0") && json.Contains("\"ShareFriends\": false") && json.Contains("\"Relation\": \"enemy\"") && !freshCfg.Relations.Any(r => r.Relation == "ally") && freshCfg.Relations.Count == 1, "a new file is written with version 33 (no MaxHirelings, no alliance), the example entry, the battle spacing, helmet and shield settings, the regen settings, the guard radius and the hire and follow caps");
+        Check(storeFresh && freshCfg.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 34 && json.Contains("\"Version\": 34") && json.Contains("\"NpcVsNpcDamageMultiplier\": 0.5") && !json.Contains("\"RosterPerCaptain\":") && json.Contains("\"MaxCaptains\": 1") && json.Contains("\"RecruitExtraFollowers\": 1") && !json.Contains("MaxHirelings") && json.Contains("\"ShieldChance\": 0.5") && json.Contains("\"HelmetChance\": 0.6") && json.Contains("\"CaptainsAlwaysHelmeted\": false") && json.Contains("\"MaxAttackersPerTarget\": 4") && json.Contains("\"CombatSpacing\": 1.5") && json.Contains("\"BattleLines\": true") && json.Contains("\"DuelDistanceMin\": 1.0") && json.Contains("\"DuelDistanceMax\": 1.6") && json.Contains("\"LineHoldRange\": 6.0") && json.Contains("\"MaxRecruits\": 16") && json.Contains("\"MaxFollowers\": 3") && json.Contains("\"GuardRadius\": 16") && json.Contains("\"HealthRegenSpeed\": 30.0") && json.Contains("\"ShareFriends\": false") && json.Contains("\"Relation\": \"enemy\"") && !freshCfg.Relations.Any(r => r.Relation == "ally") && freshCfg.Relations.Count == 1, "a new file is written with version 34 (no MaxHirelings, no alliance), the example entry, the battle spacing, helmet and shield settings, the regen settings, the guard radius and the hire and follow caps");
         var current = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(json.Replace("\"Stance\": \"aggressive\"", "\"Stance\": \"defensive\"")), out bool storeCurrent);
         Check(!storeCurrent && current.Factions["gondor"].Stance == "defensive", "a current file is left alone, even with defensive factions");
         // 0.0.112: files before version 19 are no longer converted step by step (both servers run 0.0.108 or later).
@@ -657,12 +657,12 @@ public static class Program {
         float JsonMaxHealth(string code) => (float)entityFiles[code]["server"]["behaviors"].First(b => (string)b["code"] == "health")["maxhealth"];
         bool healthOk = entityFiles.Keys.All(c => {
             string rank = (string)entityFiles[c]["attributes"]["lotrnpcsRank"];
-            float want = rank == "recruit" ? 22 : rank == "warrior" || rank == "archer" ? 34 : rank == "captain" ? 96 : rank == "guard" ? 43 : rank == "shock" ? 27 : rank == "rider" ? 34 : rank == "recruitguard" ? 28 : rank == "recruitshock" ? 18 : 19;
+            float want = rank == "recruit" ? 22 : rank == "warrior" || rank == "archer" ? 34 : rank == "captain" ? 48 : rank == "guard" ? 43 : rank == "shock" ? 27 : rank == "rider" ? 34 : rank == "recruitguard" ? 28 : rank == "recruitshock" ? 18 : 19;
             float cur = (float)entityFiles[c]["server"]["behaviors"].First(b => (string)b["code"] == "health")["currenthealth"];
             if (JsonMaxHealth(c) != want || cur != want) { Console.WriteLine("  " + c + ": " + JsonMaxHealth(c) + " health"); return false; }
             return true;
         });
-        Check(healthOk && JsonMaxHealth("test-hobbit") == 22 && JsonMaxHealth("test-goblin") == 19, "recruits have 22 health, warriors and archers 34, captains 96 (0.0.153; 48 before), the rankless leftovers 19 (6 less than before); 0.0.113 guards 43 and shock troops 27; 0.0.117 riders 34; 0.0.154 guard recruits 28 and shock recruits 18");
+        Check(healthOk && JsonMaxHealth("test-hobbit") == 22 && JsonMaxHealth("test-goblin") == 19, "recruits have 22 health, warriors and archers 34, captains 48 (96 in 0.0.153-0.0.154), the rankless leftovers 19 (6 less than before); 0.0.113 guards 43 and shock troops 27; 0.0.117 riders 34; 0.0.154 guard recruits 28 and shock recruits 18");
         TestAgent Hurt(float baseMax, float max, float cur) {
             var e = Wild("test-gondor-captain"); var h = new TreeAttribute();
             h.SetFloat("basemaxhealth", baseMax); h.SetFloat("maxhealth", max); h.SetFloat("currenthealth", cur); e.WatchedAttributes["health"] = h; return e;
@@ -881,6 +881,9 @@ public static class Program {
             && Promotion.StatRank("recruitguard") == "recruit" && Promotion.PriceRank("recruitshock") == "recruit" && Promotion.GuardLike("recruitguard") && !Promotion.GuardLike("recruitshock")
             && FactionTiers.Branch("recruitguard", 22, true) == 28 && FactionTiers.Branch("recruitshock", 22, true) == 18 && Math.Abs(FactionTiers.Branch("recruitshock", 3.15f, false) - 3.94f) < 0.01,
             "0.0.154: guard and shock recruits count as recruits (XP, promotions, price) with health x1.25 / damage x0.8 and the other way round");
+        Check(Riders.CaptainNpcFight("captain", "warrior", false) == 1.5f && Riders.CaptainNpcFight("warrior", "captain", false) == 0.5f && Riders.CaptainNpcFight("captain", "captain", false) == 0.75f
+            && Riders.CaptainNpcFight("captain", null, true) == 1f && Riders.CaptainNpcFight("archer", "captain", false) == 0.5f && Riders.CaptainNpcFight("warrior", "rider", false) == 1f,
+            "0.0.155: captains hit NPCs x1.5 and take x0.5 from NPCs (melee and arrows); against players nothing changes");
         // 0.0.137 back hits: the rear cone and the stacking.
         {
             float north = (float)Math.Atan2(0, 1); // facing +z
@@ -931,7 +934,7 @@ public static class Program {
             var m30 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v30.ToString()), out bool store30);
             string T5(Dictionary<string, float> t) => string.Join("/", FactionTiers.Ranks.Select(rk => t[rk].ToString(System.Globalization.CultureInfo.InvariantCulture)));
             Check(store30 && m30.Version == FactionConfig.CurrentVersion && m30.MaxFollowers == 3 && m30.Factions["mistymountains"].MaxFollowers == 3 && m30.Factions["mistymountains"].MaxRecruits == 16
-                && T5(m30.Factions["mistymountains"].Health) == "22/34/96/35" && T5(m30.Factions["dwarves"].Damage) == "3.15/3.95/10.5/3.05" && m30.Factions["dwarves"].HirePrices["captain"] == 40 && m30.Factions["dwarves"].PromotePrices["captain"] == 36
+                && T5(m30.Factions["mistymountains"].Health) == "22/34/48/35" && T5(m30.Factions["dwarves"].Damage) == "3.15/3.95/7/3.05" && m30.Factions["dwarves"].HirePrices["captain"] == 40 && m30.Factions["dwarves"].PromotePrices["captain"] == 36
                 && m30.Factions["elves"].MaxFollowers == 7 && T5(m30.Factions["mordor"].Health) == "19/30/55/30" && m30.Factions["isengard"].HirePrices["warrior"] == 20 && m30.Factions["isengard"].HirePrices["captain"] == 41
                 && m30.NpcVsNpcDamageMultiplier == 0.5f,
                 "0.0.135: a version 30 file's shipped follow limits, rosters, tables and prices move to the equal ones (baseline follow 5 to 3); values the admin changed stay; NpcVsNpcDamageMultiplier comes in at 0.5");
@@ -1016,8 +1019,8 @@ public static class Program {
         var melee = entityFiles.Values.Select(e => e["server"]["behaviors"].First(b => (string)b["code"] == "taskai")["aitasks"].First(t => (string)t["code"] == "lotrnpcs:meleeattack")).ToList();
         Check(melee.Count == 149 && melee.All(t => (int)t["mincooldown"] == 1700 && (int)t["maxcooldown"] == 2100 && (int)t["attackDurationMs"] == 900 && (int)t["damagePlayerAtMs"] == 400 && (string)t["animation"] == "hit"),
             "every NPC waits 1700 to 2100 ms between swings (0.0.108: 0.5 s less than 0.0.44), with the same swing length, hit timing and unarmed punch");
-        Check(entityFiles["test-mordororc-captain"]["server"]["behaviors"].First(b => (string)b["code"] == "taskai")["aitasks"].First(t => (string)t["code"] == "lotrnpcs:meleeattack").Value<double>("damage") == 10.5
-            && (int)melee.First()["damageTier"] > 0, "weapons change no damage numbers (captain still 10.5, 7 before 0.0.153)");
+        Check(entityFiles["test-mordororc-captain"]["server"]["behaviors"].First(b => (string)b["code"] == "taskai")["aitasks"].First(t => (string)t["code"] == "lotrnpcs:meleeattack").Value<double>("damage") == 7
+            && (int)melee.First()["damageTier"] > 0, "weapons change no damage numbers (captain still 7)");
 
         // The behavior itself.
         var listJson = new JsonObject(JToken.Parse("[{item: ' LotrNpcs:OrcWeapon-Axe ', attackAnimation: 'Lotrnpcs-Axe-Attack'}, {item: 'orcweapon-dagger', attackAnimation: 'x'}, {item: 'lotrnpcs:orcweapon-axe', attackAnimation: 'y'}, {attackAnimation: 'z'}, {item: 'lotrnpcs:nothing'}, null, {item: 'lotrnpcs:orcweapon-poleaxe', attackAnimation: 'p', holdAnimation: ' P-Hold '}]"));
@@ -2194,8 +2197,8 @@ public static class Program {
             v26["Factions"]["gundabad"]["MaxFollowers"] = 9; v26["Factions"]["elves"]["Health"]["captain"] = 70;
             var m26 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v26.ToString()), out bool store26);
             Check(store26 && m26.Factions["mordor"].MaxFollowers == 3 && m26.Factions["angmar"].MaxFollowers == 3 && m26.Factions["gundabad"].MaxFollowers == 9
-                && T4(m26.Factions["gondor"].Health) == "22/34/96/35" && T4(m26.Factions["mistymountains"].Health) == "22/34/96/35" && T4(m26.Factions["dwarves"].Damage) == "3.15/3.95/10.5/3.05"
-                && T4(m26.Factions["elves"].Health) == "27/37/70/37" && T4(m26.Factions["elves"].Damage) == "3.15/3.95/10.5/3.05",
+                && T4(m26.Factions["gondor"].Health) == "22/34/48/35" && T4(m26.Factions["mistymountains"].Health) == "22/34/48/35" && T4(m26.Factions["dwarves"].Damage) == "3.15/3.95/7/3.05"
+                && T4(m26.Factions["elves"].Health) == "27/37/70/37" && T4(m26.Factions["elves"].Damage) == "3.15/3.95/7/3.05",
                 "0.0.107: a version 26 file's 0.0.103 tables take the refit (the equal 0.0.135 one since then) and orcs following 7 follow the tier (3 since 0.0.135); a follow limit or table the admin changed stays");
             // 0.0.108 (owner: "balance combat for equal coin spendage"): a version 27 file with the 0.0.107 tables and prices moves; the admin's values stay.
             string H4(Dictionary<string, int> t) => string.Join("/", FactionTiers.Ranks.Select(r => t[r]));
@@ -2211,12 +2214,12 @@ public static class Program {
             }
             v27["Factions"]["angmar"]["HirePrices"]["captain"] = 30; v27["Factions"]["isengard"]["PromotePrices"]["warrior"] = 20; v27["Factions"]["elves"]["Damage"]["captain"] = 12;
             var m27 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v27.ToString()), out bool store27);
-            Check(store27 && m27.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 33
-                && H4(m27.Factions["mordor"].HirePrices) == "5/15/40/15" && P3(m27.Factions["mordor"].PromotePrices) == "12/12/36" && T4(m27.Factions["mordor"].Health) == "22/34/96/35"
-                && H4(m27.Factions["angmar"].HirePrices) == "4/11/30/11" && P3(m27.Factions["angmar"].PromotePrices) == "8/8/25" && T4(m27.Factions["angmar"].Damage) == "3.15/3.95/10.5/3.05"
+            Check(store27 && m27.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 34
+                && H4(m27.Factions["mordor"].HirePrices) == "5/15/40/15" && P3(m27.Factions["mordor"].PromotePrices) == "12/12/36" && T4(m27.Factions["mordor"].Health) == "22/34/48/35"
+                && H4(m27.Factions["angmar"].HirePrices) == "4/11/30/11" && P3(m27.Factions["angmar"].PromotePrices) == "8/8/25" && T4(m27.Factions["angmar"].Damage) == "3.15/3.95/7/3.05"
                 && H4(m27.Factions["isengard"].HirePrices) == "5/15/40/15" && P3(m27.Factions["isengard"].PromotePrices) == "20/14/40"
-                && H4(m27.Factions["elves"].HirePrices) == "5/15/40/15" && P3(m27.Factions["elves"].PromotePrices) == "12/12/36" && T4(m27.Factions["elves"].Damage) == "3.65/5.35/12/4.25" && T4(m27.Factions["elves"].Health) == "22/34/96/35"
-                && H4(m27.Factions["gondor"].HirePrices) == "5/15/40/15" && T4(m27.Factions["gondor"].Damage) == "3.15/3.95/10.5/3.05",
+                && H4(m27.Factions["elves"].HirePrices) == "5/15/40/15" && P3(m27.Factions["elves"].PromotePrices) == "12/12/36" && T4(m27.Factions["elves"].Damage) == "3.65/5.35/12/4.25" && T4(m27.Factions["elves"].Health) == "22/34/48/35"
+                && H4(m27.Factions["gondor"].HirePrices) == "5/15/40/15" && T4(m27.Factions["gondor"].Damage) == "3.15/3.95/7/3.05",
                 "0.0.108: a version 27 file's 0.0.107 tables and hire prices take the new ones, promotion prices that followed the old hire prices follow the new; prices or tables the admin changed stay");
         }
 
@@ -2232,8 +2235,8 @@ public static class Program {
             v24["Factions"]["angmar"]["Health"]["captain"] = 60;   // the admin's own Angmar health stays, its damage still moves
             var m24 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v24.ToString()), out bool store24);
             double Strength(string tier, string rank) { var t = tier == "orc" ? FactionTiers.Orc : FactionTiers.Men; return t.Health[rank] * t.Damage[rank]; }
-            Check(store24 && T3(m24.Factions["mordor"].Health) == "22/34/96/35" && T3(m24.Factions["gundabad"].Damage) == "3.15/3.95/10.5/3.05"
-                && T3(m24.Factions["angmar"].Health) == "15/27/60/22" && T3(m24.Factions["angmar"].Damage) == "3.15/3.95/10.5/3.05" && T3(m24.Factions["gondor"].Health) == "22/34/96/35"
+            Check(store24 && T3(m24.Factions["mordor"].Health) == "22/34/48/35" && T3(m24.Factions["gundabad"].Damage) == "3.15/3.95/7/3.05"
+                && T3(m24.Factions["angmar"].Health) == "15/27/60/22" && T3(m24.Factions["angmar"].Damage) == "3.15/3.95/7/3.05" && T3(m24.Factions["gondor"].Health) == "22/34/48/35"
                 && FactionTiers.Ranks.All(r => Strength("orc", r) == Strength("men", r)),
                 "0.0.103: a version 24 file's unchanged 0.0.91 orc tables move to the tier's (equal to the Men's since 0.0.135), a value the admin changed keeps that table");
         }
@@ -2323,16 +2326,16 @@ public static class Program {
                 "a new file is version 20: every faction has MaxFollowers, MaxRecruits and Health and Damage for each rank (no multipliers), and DamageSpread 0.2");
             string RT(Dictionary<string, float> t) => string.Join("/", new[] { "recruit", "warrior", "captain", "archer" }.Select(r => t[r].ToString(System.Globalization.CultureInfo.InvariantCulture)));
             bool Tier(string f, int fol, int ros, string h, string d) => D(f).MaxFollowers == fol && D(f).MaxRecruits == ros && RT(D(f).Health) == h && RT(D(f).Damage) == d;
-            Check(c90.Factions.Keys.All(f => Tier(f, 3, 16, "22/34/96/35", "3.15/3.95/10.5/3.05")),
-                "the tiers (0.0.135, owner: \"Equal stats, everyone 3\"): every faction follows 3, has a roster of 16, health 22/34/96/35 and damage 3.15/3.95/10.5/3.05");
+            Check(c90.Factions.Keys.All(f => Tier(f, 3, 16, "22/34/48/35", "3.15/3.95/7/3.05")),
+                "the tiers (0.0.135, owner: \"Equal stats, everyone 3\"): every faction follows 3, has a roster of 16, health 22/34/48/35 and damage 3.15/3.95/7/3.05");
             string P(Dictionary<string, int> p, params string[] ranks) => string.Join("/", ranks.Select(r => p[r]));
             string[] H = { "recruit", "warrior", "captain", "archer" }, Pr = { "warrior", "archer", "captain" };
             Check(c90.Factions.Keys.All(f => P(D(f).HirePrices, H) == "5/15/40/15" && P(D(f).PromotePrices, Pr) == "12/12/36"),
                 "tier prices (0.0.135): every faction hires for 5/15/40/15 and promotes for 12/12/36 (warrior/archer/captain)");
             var mine = Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(@"{ ""Version"": 20, ""DamageSpread"": 7, ""Factions"": { ""rivendell"": { ""Stance"": ""aggressive"" }, ""mordor"": { ""MaxFollowers"": 99, ""Health"": { ""Recruit"": 0, ""warrior"": 26.4 }, ""Damage"": { ""captain"": 6.5 } } } }");
             var mMine = FactionConfig.FromFile(mine, out _);
-            Check(mMine.Factions["rivendell"].MaxFollowers == 3 && mMine.Factions["rivendell"].MaxRecruits == 16 && RT(mMine.Factions["rivendell"].Health) == "22/34/96/35" && P(mMine.Factions["rivendell"].HirePrices, H) == "5/15/40/15"
-                && mMine.Factions["mordor"].MaxFollowers == 32 && RT(mMine.Factions["mordor"].Health) == "1/26/96/35" && RT(mMine.Factions["mordor"].Damage) == "3.15/3.95/6.5/3.05" && mMine.Factions["mordor"].MaxRecruits == 16 && mMine.Spread == 0.9,
+            Check(mMine.Factions["rivendell"].MaxFollowers == 3 && mMine.Factions["rivendell"].MaxRecruits == 16 && RT(mMine.Factions["rivendell"].Health) == "22/34/48/35" && P(mMine.Factions["rivendell"].HirePrices, H) == "5/15/40/15"
+                && mMine.Factions["mordor"].MaxFollowers == 32 && RT(mMine.Factions["mordor"].Health) == "1/26/48/35" && RT(mMine.Factions["mordor"].Damage) == "3.15/3.95/6.5/3.05" && mMine.Factions["mordor"].MaxRecruits == 16 && mMine.Spread == 0.9,
                 "a faction the mod doesn't ship gets the baseline; out of range values are clamped (follow 1 to 32, health at least 1 and whole, spread at most 0.9), rank names in any case, missing ranks filled from the tier");
             Check(mMine.FollowersOf("nobody") == 3 && mMine.RosterOf(null) == 16 && mMine.HealthFor("nobody", "recruit") == null && mMine.DamageFor("mordor", null) == null && mMine.HealthFor("mordor", "warrior") == 26 && mMine.DamageFor("mordor", "captain") == 6.5f,
                 "a faction the config doesn't know, or a rankless NPC, keeps its type's health and damage; a faction's own rank values are used");
@@ -2347,8 +2350,8 @@ public static class Program {
             o19["Factions"]["elves"]["DamageMultiplier"] = 2.0;
             var m19 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(o19.ToString()), out bool store19);
             string j19 = Newtonsoft.Json.JsonConvert.SerializeObject(m19);
-            Check(store19 && m19.Version == FactionConfig.CurrentVersion && RT(m19.Factions["gondor"].Health) == "22/34/96/35" && RT(m19.Factions["dwarves"].Damage) == "3.15/3.95/10.5/3.05"
-                && RT(m19.Factions["mordor"].Health) == "22/34/96/34" && RT(m19.Factions["mordor"].Damage) == "3.15/3.95/10.5/3.05" && RT(m19.Factions["elves"].Damage) == "6/8/14/6" && RT(m19.Factions["elves"].Health) == "22/34/96/35"
+            Check(store19 && m19.Version == FactionConfig.CurrentVersion && RT(m19.Factions["gondor"].Health) == "22/34/48/35" && RT(m19.Factions["dwarves"].Damage) == "3.15/3.95/7/3.05"
+                && RT(m19.Factions["mordor"].Health) == "22/34/48/34" && RT(m19.Factions["mordor"].Damage) == "3.15/3.95/7/3.05" && RT(m19.Factions["elves"].Damage) == "6/8/14/6" && RT(m19.Factions["elves"].Health) == "22/34/48/35"
                 && !j19.Replace("NpcVsNpcDamageMultiplier", "").Replace("BackHitMultiplier", "").Contains("Multiplier") && m19.DamageSpread == 0.2,
                 "a version 19 file: multipliers as 0.0.90 shipped them take the fitted per-rank tables; ones the admin changed become the units' own values times theirs (orcs 22/34/48/34, elves hit 6/8/14/6); the multipliers aren't written back; DamageSpread 0.2 comes in");
             // The spread.
@@ -2373,11 +2376,11 @@ public static class Program {
             bool c3 = EntityBehaviorFactionMember.SyncMaxHealth(manNew, S(manNew, 22));
             EntityBehaviorFactionMember.SyncMaxHealth(dwNew, S(dwNew, 48));
             Console.WriteLine($"   > health: orc recruit {Hv(orcNew, "maxhealth")}/{Hv(orcNew, "currenthealth")} (changed {c1}), orc captain {Hv(orcHurt, "maxhealth")}/{Hv(orcHurt, "currenthealth")}, man {Hv(manNew, "maxhealth")} (changed {c3}), dwarf captain {Hv(dwNew, "maxhealth")}/{Hv(dwNew, "currenthealth")}");
-            Check(c1 && Hv(orcNew, "maxhealth") == 22 && Hv(orcNew, "currenthealth") == 22 && Hv(orcHurt, "maxhealth") == 96 && Hv(orcHurt, "currenthealth") == 88
-                && !c3 && Hv(manNew, "maxhealth") == 22 && Hv(dwNew, "maxhealth") == 96 && Hv(dwNew, "currenthealth") == 96
+            Check(c1 && Hv(orcNew, "maxhealth") == 22 && Hv(orcNew, "currenthealth") == 22 && Hv(orcHurt, "maxhealth") == 48 && Hv(orcHurt, "currenthealth") == 40
+                && !c3 && Hv(manNew, "maxhealth") == 22 && Hv(dwNew, "maxhealth") == 48 && Hv(dwNew, "currenthealth") == 48
                 && !EntityBehaviorFactionMember.SyncMaxHealth(orcNew, S(orcNew, 22)) && EntityBehaviorFactionMember.ScaledMaxHealth(orcNew, null) == 0,
-                "on load an old orc recruit (19) takes 22 health (full stays full), a wounded old orc captain keeps its 8 wounds (88 of 96 since 0.0.153), a man is unchanged, an old dwarf captain (63) gets 96; a second load changes nothing");
-            Check(fs90.Config.DamageFor("mordor", "recruit") == 3.15f && fs90.Config.DamageFor("gondor", "recruit") == 3.15f && fs90.Config.DamageFor("elves", "captain") == 10.5f && fs90.Config.DamageFor("mordor", "archer") == 3.05f
+                "on load an old orc recruit (19) takes 22 health (full stays full), a wounded old orc captain keeps its 8 wounds (40 of 48), a man is unchanged, an old dwarf captain (63) gets 48; a second load changes nothing");
+            Check(fs90.Config.DamageFor("mordor", "recruit") == 3.15f && fs90.Config.DamageFor("gondor", "recruit") == 3.15f && fs90.Config.DamageFor("elves", "captain") == 7f && fs90.Config.DamageFor("mordor", "archer") == 3.05f
                 && EntityBehaviorFactionMember.RankOf(Npc("test-mordororc-archer")) == "archer" && EntityBehaviorFactionMember.RankOf(Npc("test-goblin")) == null,
                 "damage per rank: an orc recruit and a Men recruit hit for 3.15, an elf captain 7, an orc archer's arrow 3.05 (before the spread, equal since 0.0.135); the rankless goblin keeps its own");
 
@@ -2449,7 +2452,7 @@ public static class Program {
                 && FactionConfig.InstructionText.Any(l => l.StartsWith("DamageSpread")) && !FactionConfig.InstructionText.Any(l => !l.StartsWith("NpcVsNpcDamageMultiplier") && !l.StartsWith("BackHitMultiplier") && l.Contains("Multiplier"))
                 && FactionConfig.InstructionText.Any(l => l.StartsWith("ShareFriends") && l.Contains("hire")) && FactionConfig.InstructionText.Any(l => l.StartsWith("Hiring:") && l.Contains("ShareFriends")),
                 "#Instructions explain follow shares, the multipliers, and that ShareFriends allies can hire each other's NPCs (owner: \"every faction they are allied to\")");
-            Check(fs90.DescribeFactions().Contains("mordor: aggressive") && fs90.DescribeFactions().Contains("follow 3, roster 16, health 22/34/96/35/43/27, damage 3.15/3.95/10.5/3.05/3.16/4.94") && fs90.DescribeFactions().Contains("Hits vary by 20% either way."),
+            Check(fs90.DescribeFactions().Contains("mordor: aggressive") && fs90.DescribeFactions().Contains("follow 3, roster 16, health 22/34/48/35/43/27, damage 3.15/3.95/7/3.05/3.16/4.94") && fs90.DescribeFactions().Contains("Hits vary by 20% either way."),
                 "/recruits faction list shows each faction's follow limit, roster and per-rank health and damage, and the hit spread");
         }
 

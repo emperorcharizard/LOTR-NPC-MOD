@@ -202,6 +202,15 @@ namespace LotrNpcs
         public static float RankMatchup(string attackerRank, bool attackerMounted, bool targetIsArcher, bool targetMounted) =>
             (targetMounted && attackerRank == "captain" ? CaptainVsRiderMultiplier : 1f) * (attackerMounted && targetIsArcher ? RiderVsArcherMultiplier : 1f);
 
+        /// <summary>0.0.155 (owner, 2026-11-16: "We need to keep this within reason for players to be able to kill in
+        /// equivalent armor and weapons", "Aka for captains, iron and steel"): captains are back to 48 health and 7 damage,
+        /// what players in iron and steel were tuned against, and keep 0.0.153's strength against NPCs only: a captain's
+        /// hits on NPCs do CaptainVsNpcMultiplier times the damage, and NPC hits on a captain (melee and arrows)
+        /// CaptainFromNpcMultiplier times. 1.5 x 2 is the 3 times of 96 health x 10.5 damage.</summary>
+        public const float CaptainVsNpcMultiplier = 1.5f, CaptainFromNpcMultiplier = 0.5f;
+        public static float CaptainNpcFight(string attackerRank, string targetRank, bool targetIsPlayer) =>
+            targetIsPlayer ? 1f : (attackerRank == "captain" ? CaptainVsNpcMultiplier : 1f) * (targetRank == "captain" ? CaptainFromNpcMultiplier : 1f);
+
         public static bool NpcControls(Entity controller) => controller != null && !(controller is EntityPlayer) && controller.Code?.Domain == "lotrnpcs";
 
         /// <summary>0.0.142: a mounted rider's blow is due damageAtMs after its swing started (no facing needed).</summary>

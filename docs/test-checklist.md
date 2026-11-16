@@ -777,7 +777,7 @@ Owner, 2026-11-16, chose "Stronger captains overall" (so a captain beats a rider
 - [x] 153.1 1 Rohan rider v 1 Dunlending captain: the captain wins.
   - 2026-11-16 on 0.0.153: captain dealt 32 (rider left on 2 of 34, then stood off), rider dealt 46 of the captain's 96, by 172 s (log 104729).
 - [ ] 153.2 1 Dunlending captain v 2 Dunlending warriors: the captain wins.
-- [ ] 153.3 A hired captain from before keeps its wounds and gets 96 max health after the update.
+- [ ] 153.3 0.0.155 (owner: "keep this within reason for players to be able to kill in equivalent armor and weapons", "Aka for captains, iron and steel"): captains are back to 48 health and 7 damage against players; config version 34 moves 96/10.5 back. A player in iron or steel armor with an iron or steel weapon can kill a captain one on one. Against NPCs the captain still hits x1.5 and takes x0.5 (redo 153.1 and 153.2 on 0.0.155).
 
 ## 154. Guard and shock recruits (0.0.154)
 
