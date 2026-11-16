@@ -612,3 +612,236 @@ Install `lotrnpcs_0.0.149-test.zip`; restart fully. Synergy's activation range o
 Install `lotrnpcs_0.0.150-test.zip`; restart fully. Synergy's activation range off for the test, back on after.
 
 - [ ] 150.1 Owner, 2026-11-16: "3 riders should beat 5-7 warriors". A Rohan rider has a warrior's 34 health and 3.95 damage (x2 on charge hits). 3 Rohan riders beat 6 Dunlending warriors with losses, and 3 v 8 or 9 is about even.
+
+## 151. Every faction's units against each other, in game (owner, 2026-11-16)
+
+Owner, 2026-11-16: "On the checklist I want all the factions units to be tested against each other." "In game". Since 0.0.135 every faction has the same numbers per rank, so what still differs is weapons, reach, body size and armor tiers. Three parts: every faction against every other (136 pairs), every rank against every rank, and the riders' role.
+
+How: Synergy's activation range off (back on after), battle log on, a flat open area within 40 blocks of the player. Spawn each side in batches of 5 about 16 blocks apart, e.g. `/entity spawnat lotrnpcs:test-gondor-warrior 5 x 4 z 2`. Read `/recruits battlelog` at the end, then kill both types with explicit types and a range. Save the CSVs to docs/handover/battle-logs/ and note the score next to the item.
+
+### 151A. Faction v faction: 5 warriors a side, 3 runs
+
+Owner, 2026-11-16: "Actually I guess it doesnt really matter if they have equal stats", then "But do it anyway": every pair. Pass: neither side wins all 3, or the winner never keeps more than 2 of its 5 standing. A fail points at that faction's weapon, reach, body size or armor tier. Run several pairs at once only when each fight is 30+ blocks from the next.
+
+**gondor**
+
+- [ ] 151.1 gondor v rohan
+- [ ] 151.2 gondor v arnor
+- [ ] 151.3 gondor v dale
+- [ ] 151.4 gondor v elf
+- [ ] 151.5 gondor v dwarf
+- [ ] 151.6 gondor v mordororc
+- [ ] 151.7 gondor v angmarorc
+- [ ] 151.8 gondor v gundabadorc
+- [ ] 151.9 gondor v goblin
+- [ ] 151.10 gondor v uruk
+- [ ] 151.11 gondor v dunlending
+- [ ] 151.12 gondor v haradrim
+- [ ] 151.13 gondor v easterling
+- [ ] 151.14 gondor v blacknumenorean
+- [ ] 151.15 gondor v tormentedelf
+- [ ] 151.16 gondor v wickeddwarf
+
+**rohan**
+
+- [ ] 151.17 rohan v arnor
+- [ ] 151.18 rohan v dale
+- [ ] 151.19 rohan v elf
+- [ ] 151.20 rohan v dwarf
+- [ ] 151.21 rohan v mordororc
+- [ ] 151.22 rohan v angmarorc
+- [ ] 151.23 rohan v gundabadorc
+- [ ] 151.24 rohan v goblin
+- [ ] 151.25 rohan v uruk
+- [ ] 151.26 rohan v dunlending
+- [ ] 151.27 rohan v haradrim
+- [ ] 151.28 rohan v easterling
+- [ ] 151.29 rohan v blacknumenorean
+- [ ] 151.30 rohan v tormentedelf
+- [ ] 151.31 rohan v wickeddwarf
+
+**arnor**
+
+- [ ] 151.32 arnor v dale
+- [ ] 151.33 arnor v elf
+- [ ] 151.34 arnor v dwarf
+- [ ] 151.35 arnor v mordororc
+- [ ] 151.36 arnor v angmarorc
+- [ ] 151.37 arnor v gundabadorc
+- [ ] 151.38 arnor v goblin
+- [ ] 151.39 arnor v uruk
+- [ ] 151.40 arnor v dunlending
+- [ ] 151.41 arnor v haradrim
+- [ ] 151.42 arnor v easterling
+- [ ] 151.43 arnor v blacknumenorean
+- [ ] 151.44 arnor v tormentedelf
+- [ ] 151.45 arnor v wickeddwarf
+
+**dale**
+
+- [ ] 151.46 dale v elf
+- [ ] 151.47 dale v dwarf
+- [ ] 151.48 dale v mordororc
+- [ ] 151.49 dale v angmarorc
+- [ ] 151.50 dale v gundabadorc
+- [ ] 151.51 dale v goblin
+- [ ] 151.52 dale v uruk
+- [ ] 151.53 dale v dunlending
+- [ ] 151.54 dale v haradrim
+- [ ] 151.55 dale v easterling
+- [ ] 151.56 dale v blacknumenorean
+- [ ] 151.57 dale v tormentedelf
+- [ ] 151.58 dale v wickeddwarf
+
+**elf**
+
+- [ ] 151.59 elf v dwarf
+- [ ] 151.60 elf v mordororc
+- [ ] 151.61 elf v angmarorc
+- [ ] 151.62 elf v gundabadorc
+- [ ] 151.63 elf v goblin
+- [ ] 151.64 elf v uruk
+- [ ] 151.65 elf v dunlending
+- [ ] 151.66 elf v haradrim
+- [ ] 151.67 elf v easterling
+- [ ] 151.68 elf v blacknumenorean
+- [ ] 151.69 elf v tormentedelf
+- [ ] 151.70 elf v wickeddwarf
+
+**dwarf**
+
+- [ ] 151.71 dwarf v mordororc
+- [ ] 151.72 dwarf v angmarorc
+- [ ] 151.73 dwarf v gundabadorc
+- [ ] 151.74 dwarf v goblin
+- [ ] 151.75 dwarf v uruk
+- [ ] 151.76 dwarf v dunlending
+- [ ] 151.77 dwarf v haradrim
+- [ ] 151.78 dwarf v easterling
+- [ ] 151.79 dwarf v blacknumenorean
+- [ ] 151.80 dwarf v tormentedelf
+- [ ] 151.81 dwarf v wickeddwarf
+
+**mordororc**
+
+- [ ] 151.82 mordororc v angmarorc
+- [ ] 151.83 mordororc v gundabadorc
+- [ ] 151.84 mordororc v goblin
+- [ ] 151.85 mordororc v uruk
+- [ ] 151.86 mordororc v dunlending
+- [ ] 151.87 mordororc v haradrim
+- [ ] 151.88 mordororc v easterling
+- [ ] 151.89 mordororc v blacknumenorean
+- [ ] 151.90 mordororc v tormentedelf
+- [ ] 151.91 mordororc v wickeddwarf
+
+**angmarorc**
+
+- [ ] 151.92 angmarorc v gundabadorc
+- [ ] 151.93 angmarorc v goblin
+- [ ] 151.94 angmarorc v uruk
+- [ ] 151.95 angmarorc v dunlending
+- [ ] 151.96 angmarorc v haradrim
+- [ ] 151.97 angmarorc v easterling
+- [ ] 151.98 angmarorc v blacknumenorean
+- [ ] 151.99 angmarorc v tormentedelf
+- [ ] 151.100 angmarorc v wickeddwarf
+
+**gundabadorc**
+
+- [ ] 151.101 gundabadorc v goblin
+- [ ] 151.102 gundabadorc v uruk
+- [ ] 151.103 gundabadorc v dunlending
+- [ ] 151.104 gundabadorc v haradrim
+- [ ] 151.105 gundabadorc v easterling
+- [ ] 151.106 gundabadorc v blacknumenorean
+- [ ] 151.107 gundabadorc v tormentedelf
+- [ ] 151.108 gundabadorc v wickeddwarf
+
+**goblin**
+
+- [ ] 151.109 goblin v uruk
+- [ ] 151.110 goblin v dunlending
+- [ ] 151.111 goblin v haradrim
+- [ ] 151.112 goblin v easterling
+- [ ] 151.113 goblin v blacknumenorean
+- [ ] 151.114 goblin v tormentedelf
+- [ ] 151.115 goblin v wickeddwarf
+
+**uruk**
+
+- [ ] 151.116 uruk v dunlending
+- [ ] 151.117 uruk v haradrim
+- [ ] 151.118 uruk v easterling
+- [ ] 151.119 uruk v blacknumenorean
+- [ ] 151.120 uruk v tormentedelf
+- [ ] 151.121 uruk v wickeddwarf
+
+**dunlending**
+
+- [ ] 151.122 dunlending v haradrim
+- [ ] 151.123 dunlending v easterling
+- [ ] 151.124 dunlending v blacknumenorean
+- [ ] 151.125 dunlending v tormentedelf
+- [ ] 151.126 dunlending v wickeddwarf
+
+**haradrim**
+
+- [ ] 151.127 haradrim v easterling
+- [ ] 151.128 haradrim v blacknumenorean
+- [ ] 151.129 haradrim v tormentedelf
+- [ ] 151.130 haradrim v wickeddwarf
+
+**easterling**
+
+- [ ] 151.131 easterling v blacknumenorean
+- [ ] 151.132 easterling v tormentedelf
+- [ ] 151.133 easterling v wickeddwarf
+
+**blacknumenorean**
+
+- [ ] 151.134 blacknumenorean v tormentedelf
+- [ ] 151.135 blacknumenorean v wickeddwarf
+
+**tormentedelf**
+
+- [ ] 151.136 tormentedelf v wickeddwarf
+
+### 151B. Rank v rank: Gondor against Mordor orcs, 3 runs each
+
+The rank pairs at equal coin, using each side's hire price (recruit 5, warrior 12, guard and shock their promotion prices, captain and rider 51, archer 12; check `/recruits faction list` for the live prices). Note who wins and by how much; the expected order is captain > rider > guard/shock > warrior > archer in melee > recruit, and archers should win if they get to shoot first from 16+ blocks.
+
+- [ ] 151.B1 gondor recruit v mordororc recruit
+- [ ] 151.B2 gondor recruit v mordororc warrior (and mordororc recruit v gondor warrior)
+- [ ] 151.B3 gondor recruit v mordororc guard (and mordororc recruit v gondor guard)
+- [ ] 151.B4 gondor recruit v mordororc shock (and mordororc recruit v gondor shock)
+- [ ] 151.B5 gondor recruit v mordororc captain (and mordororc recruit v gondor captain)
+- [ ] 151.B6 gondor recruit v mordororc archer (and mordororc recruit v gondor archer)
+- [ ] 151.B7 gondor recruit v mordororc rider (and mordororc recruit v gondor rider)
+- [ ] 151.B8 gondor warrior v mordororc warrior
+- [ ] 151.B9 gondor warrior v mordororc guard (and mordororc warrior v gondor guard)
+- [ ] 151.B10 gondor warrior v mordororc shock (and mordororc warrior v gondor shock)
+- [ ] 151.B11 gondor warrior v mordororc captain (and mordororc warrior v gondor captain)
+- [ ] 151.B12 gondor warrior v mordororc archer (and mordororc warrior v gondor archer)
+- [ ] 151.B13 gondor warrior v mordororc rider (and mordororc warrior v gondor rider)
+- [ ] 151.B14 gondor guard v mordororc guard
+- [ ] 151.B15 gondor guard v mordororc shock (and mordororc guard v gondor shock)
+- [ ] 151.B16 gondor guard v mordororc captain (and mordororc guard v gondor captain)
+- [ ] 151.B17 gondor guard v mordororc archer (and mordororc guard v gondor archer)
+- [ ] 151.B18 gondor guard v mordororc rider (and mordororc guard v gondor rider)
+- [ ] 151.B19 gondor shock v mordororc shock
+- [ ] 151.B20 gondor shock v mordororc captain (and mordororc shock v gondor captain)
+- [ ] 151.B21 gondor shock v mordororc archer (and mordororc shock v gondor archer)
+- [ ] 151.B22 gondor shock v mordororc rider (and mordororc shock v gondor rider)
+- [ ] 151.B23 gondor captain v mordororc captain
+- [ ] 151.B24 gondor captain v mordororc archer (and mordororc captain v gondor archer)
+- [ ] 151.B25 gondor captain v mordororc rider (and mordororc captain v gondor rider)
+- [ ] 151.B26 gondor archer v mordororc archer
+- [ ] 151.B27 gondor archer v mordororc rider (and mordororc archer v gondor rider)
+- [ ] 151.B28 gondor rider v mordororc rider
+
+### 151C. Riders' role (owner, 2026-11-16: riders should "beat 2 warriors, less than one captain, and be a harassing unit for archers")
+
+- [ ] 151.C1 1 Rohan rider v 2 Dunlending warriors: the rider wins.
+- [ ] 151.C2 1 Rohan rider v 1 Dunlending captain: the captain wins.
+- [ ] 151.C3 3 Rohan riders v 5 Dunlending warriors + 3 archers behind them: the riders ride past the warriors to the archers and kill them first (0.0.151).

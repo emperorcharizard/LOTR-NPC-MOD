@@ -222,6 +222,21 @@ namespace LotrNpcs
             minVerDist = footMinVerDist + vertical;
         }
 
+        AiTaskFactionSeek seek;
+        bool seekLookedUp;
+        AiTaskFactionSeek Seek
+        {
+            get
+            {
+                if (!seekLookedUp)
+                {
+                    seek = entity.GetBehavior<EntityBehaviorTaskAI>()?.TaskManager?.AllTasks?.OfType<AiTaskFactionSeek>().FirstOrDefault();
+                    seekLookedUp = true;
+                }
+                return seek;
+            }
+        }
+
         EntityBehaviorHeldWeapon Weapon
         {
             get
@@ -257,6 +272,13 @@ namespace LotrNpcs
             if ((entity as EntityAgent)?.MountedOn != null && targetEntity != null)
             {
                 Entity kept = Riders.FocusOf(entity);
+                // 0.0.151: the archer its seek rides for becomes the focus (riders harass archers).
+                Entity hunted = Seek?.TargetEntity;
+                if (hunted != null && hunted.Alive && hunted != kept && Riders.FocusOnHunted(Recruit.IsArcher(hunted), kept != null && Recruit.IsArcher(kept)))
+                {
+                    Riders.SetFocus(entity, hunted);
+                    kept = Riders.FocusOf(entity);
+                }
                 if (kept == null) Riders.SetFocus(entity, targetEntity);
                 else if (kept != targetEntity)
                 {

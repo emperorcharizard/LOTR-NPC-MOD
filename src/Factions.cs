@@ -2114,8 +2114,20 @@ namespace LotrNpcs
         public override bool IsTargetableEntity(Entity e, float range)
         {
             // 0.0.94 (owner: not "through walls", chose A): only an enemy it can see, checked after the cheap rules.
-            if (factions != null && Recruit.OwnerUidOf(entity) is string owner) return e.Alive && CanSense(e, range) && factions.RecruitWantsToAttack(entity, owner, e) && !BeyondLeash(e) && CanSee(e) && NotCrowded(e);
-            return faction == null || factions == null ? base.IsTargetableEntity(e, range) : e.Alive && CanSense(e, range) && factions.WantsToAttack(faction, e) && CanSee(e) && NotCrowded(e);
+            if (factions != null && Recruit.OwnerUidOf(entity) is string owner) return e.Alive && CanSense(e, range) && factions.RecruitWantsToAttack(entity, owner, e) && !BeyondLeash(e) && CanSee(e) && NotCrowded(e) && ArcherFirst(e);
+            return faction == null || factions == null ? base.IsTargetableEntity(e, range) : e.Alive && CanSense(e, range) && factions.WantsToAttack(faction, e) && CanSee(e) && NotCrowded(e) && ArcherFirst(e);
+        }
+
+        // 0.0.151 (owner, 2026-11-16: riders "a harassing unit for archers"): a mounted NPC passes over a free enemy that
+        // isn't an archer, remembering the nearest, which ShouldExecute takes when no archer turns up.
+        Entity nonArcherFallback;
+        double nonArcherFallbackDistSq;
+        bool ArcherFirst(Entity e)
+        {
+            if (!Riders.PassesOver((entity as EntityAgent)?.MountedOn != null, Recruit.IsArcher(e))) return true;
+            double d = e.Pos.SquareDistanceTo(entity.Pos);
+            if (nonArcherFallback == null || d < nonArcherFallbackDistSq) { nonArcherFallback = e; nonArcherFallbackDistSq = d; }
+            return false;
         }
 
         /// <summary>Lines of sight (0.0.94): a target is picked only when seen (Sight.CanSee); once fighting, one out of
@@ -2261,6 +2273,7 @@ namespace LotrNpcs
             crowdedFallback = null;
             pairedFallback = null;
             fullFallback = null;
+            nonArcherFallback = null;
             long searchedBefore = lastSearchTotalMs;
             bool found = base.ShouldExecute();
             // The search ran (lastSearchTotalMs moved) and found no free target: take one already being fought (0.0.82),
@@ -2268,7 +2281,8 @@ namespace LotrNpcs
             // than 2 on one enemy).
             if (!found && targetEntity == null && lastSearchTotalMs != searchedBefore)
             {
-                Entity fallback = pairedFallback != null && pairedFallback.Alive ? pairedFallback
+                Entity fallback = nonArcherFallback != null && nonArcherFallback.Alive ? nonArcherFallback
+                    : pairedFallback != null && pairedFallback.Alive ? pairedFallback
                     : fullFallback != null && fullFallback.Alive ? fullFallback
                     : crowdedFallback != null && crowdedFallback.Alive && !(factions?.Lines.Wants(entity, crowdedFallback) ?? false) ? crowdedFallback : null;
                 if (fallback != null)
@@ -2281,6 +2295,7 @@ namespace LotrNpcs
             crowdedFallback = null;
             pairedFallback = null;
             fullFallback = null;
+            nonArcherFallback = null;
             if (!found || BeyondLeash(targetEntity)) return false;
             long now = entity.World.ElapsedMilliseconds;
             Member?.MarkFighting(now);

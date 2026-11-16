@@ -185,6 +185,13 @@ namespace LotrNpcs
 
         /// <summary>0.0.148: a mount's controlling passenger is one of our NPCs (not a player), so the client mustn't read
         /// its keys (it has none there).</summary>
+        /// <summary>0.0.151 (owner, 2026-11-16: riders should "be a harassing unit for archers"): a mounted NPC passes over
+        /// any enemy but an archer while an archer is there to pick; with none, it takes the nearest as before.</summary>
+        public static bool PassesOver(bool mounted, bool targetIsArcher) => mounted && !targetIsArcher;
+
+        /// <summary>0.0.151: the rider's focus moves to the archer its seek is riding for, unless it already finishes one.</summary>
+        public static bool FocusOnHunted(bool huntedIsArcher, bool focusIsArcher) => huntedIsArcher && !focusIsArcher;
+
         public static bool NpcControls(Entity controller) => controller != null && !(controller is EntityPlayer) && controller.Code?.Domain == "lotrnpcs";
 
         /// <summary>0.0.142: a mounted rider's blow is due damageAtMs after its swing started (no facing needed).</summary>
