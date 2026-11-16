@@ -437,7 +437,7 @@ Install `lotrnpcs_0.0.125-test.zip`; restart fully. Needs Feverstone Wilds.
 
 Install `lotrnpcs_0.0.126-test.zip`; restart fully. Clear leftover test NPCs first (explicit types and a range).
 
-- [ ] 126.1 Spawn 5 Rohan riders with no enemies around: they wander at a walk and stay within about 20 blocks for a minute (in 0.0.125 they galloped 30-50 blocks off).
+- [x] 126.1 Spawn 5 Rohan riders with no enemies around: they wander at a walk and stay within about 20 blocks for a minute (in 0.0.125 they galloped 30-50 blocks off). (passes on 0.0.147, see 147.1)
   - 2026-11-16 on 0.0.146: after ~70 s, 0 of 5 riders within 30 blocks, 1 within 50, all 5 within 100. Failed; 0.0.147 puts riders' wander on a 12-block leash (147.1).
 - [x] 126.2 Spawn 3 goblin warriors 15 blocks from them: the riders ride in, the horses walk up to each goblin and the riders land hits; no rider stands off out of reach for more than a few seconds.
 - [ ] 126.3 A hired rider on Follow still keeps up when you sprint away (its horse runs when the rider runs).
@@ -493,13 +493,13 @@ Install `lotrnpcs_0.0.133-test.zip`; restart fully. Battle log on, each side on 
 
 ## 134: smaller mod file (packaging only)
 - [x] 134.1 Every race still shows its skins (dwarves, elves, hobbits, Men of each faction, orcs): the 25 duplicate skin pictures now point at one shared copy. *2026-11-14: Haradrim, Black Númenórean, Easterling, dwarf, elf and tormented elf recruits, Gondor, Mordor and Dunlendings all showed their skins.*
-- [ ] 134.2 No new "texture not found" or JSON parse lines for lotrnpcs in client-main.log / server-main.log.
+- [x] 134.2 No new "texture not found" or JSON parse lines for lotrnpcs in client-main.log / server-main.log. (2026-11-16 on 0.0.147, owner's PC: no lotrnpcs error/exception/failed lines and no [lotrnpcs] warnings in client-main.log or server-main.log after a fresh start; the server without LRC still to check before release)
 
 ## 135. Equal stats, 3 followers, longer NPC fights (0.0.135)
 
 Install `lotrnpcs_0.0.135-test.zip`; restart fully. Battle log on, each side on one spot.
 
-- [ ] 135.1 `/recruits faction list`: every faction shows follow 3, roster 16, health 22/34/48/35/43/27, damage 3.15/3.95/7/3.05/3.16/4.94; ModConfig/lotrnpcs-factions.json is Version 31 with NpcVsNpcDamageMultiplier 0.5.
+- [x] 135.1 `/recruits faction list`: every faction shows follow 3, roster 16, health 22/34/48/35/43/27, damage 3.15/3.95/7/3.05/3.16/4.94; ModConfig/lotrnpcs-factions.json is Version 31 with NpcVsNpcDamageMultiplier 0.5. (2026-11-16 on 0.0.147: every faction follow 3, roster 16, health 22/34/48/35/43/27, damage 3.15/3.95/7/3.05/3.16/4.94; the file is now Version 32 (0.0.138) with NpcVsNpcDamageMultiplier 0.5)
 - [ ] 135.2 9 Gondor warriors v 9 Mordor warriors, twice: about even (each side wins some), and the fight lasts roughly twice as long as a 0.0.134 fight of the same size (battle log damage per NPC hit about half the warrior's 3.95, so about 1.6-2.4). *2026-11-14 on 0.0.138: not even, Gondor won 3 of 3 (9-2, 9-7, 9-3); 1.96-1.97 per hit; 71-114 s from first blow (pre-0.0.135 about 25 s), so 3-4x longer. Same swing rate both sides; orc weapons land later (mean 462 v 367 ms). Owner deciding.*
 - [ ] 135.3 A warrior hitting you does its full damage (not halved), and your hits on NPCs are unchanged.
 - [ ] 135.4 The hire menu shows 3 followers for every faction, and a third follower of any faction fills the band.
@@ -522,7 +522,7 @@ Install `lotrnpcs_0.0.137-test.zip`; restart fully. Battle log on.
 - [ ] 137.1 Hit a standing NPC from behind and from the front with the same weapon: the hit from behind does 1.5x (watch its health or the battle log); `/recruits battlelog` shows "hits in the back" in an NPC fight. *2026-11-14: "hits in the back" shows (22-35 per side per 9 v 9, about 20-25% of hits); the player hit test not done yet.*
 - [ ] 137.2 In a 9 v 9 warrior fight, NPCs keep their faces toward the nearest enemy; when one backs off (spacing, hiding) it steps back facing the enemy with the walk-back animation, at a walk, not moonwalking in place or sliding.
 - [ ] 137.3 On Retreat, followers turn and run (no stepping back); riders never step back.
-- [ ] 137.4 lotrnpcs-factions.json has BackHitMultiplier 1.5 and BackArcDegrees 120, and #Instructions explain them.
+- [x] 137.4 lotrnpcs-factions.json has BackHitMultiplier 1.5 and BackArcDegrees 120, and #Instructions explain them. (2026-11-16: BackHitMultiplier 1.5, BackArcDegrees 120, one #Instructions entry explains both)
 
 ## 138. One captain, recruit-only places (0.0.138; 1 recruit place since the owner's change)
 
@@ -531,7 +531,7 @@ Install `lotrnpcs_0.0.138-test.zip`; restart fully.
 - [ ] 138.1 With one captain hired, hiring or promoting a second captain is refused ("captains full"); riders don't count.
 - [ ] 138.2 With 3 warriors following, 1 recruit can still follow (Follow me in the orders menu or the talk menu), a 2nd recruit or a 4th warrior can't; 4 recruits can all follow. The roster header shows "Following: 3 of 3 ranked places, 1 of 1 recruit places". (Owner 2026-11-14: "maybe just 1 recruit place"; RecruitExtraFollowers 1.)
 - [ ] 138.3 Promote a following recruit while 3 ranked followers follow: it is promoted, stays on the roster, guards where it stands, and the chat says why; dismissing a warrior then lets you call it from the roster.
-- [ ] 138.4 lotrnpcs-factions.json is version 32 with MaxCaptains 1 and RecruitExtraFollowers 1, no RosterPerCaptain, and #Instructions explain both.
+- [x] 138.4 lotrnpcs-factions.json is version 32 with MaxCaptains 1 and RecruitExtraFollowers 1, no RosterPerCaptain, and #Instructions explain both. (2026-11-16: Version 32, MaxCaptains 1, RecruitExtraFollowers 1, no RosterPerCaptain key (only named in #Instructions as replaced), both explained)
 
 ## 139. Riders strike while charging (0.0.139)
 
@@ -553,7 +553,7 @@ Install `lotrnpcs_0.0.140-test.zip`; restart fully. Battle log on.
 Install `lotrnpcs_0.0.141-test.zip`; restart fully. DebugCommands on.
 
 - [x] 141.1 After the 139 rider tests, `/entity cmd e[type=lotrnpcs:test-rohan-rider,range=60] kill` finds all the riders still alive (none ran off beyond 60 blocks); no riderless-looking horse gallops on in a straight line. *2026-11-15: every rider found within 40-60 blocks after each run.*
-- [ ] 141.2 Fly about 60 blocks away from a rider fight (past Synergy's 48-block freeze) for 20 s and come back: the riders' horses stand where they were frozen instead of having galloped off.
+- [x] 141.2 Fly about 60 blocks away from a rider fight (past Synergy's 48-block freeze) for 20 s and come back: the riders' horses stand where they were frozen instead of having galloped off. (2026-11-16 on 0.0.147 with Synergy on: 3 riders v 10 Dunlendings, player teleported 84 blocks off for 22 s and back: all 3 riders within 60 blocks, 2 within 40 (the fight moved, no runaway horses))
 
 ## 142. Mounted riders' blows fall on time (0.0.142)
 
@@ -591,4 +591,4 @@ Install `lotrnpcs_0.0.144-test.zip`; restart fully. DebugCommands on, battle log
 
 Install `lotrnpcs_0.0.147-test.zip`; restart fully.
 
-- [ ] 147.1 Spawn 5 Rohan riders with no enemies around: after a minute and after two, all 5 are within about 20 blocks of where they spawned (`/entity list e[type=lotrnpcs:test-rohan-rider,range=20,alive=true]` from the spawn point).
+- [x] 147.1 Spawn 5 Rohan riders with no enemies around: after a minute and after two, all 5 are within about 20 blocks of where they spawned (`/entity list e[type=lotrnpcs:test-rohan-rider,range=20,alive=true]` from the spawn point). (2026-11-16: 5 of 5 within 20 blocks after ~65 s, all 5 within 12 after ~2 min)
