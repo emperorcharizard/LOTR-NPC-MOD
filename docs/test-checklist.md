@@ -321,14 +321,14 @@ Install `lotrnpcs_0.0.109-test.zip` (instead of any older lotrnpcs zip); restart
 - [ ] 100.1 Kite, Easterling and Gondor shields touch the hand with no gap.
 - [ ] 101.1 Gondor/Arnor NPCs carry a steel spear or falx, Rohan/Dale iron spear or falx with a wood-and-metal shield, Dunlendings clubs, flint spears, ruined axes and the crude shield; Uruks iron falx, spear or ruined battle axe. Nobody is empty-handed. Say if a game shield shows the wrong texture.
 - [ ] 102.1 With two players on enemy factions, one player's aggressive recruits attack the other player and their recruits on sight. A player with no faction is left alone.
-- [ ] 102.2 No more than 4 NPCs attack one NPC at once; the rest find another enemy or wait.
+- [x] 102.2 No more than 4 NPCs attack one NPC at once; the rest find another enemy or wait. (2026-11-16 `215004`: distinct attackers on one target within 3 s: 1 in 178 blows, 2 in 85, 3 in 20, 4 in 10, 5-6 in 2 (a swap inside the window))
 - [ ] 104.1 A marching column of your recruits doesn't walk through each other, and NPCs walking past a standing group steer round it.
 - [ ] 104.2 Two groups of wild NPCs meeting form lines and fight one-on-one along the front; the side with more then wraps round the enemy.
 - [ ] 104.3 Hiring or promoting past the captain limit (Men 2, orcs and goblins 3, elves and dwarves 1, Uruks and Dunlendings 2) is refused with a message.
 - [ ] 105.1 An archer on a wall more than 2 blocks above its target keeps shooting instead of jumping down into melee.
 - [ ] 106.1 In a follow formation, captains stand front-middle, then warriors, then recruits; archers at the back or the ends.
 - [ ] 107.1 Mordor/Angmar/Gundabad orcs follow up to 6 at a time.
-- [ ] 108.1 Melee NPCs swing about every 2.6 to 3 s. Fighting a group of 3 or more: say if it now feels too fast or too slow.
+- [x] 108.1 Melee NPCs swing about every 2.6 to 3 s. Fighting a group of 3 or more: say if it now feels too fast or too slow. (2026-11-16 `215004` 9 v 9: swings every 2.95 s (Gondor) and 3.05 s (Mordor) median, 2.8-3.5 s middle half; the feel question is the owner's)
 - [ ] 108.2 Hire prices match the new table (for example Mordor 5/12/29/12, Elves 6/19/50/20); promotion costs the new rank's price minus 3 (captain minus 4).
 - [ ] 109.1 The big one: 100 Mordor orcs against 50 Haradrim (a shared zone or creative spawns), battle log on. Send the totals. Then set `NpcHitsIgnoreHurtWindow` to true in lotrnpcs-factions.json, `/recruits faction reload`, and repeat with the log on again.
 - [ ] 109.2 During that fight, note the server's lag (any "Server overloaded" lines in server-main.log) and whether many NPCs stand around not fighting; the log's "idle while fighting" counts those.
@@ -438,6 +438,7 @@ Install `lotrnpcs_0.0.125-test.zip`; restart fully. Needs Feverstone Wilds.
 Install `lotrnpcs_0.0.126-test.zip`; restart fully. Clear leftover test NPCs first (explicit types and a range).
 
 - [ ] 126.1 Spawn 5 Rohan riders with no enemies around: they wander at a walk and stay within about 20 blocks for a minute (in 0.0.125 they galloped 30-50 blocks off).
+  - 2026-11-16 on 0.0.146: after ~70 s, 0 of 5 riders within 30 blocks, 1 within 50, all 5 within 100. Failed; 0.0.147 puts riders' wander on a 12-block leash (147.1).
 - [x] 126.2 Spawn 3 goblin warriors 15 blocks from them: the riders ride in, the horses walk up to each goblin and the riders land hits; no rider stands off out of reach for more than a few seconds.
 - [ ] 126.3 A hired rider on Follow still keeps up when you sprint away (its horse runs when the rider runs).
 
@@ -471,6 +472,7 @@ Install `lotrnpcs_0.0.131-test.zip`; restart fully. Battle log on, each side on 
 
 - [ ] 131.1 3 Rohan riders v 10 Dunlending warriors (14-20 blocks apart), twice: the horses stop when they reach the enemy and turn to face it instead of walking around; riders swing about every 3 s (about as often as a Dunlending) and win or come close (0.0.130: 0-3 and 4-3).
 - [ ] 131.2 The CSV has few `nocontact` melee rows for riders, and the `/recruits battlelog` summary shows "out of reach when the blow fell" only rarely.
+  - 2026-11-16 (`214310`, `214600`): rider out of reach 17 of 83 and 25 of 84 (20-30%): misses are targets 13-122 degrees off the rider's facing while the horse moves. Not rare, but riders already win 10-0; left for the owner's rider-strength decision.
 - [ ] 131.3 Riders still chase an enemy that backs off (beyond 3.5 blocks they follow the path again).
 
 ## 132. Riders finish one enemy at a time (0.0.132)
@@ -584,3 +586,9 @@ Install `lotrnpcs_0.0.144-test.zip`; restart fully. DebugCommands on, battle log
 
 - [x] 146.1 Rider test (3 Rohan riders v 10 Dunlendings), twice: Dunlendings' out of reach well under 47 of 88 / 22 of 45, more landed blows on riders; riders still win clearly (owner: riders stay as they are).
   - 2026-11-16 (Synergy off, both ran to the end): `214310` 147 s: Dunlendings 49/66 landed (17 out of reach, 26%), 96 damage, 10 deaths; rohan 65/83, 375 damage, 10 kills, 0 deaths, 20 charge hits. `214600` 158 s: Dunlendings 46/56 (10 out of reach, 18%), 93 damage, 10 deaths; rohan 59/84, 328 damage, 10 kills, 0 deaths, 18 charge hits. Out of reach down from 53-79% to 18-26%; Dunlending damage about doubled; riders still win 3 v 10 with no losses. Pass.
+
+## 147. Riders wander on a leash (0.0.147)
+
+Install `lotrnpcs_0.0.147-test.zip`; restart fully.
+
+- [ ] 147.1 Spawn 5 Rohan riders with no enemies around: after a minute and after two, all 5 are within about 20 blocks of where they spawned (`/entity list e[type=lotrnpcs:test-rohan-rider,range=20,alive=true]` from the spawn point).

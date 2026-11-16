@@ -931,11 +931,17 @@ ARCHER_TASK = {"code": "lotrnpcs:shootattack", "priority": 2.6, "slot": 0, "rang
                "projectileCode": "lotrnpcs:npcarrow", "shootSound": "game:sounds/bow-release",
                "animation": "lotrnpcs-bow-draw", "releaseAnimation": "lotrnpcs-bow-release"}
 ARCHER_STAND_OFF = 16
+RIDER_WANDER_LEASH = 12
 
 
 def entity(code, name, extra_attributes, skin_client, skin_server, health=25, armor_tier=0, melee=(3, 1), archer=False):
     ai_tasks = [dict(t, damage=melee[0], damageTier=melee[1], damageType="SlashingAttack") if t["code"] == "lotrnpcs:meleeattack" else t
                 for t in AI_TASKS]
+    # 0.0.147 (checklist 126.1, 2026-11-16: 5 idle Rohan riders were 30-100 blocks off after 70 s; a walking horse
+    # covers about 4 blocks a second, so the game's wander legs of up to 30 blocks add up fast): riders wander on a
+    # leash, the game's own maxDistanceToSpawn, walking back when farther from where they spawned.
+    if "lotrnpcsMounts" in extra_attributes:
+        ai_tasks = [dict(t, maxDistanceToSpawn=RIDER_WANDER_LEASH) if t["code"] == "wander" else t for t in ai_tasks]
     if archer:
         ai_tasks = [dict(t, standOff=ARCHER_STAND_OFF) if t["code"] == "lotrnpcs:seekentity" else t for t in ai_tasks]
         ai_tasks.insert(1, ARCHER_TASK)
@@ -2102,7 +2108,7 @@ with open(os.path.join(out, "modinfo.json"), "w") as f:
         "type": "code",
         "modid": "lotrnpcs",
         "name": "LOTR NPCs",
-        "version": "0.0.146",
+        "version": "0.0.147",
         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Race models from "
                        "LOTR Races and Classes by Dango Dango Dango, Shakgriig and Buggoi, used with their permission.",
