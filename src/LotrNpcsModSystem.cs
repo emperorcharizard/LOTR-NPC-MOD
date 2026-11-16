@@ -194,7 +194,7 @@ namespace LotrNpcs
         // The task's own damagePlayerAtMs, used when the weapon has no wind-up of its own (0.0.99).
         readonly int baseHitMs;
         // 0.0.99 swing sync: when this attack started, and whether its swing animation has begun.
-        long startedMs;
+        long startedMs, swingStartedMs;
         bool swingStarted;
         // Longest the damage timer waits for the NPC to turn to its target before the vanilla timing takes over (so
         // an attack on a target it can never face still ends).
@@ -321,6 +321,7 @@ namespace LotrNpcs
             Weapon?.Lower();
             startedMs = entity.World.ElapsedMilliseconds;
             swingStarted = false;
+            swingStartedMs = 0;
             struck = false;
             Riders.SwingStarted(entity, startedMs);
             RiderLog("swing at " + (targetEntity?.EntityId ?? 0));
@@ -350,7 +351,7 @@ namespace LotrNpcs
             if (!swingStarted && (entity as EntityAgent)?.MountedOn == null)
             {
                 long now = entity.World.ElapsedMilliseconds;
-                if (animMeta != null && entity.AnimManager?.IsAnimationActive(animMeta.Animation) == true) swingStarted = true;
+                if (animMeta != null && entity.AnimManager?.IsAnimationActive(animMeta.Animation) == true) { swingStarted = true; swingStartedMs = now; }
                 else if (now - startedMs <= MaxTurnWaitMs) lastCheckOrAttackMs = now;
             }
             // 0.0.142 (in game 2026-11-15: 58 of 66 rider swings ran their full 900 ms without a blow): the game's own
@@ -385,6 +386,24 @@ namespace LotrNpcs
         /// never on players).</summary>
         bool IgnoresWindow(Entity target) => target != null && !(target is EntityPlayer) && factions?.Config.NpcHitsIgnoreHurtWindow == true;
 
+        /// <summary>0.0.145 battle log: why a blow fell out of reach. ms = since the swing was decided, swing = since its
+        /// animation started (-1: never), d/v = distance and height gap from the attacker's reach point to the target's box
+        /// (contact needs d under minDist, v under minVerDist), spd = the target's (or its mount's) speed in blocks a second,
+        /// yaw = how far the attacker faces off the target in degrees.</summary>
+        string MissDetail()
+        {
+            Entity t = targetEntity;
+            long now = entity.World.ElapsedMilliseconds;
+            Cuboidd box = t.SelectionBox.ToDouble().Translate(t.Pos.X, t.Pos.Y, t.Pos.Z);
+            Vec3d reachPos = entity.Pos.XYZ.Add(0, entity.SelectionBox.Y2 / 2, 0).Ahead(entity.SelectionBox.XSize / 2, 0, entity.Pos.Yaw);
+            Entity mover = (t as EntityAgent)?.MountedOn?.Entity ?? t;
+            double spd = Math.Sqrt(mover.Pos.Motion.X * mover.Pos.Motion.X + mover.Pos.Motion.Z * mover.Pos.Motion.Z) * 60;
+            double off = GameMath.AngleRadDistance(entity.Pos.Yaw, (float)Math.Atan2(t.Pos.X - entity.Pos.X, t.Pos.Z - entity.Pos.Z)) * GameMath.RAD2DEG;
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture, "ms={0} swing={1} d={2:0.00}/{3:0.00} v={4:0.00}/{5:0.00} spd={6:0.0} yaw={7:0} mounted={8}",
+                now - startedMs, swingStartedMs > 0 ? now - swingStartedMs : -1, box.ShortestDistanceFrom(reachPos), minDist,
+                Math.Abs(box.ShortestVerticalDistanceFrom(reachPos.Y)), minVerDist, spd, off, mover != t ? 1 : 0);
+        }
+
         protected override void attackTarget()
         {
             // 0.0.142: one blow a swing (a rider's may already have fallen in ContinueExecute).
@@ -396,7 +415,7 @@ namespace LotrNpcs
             if (factions != null && targetEntity != null) factions.Spacing.BookHit(targetEntity.EntityId, entity.World.ElapsedMilliseconds, 0);
             if (!hasDirectContact(targetEntity, minDist, minVerDist))
             {
-                if (targetEntity != null) factions?.Log.Attack(entity, targetEntity, false, 0, BattleLog.Result.NoContact, false, entity.World.ElapsedMilliseconds);
+                if (targetEntity != null) factions?.Log.Attack(entity, targetEntity, false, 0, BattleLog.Result.NoContact, false, entity.World.ElapsedMilliseconds, factions.Log.On ? MissDetail() : null);
                 return;
             }
             // 0.0.109: vanilla's attackTarget, done here so the hit can skip the hurt window (IgnoresWindow) and the

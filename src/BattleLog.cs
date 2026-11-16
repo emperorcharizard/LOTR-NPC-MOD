@@ -96,7 +96,8 @@ namespace LotrNpcs
         public static Result Classify(bool received, bool aliveBefore, bool windowBefore) =>
             received ? Result.Landed : aliveBefore && windowBefore ? Result.LostWindow : Result.LostOther;
 
-        public void Attack(Entity attacker, Entity target, bool arrow, float damage, Result result, bool killed, long now)
+        /// <param name="detail">0.0.145: appended to the row's result (a nocontact row says why it missed).</param>
+        public void Attack(Entity attacker, Entity target, bool arrow, float damage, Result result, bool killed, long now, string detail = null)
         {
             if (!On || attacker == null) return;
             string faction = FactionSystem.FactionOf(attacker);
@@ -115,7 +116,7 @@ namespace LotrNpcs
             }
             if (result == Result.Landed) t.DamageDealt += damage;
             if (killed) t.Kills++;
-            Write(now, arrow ? "arrow" : "melee", attacker, target, damage, result == Result.Landed ? (killed ? "kill" : "landed") : result == Result.LostWindow ? "lostwindow" : result == Result.NoContact ? "nocontact" : "lost");
+            Write(now, arrow ? "arrow" : "melee", attacker, target, damage, result == Result.Landed ? (killed ? "kill" : "landed") : result == Result.LostWindow ? "lostwindow" : result == Result.NoContact ? "nocontact" + (detail == null ? "" : " " + detail) : "lost");
         }
 
         /// <summary>An NPC started a swing or loosed an arrow (the idle count restarts).</summary>

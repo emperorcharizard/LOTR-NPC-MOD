@@ -573,3 +573,8 @@ Install `lotrnpcs_0.0.143-test.zip`; restart fully. DebugCommands on, battle log
 Install `lotrnpcs_0.0.144-test.zip`; restart fully. DebugCommands on, battle log on. Turn Synergy's `EntityActivationRangeEnabled` off for this test (rider fights drift past 48 blocks) and back on afterwards.
 
 - [ ] 144.1 3 Rohan riders v 10 Dunlending warriors, twice, 150 s each: the Dunlendings' "out of reach when the blow fell" is under a third of their melee swings (0.0.142: 71-79%, 0.0.143: 55-65%), and they still land blows on riders.
+  - 2026-11-16 (`212951`, Synergy off, 208 s, fight ran to the end): Dunlendings 41/88 landed, 47 out of reach (53%), 0 kills, 10 deaths; rohan 70/106 (36 out of reach), 383 damage, 10 kills, 0 deaths, 17 charge hits. Not met: the prediction barely changed it, so the cause isn't (only) horse speed. 0.0.145 logs why each blow missed (145.1).
+
+## 145. Out-of-reach blows say why (0.0.145, debug)
+
+- [ ] 145.1 Same rider test with the battle log on: every `nocontact` row ends with `ms= swing= d=dist/minDist v=gap/minVerDist spd= yaw= mounted=`. Read the rows to find the cause.
