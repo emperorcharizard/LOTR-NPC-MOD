@@ -34,7 +34,7 @@ namespace LotrNpcs
         public const int WindowMs = 10000;
 
         /// <summary>XP a rank needs before it can be promoted; 0 for ranks that earn none (archers, captains, rankless).</summary>
-        public static int Need(string rank) => rank == "recruit" ? 15 : BaseRank(rank) == "warrior" ? 40 : 0;
+        public static int Need(string rank) => BaseRank(rank) == "recruit" ? 15 : BaseRank(rank) == "warrior" ? 40 : 0;
 
         /// <summary>
         /// 0.0.113 (design-roster-promotion.md, owner: "branching promotion is good"): promotion-only sidegrades of the
@@ -42,11 +42,24 @@ namespace LotrNpcs
         /// weapon. Both count as warriors everywhere else (prices they lack, body loot, order lists) and lead to captain.
         /// </summary>
         public static readonly string[] Branches = { "guard", "shock" };
-        /// <summary>The rank a branch stands in for (warrior), else the rank itself.</summary>
-        public static string BaseRank(string rank) => Array.IndexOf(Branches, rank) >= 0 ? "warrior" : rank;
+        /// <summary>
+        /// 0.0.154 (owner, 2026-11-16: "Do the same for recruit", chose "Pick it when hiring", "They should also still be
+        /// able to be changed after hire"): the recruit's classes, guard recruit (health x1.25, damage x0.8, always a
+        /// shield) and shock recruit (the other way round, a two-handed weapon). Picked in the hire menu at the recruit's
+        /// price and changed for free in the talk menu; they count as recruits everywhere else.
+        /// </summary>
+        public static readonly string[] RecruitBranches = { "recruitguard", "recruitshock" };
+        /// <summary>A recruit's classes, in menu order.</summary>
+        public static readonly string[] RecruitClasses = { "recruit", "recruitguard", "recruitshock" };
+        /// <summary>Every branch, of warriors and of recruits.</summary>
+        public static readonly string[] AllBranches = { "guard", "shock", "recruitguard", "recruitshock" };
+        /// <summary>The rank a branch stands in for (warrior or recruit), else the rank itself.</summary>
+        public static string BaseRank(string rank) => Array.IndexOf(Branches, rank) >= 0 ? "warrior" : Array.IndexOf(RecruitBranches, rank) >= 0 ? "recruit" : rank;
+        /// <summary>0.0.154: a guard-like branch (more health, less damage).</summary>
+        public static bool GuardLike(string branch) => branch == "guard" || branch == "recruitguard";
 
         /// <summary>The ranks a rank can be promoted to, in menu order.</summary>
-        public static string[] Targets(string rank) => rank == "recruit" ? new[] { "warrior", "guard", "shock", "archer" } : BaseRank(rank) == "warrior" ? new[] { "captain", "rider" } : Array.Empty<string>();
+        public static string[] Targets(string rank) => BaseRank(rank) == "recruit" ? new[] { "warrior", "guard", "shock", "archer" } : BaseRank(rank) == "warrior" ? new[] { "captain", "rider" } : Array.Empty<string>();
 
         /// <summary>0.0.117: the rank whose health, damage and body loot a rank takes when the config lists none of its
         /// own (riders fight as warriors; the mount is what they gain), else BaseRank.</summary>

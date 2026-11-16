@@ -149,14 +149,14 @@ namespace LotrNpcs
         /// against plain warriors, coin for coin, in every faction).</summary>
         static Dictionary<string, float> WithBranches(Dictionary<string, float> table, bool health)
         {
-            foreach (string branch in Promotion.Branches) table[branch] = Branch(branch, table["warrior"], health);
+            foreach (string branch in Promotion.AllBranches) table[branch] = Branch(branch, table[Promotion.BaseRank(branch)], health);
             return table;
         }
 
-        /// <summary>A branch's health or damage from its warrior's.</summary>
+        /// <summary>A branch's health or damage from its warrior's (0.0.154: a recruit branch's from its recruit's).</summary>
         public static float Branch(string branch, float warrior, bool health)
         {
-            double scale = (branch == "guard") == health ? 1.25 : 0.8;
+            double scale = Promotion.GuardLike(branch) == health ? 1.25 : 0.8;
             return health ? Round(warrior * scale) : (float)Math.Round(warrior * scale, 2);
         }
 
@@ -486,9 +486,9 @@ namespace LotrNpcs
                 if (!string.IsNullOrEmpty(rank) && !table.ContainsKey(rank) && !float.IsNaN(kv.Value)) table[rank] = clean(kv.Value);
             }
             // 0.0.113: a file from before the branches gets them from its own warrior's value, so an admin's change carries.
-            foreach (string branch in Promotion.Branches)
+            foreach (string branch in Promotion.AllBranches)
             {
-                if (!table.ContainsKey(branch) && table.TryGetValue("warrior", out float warrior)) table[branch] = clean(FactionTiers.Branch(branch, warrior, health));
+                if (!table.ContainsKey(branch) && table.TryGetValue(Promotion.BaseRank(branch), out float source)) table[branch] = clean(FactionTiers.Branch(branch, source, health));
             }
             foreach (KeyValuePair<string, float> kv in tier)
             {
@@ -813,7 +813,7 @@ namespace LotrNpcs
         static bool SamePrices(Dictionary<string, int> a, Dictionary<string, int> b) =>
             a != null && b != null && NoBranches(a).Count() == NoBranches(b).Count() && NoBranches(a).All(kv => b.TryGetValue(kv.Key, out int v) && v == kv.Value);
 
-        static IEnumerable<KeyValuePair<string, T>> NoBranches<T>(Dictionary<string, T> d) => d.Where(kv => Array.IndexOf(Promotion.Branches, kv.Key) < 0);
+        static IEnumerable<KeyValuePair<string, T>> NoBranches<T>(Dictionary<string, T> d) => d.Where(kv => Array.IndexOf(Promotion.AllBranches, kv.Key) < 0);
 
         public static bool SamePair(FactionRelationDef r, string a, string b)
         {

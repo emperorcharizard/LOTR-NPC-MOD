@@ -769,3 +769,20 @@ Each side spends about 60 coins at its live hire prices (`/recruits faction list
 - [ ] 151.C2 1 Rohan rider v 1 Dunlending captain: the captain wins.
   - 2026-11-16 on 0.0.150: FAILED, the rider was winning when stopped at 218 s (52 v 17 damage, captain landed 5 of 6 swings but swung only 6 times). By stats a captain (48/7) is weaker than 2 warriors (34/3.95 each), so no rider strength gives 'beats 2 warriors, loses to a captain'; owner decision asked.
 - [ ] 151.C3 3 Rohan riders v 5 Dunlending warriors + 3 archers behind them: the riders ride past the warriors to the archers and kill them first (0.0.151).
+
+## 153. Stronger captains (0.0.153)
+
+Owner, 2026-11-16, chose "Stronger captains overall" (so a captain beats a rider that beats 2 warriors). Captains have 96 health and 10.5 damage (were 48 and 7); config version 33 moves a captain still at 48 or 7. The captain x2.5 on riders from 0.0.152 is gone; riders keep x2 on archers.
+
+- [ ] 153.1 1 Rohan rider v 1 Dunlending captain: the captain wins.
+- [ ] 153.2 1 Dunlending captain v 2 Dunlending warriors: the captain wins.
+- [ ] 153.3 A hired captain from before keeps its wounds and gets 96 max health after the update.
+
+## 154. Guard and shock recruits (0.0.154)
+
+Owner, 2026-11-16: "Do the same for recruit", chose "Pick it when hiring", then "They should also still be able to be changed after hire". Guard recruit: 28 health, 2.4 damage, one-handed weapon and always a shield. Shock recruit: 18 health, 3.75 damage, two-handed weapon. Same price, XP and promotions as a recruit; wild recruits stay plain.
+
+- [ ] 154.1 Talking to a wild recruit of your faction offers "hire you" plus "hire you as a guard recruit" and "as a shock recruit", all at the recruit's price. Hiring as one closes the menu and the chat says the recruit became that class.
+- [ ] 154.2 Your own recruit's talk menu offers "Train as a ..." for the two other classes; picking one swaps it for free and keeps its XP, name, looks and orders.
+- [ ] 154.3 Guard and shock recruits count as recruits for the 2 recruit-only follower places, and promote to warrior, guard, shock or archer at 15 XP.
+- [ ] 154.4 The creative tab lists recruit, guard recruit, shock recruit before warrior in every faction.

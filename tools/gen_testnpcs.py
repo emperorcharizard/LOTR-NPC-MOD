@@ -777,10 +777,11 @@ def held_weapon(faction, rank):
     listed = {name: ALL_WEAPONS[name] for name in prefs} if prefs else WEAPONS_OF.get(faction, {})
     shields = SHIELD_OF.get(faction, [])
     shields = shields.get(base, []) if isinstance(shields, dict) else shields
-    if rank == "guard":
+    # 0.0.154: guard and shock recruits pick from the recruit's list the same way.
+    if rank in ("guard", "recruitguard"):
         listed = {n: w for n, w in listed.items() if not w.get("twoHanded")} or listed
         shields = shields or GUARD_SHIELD_STANDIN.get(faction, [])
-    elif rank == "shock":
+    elif rank in ("shock", "recruitshock"):
         listed = {n: w for n, w in listed.items() if w.get("twoHanded")} or {SHOCK_STANDIN: ALL_WEAPONS[SHOCK_STANDIN]}
         shields = []
     if rank == "rider" and any(w.get("attack") == "spearhit" for w in listed.values()):
@@ -789,7 +790,7 @@ def held_weapon(faction, rank):
     behavior = {"code": "lotrnpcs:heldweapon", "weapons": weapon_list(listed, prefs)}
     if shields:
         behavior["shields"] = [s if ":" in s else f"lotrnpcs:orcweapon-{s}" for s in shields]
-        if rank == "guard":
+        if rank in ("guard", "recruitguard"):
             behavior["alwaysShield"] = True
     return behavior
 
@@ -1022,11 +1023,13 @@ RANK_STATS = {"recruit": (22, 0, (3, 8)), "warrior": (34, 0, (4, 9)), "captain":
               # the other way round. The faction config's tables replace these (FactionTiers.WithBranches).
               "guard": (43, 0, (3.2, 9)), "shock": (27, 0, (5, 9)),
               # 0.0.117 riders (promoted from the warrior line next to captain): a warrior's numbers; the mount is the gain.
-              "rider": (34, 0, (4, 9))}
+              "rider": (34, 0, (4, 9)),
+              # 0.0.154 (owner, 2026-11-16: "Do the same for recruit"): the recruit's classes, picked when hiring.
+              "recruitguard": (28, 0, (2.4, 8)), "recruitshock": (18, 0, (3.75, 8))}
 # Ranks that wear, carry and offer what another rank does (0.0.113: the warrior branches; 0.0.117 riders, for gear only:
 # in the code a rider is its own rank, Promotion.StatRank).
-BASE_RANK = {"guard": "warrior", "shock": "warrior", "rider": "warrior"}
-BRANCH_NAMES = {"guard": "guard", "shock": "shock trooper"}
+BASE_RANK = {"guard": "warrior", "shock": "warrior", "rider": "warrior", "recruitguard": "recruit", "recruitshock": "recruit"}
+BRANCH_NAMES = {"guard": "guard", "shock": "shock trooper", "recruitguard": "guard recruit", "recruitshock": "shock recruit"}
 RANKLESS_STATS = (19, 0, (3, 1))
 CAPTAIN_GEAR = ["game:armor-head-antique-blackguard-damaged", "game:armor-body-antique-blackguard-damaged",
                 "game:armor-legs-antique-blackguard-damaged"]
@@ -1475,6 +1478,10 @@ MOUNTS_OF = {"gondor": HORSES, "rohan": HORSES, "dale": HORSES, "arnor": HORSES,
 TEST_NPCS += [(code.removesuffix("-warrior") + "-rider", name.removesuffix(" warrior") + " rider", model, skin, gear)
               for code, name, model, skin, gear in list(TEST_NPCS)
               if code.endswith("-warrior") and code.removeprefix("test-").removesuffix("-warrior") in MOUNTS_OF]
+# 0.0.154: every faction's recruit has a guard and a shock class (Promotion.RecruitBranches), wearing the recruit's gear.
+TEST_NPCS += [(code.removesuffix("-recruit") + "-" + branch, name.removesuffix(" recruit") + " " + BRANCH_NAMES[branch], model, skin, gear)
+              for code, name, model, skin, gear in list(TEST_NPCS) if code.endswith("-recruit")
+              for branch in ("recruitguard", "recruitshock")]
 # Natural spawning (user, 2026-11-02): recruits, warriors and rare captains spawn on the surface inside admin
 # zones (/recruits zone) that list their faction, one group every 3 to 5 minutes near a player. SpawnZones.cs does all
 # of it, finding the NPC types by these lotrnpcsFaction and lotrnpcsRank attributes; there are no vanilla spawn
@@ -1635,7 +1642,7 @@ write_weapons()
 CREATIVE_FACTIONS = ["shire", "gondor", "rohan", "arnor", "dale", "dwarves", "elves",
                      "mordor", "angmar", "mistymountains", "gundabad", "isengard", "haradrim", "easterlings", "dunlendings",
                      "blacknumenoreans", "wickeddwarves", "tormentedelves"]
-CREATIVE_RANKS = ["recruit", "warrior", "guard", "shock", "captain", "rider", "archer"]
+CREATIVE_RANKS = ["recruit", "recruitguard", "recruitshock", "warrior", "guard", "shock", "captain", "rider", "archer"]
 def _creative_key(code):
     race, _, rank = code.removeprefix("test-").partition("-")
     return CREATIVE_FACTIONS.index(FACTION_OF[race]), CREATIVE_RANKS.index(RANK_OF.get(code, rank))
@@ -1686,6 +1693,9 @@ def prefix_and_creature(name):
 TALK = {
     "talk-opt-hire": "I'd like to hire you. ({0} × {1})",
     "talk-opt-hire-free": "I'd like to hire you.",
+    "talk-opt-hire-as": "I'd like to hire you as a {2}. ({0} × {1})",
+    "talk-opt-hire-as-free": "I'd like to hire you as a {2}.",
+    "talk-opt-class": "Train as a {0} instead.",
     "talk-opt-ask": "I have a question.",
     "talk-opt-follow": "Follow me.",
     "talk-opt-hold": "Hold your position here.",
@@ -1774,6 +1784,8 @@ TALK = {
     "title-shock": "Shock trooper",
     # 0.0.117: mounted riders.
     "title-rider": "Rider",
+    "title-recruitguard": "Guard recruit",
+    "title-recruitshock": "Shock recruit",
     "title-shire-recruit": "Farmer",
     "recruit-yours": "Your {3}: {0} in {2} formation, {1} stance",
     "recruit-yours-guard": "Your {1}: guarding their post, {0} stance",
@@ -2109,7 +2121,7 @@ with open(os.path.join(out, "modinfo.json"), "w") as f:
         "type": "code",
         "modid": "lotrnpcs",
         "name": "LOTR NPCs",
-        "version": "0.0.153",
+        "version": "0.0.154",
         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Race models from "
                        "LOTR Races and Classes by Dango Dango Dango, Shakgriig and Buggoi, used with their permission.",

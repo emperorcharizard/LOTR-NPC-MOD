@@ -45,6 +45,9 @@ namespace LotrNpcs
         public List<RoomEntry> RosterRoom = new List<RoomEntry>();
         // 0.0.104: the player's captain places are full, so no captain is offered.
         public bool CaptainsFull;
+        // 0.0.154: the recruit classes on offer: "member", the ones it can be hired as besides its own; "own", the ones it
+        // can change to (free). Empty for other ranks.
+        public List<string> Classes = new List<string>();
     }
 
     /// <summary>One faction in the room line (0.0.90): how many more of its recruits fit the following.</summary>
@@ -467,7 +470,7 @@ namespace LotrNpcs
         }
 
         int RecruitExtra => Factions?.Config.RecruitExtra ?? FactionConfig.DefaultRecruitExtraFollowers;
-        (double Share, bool Recruit) Member(Entity e) => (FollowShare(FactionSystem.FactionOf(e)), RankOf(e) == "recruit");
+        (double Share, bool Recruit) Member(Entity e) => (FollowShare(FactionSystem.FactionOf(e)), Promotion.BaseRank(RankOf(e)) == "recruit");
 
         /// <summary>0.0.138: would candidate fit the player's following (its followers but except, plus candidate)?</summary>
         public bool FollowFits(string uid, Entity candidate, Entity except = null) =>
@@ -750,6 +753,7 @@ namespace LotrNpcs
                 Factions.Config.Factions.TryGetValue(faction, out FactionDef ownDef);
                 state.Coin = ownDef?.HireCoin ?? FactionConfig.DefaultHireCoin;
                 if (Promotions != null) state.Promote = Promotions.Offers(npc, ownDef);
+                state.Classes = OtherClasses(npc);
                 // 0.0.104: no captain offer while the player's captain places are full.
                 if (state.Promote != null && state.Promote.ContainsKey("captain") && RankOf(npc) != "captain" && !CaptainFits(player.PlayerUID, faction))
                 {
@@ -777,6 +781,7 @@ namespace LotrNpcs
                 state.Mode = "member";
                 state.Price = PriceFor(def, RankOf(npc));
                 state.Coin = def?.HireCoin ?? FactionConfig.DefaultHireCoin;
+                state.Classes = OtherClasses(npc);
             }
             else state.Mode = "stranger";
             // 0.0.90: the room line for the menus that can hire, follow or borrow.
@@ -799,6 +804,22 @@ namespace LotrNpcs
             {
                 case "hire":
                     return state.Mode == "member" ? Hire(npc, player, state) : state;
+                case string hireAs when hireAs.StartsWith("hire:"):
+                    {
+                        // 0.0.154: hired as a guard or shock recruit, at the recruit's price; a new NPC of that class
+                        // takes its place, as with a promotion, so the menu closes.
+                        string cls = hireAs.Substring("hire:".Length);
+                        if (state.Mode != "member" || !state.Classes.Contains(cls)) return state;
+                        TalkState hired = Hire(npc, player, state);
+                        if (hired?.Reply != "talk-hired" && hired?.Reply != "talk-hired-guard") return hired;
+                        return ChangeClass(npc, player, cls) ? null : hired;
+                    }
+                case string trainAs when trainAs.StartsWith("class:"):
+                    {
+                        string cls = trainAs.Substring("class:".Length);
+                        if (state.Mode != "own" || !state.Classes.Contains(cls)) return state;
+                        return ChangeClass(npc, player, cls) ? null : state;
+                    }
                 case "borrow":
                     {
                         if (state.Mode != "shared") return state;
@@ -863,6 +884,30 @@ namespace LotrNpcs
             }
         }
 
+        /// <summary>0.0.154: the recruit classes (Promotion.RecruitClasses) this NPC could take besides its own, whose
+        /// entity types exist; empty for any other rank.</summary>
+        List<string> OtherClasses(Entity npc)
+        {
+            string rank = RankOf(npc);
+            if (Promotion.BaseRank(rank) != "recruit" || sapi == null) return new List<string>();
+            return Promotion.RecruitClasses.Where(c => c != rank && sapi.World.GetEntityType(Promotion.CodeAtRank(npc.Code, c)) != null).ToList();
+        }
+
+        /// <summary>0.0.154: the player's recruit becomes another recruit class (a new NPC, as a promotion makes),
+        /// keeping its XP, for free. True when done (the owner is told in chat).</summary>
+        bool ChangeClass(EntityAgent npc, IServerPlayer player, string cls)
+        {
+            int xp = Promotion.Xp(npc);
+            string before = Recruit.TitleInSentence(npc, player.LanguageCode);
+            EntityAgent next = Promotions?.Promote(npc, cls);
+            if (next == null) return false;
+            next.WatchedAttributes.SetInt(Promotion.XpAttr, xp);
+            next.WatchedAttributes.MarkPathDirty(Promotion.XpAttr);
+            player.SendMessage(GlobalConstants.GeneralChatGroup, Lang.GetL(player.LanguageCode, "lotrnpcs:promote-done", before, Recruit.TitleInSentence(next, player.LanguageCode)), EnumChatType.Notification);
+            sapi?.Logger.Notification("[lotrnpcs] " + player.PlayerName + " made their recruit a " + cls + ".");
+            return true;
+        }
+
         /// <summary>
         /// Promotes the player's own recruit to rank if its XP is full, the rank is on offer and the player pays (the talk
         /// menu, and since 0.0.113 the promotion screen, also from the roster, at any distance). Null when done (the
@@ -923,7 +968,7 @@ namespace LotrNpcs
             if (owner.Captains != null && owner.Captains.Count > 0) state.Header.Add(L("roster-captains", new object[] { Percent(CaptainsUsed(uid)) }));
             // 0.0.138: ranked places and recruit-only places in use.
             List<EntityAgent> band = Followers(uid);
-            int recruits = band.Count(e => RankOf(e) == "recruit"), extra = RecruitExtra, inExtra = Math.Min(recruits, extra);
+            int recruits = band.Count(e => Promotion.BaseRank(RankOf(e)) == "recruit"), extra = RecruitExtra, inExtra = Math.Min(recruits, extra);
             state.Header.Add(L("roster-band", new object[] { band.Count - inExtra, MaxFollowers, inExtra, extra }));
             return state;
         }
@@ -1587,7 +1632,7 @@ namespace LotrNpcs
                         // fits (so a goblin may still join after an elf didn't), and the rest keep their orders.
                         List<EntityAgent> following = Followers(player.PlayerUID);
                         // 0.0.138: ranked recruits take the ranked places first, then recruits fill the recruit-only ones.
-                        List<EntityAgent> joining = crew.Where(e => !following.Contains(e)).OrderBy(e => RankOf(e) == "recruit").ThenBy(e => e.Pos.SquareDistanceTo(by.Pos)).ToList();
+                        List<EntityAgent> joining = crew.Where(e => !following.Contains(e)).OrderBy(e => Promotion.BaseRank(RankOf(e)) == "recruit").ThenBy(e => e.Pos.SquareDistanceTo(by.Pos)).ToList();
                         List<EntityAgent> coming = following.Where(crew.Contains).ToList();
                         List<EntityAgent> band = new List<EntityAgent>(following);
                         int joined = 0, left = 0;
@@ -2501,6 +2546,13 @@ namespace LotrNpcs
             else if (state.Mode == "member")
             {
                 Choice(state.Price > 0 ? "lotrnpcs:talk-opt-hire" : "lotrnpcs:talk-opt-hire-free", () => Send("hire"));
+                // 0.0.154: or as a guard or shock recruit, at the same price.
+                foreach (string cls in state.Classes ?? new List<string>())
+                {
+                    string text = Lang.Get(state.Price > 0 ? "lotrnpcs:talk-opt-hire-as" : "lotrnpcs:talk-opt-hire-as-free", state.Price, CoinName(), ClassTitle(cls));
+                    string pick = cls;
+                    Add(text, () => { Player(text); Send("hire:" + pick); });
+                }
                 Add(Lang.Get("lotrnpcs:talk-opt-ask"), Ask);
             }
             else if (state.Mode == "own")
@@ -2510,6 +2562,13 @@ namespace LotrNpcs
                 Choice("lotrnpcs:talk-opt-guard", () => Send(Recruit.Guard));
                 Choice("lotrnpcs:talk-opt-guard-shared", () => Send(Recruit.GuardShared));
                 Choice("lotrnpcs:talk-opt-looks", OpenLooks);
+                // 0.0.154: a recruit changes class for free.
+                foreach (string cls in state.Classes ?? new List<string>())
+                {
+                    string text = Lang.Get("lotrnpcs:talk-opt-class", ClassTitle(cls));
+                    string pick = cls;
+                    Add(text, () => { Player(text); Send("class:" + pick); });
+                }
                 // Promotion (0.0.76), once the recruit's XP is full. 0.0.113: one choice that opens the promotion screen.
                 if ((state.Promote != null && state.Promote.Count > 0) || state.CaptainsFull)
                     Choice("lotrnpcs:talk-opt-promote-menu", () => { capi.ModLoader.GetModSystem<RosterSystem>()?.Send(new RosterRequest { Action = "promote-menu", Id = npc.EntityId }); Options(); });
@@ -2594,6 +2653,9 @@ namespace LotrNpcs
         // {0} price, {1} coin name, {2} the baseline roster, {3} owner, {4} recruits the player leads, {5} the baseline
         // follow limit, {6} the room line (0.0.90 follow shares: "Room in your band: Mordor orcs 1, Men of Gondor 0."),
         // {7} the roster line (0.0.91: "Room on your roster: Mordor orcs 12.").
+        string ClassTitle(string cls) =>
+            Recruit.TitleKey(faction, cls, k => Lang.HasTranslation(k)) is string key ? Lang.Get(key).ToLowerInvariant() : cls;
+
         string Format(string key) => Lang.Get(key, state.Price, CoinName(), state.Cap, state.OwnerName ?? "", state.Hired, state.FollowCap,
             HiringSystem.RoomText(state.Room, ClientLang), HiringSystem.RosterText(state.RosterRoom, ClientLang));
 
