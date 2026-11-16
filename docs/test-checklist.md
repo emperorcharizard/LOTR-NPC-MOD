@@ -599,3 +599,9 @@ Install `lotrnpcs_0.0.148-test.zip`; restart fully.
 
 - [ ] 148.1 Owner, 2026-11-16: "The animals ride around without animations." Spawn 3 Rohan riders near goblins or Dunlendings: the horses play their walk and gallop animations while they move and stand idle when they stop (no sliding).
 - [ ] 148.2 Ride a horse yourself: walking, galloping and stopping still work with your keys as before.
+
+## 149. Riders 1.5x a warrior, for about 50/50 at equal coin (0.0.149)
+
+Install `lotrnpcs_0.0.149-test.zip`; restart fully. Synergy's activation range off for the test, back on after.
+
+- [ ] 149.1 Owner, 2026-11-16: "isnt the warriors supposed to be 50/50 with the riders?" A Rohan rider has 51 health and hits for about 5.9 (warrior 34 and 3.95). 3 Rohan riders v 13 Dunlending warriors (equal coin), a few runs: each side wins about half (on 0.0.147, 2.24x: riders 13-0 with no losses).

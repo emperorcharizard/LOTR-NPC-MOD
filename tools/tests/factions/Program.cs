@@ -1254,10 +1254,10 @@ public static class Program {
                 float scale = FactionConfig.RiderScale(rohanDef), wh = riderConfig.HealthFor("rohan", "warrior") ?? 0, wd = riderConfig.DamageFor("rohan", "warrior") ?? 0;
                 double expect = FactionConfig.DefaultRiderScale;
                 var own = new FactionDef { Health = new Dictionary<string, float> { ["warrior"] = 34, ["rider"] = 50 }, Damage = new Dictionary<string, float> { ["warrior"] = 4 } };
-                Check(Math.Abs(scale - expect) < 1e-4 && scale > 2 && scale < 2.5 && riderConfig.HealthFor("rohan", "rider") == (float)Math.Round(wh * scale)
+                Check(Math.Abs(scale - expect) < 1e-4 && scale > 1.4 && scale < 1.6 && riderConfig.HealthFor("rohan", "rider") == (float)Math.Round(wh * scale)
                     && Math.Abs((riderConfig.DamageFor("rohan", "rider") ?? 0) - wd * scale) < 0.006 && riderConfig.HealthFor("mordor", "rider") == riderConfig.HealthFor("rohan", "rider") && riderConfig.DamageFor("dunlendings", "rider") == riderConfig.DamageFor("rohan", "rider")
                     && FactionConfig.RiderScale(null) == (float)FactionConfig.DefaultRiderScale && FactionConfig.RiderScale(own) == (float)FactionConfig.DefaultRiderScale,
-                    "0.0.130/0.0.135: a rider's health and damage are its faction's warrior's times 2.24, the same in every faction, unless the config lists its own");
+                    "0.0.130/0.0.135/0.0.149: a rider's health and damage are its faction's warrior's times 1.5, the same in every faction, unless the config lists its own");
             }
             Check(!Riders.CanHaveMount(null, null) && Riders.AvailableMounts(null, null).Length == 0, "0.0.117: no world or no type means no mount (the rank isn't offered)");
             var rr = new Random(3);
