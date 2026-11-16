@@ -192,6 +192,12 @@ namespace LotrNpcs
         /// <summary>0.0.151: the rider's focus moves to the archer its seek is riding for, unless it already finishes one.</summary>
         public static bool FocusOnHunted(bool huntedIsArcher, bool focusIsArcher) => huntedIsArcher && !focusIsArcher;
 
+        /// <summary>0.0.152 (owner, 2026-11-16: a rider should beat 2 warriors but "less than one captain"): captains are the
+        /// anti-cavalry rank. On 0.0.150 a rider beat 2 warriors and was beating a captain too, the captain swinging only
+        /// 6 times in 218 s while it chased; its hits on a mounted enemy do this much more.</summary>
+        public const float CaptainVsRiderMultiplier = 2.5f;
+        public static float AntiCavalry(string attackerRank, bool targetMounted) => targetMounted && attackerRank == "captain" ? CaptainVsRiderMultiplier : 1f;
+
         public static bool NpcControls(Entity controller) => controller != null && !(controller is EntityPlayer) && controller.Code?.Domain == "lotrnpcs";
 
         /// <summary>0.0.142: a mounted rider's blow is due damageAtMs after its swing started (no facing needed).</summary>
