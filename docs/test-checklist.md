@@ -764,6 +764,8 @@ Each side spends about 60 coins at its live hire prices (`/recruits faction list
 
 ### 151C. Riders' role (owner, 2026-11-16: riders should "beat 2 warriors, less than one captain, and be a harassing unit for archers")
 
-- [ ] 151.C1 1 Rohan rider v 2 Dunlending warriors: the rider wins.
+- [x] 151.C1 1 Rohan rider v 2 Dunlending warriors: the rider wins.
+  - 2026-11-16 on 0.0.150: rider won in 276 s with 20 of 34 health left (73 v 14 damage; warriors chased 77% of the time).
 - [ ] 151.C2 1 Rohan rider v 1 Dunlending captain: the captain wins.
+  - 2026-11-16 on 0.0.150: FAILED, the rider was winning when stopped at 218 s (52 v 17 damage, captain landed 5 of 6 swings but swung only 6 times). By stats a captain (48/7) is weaker than 2 warriors (34/3.95 each), so no rider strength gives 'beats 2 warriors, loses to a captain'; owner decision asked.
 - [ ] 151.C3 3 Rohan riders v 5 Dunlending warriors + 3 archers behind them: the riders ride past the warriors to the archers and kill them first (0.0.151).
