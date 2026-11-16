@@ -264,6 +264,16 @@ namespace LotrNpcs
                     targetEntity = kept;
                 }
             }
+            // 0.0.143 (in game 2026-11-15: Dunlendings' blows at riders fell out of reach 85 of 108 and 100 of 140 times):
+            // a soldier on foot doesn't swing at a rider whose horse gallops away from it; the blow would fall after the
+            // horse had carried the rider off. It looks again shortly (a rider galloping at it is still struck).
+            if ((entity as EntityAgent)?.MountedOn == null && targetEntity is EntityAgent rider && rider.MountedOn?.Entity is Entity horse
+                && Riders.Outrunning(rider.Pos.X - entity.Pos.X, rider.Pos.Z - entity.Pos.Z, horse.Pos.Yaw, Riders.ChargeOf(rider).Speed))
+            {
+                lastCheckOrAttackMs = entity.World.ElapsedMilliseconds - attackDurationMs + TurnRetryMs * 2;
+                targetEntity = null;
+                return false;
+            }
             // 0.0.99: this weapon's own wind-up (gen HIT_MS), set before the turn check below, which uses it.
             int weaponHitMs = Weapon?.HitMs ?? 0;
             damagePlayerAtMs = weaponHitMs > 0 ? weaponHitMs : baseHitMs;

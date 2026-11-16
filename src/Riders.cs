@@ -166,6 +166,11 @@ namespace LotrNpcs
         public const long SwingHoldMs = 600;
         public static bool SwingPending(long swingMs, long now) => swingMs > 0 && now - swingMs < SwingHoldMs;
 
+        /// <summary>0.0.143: is a rider (dx, dz from the attacker to it) riding away from the attacker at a gallop
+        /// (mountSpeed from its ChargeState)? Then a foot soldier's blow would fall out of reach.</summary>
+        public static bool Outrunning(double dx, double dz, float mountYaw, double mountSpeed) =>
+            mountSpeed >= SprintSpeed && Math.Sin(mountYaw) * dx + Math.Cos(mountYaw) * dz > 0;
+
         /// <summary>0.0.142: a mounted rider's blow is due damageAtMs after its swing started (no facing needed).</summary>
         public static bool BlowDue(long startedMs, long damageAtMs, long now) => startedMs > 0 && now - startedMs >= damageAtMs;
 

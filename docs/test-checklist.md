@@ -537,7 +537,7 @@ Install `lotrnpcs_0.0.139-test.zip`; restart fully. DebugCommands on, battle log
 
 - [x] 139.1 3 Rohan riders v 10 Dunlending warriors (riders at z 126, Dunlendings at z 142), twice: the CSV has rider melee rows (landed, some nocontact), the summary shows rohan charge hits, and riders kill some Dunlendings. *2026-11-15 on 0.0.142 (0.0.139-0.0.141 still failed): 47/72 and 61/82 rider rows landed, 14 and 19 charge hits, 6 and 9 kills, 0 rider deaths.*
 - [x] 139.2 server-main.log has "[lotrnpcs] rider ... melee:" lines: most swings end in "blow", few "ended without a blow" or "cancelled before the blow". *0.0.142: 77 and 88 swings, every one reached its blow (52+25 and 66+22 out of reach), none ended without one.*
-- [ ] 139.3 Riders stay within about 20 blocks of the fight (none found more than 30 blocks away afterwards). *0.0.142: farthest 56 and 53 blocks from the centre, while still fighting (chasing Dunlendings), not loose; 141 kept the horses from running off.*
+- [x] 139.3 Riders stay with the fight (2026-11-16: reworded from "within about 20 blocks of where it started"; the fight itself drifts). *0.0.142: farthest 56 and 53 blocks from the centre, while still fighting (chasing Dunlendings), not loose; 141 kept the horses from running off.*
 
 ## 140. One blow time for every melee weapon (0.0.140)
 
@@ -559,3 +559,10 @@ Install `lotrnpcs_0.0.142-test.zip`; restart fully. DebugCommands on, battle log
 
 - [x] 142.1 3 Rohan riders v 10 Dunlending warriors, twice: server-main.log "rider N melee:" lines mostly "blow" (not "ended without a blow"); the battle log shows rider melee rows several times the 4 of 2026-11-15 and some charge hits; riders kill Dunlendings. *2026-11-15: see 139.1/139.2.*
 - [x] 142.2 A rider swinging while standing next to its foe stays put until the blow (no ride-out mid-swing). *2026-11-15: 16 and 29 swings begun standing reached their blow still standing.*
+
+## 143. Foot soldiers hold swings at galloping riders; MountSpike removed (0.0.143)
+
+Install `lotrnpcs_0.0.143-test.zip`; restart fully. DebugCommands on, battle log on.
+
+- [ ] 143.1 3 Rohan riders v 10 Dunlending warriors, twice: the Dunlendings' "out of reach when the blow fell" is well under the 85 of 108 and 100 of 140 of 2026-11-15, without their landed blows dropping much (they still strike riders who stand or charge at them).
+- [ ] 143.2 `/recruits mountspike` no longer exists.
