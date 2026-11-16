@@ -2136,13 +2136,22 @@ for weapon, w in {**{k: w for k, w in ALL_WEAPONS.items() if "item" not in w}, *
 lang["entity-npcarrow"] = "Arrow"
 lang.update(TALK)
 write("lang/en.json", lang)
+# 0.0.158: names for the caribou our patch adds to the game's tamed deer (in game they showed the raw key), in the
+# game's own wording for the elk.
+write("../game/lang/en.json", {
+    "item-creature-tameddeer-caribou-male-adult": "Tamed caribou (male)",
+    "item-creature-tameddeer-caribou-female-adult": "Tamed caribou (female)",
+    "item-dead-creature-tameddeer-caribou-male-adult": "Dead tamed caribou (male)",
+    "item-dead-creature-tameddeer-caribou-female-adult": "Dead tamed caribou (female)",
+    "deathmsg-tameddeer-caribou-*": "Player {0} was killed by a caribou.",
+    "creaturegroup-tameddeer-caribou": "Caribou"})
 
 with open(os.path.join(out, "modinfo.json"), "w") as f:
     json.dump({
         "type": "code",
         "modid": "lotrnpcs",
         "name": "LOTR NPCs",
-        "version": "0.0.157",
+        "version": "0.0.158",
         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Race models from "
                        "LOTR Races and Classes by Dango Dango Dango, Shakgriig and Buggoi, used with their permission.",
