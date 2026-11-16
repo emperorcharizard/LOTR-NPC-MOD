@@ -183,6 +183,10 @@ namespace LotrNpcs
         /// <summary>Half the width of a rider's selection box, added to a foot soldier's reach (to the box) in GoneByBlow.</summary>
         public const double RiderHalfWidth = 0.4;
 
+        /// <summary>0.0.148: a mount's controlling passenger is one of our NPCs (not a player), so the client mustn't read
+        /// its keys (it has none there).</summary>
+        public static bool NpcControls(Entity controller) => controller != null && !(controller is EntityPlayer) && controller.Code?.Domain == "lotrnpcs";
+
         /// <summary>0.0.142: a mounted rider's blow is due damageAtMs after its swing started (no facing needed).</summary>
         public static bool BlowDue(long startedMs, long damageAtMs, long now) => startedMs > 0 && now - startedMs >= damageAtMs;
 
@@ -358,6 +362,23 @@ namespace LotrNpcs
             if (canMount == null) { api.Logger.Warning("[lotrnpcs] EntityRideableSeat.CanMount not found; riders stay on foot."); return; }
             harmony = new Harmony(HarmonyId);
             harmony.Patch(canMount, new HarmonyMethod(typeof(RiderSystem).GetMethod(nameof(NpcMayMount), BindingFlags.Static | BindingFlags.NonPublic)));
+            // 0.0.148 (owner, 2026-11-16: "The animals ride around without animations"): on each client, the game's
+            // EntityBehaviorRideable.SeatsToMotion reads the controlling passenger's keys every frame and, with the Hold
+            // control scheme and no key held, sets the mount's gait to idle. An NPC rider has no keys on the client, so the
+            // client kept stopping the walk and gallop the server set. Skipped on the client for a mount an NPC controls.
+            MethodInfo seatsToMotion = AccessTools.TypeByName("Vintagestory.GameContent.EntityBehaviorRideable")?.GetMethod("SeatsToMotion", new[] { typeof(float) });
+            if (seatsToMotion == null) api.Logger.Warning("[lotrnpcs] EntityBehaviorRideable.SeatsToMotion not found; NPC mounts may not animate.");
+            else harmony.Patch(seatsToMotion, new HarmonyMethod(typeof(RiderSystem).GetMethod(nameof(NpcSteersOnClient), BindingFlags.Static | BindingFlags.NonPublic)));
+        }
+
+        static bool NpcSteersOnClient(EntityBehavior __instance, ref double __result)
+        {
+            Entity mount = __instance?.entity;
+            if (mount?.Api?.Side != EnumAppSide.Client || !(__instance is IMountable mountable)) return true;
+            Entity controller = mountable.Seats?.FirstOrDefault(s => s != null && s.CanControl && s.Passenger != null)?.Passenger;
+            if (!Riders.NpcControls(controller)) return true;
+            __result = 0;
+            return false;
         }
 
         public override void StartServerSide(ICoreServerAPI api)

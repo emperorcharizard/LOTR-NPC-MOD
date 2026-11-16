@@ -592,3 +592,10 @@ Install `lotrnpcs_0.0.144-test.zip`; restart fully. DebugCommands on, battle log
 Install `lotrnpcs_0.0.147-test.zip`; restart fully.
 
 - [x] 147.1 Spawn 5 Rohan riders with no enemies around: after a minute and after two, all 5 are within about 20 blocks of where they spawned (`/entity list e[type=lotrnpcs:test-rohan-rider,range=20,alive=true]` from the spawn point). (2026-11-16: 5 of 5 within 20 blocks after ~65 s, all 5 within 12 after ~2 min)
+
+## 148. NPC riders' mounts play their walk and gallop (0.0.148)
+
+Install `lotrnpcs_0.0.148-test.zip`; restart fully.
+
+- [ ] 148.1 Owner, 2026-11-16: "The animals ride around without animations." Spawn 3 Rohan riders near goblins or Dunlendings: the horses play their walk and gallop animations while they move and stand idle when they stop (no sliding).
+- [ ] 148.2 Ride a horse yourself: walking, galloping and stopping still work with your keys as before.
