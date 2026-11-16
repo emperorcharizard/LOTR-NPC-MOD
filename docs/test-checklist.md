@@ -330,8 +330,8 @@ Install `lotrnpcs_0.0.109-test.zip` (instead of any older lotrnpcs zip); restart
 - [ ] 107.1 Mordor/Angmar/Gundabad orcs follow up to 6 at a time.
 - [x] 108.1 Melee NPCs swing about every 2.6 to 3 s. Fighting a group of 3 or more: say if it now feels too fast or too slow. (2026-11-16 `215004` 9 v 9: swings every 2.95 s (Gondor) and 3.05 s (Mordor) median, 2.8-3.5 s middle half; the feel question is the owner's)
 - [ ] 108.2 Hire prices match the new table (for example Mordor 5/12/29/12, Elves 6/19/50/20); promotion costs the new rank's price minus 3 (captain minus 4).
-- [ ] 109.1 The big one: 100 Mordor orcs against 50 Haradrim (a shared zone or creative spawns), battle log on. Send the totals. Then set `NpcHitsIgnoreHurtWindow` to true in lotrnpcs-factions.json, `/recruits faction reload`, and repeat with the log on again.
-- [ ] 109.2 During that fight, note the server's lag (any "Server overloaded" lines in server-main.log) and whether many NPCs stand around not fighting; the log's "idle while fighting" counts those.
+- [x] 109.1 The big one: 100 Mordor orcs against 50 Haradrim (a shared zone or creative spawns), battle log on. Send the totals. Then set `NpcHitsIgnoreHurtWindow` to true in lotrnpcs-factions.json, `/recruits faction reload`, and repeat with the log on again. (2026-11-16 on 0.0.147 (`221011`, NpcHitsIgnoreHurtWindow already true by default since 0.0.112, so run once): 100 Mordor orcs v 50 Haradrim in batches of 5 within ~30 blocks, Synergy on. 93 s: mordor 99 NPCs, 691/839 landed (103 out of reach), 1362 damage, 49 kills, 0 deaths, 81 back hits; haradrim 49 NPCs, 266/313 (47), 528 damage, 0 kills, 49 deaths, 243 back hits (surrounded). The 50th Haradrim was dead at cleanup)
+- [x] 109.2 During that fight, note the server's lag (any "Server overloaded" lines in server-main.log) and whether many NPCs stand around not fighting; the log's "idle while fighting" counts those. (2026-11-16: no "Server overloaded" or running-behind lines in any server log during the fight, no lotrnpcs errors; idle while fighting: mordor 76 NPC-seconds, haradrim 3)
 
 ## 110. Extras on the flanks (0.0.110)
 
@@ -464,7 +464,7 @@ Install `lotrnpcs_0.0.130-test.zip`; restart fully. Stage each side on one spot,
 - [ ] 130.1 A Rohan rider (creative tab) has about 76 health (a warrior 34; promotion card or `/entity` info). 3 Rohan riders against 120 coins of enemy warriors of similar strength win about half the time, and riders no longer die about 14 s into a crowd.
 - [ ] 130.2 In a 38 v 26 blob no two NPCs stand inside each other: walking in or fighting, their bodies stay about 0.7 blocks apart (look from above), and none are pushed into walls or off ledges.
 - [ ] 130.3 Riders still sit on their mounts (rider and mount aren't shoved apart), and the player can still walk among NPCs (the game's push).
-- [ ] 130.4 `/recruits bench 200`: the server still holds about 29 ticks/s.
+- [x] 130.4 `/recruits bench 200`: the server still holds about 29 ticks/s. (2026-11-16 on 0.0.147: `/recruits bench 200`: server avg 29.3 ticks/s, 1% low 27.2, worst tick 39 ms)
 
 ## 131. Riders hold still to fight (0.0.131)
 
