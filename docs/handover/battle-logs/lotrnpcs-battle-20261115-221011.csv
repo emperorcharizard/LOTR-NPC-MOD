@@ -1,0 +1,1281 @@
+﻿ms,event,attacker,attackerFaction,attackerRank,target,targetFaction,targetRank,damage,result,targetHealth
+32,melee,12702,haradrim,warrior,12590,mordor,warrior,2.24,landed,30.65
+66,melee,12686,haradrim,warrior,12646,mordor,warrior,2.07,landed,28.2
+99,melee,12589,mordor,warrior,12689,haradrim,warrior,2.03,landed,29.85
+202,melee,12649,mordor,warrior,12699,haradrim,warrior,2.18,landed,30.73
+237,melee,12705,haradrim,warrior,12656,mordor,warrior,1.64,landed,30.46
+304,melee,12682,haradrim,warrior,12650,mordor,warrior,2.07,landed,31.93
+407,melee,12640,mordor,warrior,12703,haradrim,warrior,1.8,landed,30.13
+408,melee,12667,mordor,warrior,12672,haradrim,warrior,1.8,landed,13.17
+408,melee,12684,haradrim,warrior,12664,mordor,warrior,2,landed,28.01
+440,melee,12636,mordor,warrior,12703,haradrim,warrior,0,nocontact ms=614 swing=511 d=2.00/2.00 v=0.00/1.00 spd=6.5 yaw=-0 mounted=0,30.13
+441,melee,12644,mordor,warrior,12679,haradrim,warrior,1.62,landed,21.99
+442,melee,12707,haradrim,warrior,12597,mordor,warrior,1.84,landed,32.16
+442,melee,12711,haradrim,warrior,12623,mordor,warrior,1.63,landed,31.55
+474,melee,12663,mordor,warrior,12672,haradrim,warrior,1.76,landed,11.41
+508,melee,12675,haradrim,warrior,12650,mordor,warrior,0,nocontact ms=477 swing=372 d=2.53/2.00 v=0.00/1.00 spd=2.4 yaw=0 mounted=0,31.93
+509,melee,12689,haradrim,warrior,12670,mordor,warrior,1.94,landed,20.18
+541,melee,12641,mordor,warrior,12680,haradrim,warrior,2.25,landed,31.75
+542,melee,12687,haradrim,warrior,12616,mordor,warrior,2.34,landed,30.49
+575,melee,12615,mordor,warrior,12696,haradrim,warrior,2.08,landed,31.92
+575,melee,12626,mordor,warrior,12703,haradrim,warrior,2.15,landed,27.98
+576,melee,12668,mordor,warrior,12696,haradrim,warrior,1.94,landed,29
+609,melee,12629,mordor,warrior,12703,haradrim,warrior,1.89,landed,26.09
+610,melee,12691,haradrim,warrior,12596,mordor,warrior,1.98,landed,23.4
+644,melee,12708,haradrim,warrior,12612,mordor,warrior,1.63,landed,31.55
+677,melee,12591,mordor,warrior,12703,haradrim,warrior,2.21,landed,23.88
+680,melee,12700,haradrim,warrior,12612,mordor,warrior,1.8,landed,29.75
+680,melee,12709,haradrim,warrior,12612,mordor,warrior,1.82,landed,27.02
+713,melee,12703,haradrim,warrior,12626,mordor,warrior,1.63,landed,32.37
+746,melee,12671,mordor,warrior,12690,haradrim,warrior,2,landed,24.25
+781,melee,12698,haradrim,warrior,12612,mordor,warrior,1.62,landed,25.41
+813,melee,12573,mordor,warrior,12703,haradrim,warrior,0,nocontact ms=578 swing=374 d=3.45/2.00 v=0.00/1.00 spd=0.4 yaw=-0 mounted=0,23.89
+814,melee,12612,mordor,warrior,12701,haradrim,warrior,2.29,landed,30.57
+814,melee,12639,mordor,warrior,12701,haradrim,warrior,1.78,landed,28.79
+814,melee,12683,haradrim,warrior,12615,mordor,warrior,0,nocontact ms=1745 swing=-1 d=2.80/2.00 v=0.00/1.00 spd=1.9 yaw=0 mounted=0,34
+916,melee,12583,mordor,warrior,12703,haradrim,warrior,2.35,landed,21.54
+951,melee,12623,mordor,warrior,12701,haradrim,warrior,2.12,landed,25.61
+985,melee,12710,haradrim,warrior,12623,mordor,warrior,2.15,landed,29.4
+1121,melee,12681,haradrim,warrior,12610,mordor,warrior,0,nocontact ms=1568 swing=647 d=2.61/2.00 v=0.00/1.00 spd=4.0 yaw=-0 mounted=0,28.14
+1189,melee,12657,mordor,warrior,12706,haradrim,warrior,2.31,landed,31.69
+1359,melee,12659,mordor,warrior,12706,haradrim,warrior,1.98,landed,29.7
+1394,melee,12695,haradrim,warrior,12615,mordor,warrior,2.07,landed,31.93
+1427,melee,12624,mordor,warrior,12673,haradrim,warrior,0,nocontact ms=784 swing=476 d=2.23/2.00 v=0.00/1.00 spd=1.0 yaw=-0 mounted=0,2.66
+1427,melee,12625,mordor,warrior,12706,haradrim,warrior,1.72,landed,27.98
+1428,melee,12690,haradrim,warrior,12671,mordor,warrior,2.26,landed,29.51
+1497,melee,12650,mordor,warrior,12682,haradrim,warrior,2.35,landed,24.4
+1530,melee,12665,mordor,warrior,12679,haradrim,warrior,1.97,landed,19.04
+1597,melee,12616,mordor,warrior,12696,haradrim,warrior,1.72,landed,27.3
+1598,melee,12630,mordor,warrior,12676,haradrim,warrior,2.03,landed,20.17
+1599,melee,12696,haradrim,warrior,12668,mordor,warrior,1.78,landed,31.33
+1631,melee,12599,mordor,warrior,12706,haradrim,warrior,1.83,landed,26.15
+1632,melee,12653,mordor,warrior,12710,haradrim,warrior,2.36,landed,31.64
+1665,melee,12598,mordor,warrior,12678,haradrim,warrior,2.21,landed,21.84
+1665,melee,12601,mordor,warrior,12701,haradrim,warrior,1.64,landed,23.98
+1666,melee,12635,mordor,warrior,12672,haradrim,warrior,2.31,landed,7.96
+1700,melee,12643,mordor,warrior,12678,haradrim,warrior,1.64,landed,19.37
+1802,melee,12605,mordor,warrior,12701,haradrim,warrior,1.63,landed,21.54
+1803,melee,12633,mordor,warrior,12698,haradrim,warrior,2.22,landed,30.67
+1870,melee,12614,mordor,warrior,12685,haradrim,warrior,1.78,landed,30.67
+1871,melee,12678,haradrim,warrior,12669,mordor,warrior,1.75,landed,31.38
+1905,melee,12679,haradrim,warrior,12644,mordor,warrior,0,nocontact ms=886 swing=477 d=2.07/2.00 v=0.00/1.00 spd=4.4 yaw=-0 mounted=0,34
+1944,melee,12676,haradrim,warrior,12630,mordor,warrior,1.93,landed,32.07
+1972,death,12627,mordor,warrior,12673,haradrim,warrior,0,died,0
+1972,melee,12627,mordor,warrior,12673,haradrim,warrior,1.91,kill,0
+1973,melee,12706,haradrim,warrior,12630,mordor,warrior,0,nocontact ms=1703 swing=579 d=2.31/2.00 v=0.00/1.00 spd=5.2 yaw=0 mounted=0,32.07
+2007,melee,12631,mordor,warrior,12682,haradrim,warrior,1.87,landed,22.52
+2043,melee,12699,haradrim,warrior,12644,mordor,warrior,0,nocontact ms=615 swing=546 d=2.30/2.00 v=0.00/1.00 spd=4.1 yaw=0 mounted=0,34
+2109,melee,12577,mordor,warrior,12702,haradrim,warrior,0,nocontact ms=1160 swing=376 d=2.07/2.00 v=0.00/1.00 spd=0.4 yaw=0 mounted=0,34
+2143,melee,12610,mordor,warrior,12677,haradrim,warrior,1.91,landed,24.59
+2143,melee,12628,mordor,warrior,12701,haradrim,warrior,2.26,landed,19.28
+2144,melee,12680,haradrim,warrior,12641,mordor,warrior,2.08,landed,29.16
+2176,melee,12632,mordor,warrior,12672,haradrim,warrior,1.82,landed,6.15
+2212,melee,12609,mordor,warrior,12701,haradrim,warrior,1.73,landed,17.57
+2279,melee,12602,mordor,warrior,12677,haradrim,warrior,1.83,landed,22.76
+2314,melee,12638,mordor,warrior,12698,haradrim,warrior,0,nocontact ms=716 swing=648 d=2.05/2.00 v=0.00/1.00 spd=3.5 yaw=-0 mounted=0,30.68
+2348,melee,12604,mordor,warrior,12672,haradrim,warrior,1.84,landed,3.4
+2348,melee,12651,mordor,warrior,12690,haradrim,warrior,2.24,landed,22.03
+2381,melee,12586,mordor,warrior,12681,haradrim,warrior,1.64,landed,23.08
+2382,melee,12677,haradrim,warrior,12655,mordor,warrior,1.94,landed,32.06
+2416,melee,12646,mordor,warrior,12686,haradrim,warrior,0,nocontact ms=1126 swing=374 d=2.98/2.00 v=0.00/1.00 spd=3.5 yaw=-0 mounted=0,31.76
+2417,melee,12654,mordor,warrior,12694,haradrim,warrior,2.09,landed,31.91
+2450,melee,12652,mordor,warrior,12673,haradrim,warrior,0,nocontact ms=784 swing=375 d=2.34/2.00 v=0.68/1.00 spd=0.7 yaw=-0 mounted=0,0
+2450,melee,12658,mordor,warrior,12677,haradrim,warrior,2.14,landed,19.55
+2483,melee,12664,mordor,warrior,12684,haradrim,warrior,0,nocontact ms=851 swing=783 d=2.52/2.00 v=0.00/1.00 spd=1.7 yaw=-0 mounted=0,30.07
+2484,melee,12694,haradrim,warrior,12654,mordor,warrior,1.96,landed,32.04
+2484,melee,12701,haradrim,warrior,12605,mordor,warrior,1.81,landed,32.19
+2484,melee,12715,haradrim,warrior,12654,mordor,warrior,2.09,landed,29.95
+2551,melee,12575,mordor,warrior,12703,haradrim,warrior,1.73,landed,19.82
+2551,melee,12621,mordor,warrior,12685,haradrim,warrior,0,nocontact ms=1771 swing=579 d=3.05/2.00 v=0.00/1.00 spd=1.6 yaw=0 mounted=0,30.68
+2552,melee,12685,haradrim,warrior,12614,mordor,warrior,2.32,landed,31.68
+2622,melee,12647,mordor,warrior,12698,haradrim,warrior,2.22,landed,27.35
+2624,melee,12705,haradrim,warrior,12641,mordor,warrior,2.04,landed,27.12
+2724,melee,12594,mordor,warrior,12712,haradrim,warrior,1.94,landed,31.09
+2726,melee,12704,haradrim,warrior,12628,mordor,warrior,1.94,landed,32.06
+2758,melee,12592,mordor,warrior,12696,haradrim,warrior,1.63,landed,25.68
+2758,melee,12667,mordor,warrior,12701,haradrim,warrior,2.35,landed,14.03
+2792,melee,12682,haradrim,warrior,12631,mordor,warrior,1.99,landed,31.01
+2792,melee,12693,haradrim,warrior,12621,mordor,warrior,2.07,landed,31.93
+2861,melee,12580,mordor,warrior,12702,haradrim,warrior,2.01,landed,31.99
+2862,melee,12642,mordor,warrior,12701,haradrim,warrior,2.2,landed,11.83
+2863,melee,12649,mordor,warrior,12709,haradrim,warrior,2.27,landed,30.59
+2896,melee,12603,mordor,warrior,12702,haradrim,warrior,1.94,landed,30.05
+2931,melee,12666,mordor,warrior,12690,haradrim,warrior,2.31,landed,19.72
+2966,melee,12669,mordor,warrior,12678,haradrim,warrior,2.23,landed,17.17
+3101,melee,12684,haradrim,warrior,12602,mordor,warrior,2.28,landed,31.72
+3135,melee,12634,mordor,warrior,12701,haradrim,warrior,1.73,landed,10.09
+3136,melee,12663,mordor,warrior,12701,haradrim,warrior,2.08,landed,8.01
+3168,melee,12579,mordor,warrior,12708,haradrim,warrior,2.18,landed,30.73
+3169,melee,12648,mordor,warrior,12672,haradrim,warrior,1.9,landed,1.5
+3202,melee,12611,mordor,warrior,12677,haradrim,warrior,0,nocontact ms=1195 swing=375 d=2.01/2.00 v=0.00/1.00 spd=3.1 yaw=0 mounted=0,19.56
+3237,melee,12589,mordor,warrior,12685,haradrim,warrior,1.94,landed,27.77
+3238,melee,12700,haradrim,warrior,12653,mordor,warrior,2.32,landed,24.08
+3339,melee,12590,mordor,warrior,12701,haradrim,warrior,1.82,landed,6.2
+3339,melee,12636,mordor,warrior,12676,haradrim,warrior,0,nocontact ms=614 swing=548 d=2.24/2.00 v=0.00/1.00 spd=3.2 yaw=-0 mounted=0,20.2
+3340,melee,12686,haradrim,warrior,12631,mordor,warrior,1.7,landed,28.47
+3410,melee,12716,haradrim,warrior,12654,mordor,warrior,2.28,landed,26.54
+3442,melee,12615,mordor,warrior,12695,haradrim,warrior,2.11,landed,30.83
+3442,melee,12629,mordor,warrior,12708,haradrim,warrior,1.75,landed,28.1
+3443,melee,12707,haradrim,warrior,12591,mordor,warrior,2.29,landed,31.71
+3443,melee,12711,haradrim,warrior,12659,mordor,warrior,2.37,landed,31.63
+3477,melee,12691,haradrim,warrior,12600,mordor,warrior,2.35,landed,31.65
+3510,melee,12591,mordor,warrior,12707,haradrim,warrior,1.62,landed,32.38
+3511,melee,12619,mordor,warrior,12696,haradrim,warrior,2.2,landed,22.38
+3511,melee,12620,mordor,warrior,12675,haradrim,warrior,1.73,landed,30.27
+3512,melee,12640,mordor,warrior,12707,haradrim,warrior,1.9,landed,29.53
+3512,melee,12661,mordor,warrior,12675,haradrim,warrior,2.03,landed,28.24
+3512,melee,12662,mordor,warrior,12695,haradrim,warrior,1.95,landed,28.88
+3512,melee,12671,mordor,warrior,12690,haradrim,warrior,0,nocontact ms=479 swing=445 d=2.27/2.00 v=0.00/1.00 spd=4.0 yaw=-0 mounted=0,19.73
+3512,melee,12713,haradrim,warrior,12654,mordor,warrior,0,nocontact ms=1362 swing=375 d=2.49/2.00 v=0.00/1.00 spd=2.3 yaw=-0 mounted=0,26.54
+3546,melee,12683,haradrim,warrior,12616,mordor,warrior,1.98,landed,28.54
+3580,melee,12626,mordor,warrior,12707,haradrim,warrior,1.68,landed,27.01
+3581,melee,12675,haradrim,warrior,12669,mordor,warrior,1.71,landed,29.69
+3653,melee,12655,mordor,warrior,12684,haradrim,warrior,2.25,landed,26.7
+3654,melee,12708,haradrim,warrior,12640,mordor,warrior,1.99,landed,31.02
+3682,melee,12584,mordor,warrior,12703,haradrim,warrior,1.8,landed,17.13
+3683,melee,12639,mordor,warrior,12702,haradrim,warrior,1.86,landed,27.27
+3684,melee,12698,haradrim,warrior,12647,mordor,warrior,0,nocontact ms=481 swing=379 d=2.42/2.00 v=0.00/1.00 spd=0.5 yaw=-0 mounted=0,34
+3716,melee,12623,mordor,warrior,12710,haradrim,warrior,1.66,landed,30
+3749,melee,12612,mordor,warrior,12698,haradrim,warrior,2.25,landed,25.12
+3750,melee,12710,haradrim,warrior,12653,mordor,warrior,1.69,landed,22.39
+3818,melee,12650,mordor,warrior,12682,haradrim,warrior,1.95,landed,20.59
+3861,melee,12597,mordor,warrior,12704,haradrim,warrior,1.82,landed,32.18
+3863,melee,12709,haradrim,warrior,12649,mordor,warrior,2.08,landed,26.82
+3921,melee,12702,haradrim,warrior,12603,mordor,warrior,1.66,landed,31.51
+3921,melee,12703,haradrim,warrior,12575,mordor,warrior,2.12,landed,30.82
+3956,melee,12689,haradrim,warrior,12651,mordor,warrior,1.74,landed,29.86
+3988,melee,12581,mordor,warrior,12702,haradrim,warrior,1.98,landed,25.3
+3989,melee,12659,mordor,warrior,12711,haradrim,warrior,1.72,landed,32.28
+4125,melee,12657,mordor,warrior,12710,haradrim,warrior,1.64,landed,27.54
+4126,melee,12688,haradrim,warrior,12647,mordor,warrior,1.61,landed,32.39
+4194,melee,12660,mordor,warrior,12684,haradrim,warrior,2.34,landed,23.19
+4228,melee,12641,mordor,warrior,12705,haradrim,warrior,2.11,landed,30.83
+4330,melee,12637,mordor,warrior,12710,haradrim,warrior,1.61,landed,25.93
+4331,melee,12668,mordor,warrior,12696,haradrim,warrior,2.34,landed,20.06
+4433,melee,12596,mordor,warrior,12693,haradrim,warrior,2.07,landed,30.89
+4467,melee,12583,mordor,warrior,12703,haradrim,warrior,2.16,landed,13.91
+4468,melee,12643,mordor,warrior,12687,haradrim,warrior,2.07,landed,31.93
+4502,melee,12587,mordor,warrior,12703,haradrim,warrior,0,nocontact ms=1197 swing=753 d=2.16/2.00 v=0.00/1.00 spd=6.2 yaw=0 mounted=0,13.91
+4503,melee,12608,mordor,warrior,12703,haradrim,warrior,2.36,landed,10.36
+4503,melee,12624,mordor,warrior,12678,haradrim,warrior,1.72,landed,15.45
+4536,melee,12574,mordor,warrior,12687,haradrim,warrior,2.24,landed,28.58
+4536,melee,12598,mordor,warrior,12687,haradrim,warrior,2.1,landed,25.43
+4537,melee,12622,mordor,warrior,12706,haradrim,warrior,2.36,landed,23.82
+4537,melee,12625,mordor,warrior,12708,haradrim,warrior,2.15,landed,25.97
+4605,melee,12614,mordor,warrior,12685,haradrim,warrior,2.28,landed,25.51
+4649,melee,12690,haradrim,warrior,12654,mordor,warrior,0,nocontact ms=830 swing=659 d=2.02/2.00 v=0.00/1.00 spd=0.4 yaw=-0 mounted=0,26.55
+4673,melee,12696,haradrim,warrior,12619,mordor,warrior,2.04,landed,31.96
+4706,melee,12631,mordor,warrior,12686,haradrim,warrior,1.96,landed,28.85
+4707,melee,12633,mordor,warrior,12684,haradrim,warrior,2.07,landed,20.1
+4774,melee,12585,mordor,warrior,12675,haradrim,warrior,1.58,landed,25.87
+4776,melee,12627,mordor,warrior,12705,haradrim,warrior,2.32,landed,28.51
+4777,melee,12665,mordor,warrior,12679,haradrim,warrior,2.14,landed,16.93
+4809,melee,12610,mordor,warrior,12675,haradrim,warrior,1.7,landed,23.32
+4842,melee,12577,mordor,warrior,12703,haradrim,warrior,2.35,landed,8.01
+4843,melee,12664,mordor,warrior,12684,haradrim,warrior,0,nocontact ms=409 swing=375 d=2.17/2.00 v=0.00/1.00 spd=3.0 yaw=-0 mounted=0,20.1
+4877,melee,12672,haradrim,warrior,12648,mordor,warrior,1.95,landed,31.08
+4910,melee,12593,mordor,warrior,12691,haradrim,warrior,2.01,landed,29.1
+4911,melee,12616,mordor,warrior,12683,haradrim,warrior,1.94,landed,29.26
+4946,melee,12679,haradrim,warrior,12665,mordor,warrior,1.75,landed,30.71
+5049,melee,12628,mordor,warrior,12704,haradrim,warrior,0,nocontact ms=856 swing=377 d=2.07/2.00 v=0.00/1.00 spd=3.1 yaw=-0 mounted=0,32.2
+5083,melee,12617,mordor,warrior,12715,haradrim,warrior,2.3,landed,31.7
+5084,melee,12715,haradrim,warrior,12624,mordor,warrior,2.3,landed,31.7
+5117,melee,12699,haradrim,warrior,12600,mordor,warrior,0,nocontact ms=991 swing=546 d=2.02/2.00 v=0.00/1.00 spd=2.0 yaw=-0 mounted=0,31.67
+5152,melee,12638,mordor,warrior,12697,haradrim,warrior,2.19,landed,30.72
+5186,melee,12630,mordor,warrior,12689,haradrim,warrior,0,nocontact ms=958 swing=890 d=2.39/2.00 v=0.00/1.00 spd=3.2 yaw=-0 mounted=0,29.9
+5223,melee,12605,mordor,warrior,12700,haradrim,warrior,2.01,landed,31.99
+5223,melee,12618,mordor,warrior,12712,haradrim,warrior,2.09,landed,29.02
+5257,melee,12602,mordor,warrior,12684,haradrim,warrior,1.63,landed,18.47
+5257,melee,12607,mordor,warrior,12691,haradrim,warrior,2.18,landed,25.83
+5258,melee,12712,haradrim,warrior,12668,mordor,warrior,1.92,landed,29.44
+5291,melee,12613,mordor,warrior,12678,haradrim,warrior,2.03,landed,13.44
+5325,melee,12575,mordor,warrior,12703,haradrim,warrior,2.37,landed,4.47
+5327,melee,12658,mordor,warrior,12688,haradrim,warrior,1.67,landed,32.33
+5327,idle,12719,haradrim,warrior,12658,mordor,warrior,6.46,FactionSeek,34
+5328,idle,12720,haradrim,warrior,12658,mordor,warrior,5.75,FactionSeek,34
+5328,idle,12721,haradrim,warrior,12658,mordor,warrior,4.99,FactionSeek,34
+5359,melee,12651,mordor,warrior,12689,haradrim,warrior,2.04,landed,27.86
+5394,melee,12654,mordor,warrior,12716,haradrim,warrior,0,nocontact ms=960 swing=890 d=2.62/2.00 v=0.00/1.00 spd=2.9 yaw=-0 mounted=0,34
+5395,melee,12717,haradrim,warrior,12631,mordor,warrior,2.18,landed,25.23
+5428,melee,12645,mordor,warrior,12679,haradrim,warrior,2.2,landed,13.65
+5429,melee,12656,mordor,warrior,12705,haradrim,warrior,2.02,landed,26.5
+5462,melee,12586,mordor,warrior,12694,haradrim,warrior,1.76,landed,29.31
+5463,melee,12694,haradrim,warrior,12654,mordor,warrior,1.72,landed,24.84
+5497,melee,12601,mordor,warrior,12683,haradrim,warrior,1.99,landed,27.27
+5497,melee,12646,mordor,warrior,12691,haradrim,warrior,2.14,landed,22.62
+5498,melee,12718,haradrim,warrior,12596,mordor,warrior,2.15,landed,21.29
+5530,melee,12599,mordor,warrior,12701,haradrim,warrior,2.11,landed,4.11
+5531,melee,12609,mordor,warrior,12704,haradrim,warrior,2.1,landed,30.1
+5531,melee,12635,mordor,warrior,12675,haradrim,warrior,2.24,landed,21.09
+5531,melee,12652,mordor,warrior,12688,haradrim,warrior,0,nocontact ms=517 swing=414 d=2.29/2.00 v=0.00/1.00 spd=3.2 yaw=-0 mounted=0,32.34
+5532,melee,12678,haradrim,warrior,12624,mordor,warrior,2.13,landed,28.52
+5564,melee,12604,mordor,warrior,12702,haradrim,warrior,1.85,landed,23.46
+5564,melee,12666,mordor,warrior,12679,haradrim,warrior,1.89,landed,11.76
+5565,melee,12676,haradrim,warrior,12649,mordor,warrior,1.88,landed,24.97
+5601,melee,12705,haradrim,warrior,12627,mordor,warrior,1.97,landed,25.27
+5701,melee,12653,mordor,warrior,12710,haradrim,warrior,2.14,landed,23.81
+5702,melee,12677,haradrim,warrior,12658,mordor,warrior,2.01,landed,31.99
+5734,melee,12589,mordor,warrior,12685,haradrim,warrior,1.74,landed,23.78
+5735,melee,12682,haradrim,warrior,12650,mordor,warrior,2.31,landed,28.51
+5768,melee,12578,mordor,warrior,12702,haradrim,warrior,2.33,landed,21.13
+5769,melee,12685,haradrim,warrior,12614,mordor,warrior,1.83,landed,29.88
+5802,melee,12595,mordor,warrior,12678,haradrim,warrior,0,nocontact ms=926 swing=857 d=2.29/2.00 v=0.00/1.00 spd=1.5 yaw=-0 mounted=0,13.44
+5803,melee,12714,haradrim,warrior,12666,mordor,warrior,2.27,landed,28.84
+5837,melee,12580,mordor,warrior,12702,haradrim,warrior,2.23,landed,18.9
+5837,melee,12592,mordor,warrior,12705,haradrim,warrior,2.25,landed,23.13
+5838,melee,12704,haradrim,warrior,12597,mordor,warrior,2.26,landed,29.97
+5875,melee,12700,haradrim,warrior,12605,mordor,warrior,1.78,landed,29.56
+5906,melee,12649,mordor,warrior,12709,haradrim,warrior,2.19,landed,28.44
+5940,melee,12603,mordor,warrior,12702,haradrim,warrior,0,nocontact ms=995 swing=376 d=2.58/2.00 v=0.00/1.00 spd=5.1 yaw=-0 mounted=0,18.91
+5941,melee,12701,haradrim,warrior,12590,mordor,warrior,1.67,landed,29.04
+5942,melee,12706,haradrim,warrior,12599,mordor,warrior,1.73,landed,32.27
+6009,melee,12606,mordor,warrior,12691,haradrim,warrior,2.32,landed,20.3
+6009,melee,12642,mordor,warrior,12675,haradrim,warrior,1.79,landed,19.3
+6009,melee,12647,mordor,warrior,12688,haradrim,warrior,2.21,landed,30.13
+6009,death,12648,mordor,warrior,12672,haradrim,warrior,0,died,0
+6010,melee,12648,mordor,warrior,12672,haradrim,warrior,1.61,kill,0
+6010,melee,12692,haradrim,warrior,12617,mordor,warrior,1.77,landed,32.23
+6077,melee,12600,mordor,warrior,12679,haradrim,warrior,1.78,landed,9.1
+6147,melee,12634,mordor,warrior,12702,haradrim,warrior,2.33,landed,16.57
+6148,melee,12693,haradrim,warrior,12596,mordor,warrior,0,nocontact ms=821 swing=379 d=2.54/2.00 v=0.00/1.00 spd=1.4 yaw=0 mounted=0,21.3
+6215,melee,12619,mordor,warrior,12696,haradrim,warrior,2.1,landed,17.97
+6216,melee,12684,haradrim,warrior,12602,mordor,warrior,2.29,landed,29.45
+6216,melee,12707,haradrim,warrior,12626,mordor,warrior,2.12,landed,30.3
+6217,melee,12716,haradrim,warrior,12663,mordor,warrior,1.73,landed,32.27
+6282,melee,12579,mordor,warrior,12710,haradrim,warrior,1.96,landed,21.85
+6283,melee,12661,mordor,warrior,12675,haradrim,warrior,0,nocontact ms=446 swing=377 d=2.05/2.00 v=0.00/1.00 spd=1.1 yaw=0 mounted=0,19.3
+6350,melee,12629,mordor,warrior,12675,haradrim,warrior,1.72,landed,16.73
+6384,melee,12620,mordor,warrior,12700,haradrim,warrior,1.93,landed,30.08
+6421,melee,12663,mordor,warrior,12716,haradrim,warrior,1.94,landed,32.06
+6453,melee,12594,mordor,warrior,12697,haradrim,warrior,1.75,landed,28.99
+6454,melee,12720,haradrim,warrior,12641,mordor,warrior,2.29,landed,23.72
+6487,melee,12640,mordor,warrior,12708,haradrim,warrior,2.25,landed,23.74
+6488,melee,12708,haradrim,warrior,12625,mordor,warrior,2.07,landed,30.89
+6488,melee,12721,haradrim,warrior,12641,mordor,warrior,0,nocontact ms=956 swing=546 d=2.73/2.00 v=0.00/1.00 spd=6.1 yaw=-0 mounted=0,23.72
+6523,melee,12719,haradrim,warrior,12641,mordor,warrior,1.6,landed,21.32
+6555,melee,12582,mordor,warrior,12703,haradrim,warrior,2.09,landed,2.39
+6555,melee,12584,mordor,warrior,12706,haradrim,warrior,2.22,landed,21.62
+6556,melee,12626,mordor,warrior,12698,haradrim,warrior,1.89,landed,23.25
+6590,melee,12639,mordor,warrior,12701,haradrim,warrior,2.21,landed,1.9
+6590,melee,12655,mordor,warrior,12677,haradrim,warrior,2.35,landed,16.07
+6590,melee,12670,mordor,warrior,12693,haradrim,warrior,1.63,landed,29.29
+6624,melee,12689,haradrim,warrior,12651,mordor,warrior,2.19,landed,27.7
+6658,melee,12686,haradrim,warrior,12631,mordor,warrior,0,nocontact ms=717 swing=683 d=2.09/2.00 v=0.00/1.00 spd=2.4 yaw=-0 mounted=0,25.24
+6692,melee,12581,mordor,warrior,12706,haradrim,warrior,1.79,landed,19.83
+6694,melee,12675,haradrim,warrior,12635,mordor,warrior,0,nocontact ms=719 swing=378 d=2.93/2.00 v=0.00/1.00 spd=1.9 yaw=-0 mounted=0,34
+6726,death,12612,mordor,warrior,12701,haradrim,warrior,0,died,0
+6726,melee,12612,mordor,warrior,12701,haradrim,warrior,2.32,kill,0
+6727,melee,12709,haradrim,warrior,12649,mordor,warrior,2.31,landed,21.51
+6760,melee,12588,mordor,warrior,12715,haradrim,warrior,2,landed,29.72
+6760,melee,12650,mordor,warrior,12682,haradrim,warrior,2.19,landed,18.43
+6761,melee,12710,haradrim,warrior,12653,mordor,warrior,0,nocontact ms=581 swing=376 d=2.09/2.00 v=0.00/1.00 spd=1.6 yaw=-0 mounted=0,22.42
+6794,melee,12597,mordor,warrior,12704,haradrim,warrior,2.28,landed,26.7
+6828,melee,12662,mordor,warrior,12692,haradrim,warrior,2.15,landed,31.85
+6828,melee,12691,haradrim,warrior,12646,mordor,warrior,0,nocontact ms=1228 swing=512 d=2.28/2.00 v=0.00/1.00 spd=2.5 yaw=-0 mounted=0,28.27
+6862,melee,12611,mordor,warrior,12701,haradrim,warrior,1.85,lost,0
+6896,melee,12583,mordor,warrior,12703,haradrim,warrior,2.22,landed,0.17
+6963,melee,12590,mordor,warrior,12702,haradrim,warrior,0,nocontact ms=1433 swing=136 d=2.27/2.00 v=0.00/1.00 spd=1.5 yaw=-0 mounted=0,16.58
+6966,melee,12713,haradrim,warrior,12618,mordor,warrior,2.02,landed,31.98
+6998,melee,12624,mordor,warrior,12678,haradrim,warrior,1.73,landed,11.73
+6999,melee,12681,haradrim,warrior,12611,mordor,warrior,2.32,landed,31.68
+7032,melee,12641,mordor,warrior,12719,haradrim,warrior,1.66,landed,32.34
+7033,melee,12702,haradrim,warrior,12634,mordor,warrior,1.67,landed,32.33
+7066,melee,12587,mordor,warrior,12702,haradrim,warrior,2.14,landed,13.37
+7101,melee,12688,haradrim,warrior,12647,mordor,warrior,1.96,landed,30.47
+7134,melee,12615,mordor,warrior,12695,haradrim,warrior,0,nocontact ms=1228 swing=750 d=2.27/2.00 v=0.00/1.00 spd=3.0 yaw=-0 mounted=0,28.91
+7203,melee,12659,mordor,warrior,12711,haradrim,warrior,2.21,landed,30.1
+7239,melee,12644,mordor,warrior,12699,haradrim,warrior,1.84,landed,28.95
+7271,melee,12574,mordor,warrior,12699,haradrim,warrior,1.69,landed,27.26
+7272,melee,12598,mordor,warrior,12691,haradrim,warrior,2.21,landed,18.09
+7272,melee,12623,mordor,warrior,12710,haradrim,warrior,1.64,landed,20.22
+7272,melee,12637,mordor,warrior,12694,haradrim,warrior,1.94,landed,26.41
+7306,melee,12657,mordor,warrior,12690,haradrim,warrior,2.35,landed,17.41
+7340,melee,12668,mordor,warrior,12712,haradrim,warrior,1.84,landed,27.2
+7374,melee,12643,mordor,warrior,12678,haradrim,warrior,1.61,landed,9.31
+7408,melee,12585,mordor,warrior,12714,haradrim,warrior,1.74,landed,32.26
+7442,melee,12695,haradrim,warrior,12662,mordor,warrior,0,nocontact ms=988 swing=375 d=2.21/2.00 v=0.00/1.00 spd=2.3 yaw=-0 mounted=0,34
+7475,melee,12591,mordor,warrior,12707,haradrim,warrior,0,nocontact ms=1398 swing=341 d=2.55/2.00 v=0.00/1.00 spd=3.4 yaw=0 mounted=0,27.04
+7511,melee,12625,mordor,warrior,12708,haradrim,warrior,2.08,landed,21.67
+7511,melee,12654,mordor,warrior,12694,haradrim,warrior,1.63,landed,24.79
+7512,melee,12703,haradrim,warrior,12575,mordor,warrior,1.97,landed,28.88
+7543,melee,12577,mordor,warrior,12698,haradrim,warrior,1.94,landed,21.33
+7545,melee,12696,haradrim,warrior,12619,mordor,warrior,2.04,landed,29.94
+7645,melee,12605,mordor,warrior,12700,haradrim,warrior,0,nocontact ms=613 swing=373 d=2.48/2.00 v=0.00/1.00 spd=1.5 yaw=-0 mounted=0,30.09
+7645,melee,12610,mordor,warrior,12675,haradrim,warrior,1.69,landed,14.21
+7748,melee,12632,mordor,warrior,12706,haradrim,warrior,2.03,landed,16.79
+7783,melee,12614,mordor,warrior,12706,haradrim,warrior,2.17,landed,13.53
+7784,melee,12665,mordor,warrior,12679,haradrim,warrior,1.87,landed,6.3
+7816,melee,12638,mordor,warrior,12684,haradrim,warrior,2.2,landed,15.2
+7817,melee,12699,haradrim,warrior,12574,mordor,warrior,2.26,landed,31.74
+7886,melee,12617,mordor,warrior,12691,haradrim,warrior,1.67,landed,16.43
+7921,melee,12715,haradrim,warrior,12588,mordor,warrior,2.31,landed,30.54
+7954,melee,12593,mordor,warrior,12687,haradrim,warrior,2.09,landed,23.37
+7954,melee,12613,mordor,warrior,12712,haradrim,warrior,1.84,landed,25.37
+7988,melee,12616,mordor,warrior,12713,haradrim,warrior,2.18,landed,30.73
+7988,melee,12633,mordor,warrior,12694,haradrim,warrior,1.9,landed,22.9
+8022,melee,12628,mordor,warrior,12710,haradrim,warrior,1.72,landed,18.51
+8022,melee,12631,mordor,warrior,12683,haradrim,warrior,0,nocontact ms=853 swing=377 d=2.26/2.00 v=0.00/1.00 spd=2.7 yaw=-0 mounted=0,27.29
+8057,melee,12630,mordor,warrior,12676,haradrim,warrior,2.08,landed,18.15
+8091,melee,12664,mordor,warrior,12684,haradrim,warrior,0,nocontact ms=957 swing=785 d=3.37/2.00 v=0.00/1.00 spd=2.8 yaw=-0 mounted=0,15.2
+8124,melee,12595,mordor,warrior,12691,haradrim,warrior,1.99,landed,14.44
+8124,melee,12618,mordor,warrior,12713,haradrim,warrior,1.64,landed,29.1
+8125,melee,12717,haradrim,warrior,12654,mordor,warrior,1.89,landed,22.98
+8193,melee,12609,mordor,warrior,12688,haradrim,warrior,1.73,landed,27.56
+8194,melee,12645,mordor,warrior,12712,haradrim,warrior,1.8,landed,23.57
+8195,melee,12718,haradrim,warrior,12605,mordor,warrior,2.17,landed,27.41
+8228,melee,12635,mordor,warrior,12713,haradrim,warrior,0,nocontact ms=412 swing=377 d=3.29/2.00 v=0.00/1.00 spd=4.5 yaw=-0 mounted=0,29.1
+8229,melee,12712,haradrim,warrior,12668,mordor,warrior,2.16,landed,27.32
+8263,melee,12658,mordor,warrior,12677,haradrim,warrior,1.79,landed,13.4
+8330,melee,12586,mordor,warrior,12690,haradrim,warrior,2.26,landed,15.16
+8433,melee,12589,mordor,warrior,12717,haradrim,warrior,2.31,landed,31.69
+8434,melee,12651,mordor,warrior,12689,haradrim,warrior,0,nocontact ms=720 swing=376 d=2.25/2.00 v=0.00/1.00 spd=2.1 yaw=0 mounted=0,27.89
+8434,melee,12666,mordor,warrior,12715,haradrim,warrior,2.16,landed,27.57
+8434,melee,12685,haradrim,warrior,12589,mordor,warrior,1.67,landed,32.33
+8467,melee,12678,haradrim,warrior,12643,mordor,warrior,2.32,landed,31.68
+8502,melee,12599,mordor,warrior,12706,haradrim,warrior,1.87,landed,11.68
+8502,melee,12649,mordor,warrior,12709,haradrim,warrior,2.11,landed,25.29
+8503,melee,12704,haradrim,warrior,12597,mordor,warrior,1.9,landed,28.08
+8536,melee,12653,mordor,warrior,12709,haradrim,warrior,1.87,landed,22.48
+8605,melee,12652,mordor,warrior,12709,haradrim,warrior,2.15,landed,19.26
+8606,melee,12679,haradrim,warrior,12618,mordor,warrior,1.82,landed,30.17
+8706,melee,12606,mordor,warrior,12707,haradrim,warrior,2.35,landed,24.71
+8740,melee,12634,mordor,warrior,12706,haradrim,warrior,2.32,landed,8.2
+8741,melee,12682,haradrim,warrior,12658,mordor,warrior,1.75,landed,29.4
+8774,melee,12578,mordor,warrior,12707,haradrim,warrior,1.7,landed,23.01
+8774,melee,12656,mordor,warrior,12695,haradrim,warrior,1.86,landed,26.14
+8775,melee,12677,haradrim,warrior,12655,mordor,warrior,2.14,landed,29.97
+8808,melee,12680,haradrim,warrior,12641,mordor,warrior,0,nocontact ms=683 swing=580 d=2.53/2.00 v=0.00/1.00 spd=3.1 yaw=0 mounted=0,21.35
+8842,death,12575,mordor,warrior,12703,haradrim,warrior,0,died,0
+8842,melee,12575,mordor,warrior,12703,haradrim,warrior,2.11,kill,0
+8842,melee,12601,mordor,warrior,12703,haradrim,warrior,1.9,lost,0
+8879,melee,12684,haradrim,warrior,12638,mordor,warrior,2,landed,32
+8911,melee,12669,mordor,warrior,12675,haradrim,warrior,0,nocontact ms=409 swing=375 d=2.99/2.00 v=0.00/1.00 spd=4.8 yaw=-0 mounted=0,14.22
+8944,melee,12647,mordor,warrior,12688,haradrim,warrior,0,nocontact ms=510 swing=442 d=2.08/2.00 v=0.00/1.00 spd=3.7 yaw=-0 mounted=0,27.57
+8980,melee,12676,haradrim,warrior,12630,mordor,warrior,1.92,landed,29.25
+9047,melee,12619,mordor,warrior,12696,haradrim,warrior,1.96,landed,15.06
+9048,melee,12706,haradrim,warrior,12614,mordor,warrior,1.65,landed,27.44
+9048,melee,12716,haradrim,warrior,12599,mordor,warrior,2.25,landed,30.05
+9081,melee,12579,mordor,warrior,12694,haradrim,warrior,1.8,landed,21.11
+9116,melee,12640,mordor,warrior,12708,haradrim,warrior,2.25,landed,19.44
+9116,melee,12700,haradrim,warrior,12628,mordor,warrior,1.85,landed,29.35
+9151,melee,12648,mordor,warrior,12719,haradrim,warrior,1.87,landed,30.49
+9183,melee,12629,mordor,warrior,12676,haradrim,warrior,2.02,landed,16.14
+9218,melee,12602,mordor,warrior,12705,haradrim,warrior,2.12,landed,21.06
+9218,melee,12661,mordor,warrior,12675,haradrim,warrior,0,nocontact ms=682 swing=410 d=2.18/2.00 v=0.00/1.00 spd=3.5 yaw=0 mounted=0,14.22
+9219,melee,12692,haradrim,warrior,12662,mordor,warrior,1.62,landed,32.38
+9288,melee,12705,haradrim,warrior,12602,mordor,warrior,1.93,landed,27.55
+9322,melee,12620,mordor,warrior,12696,haradrim,warrior,2.26,landed,12.79
+9323,melee,12693,haradrim,warrior,12670,mordor,warrior,0,nocontact ms=753 swing=378 d=3.15/2.00 v=0.00/1.00 spd=2.0 yaw=0 mounted=0,20.26
+9355,melee,12662,mordor,warrior,12715,haradrim,warrior,1.73,landed,25.85
+9389,melee,12636,mordor,warrior,12678,haradrim,warrior,2.26,landed,7.07
+9426,melee,12709,haradrim,warrior,12652,mordor,warrior,1.96,landed,32.04
+9458,melee,12719,haradrim,warrior,12648,mordor,warrior,1.93,landed,29.2
+9525,melee,12584,mordor,warrior,12707,haradrim,warrior,1.6,landed,21.41
+9560,melee,12671,mordor,warrior,12693,haradrim,warrior,2.26,landed,27.05
+9593,melee,12655,mordor,warrior,12677,haradrim,warrior,2.37,landed,9.86
+9627,melee,12612,mordor,warrior,12698,haradrim,warrior,2.31,landed,19.03
+9627,melee,12615,mordor,warrior,12695,haradrim,warrior,1.67,landed,24.48
+9627,melee,12639,mordor,warrior,12679,haradrim,warrior,0,nocontact ms=409 swing=375 d=2.07/2.00 v=0.00/1.00 spd=3.0 yaw=-0 mounted=0,6.32
+9662,melee,12686,haradrim,warrior,12631,mordor,warrior,1.87,landed,23.4
+9662,melee,12710,haradrim,warrior,12628,mordor,warrior,2.37,landed,25.8
+9695,melee,12588,mordor,warrior,12713,haradrim,warrior,2.27,landed,25.71
+9730,melee,12683,haradrim,warrior,12605,mordor,warrior,1.94,landed,24.52
+9730,melee,12689,haradrim,warrior,12651,mordor,warrior,0,nocontact ms=785 swing=750 d=2.07/2.00 v=0.00/1.00 spd=1.6 yaw=-0 mounted=0,27.74
+9730,melee,12720,haradrim,warrior,12658,mordor,warrior,1.95,landed,26.48
+9762,melee,12598,mordor,warrior,12704,haradrim,warrior,1.64,landed,25.09
+9763,melee,12644,mordor,warrior,12699,haradrim,warrior,2.11,landed,25.17
+9763,melee,12721,haradrim,warrior,12671,mordor,warrior,1.85,landed,26.82
+9798,melee,12687,haradrim,warrior,12593,mordor,warrior,2.16,landed,30.75
+9798,melee,12714,haradrim,warrior,12585,mordor,warrior,0,nocontact ms=1638 swing=682 d=2.11/2.00 v=0.00/1.00 spd=0.3 yaw=-0 mounted=0,34
+9832,melee,12608,mordor,warrior,12678,haradrim,warrior,1.58,landed,5.49
+9866,melee,12626,mordor,warrior,12707,haradrim,warrior,2.22,landed,19.2
+9970,melee,12641,mordor,warrior,12719,haradrim,warrior,1.86,landed,28.64
+10037,melee,12624,mordor,warrior,12678,haradrim,warrior,0,nocontact ms=682 swing=613 d=2.03/2.00 v=0.00/1.00 spd=2.9 yaw=-0 mounted=0,5.49
+10072,melee,12702,haradrim,warrior,12587,mordor,warrior,1.82,landed,32.18
+10072,melee,12713,haradrim,warrior,12618,mordor,warrior,1.69,landed,28.5
+10140,melee,12663,mordor,warrior,12691,haradrim,warrior,1.87,landed,12.6
+10176,melee,12583,mordor,warrior,12691,haradrim,warrior,1.64,landed,10.95
+10176,melee,12623,mordor,warrior,12710,haradrim,warrior,1.59,landed,16.94
+10177,melee,12659,mordor,warrior,12711,haradrim,warrior,1.99,landed,28.14
+10208,melee,12657,mordor,warrior,12704,haradrim,warrior,2.11,landed,22.98
+10209,melee,12691,haradrim,warrior,12595,mordor,warrior,1.89,landed,31.16
+10242,melee,12572,mordor,warrior,12699,haradrim,warrior,1.67,landed,22.67
+10244,melee,12670,mordor,warrior,12713,haradrim,warrior,1.62,landed,23.29
+10277,melee,12711,haradrim,warrior,12659,mordor,warrior,2.36,landed,29.35
+10310,melee,12637,mordor,warrior,12680,haradrim,warrior,2.35,landed,29.5
+10310,melee,12660,mordor,warrior,12681,haradrim,warrior,1.72,landed,21.44
+10377,melee,12611,mordor,warrior,12681,haradrim,warrior,2,landed,18.44
+10411,melee,12587,mordor,warrior,12702,haradrim,warrior,1.9,landed,11.5
+10412,melee,12650,mordor,warrior,12682,haradrim,warrior,1.82,landed,16.64
+10412,melee,12654,mordor,warrior,12717,haradrim,warrior,1.59,landed,30.11
+10446,melee,12665,mordor,warrior,12679,haradrim,warrior,0,nocontact ms=442 swing=374 d=2.17/2.00 v=0.00/1.00 spd=1.6 yaw=-0 mounted=0,6.33
+10514,melee,12597,mordor,warrior,12704,haradrim,warrior,2.21,landed,20.78
+10514,melee,12605,mordor,warrior,12683,haradrim,warrior,1.73,landed,25.58
+10548,melee,12622,mordor,warrior,12702,haradrim,warrior,1.6,landed,9.11
+10548,melee,12625,mordor,warrior,12708,haradrim,warrior,1.88,landed,16.63
+10548,melee,12675,haradrim,warrior,12610,mordor,warrior,2.34,landed,24.72
+10650,melee,12582,mordor,warrior,12707,haradrim,warrior,1.77,landed,17.44
+10651,melee,12614,mordor,warrior,12706,haradrim,warrior,1.78,landed,6.44
+10718,melee,12699,haradrim,warrior,12644,mordor,warrior,1.84,landed,32.16
+10751,melee,12574,mordor,warrior,12687,haradrim,warrior,1.68,landed,21.73
+10752,melee,12632,mordor,warrior,12721,haradrim,warrior,1.89,landed,31.16
+10785,melee,12577,mordor,warrior,12710,haradrim,warrior,0,nocontact ms=748 swing=680 d=2.16/2.00 v=0.00/1.00 spd=2.3 yaw=-0 mounted=0,16.95
+10820,melee,12596,mordor,warrior,12718,haradrim,warrior,1.94,landed,32.06
+10820,melee,12613,mordor,warrior,12696,haradrim,warrior,2.16,landed,10.66
+10821,melee,12695,haradrim,warrior,12615,mordor,warrior,0,nocontact ms=887 swing=375 d=2.91/2.00 v=0.00/1.00 spd=1.4 yaw=-0 mounted=0,32.02
+10857,melee,12610,mordor,warrior,12677,haradrim,warrior,2.23,landed,6.53
+10858,melee,12696,haradrim,warrior,12622,mordor,warrior,1.93,landed,32.07
+10858,melee,12697,haradrim,warrior,12594,mordor,warrior,1.81,landed,31.29
+10957,melee,12630,mordor,warrior,12688,haradrim,warrior,1.64,landed,25.95
+10957,melee,12653,mordor,warrior,12710,haradrim,warrior,2.12,landed,14.83
+10991,melee,12643,mordor,warrior,12678,haradrim,warrior,0,nocontact ms=1398 swing=375 d=2.45/2.00 v=0.00/1.00 spd=1.7 yaw=-0 mounted=0,5.5
+10992,melee,12715,haradrim,warrior,12662,mordor,warrior,0,nocontact ms=920 swing=375 d=2.33/2.00 v=0.00/1.00 spd=2.7 yaw=-0 mounted=0,32.4
+11025,melee,12595,mordor,warrior,12691,haradrim,warrior,2.27,landed,8.69
+11025,melee,12633,mordor,warrior,12697,haradrim,warrior,2.35,landed,26.68
+11058,melee,12590,mordor,warrior,12675,haradrim,warrior,2.3,landed,11.94
+11059,melee,12618,mordor,warrior,12713,haradrim,warrior,1.88,landed,21.42
+11062,melee,12694,haradrim,warrior,12579,mordor,warrior,2.22,landed,30.67
+11127,melee,12638,mordor,warrior,12713,haradrim,warrior,0,nocontact ms=784 swing=682 d=2.70/2.00 v=0.00/1.00 spd=5.6 yaw=-0 mounted=0,21.42
+11162,melee,12645,mordor,warrior,12678,haradrim,warrior,2.35,landed,1.99
+11162,melee,12658,mordor,warrior,12720,haradrim,warrior,1.64,landed,32.36
+11195,melee,12573,mordor,warrior,12710,haradrim,warrior,1.66,landed,13.18
+11195,death,12585,mordor,warrior,12678,haradrim,warrior,0,died,0
+11195,melee,12585,mordor,warrior,12678,haradrim,warrior,1.75,kill,0
+11195,melee,12599,mordor,warrior,12716,haradrim,warrior,2.19,landed,29.91
+11230,melee,12617,mordor,warrior,12692,haradrim,warrior,2.27,landed,29.62
+11297,melee,12685,haradrim,warrior,12589,mordor,warrior,1.97,landed,30.39
+11330,melee,12586,mordor,warrior,12678,haradrim,warrior,1.59,lost,0
+11332,melee,12628,mordor,warrior,12710,haradrim,warrior,2,landed,11.17
+11365,melee,12651,mordor,warrior,12692,haradrim,warrior,1.64,landed,27.98
+11366,melee,12690,haradrim,warrior,12647,mordor,warrior,2.25,landed,28.25
+11366,melee,12718,haradrim,warrior,12615,mordor,warrior,2.26,landed,28.64
+11399,melee,12631,mordor,warrior,12686,haradrim,warrior,2.12,landed,25.74
+11399,melee,12677,haradrim,warrior,12655,mordor,warrior,2.18,landed,27.82
+11466,melee,12652,mordor,warrior,12709,haradrim,warrior,1.79,landed,16.6
+11467,melee,12704,haradrim,warrior,12597,mordor,warrior,2.01,landed,26.1
+11537,melee,12591,mordor,warrior,12707,haradrim,warrior,1.83,landed,15.61
+11538,melee,12635,mordor,warrior,12704,haradrim,warrior,1.73,landed,19.06
+11538,melee,12700,haradrim,warrior,12657,mordor,warrior,1.59,landed,31.61
+11569,melee,12712,haradrim,warrior,12645,mordor,warrior,2.11,landed,31.89
+11604,melee,12666,mordor,warrior,12714,haradrim,warrior,1.58,landed,30.73
+11637,melee,12621,mordor,warrior,12693,haradrim,warrior,1.82,landed,25.25
+11638,melee,12692,haradrim,warrior,12632,mordor,warrior,1.95,landed,31.07
+11672,melee,12649,mordor,warrior,12711,haradrim,warrior,2.15,landed,26.01
+11672,melee,12680,haradrim,warrior,12637,mordor,warrior,2.31,landed,30.54
+11706,melee,12682,haradrim,warrior,12650,mordor,warrior,1.96,landed,26.61
+11739,melee,12575,mordor,warrior,12698,haradrim,warrior,1.87,landed,16.24
+11739,melee,12627,mordor,warrior,12705,haradrim,warrior,0,nocontact ms=1599 swing=-1 d=2.26/2.00 v=0.00/1.00 spd=0.5 yaw=-0 mounted=0,21.08
+11808,melee,12679,haradrim,warrior,12665,mordor,warrior,2.15,landed,28.63
+11809,melee,12706,haradrim,warrior,12614,mordor,warrior,1.9,landed,25.56
+11842,melee,12589,mordor,warrior,12685,haradrim,warrior,1.72,landed,21.25
+11842,melee,12634,mordor,warrior,12702,haradrim,warrior,1.93,landed,7.19
+11843,melee,12667,mordor,warrior,12719,haradrim,warrior,2.23,landed,26.43
+11877,melee,12600,mordor,warrior,12702,haradrim,warrior,1.61,landed,5.57
+11877,melee,12603,mordor,warrior,12702,haradrim,warrior,2.02,landed,3.55
+11911,melee,12609,mordor,warrior,12717,haradrim,warrior,1.99,landed,28.13
+11912,melee,12676,haradrim,warrior,12606,mordor,warrior,2.15,landed,31.85
+11945,melee,12579,mordor,warrior,12694,haradrim,warrior,1.62,landed,19.53
+11979,melee,12647,mordor,warrior,12706,haradrim,warrior,1.78,landed,4.67
+11980,melee,12656,mordor,warrior,12689,haradrim,warrior,2.11,landed,25.82
+12012,melee,12604,mordor,warrior,12694,haradrim,warrior,1.65,landed,17.88
+12012,melee,12619,mordor,warrior,12696,haradrim,warrior,2.04,landed,7.6
+12047,melee,12716,haradrim,warrior,12599,mordor,warrior,0,nocontact ms=509 swing=375 d=2.61/2.00 v=0.00/1.00 spd=2.7 yaw=-0 mounted=0,30.08
+12117,melee,12580,mordor,warrior,12707,haradrim,warrior,1.7,landed,13.07
+12118,melee,12669,mordor,warrior,12721,haradrim,warrior,1.73,landed,28.57
+12187,melee,12640,mordor,warrior,12698,haradrim,warrior,2.13,landed,14.11
+12188,melee,12671,mordor,warrior,12721,haradrim,warrior,2.15,landed,25.35
+12222,melee,12601,mordor,warrior,12707,haradrim,warrior,2.35,landed,10.71
+12222,melee,12705,haradrim,warrior,12602,mordor,warrior,0,nocontact ms=684 swing=413 d=2.20/2.00 v=0.00/1.00 spd=0.6 yaw=-0 mounted=0,27.59
+12256,melee,12606,mordor,warrior,12686,haradrim,warrior,1.77,landed,23.98
+12258,melee,12708,haradrim,warrior,12625,mordor,warrior,2.26,landed,28.69
+12290,melee,12642,mordor,warrior,12698,haradrim,warrior,1.85,landed,12.26
+12324,melee,12594,mordor,warrior,12697,haradrim,warrior,1.61,landed,25.08
+12324,melee,12615,mordor,warrior,12718,haradrim,warrior,1.97,landed,30.1
+12325,melee,12707,haradrim,warrior,12591,mordor,warrior,2.09,landed,29.71
+12427,melee,12620,mordor,warrior,12713,haradrim,warrior,1.82,landed,18.7
+12461,melee,12624,mordor,warrior,12696,haradrim,warrior,2.09,landed,4.47
+12461,melee,12629,mordor,warrior,12685,haradrim,warrior,1.83,landed,19.42
+12461,melee,12636,mordor,warrior,12696,haradrim,warrior,1.9,landed,1.62
+12528,melee,12612,mordor,warrior,12698,haradrim,warrior,1.8,landed,10.47
+12562,melee,12661,mordor,warrior,12675,haradrim,warrior,1.89,landed,9.12
+12563,melee,12710,haradrim,warrior,12628,mordor,warrior,2.12,landed,23.71
+12563,melee,12714,haradrim,warrior,12666,mordor,warrior,2.24,landed,26.66
+12597,melee,12681,haradrim,warrior,12611,mordor,warrior,1.81,landed,29.93
+12597,melee,12720,haradrim,warrior,12658,mordor,warrior,2.31,landed,23.05
+12630,melee,12592,mordor,warrior,12694,haradrim,warrior,2.21,landed,15.68
+12630,melee,12639,mordor,warrior,12682,haradrim,warrior,1.81,landed,14.86
+12701,melee,12687,haradrim,warrior,12574,mordor,warrior,2.21,landed,29.59
+12767,melee,12662,mordor,warrior,12710,haradrim,warrior,2.35,landed,7.67
+12768,melee,12702,haradrim,warrior,12603,mordor,warrior,1.98,landed,29.62
+12768,melee,12721,haradrim,warrior,12632,mordor,warrior,1.97,landed,29.11
+12801,melee,12608,mordor,warrior,12702,haradrim,warrior,1.76,landed,1.81
+12802,melee,12648,mordor,warrior,12719,haradrim,warrior,2.14,landed,24.3
+12802,melee,12663,mordor,warrior,12716,haradrim,warrior,1.63,landed,27.48
+12902,melee,12572,mordor,warrior,12694,haradrim,warrior,2.23,landed,13.45
+12937,melee,12583,mordor,warrior,12706,haradrim,warrior,1.76,landed,2.04
+12937,melee,12641,mordor,warrior,12719,haradrim,warrior,1.73,landed,21.7
+12938,melee,12713,haradrim,warrior,12620,mordor,warrior,1.92,landed,32.08
+13005,melee,12598,mordor,warrior,12686,haradrim,warrior,2.13,landed,21.86
+13006,melee,12659,mordor,warrior,12711,haradrim,warrior,1.6,landed,24.42
+13073,melee,12654,mordor,warrior,12717,haradrim,warrior,1.76,landed,26.38
+13074,melee,12670,mordor,warrior,12689,haradrim,warrior,1.71,landed,24.12
+13141,melee,12644,mordor,warrior,12699,haradrim,warrior,1.9,landed,19.85
+13141,melee,12698,haradrim,warrior,12575,mordor,warrior,1.98,landed,25.97
+13175,melee,12607,mordor,warrior,12716,haradrim,warrior,1.61,landed,25.07
+13176,melee,12693,haradrim,warrior,12671,mordor,warrior,2.05,landed,24.8
+13209,melee,12683,haradrim,warrior,12596,mordor,warrior,2.18,landed,19.19
+13244,melee,12650,mordor,warrior,12682,haradrim,warrior,1.68,landed,13.17
+13277,melee,12668,mordor,warrior,12712,haradrim,warrior,1.66,landed,21.13
+13312,melee,12657,mordor,warrior,12700,haradrim,warrior,1.89,landed,28.25
+13312,melee,12686,haradrim,warrior,12631,mordor,warrior,2.02,landed,21.42
+13313,melee,12711,haradrim,warrior,12649,mordor,warrior,1.71,landed,19.01
+13347,melee,12675,haradrim,warrior,12661,mordor,warrior,1.72,landed,30.1
+13348,melee,12709,haradrim,warrior,12652,mordor,warrior,0,nocontact ms=1505 swing=-1 d=2.00/2.00 v=0.00/1.00 spd=1.9 yaw=0 mounted=0,32.08
+13380,melee,12625,mordor,warrior,12708,haradrim,warrior,2.31,landed,13.19
+13414,melee,12660,mordor,warrior,12708,haradrim,warrior,2.06,landed,10.11
+13448,melee,12614,mordor,warrior,12706,haradrim,warrior,1.63,landed,0.41
+13483,melee,12655,mordor,warrior,12677,haradrim,warrior,2.2,landed,4.36
+13483,melee,12688,haradrim,warrior,12630,mordor,warrior,2.37,landed,25.75
+13517,melee,12597,mordor,warrior,12704,haradrim,warrior,1.91,landed,16.22
+13551,melee,12582,mordor,warrior,12715,haradrim,warrior,1.67,landed,24.22
+13552,death,12622,mordor,warrior,12696,haradrim,warrior,0,died,0
+13552,melee,12622,mordor,warrior,12696,haradrim,warrior,1.73,kill,0
+13553,melee,12695,haradrim,warrior,12615,mordor,warrior,1.94,landed,26.72
+13585,melee,12595,mordor,warrior,12685,haradrim,warrior,2.03,landed,17.4
+13654,melee,12715,haradrim,warrior,12662,mordor,warrior,1.87,landed,30.55
+13688,melee,12717,haradrim,warrior,12609,mordor,warrior,2.03,landed,30.96
+13721,melee,12637,mordor,warrior,12688,haradrim,warrior,2.04,landed,23.94
+13722,melee,12664,mordor,warrior,12677,haradrim,warrior,2.37,landed,1.99
+13755,melee,12632,mordor,warrior,12721,haradrim,warrior,1.78,landed,23.59
+13755,melee,12633,mordor,warrior,12705,haradrim,warrior,1.65,landed,18.62
+13789,melee,12610,mordor,warrior,12677,haradrim,warrior,1.85,landed,0.14
+13824,melee,12699,haradrim,warrior,12572,mordor,warrior,2.31,landed,31.69
+13858,melee,12623,mordor,warrior,12710,haradrim,warrior,2.35,landed,5.33
+13892,melee,12630,mordor,warrior,12676,haradrim,warrior,1.75,landed,13.56
+13926,melee,12628,mordor,warrior,12710,haradrim,warrior,2.18,landed,2.06
+13927,melee,12677,haradrim,warrior,12655,mordor,warrior,1.65,landed,26.19
+13927,melee,12718,haradrim,warrior,12615,mordor,warrior,1.81,landed,24.9
+13960,melee,12585,mordor,warrior,12689,haradrim,warrior,2.05,landed,21.06
+13994,melee,12574,mordor,warrior,12687,haradrim,warrior,1.95,landed,19.8
+13994,melee,12593,mordor,warrior,12687,haradrim,warrior,2.03,landed,17.77
+13995,melee,12596,mordor,warrior,12683,haradrim,warrior,1.89,landed,23.74
+13995,melee,12617,mordor,warrior,12692,haradrim,warrior,2.1,landed,24.87
+14029,melee,12613,mordor,warrior,12716,haradrim,warrior,1.72,landed,22.5
+14065,melee,12645,mordor,warrior,12712,haradrim,warrior,1.93,landed,18.24
+14067,melee,12690,haradrim,warrior,12586,mordor,warrior,1.75,landed,31.38
+14166,melee,12573,mordor,warrior,12691,haradrim,warrior,1.62,landed,7.11
+14166,melee,12586,mordor,warrior,12688,haradrim,warrior,1.67,landed,22.27
+14201,melee,12590,mordor,warrior,12707,haradrim,warrior,1.85,landed,7.95
+14235,death,12577,mordor,warrior,12706,haradrim,warrior,0,died,0
+14235,melee,12577,mordor,warrior,12706,haradrim,warrior,2.09,kill,0
+14235,melee,12591,mordor,warrior,12707,haradrim,warrior,1.79,landed,5.27
+14235,melee,12599,mordor,warrior,12716,haradrim,warrior,1.63,landed,20.07
+14269,melee,12618,mordor,warrior,12713,haradrim,warrior,1.95,landed,15.8
+14274,melee,12694,haradrim,warrior,12572,mordor,warrior,1.89,landed,28.86
+14304,melee,12631,mordor,warrior,12686,haradrim,warrior,1.82,landed,20.05
+14372,melee,12666,mordor,warrior,12714,haradrim,warrior,1.85,landed,28.9
+14406,melee,12651,mordor,warrior,12689,haradrim,warrior,1.97,landed,19.09
+14406,melee,12658,mordor,warrior,12720,haradrim,warrior,2.33,landed,28.9
+14475,melee,12669,mordor,warrior,12675,haradrim,warrior,2.37,landed,5.58
+14509,melee,12692,haradrim,warrior,12617,mordor,warrior,2.3,landed,30.01
+14577,melee,12649,mordor,warrior,12711,haradrim,warrior,2.06,landed,22.37
+14645,melee,12579,mordor,warrior,12694,haradrim,warrior,2.09,landed,10.33
+14645,melee,12621,mordor,warrior,12693,haradrim,warrior,1.82,landed,23.46
+14680,melee,12635,mordor,warrior,12707,haradrim,warrior,1.96,landed,2.34
+14680,melee,12652,mordor,warrior,12709,haradrim,warrior,2.2,landed,13.33
+14715,melee,12700,haradrim,warrior,12657,mordor,warrior,1.89,landed,29.76
+14748,death,12634,mordor,warrior,12702,haradrim,warrior,0,died,0
+14748,melee,12634,mordor,warrior,12702,haradrim,warrior,2,kill,0
+14748,melee,12643,mordor,warrior,12695,haradrim,warrior,1.8,landed,21.84
+14749,melee,12712,haradrim,warrior,12645,mordor,warrior,2.29,landed,29.63
+14816,melee,12578,mordor,warrior,12698,haradrim,warrior,1.79,landed,8.7
+14884,melee,12600,mordor,warrior,12691,haradrim,warrior,2.23,landed,4.89
+14885,melee,12606,mordor,warrior,12676,haradrim,warrior,2.36,landed,11.21
+14885,melee,12616,mordor,warrior,12689,haradrim,warrior,0,nocontact ms=1575 swing=-1 d=3.19/2.00 v=0.00/1.00 spd=1.2 yaw=-0 mounted=0,19.1
+14887,melee,12679,haradrim,warrior,12665,mordor,warrior,2.26,landed,26.4
+14919,melee,12685,haradrim,warrior,12595,mordor,warrior,2.26,landed,27.82
+14952,melee,12580,mordor,warrior,12690,haradrim,warrior,1.58,landed,12.86
+14953,melee,12682,haradrim,warrior,12650,mordor,warrior,1.63,landed,25.02
+14953,melee,12704,haradrim,warrior,12597,mordor,warrior,0,nocontact ms=1198 swing=376 d=2.18/2.00 v=0.00/1.00 spd=2.0 yaw=-0 mounted=0,26.14
+14986,death,12604,mordor,warrior,12710,haradrim,warrior,0,died,0
+14986,melee,12604,mordor,warrior,12710,haradrim,warrior,2.06,kill,0
+14987,melee,12684,haradrim,warrior,12638,mordor,warrior,0,nocontact ms=889 swing=751 d=2.78/2.00 v=0.00/1.00 spd=2.0 yaw=0 mounted=0,32.06
+15021,melee,12671,mordor,warrior,12693,haradrim,warrior,1.76,landed,20.82
+15021,melee,12676,haradrim,warrior,12630,mordor,warrior,2.09,landed,22.63
+15055,melee,12667,mordor,warrior,12713,haradrim,warrior,2.06,landed,12.71
+15158,death,12624,mordor,warrior,12677,haradrim,warrior,0,died,0
+15159,melee,12624,mordor,warrior,12677,haradrim,warrior,2.04,kill,0
+15160,melee,12716,haradrim,warrior,12599,mordor,warrior,0,nocontact ms=547 swing=378 d=2.43/2.00 v=0.00/1.00 spd=1.7 yaw=-0 mounted=0,30.11
+15192,melee,12619,mordor,warrior,12702,haradrim,warrior,1.83,lost,0
+15193,melee,12680,haradrim,warrior,12637,mordor,warrior,1.83,landed,28.75
+15226,melee,12602,mordor,warrior,12705,haradrim,warrior,1.77,landed,16.86
+15226,melee,12629,mordor,warrior,12676,haradrim,warrior,2.05,landed,8.13
+15294,melee,12620,mordor,warrior,12713,haradrim,warrior,1.81,landed,10
+15295,melee,12708,haradrim,warrior,12660,mordor,warrior,0,nocontact ms=682 swing=376 d=2.19/2.00 v=0.00/1.00 spd=3.7 yaw=-0 mounted=0,34
+15329,death,12636,mordor,warrior,12707,haradrim,warrior,0,died,0
+15329,melee,12636,mordor,warrior,12707,haradrim,warrior,2,kill,0
+15329,melee,12719,haradrim,warrior,12641,mordor,warrior,0,nocontact ms=547 swing=441 d=2.07/2.00 v=0.00/1.00 spd=3.2 yaw=0 mounted=0,21.41
+15364,melee,12720,haradrim,warrior,12658,mordor,warrior,1.82,landed,21.26
+15432,melee,12609,mordor,warrior,12717,haradrim,warrior,1.73,landed,24.67
+15500,melee,12661,mordor,warrior,12675,haradrim,warrior,1.84,landed,2.84
+15500,melee,12705,haradrim,warrior,12633,mordor,warrior,0,nocontact ms=1060 swing=887 d=3.02/2.00 v=0.00/1.00 spd=1.2 yaw=-0 mounted=0,34
+15533,melee,12581,mordor,warrior,12688,haradrim,warrior,1.65,landed,20.63
+15534,melee,12627,mordor,warrior,12705,haradrim,warrior,1.79,landed,15.07
+15535,melee,12681,haradrim,warrior,12663,mordor,warrior,2.01,landed,29.35
+15569,melee,12689,haradrim,warrior,12651,mordor,warrior,1.81,landed,25.98
+15602,melee,12575,mordor,warrior,12698,haradrim,warrior,1.76,landed,6.95
+15602,melee,12592,mordor,warrior,12718,haradrim,warrior,1.86,landed,28.28
+15602,melee,12607,mordor,warrior,12681,haradrim,warrior,1.74,landed,16.75
+15602,melee,12608,mordor,warrior,12714,haradrim,warrior,2.22,landed,25.58
+15603,melee,12693,haradrim,warrior,12671,mordor,warrior,0,nocontact ms=547 swing=377 d=2.21/2.00 v=0.00/1.00 spd=2.2 yaw=-0 mounted=0,24.83
+15635,melee,12668,mordor,warrior,12712,haradrim,warrior,0,nocontact ms=442 swing=374 d=2.01/2.00 v=0.00/1.00 spd=3.9 yaw=0 mounted=0,18.26
+15636,melee,12721,haradrim,warrior,12632,mordor,warrior,1.7,landed,27.44
+15668,melee,12583,mordor,warrior,12690,haradrim,warrior,0,nocontact ms=443 swing=374 d=2.56/2.00 v=0.00/1.00 spd=2.6 yaw=0 mounted=0,12.87
+15669,melee,12598,mordor,warrior,12690,haradrim,warrior,2.32,landed,9.39
+15738,melee,12588,mordor,warrior,12715,haradrim,warrior,2,landed,22.25
+15739,melee,12670,mordor,warrior,12695,haradrim,warrior,0,nocontact ms=410 swing=376 d=2.58/2.00 v=0.00/1.00 spd=0.6 yaw=-0 mounted=0,21.85
+15806,melee,12572,mordor,warrior,12694,haradrim,warrior,0,nocontact ms=444 swing=375 d=2.59/2.00 v=0.00/1.00 spd=1.5 yaw=-0 mounted=0,10.34
+15806,melee,12615,mordor,warrior,12718,haradrim,warrior,1.59,landed,25.9
+15841,melee,12683,haradrim,warrior,12596,mordor,warrior,1.58,landed,17.63
+16012,melee,12657,mordor,warrior,12700,haradrim,warrior,2.33,landed,25.95
+16012,melee,12663,mordor,warrior,12716,haradrim,warrior,2.14,landed,16.87
+16046,melee,12660,mordor,warrior,12720,haradrim,warrior,1.63,landed,27.29
+16046,melee,12698,haradrim,warrior,12578,mordor,warrior,2.3,landed,30.56
+16148,melee,12675,haradrim,warrior,12661,mordor,warrior,2.26,landed,27.87
+16182,melee,12646,mordor,warrior,12718,haradrim,warrior,1.65,landed,24.26
+16182,melee,12665,mordor,warrior,12679,haradrim,warrior,2.13,landed,4.26
+16216,melee,12686,haradrim,warrior,12631,mordor,warrior,2.01,landed,18.44
+16251,melee,12637,mordor,warrior,12680,haradrim,warrior,0,nocontact ms=411 swing=376 d=2.49/2.00 v=0.00/1.00 spd=3.8 yaw=-0 mounted=0,29.56
+16285,melee,12641,mordor,warrior,12693,haradrim,warrior,0,nocontact ms=785 swing=546 d=2.12/2.00 v=0.00/1.00 spd=0.5 yaw=0 mounted=0,20.83
+16285,melee,12713,haradrim,warrior,12620,mordor,warrior,0,nocontact ms=750 swing=512 d=2.49/2.00 v=0.00/1.00 spd=0.4 yaw=-0 mounted=0,32.11
+16318,melee,12655,mordor,warrior,12721,haradrim,warrior,0,nocontact ms=443 swing=375 d=2.20/2.00 v=0.00/1.00 spd=2.2 yaw=-0 mounted=0,23.61
+16421,melee,12654,mordor,warrior,12717,haradrim,warrior,2.15,landed,22.53
+16422,melee,12695,haradrim,warrior,12615,mordor,warrior,1.82,landed,23.12
+16454,melee,12590,mordor,warrior,12714,haradrim,warrior,1.86,landed,22.8
+16455,melee,12648,mordor,warrior,12683,haradrim,warrior,2.23,landed,21.53
+16455,melee,12687,haradrim,warrior,12593,mordor,warrior,2.21,landed,28.61
+16487,melee,12574,mordor,warrior,12687,haradrim,warrior,1.77,landed,15.14
+16488,melee,12582,mordor,warrior,12716,haradrim,warrior,1.74,landed,15.14
+16489,melee,12691,haradrim,warrior,12600,mordor,warrior,2.22,landed,30.16
+16524,melee,12659,mordor,warrior,12687,haradrim,warrior,2.04,landed,13.1
+16557,melee,12622,mordor,warrior,12712,haradrim,warrior,2.29,landed,15.97
+16591,melee,12633,mordor,warrior,12700,haradrim,warrior,2.17,landed,22.7
+16591,melee,12638,mordor,warrior,12712,haradrim,warrior,1.58,landed,14.39
+16626,melee,12715,haradrim,warrior,12588,mordor,warrior,2.25,landed,28.37
+16659,melee,12613,mordor,warrior,12690,haradrim,warrior,2.16,landed,7.23
+16660,melee,12717,haradrim,warrior,12633,mordor,warrior,2.34,landed,30.49
+16693,melee,12632,mordor,warrior,12721,haradrim,warrior,2.26,landed,20.23
+16693,melee,12662,mordor,warrior,12681,haradrim,warrior,2.04,landed,14.71
+16727,melee,12596,mordor,warrior,12683,haradrim,warrior,0,nocontact ms=443 swing=370 d=2.62/2.00 v=0.00/1.00 spd=2.3 yaw=0 mounted=0,21.54
+16728,melee,12610,mordor,warrior,12699,haradrim,warrior,1.81,landed,18.08
+16728,melee,12617,mordor,warrior,12709,haradrim,warrior,2.14,landed,10.14
+16728,melee,12650,mordor,warrior,12682,haradrim,warrior,2.02,landed,11.19
+16796,melee,12585,mordor,warrior,12715,haradrim,warrior,1.9,landed,20.36
+16797,melee,12630,mordor,warrior,12676,haradrim,warrior,1.9,landed,6.25
+16830,melee,12664,mordor,warrior,12705,haradrim,warrior,1.66,landed,13.42
+16864,melee,12623,mordor,warrior,12694,haradrim,warrior,1.78,landed,7.67
+16865,melee,12711,haradrim,warrior,12649,mordor,warrior,1.93,landed,17.12
+16932,melee,12597,mordor,warrior,12694,haradrim,warrior,1.72,landed,5.96
+16966,melee,12631,mordor,warrior,12686,haradrim,warrior,2,landed,18.09
+17000,melee,12628,mordor,warrior,12704,haradrim,warrior,1.79,landed,14.46
+17001,melee,12709,haradrim,warrior,12652,mordor,warrior,1.59,landed,29.73
+17001,melee,12718,haradrim,warrior,12646,mordor,warrior,1.8,landed,28.35
+17034,melee,12591,mordor,warrior,12694,haradrim,warrior,1.82,landed,3.22
+17068,melee,12611,mordor,warrior,12699,haradrim,warrior,0,nocontact ms=921 swing=409 d=2.20/2.00 v=0.00/1.00 spd=2.2 yaw=0 mounted=0,18.08
+17136,melee,12599,mordor,warrior,12708,haradrim,warrior,1.59,landed,8.56
+17136,melee,12625,mordor,warrior,12708,haradrim,warrior,2.21,landed,5.25
+17171,melee,12645,mordor,warrior,12712,haradrim,warrior,0,nocontact ms=512 swing=373 d=2.16/2.00 v=0.00/1.00 spd=3.5 yaw=-0 mounted=0,14.41
+17239,melee,12690,haradrim,warrior,12598,mordor,warrior,0,nocontact ms=614 swing=375 d=2.30/2.00 v=0.00/1.00 spd=2.4 yaw=-0 mounted=0,34
+17273,melee,12669,mordor,warrior,12675,haradrim,warrior,1.7,landed,1.16
+17307,melee,12618,mordor,warrior,12718,haradrim,warrior,2.04,landed,22.23
+17307,melee,12666,mordor,warrior,12714,haradrim,warrior,1.79,landed,21.02
+17308,melee,12692,haradrim,warrior,12617,mordor,warrior,2.2,landed,27.84
+17343,melee,12699,haradrim,warrior,12613,mordor,warrior,1.69,landed,32.31
+17375,melee,12603,mordor,warrior,12690,haradrim,warrior,0,nocontact ms=443 swing=375 d=2.17/2.00 v=0.00/1.00 spd=1.7 yaw=-0 mounted=0,7.24
+17444,melee,12579,mordor,warrior,12694,haradrim,warrior,0,nocontact ms=410 swing=376 d=2.18/2.00 v=0.00/1.00 spd=6.0 yaw=-0 mounted=0,3.22
+17478,melee,12616,mordor,warrior,12683,haradrim,warrior,2.27,landed,18.13
+17479,melee,12688,haradrim,warrior,12581,mordor,warrior,1.86,landed,32.14
+17512,melee,12577,mordor,warrior,12704,haradrim,warrior,1.68,landed,12.79
+17581,melee,12606,mordor,warrior,12676,haradrim,warrior,1.8,landed,4.46
+17618,melee,12658,mordor,warrior,12720,haradrim,warrior,1.59,landed,24.92
+17649,melee,12580,mordor,warrior,12690,haradrim,warrior,0,nocontact ms=445 swing=377 d=2.54/2.00 v=0.00/1.00 spd=4.6 yaw=-0 mounted=0,7.24
+17718,melee,12634,mordor,warrior,12714,haradrim,warrior,2.2,landed,17.73
+17718,melee,12643,mordor,warrior,12679,haradrim,warrior,2.11,landed,2.16
+17720,melee,12684,haradrim,warrior,12659,mordor,warrior,2.15,landed,27.27
+17821,melee,12700,haradrim,warrior,12633,mordor,warrior,0,nocontact ms=855 swing=376 d=2.59/2.00 v=0.00/1.00 spd=2.9 yaw=-0 mounted=0,30.5
+17854,melee,12619,mordor,warrior,12681,haradrim,warrior,2.33,landed,12.4
+17855,melee,12682,haradrim,warrior,12650,mordor,warrior,2.32,landed,22.72
+17890,melee,12656,mordor,warrior,12705,haradrim,warrior,2.23,landed,11.2
+17923,melee,12604,mordor,warrior,12699,haradrim,warrior,1.63,landed,15.65
+17957,melee,12652,mordor,warrior,12709,haradrim,warrior,2.08,landed,8.07
+17957,melee,12716,haradrim,warrior,12582,mordor,warrior,0,nocontact ms=410 swing=375 d=2.83/2.00 v=0.00/1.00 spd=0.5 yaw=-0 mounted=0,34
+17991,melee,12651,mordor,warrior,12689,haradrim,warrior,1.87,landed,17.26
+17991,melee,12676,haradrim,warrior,12630,mordor,warrior,1.63,landed,21.03
+18025,melee,12680,haradrim,warrior,12637,mordor,warrior,0,nocontact ms=444 swing=375 d=2.15/2.00 v=0.00/1.00 spd=2.1 yaw=-0 mounted=0,28.78
+18025,melee,12705,haradrim,warrior,12664,mordor,warrior,1.96,landed,27.33
+18025,melee,12712,haradrim,warrior,12638,mordor,warrior,0,nocontact ms=786 swing=717 d=2.93/2.00 v=0.00/1.00 spd=4.6 yaw=-0 mounted=0,32.09
+18128,melee,12685,haradrim,warrior,12595,mordor,warrior,1.84,landed,26.01
+18231,melee,12714,haradrim,warrior,12634,mordor,warrior,2.07,landed,30.38
+18264,melee,12573,mordor,warrior,12681,haradrim,warrior,1.79,landed,9.71
+18299,melee,12667,mordor,warrior,12715,haradrim,warrior,2.33,landed,18.04
+18333,melee,12593,mordor,warrior,12687,haradrim,warrior,1.85,landed,11.27
+18333,melee,12615,mordor,warrior,12718,haradrim,warrior,2.07,landed,19.12
+18333,melee,12668,mordor,warrior,12712,haradrim,warrior,2.18,landed,12.23
+18334,melee,12689,haradrim,warrior,12651,mordor,warrior,2.3,landed,23.71
+18367,melee,12607,mordor,warrior,12691,haradrim,warrior,2.24,landed,1.56
+18401,melee,12592,mordor,warrior,12683,haradrim,warrior,2.34,landed,14.62
+18402,melee,12681,haradrim,warrior,12619,mordor,warrior,2.27,landed,27.78
+18441,melee,12720,haradrim,warrior,12658,mordor,warrior,2.21,landed,19.08
+18470,death,12636,mordor,warrior,12675,haradrim,warrior,0,died,0
+18470,melee,12636,mordor,warrior,12675,haradrim,warrior,2.01,kill,0
+18503,melee,12594,mordor,warrior,12675,haradrim,warrior,1.77,lost,0
+18504,melee,12661,mordor,warrior,12675,haradrim,warrior,1.64,lost,0
+18571,melee,12609,mordor,warrior,12717,haradrim,warrior,2.19,landed,19.26
+18606,melee,12671,mordor,warrior,12693,haradrim,warrior,2.26,landed,18.58
+18639,melee,12598,mordor,warrior,12719,haradrim,warrior,2.21,landed,19.54
+18639,melee,12670,mordor,warrior,12689,haradrim,warrior,2.27,landed,13.85
+18640,melee,12719,haradrim,warrior,12641,mordor,warrior,1.96,landed,19.78
+18673,melee,12679,haradrim,warrior,12665,mordor,warrior,0,nocontact ms=1400 swing=374 d=2.04/2.00 v=0.00/1.00 spd=1.9 yaw=0 mounted=0,26.43
+18709,melee,12663,mordor,warrior,12687,haradrim,warrior,2.22,landed,7.94
+18741,melee,12587,mordor,warrior,12713,haradrim,warrior,1.77,landed,8.27
+18742,melee,12640,mordor,warrior,12691,haradrim,warrior,0,nocontact ms=580 swing=375 d=2.04/2.00 v=0.00/1.00 spd=2.0 yaw=-0 mounted=0,1.57
+18775,melee,12602,mordor,warrior,12705,haradrim,warrior,2.14,landed,9.08
+18776,melee,12624,mordor,warrior,12705,haradrim,warrior,2.18,landed,5.81
+18777,melee,12693,haradrim,warrior,12671,mordor,warrior,2.14,landed,22.73
+18812,melee,12683,haradrim,warrior,12616,mordor,warrior,1.79,landed,28.08
+18878,melee,12639,mordor,warrior,12693,haradrim,warrior,2.06,landed,16.53
+18912,melee,12601,mordor,warrior,12690,haradrim,warrior,0,nocontact ms=409 swing=375 d=2.37/2.00 v=0.00/1.00 spd=0.7 yaw=0 mounted=0,7.26
+18912,melee,12646,mordor,warrior,12718,haradrim,warrior,1.98,landed,16.17
+18913,melee,12697,haradrim,warrior,12664,mordor,warrior,0,nocontact ms=1674 swing=-1 d=2.10/2.00 v=0.00/1.00 spd=4.4 yaw=-0 mounted=0,27.33
+18982,melee,12660,mordor,warrior,12717,haradrim,warrior,2.02,landed,17.26
+19016,melee,12654,mordor,warrior,12717,haradrim,warrior,1.8,landed,15.46
+19085,melee,12713,haradrim,warrior,12620,mordor,warrior,2.24,landed,29.9
+19119,melee,12582,mordor,warrior,12716,haradrim,warrior,1.67,landed,12.66
+19152,melee,12572,mordor,warrior,12713,haradrim,warrior,2.31,landed,4.8
+19188,melee,12620,mordor,warrior,12713,haradrim,warrior,2.01,landed,2.79
+19222,melee,12657,mordor,warrior,12709,haradrim,warrior,2.22,landed,5.87
+19258,melee,12686,haradrim,warrior,12631,mordor,warrior,1.89,landed,16.57
+19290,melee,12595,mordor,warrior,12685,haradrim,warrior,2.35,landed,15.12
+19324,melee,12665,mordor,warrior,12712,haradrim,warrior,2.33,landed,9.91
+19392,melee,12627,mordor,warrior,12705,haradrim,warrior,0,nocontact ms=1368 swing=377 d=3.57/2.00 v=0.00/1.00 spd=3.3 yaw=-0 mounted=0,5.82
+19426,melee,12612,mordor,warrior,12717,haradrim,warrior,1.62,landed,13.84
+19427,melee,12622,mordor,warrior,12721,haradrim,warrior,1.71,landed,18.54
+19427,melee,12638,mordor,warrior,12716,haradrim,warrior,1.72,landed,10.07
+19460,melee,12574,mordor,warrior,12712,haradrim,warrior,1.94,landed,7
+19461,melee,12715,haradrim,warrior,12667,mordor,warrior,0,nocontact ms=548 swing=478 d=2.74/2.00 v=0.00/1.00 spd=4.8 yaw=-0 mounted=0,34
+19494,melee,12650,mordor,warrior,12682,haradrim,warrior,2.01,landed,9.2
+19495,melee,12708,haradrim,warrior,12671,mordor,warrior,2.29,landed,20.43
+19530,melee,12648,mordor,warrior,12719,haradrim,warrior,1.64,landed,17.91
+19530,melee,12659,mordor,warrior,12684,haradrim,warrior,1.91,landed,13.41
+19531,melee,12721,haradrim,warrior,12632,mordor,warrior,0,nocontact ms=1299 swing=891 d=3.49/2.00 v=0.00/1.00 spd=1.3 yaw=-0 mounted=0,27.49
+19563,melee,12664,mordor,warrior,12676,haradrim,warrior,2.1,landed,1.33
+19597,melee,12655,mordor,warrior,12720,haradrim,warrior,0,nocontact ms=821 swing=719 d=2.21/2.00 v=0.00/1.00 spd=1.8 yaw=0 mounted=0,24.94
+19631,melee,12623,mordor,warrior,12681,haradrim,warrior,2.22,landed,7.5
+19632,melee,12695,haradrim,warrior,12643,mordor,warrior,2.19,landed,29.6
+19699,melee,12596,mordor,warrior,12683,haradrim,warrior,2.01,landed,11.62
+19699,melee,12608,mordor,warrior,12687,haradrim,warrior,0,nocontact ms=1743 swing=-1 d=2.26/2.00 v=0.00/1.00 spd=3.1 yaw=0 mounted=0,7.95
+19734,melee,12717,haradrim,warrior,12654,mordor,warrior,1.59,landed,21.79
+19837,melee,12644,mordor,warrior,12699,haradrim,warrior,0,nocontact ms=445 swing=377 d=2.05/2.00 v=0.00/1.00 spd=1.1 yaw=-0 mounted=0,15.67
+19870,melee,12599,mordor,warrior,12716,haradrim,warrior,1.6,landed,8.48
+19871,melee,12614,mordor,warrior,12720,haradrim,warrior,2.07,landed,22.88
+19905,melee,12617,mordor,warrior,12692,haradrim,warrior,1.98,landed,22.95
+19938,melee,12590,mordor,warrior,12712,haradrim,warrior,1.95,landed,4.09
+19939,melee,12625,mordor,warrior,12682,haradrim,warrior,2.23,landed,5.86
+19972,melee,12591,mordor,warrior,12713,haradrim,warrior,2.25,landed,0.55
+19973,melee,12637,mordor,warrior,12682,haradrim,warrior,2.25,landed,2.49
+19973,melee,12698,haradrim,warrior,12575,mordor,warrior,1.65,landed,24.38
+20006,melee,12647,mordor,warrior,12675,haradrim,warrior,1.72,lost,0
+20040,melee,12597,mordor,warrior,12704,haradrim,warrior,1.93,landed,9.91
+20040,melee,12628,mordor,warrior,12711,haradrim,warrior,1.67,landed,20.76
+20076,melee,12691,haradrim,warrior,12607,mordor,warrior,0,nocontact ms=1403 swing=69 d=3.12/2.00 v=0.00/1.00 spd=2.4 yaw=-0 mounted=0,34
+20109,melee,12669,mordor,warrior,12698,haradrim,warrior,2.01,landed,4.98
+20177,melee,12630,mordor,warrior,12676,haradrim,warrior,0,nocontact ms=886 swing=580 d=4.52/2.00 v=0.00/1.00 spd=4.8 yaw=-0 mounted=0,1.34
+20178,melee,12687,haradrim,warrior,12663,mordor,warrior,2.13,landed,27.27
+20178,melee,12692,haradrim,warrior,12617,mordor,warrior,0,nocontact ms=445 swing=375 d=2.62/2.00 v=0.00/1.00 spd=1.7 yaw=0 mounted=0,27.87
+20279,melee,12631,mordor,warrior,12686,haradrim,warrior,0,nocontact ms=1057 swing=374 d=2.92/2.00 v=0.00/1.00 spd=3.5 yaw=-0 mounted=0,18.12
+20279,death,12662,mordor,warrior,12691,haradrim,warrior,0,died,0
+20279,melee,12662,mordor,warrior,12691,haradrim,warrior,2.25,kill,0
+20312,death,12585,mordor,warrior,12676,haradrim,warrior,0,died,0
+20313,melee,12585,mordor,warrior,12676,haradrim,warrior,2.36,kill,0
+20347,melee,12603,mordor,warrior,12700,haradrim,warrior,1.74,landed,20.12
+20348,melee,12611,mordor,warrior,12686,haradrim,warrior,0,nocontact ms=785 swing=717 d=2.22/2.00 v=0.00/1.00 spd=0.8 yaw=0 mounted=0,18.12
+20482,melee,12600,mordor,warrior,12691,haradrim,warrior,0,nocontact ms=442 swing=374 d=2.35/2.00 v=0.68/1.00 spd=0.8 yaw=-0 mounted=0,0
+20483,melee,12684,haradrim,warrior,12659,mordor,warrior,1.97,landed,25.33
+20483,melee,12699,haradrim,warrior,12604,mordor,warrior,1.6,landed,32.4
+20516,melee,12666,mordor,warrior,12714,haradrim,warrior,1.84,landed,14.99
+20517,melee,12718,haradrim,warrior,12646,mordor,warrior,2.01,landed,26.37
+20550,melee,12606,mordor,warrior,12708,haradrim,warrior,0,nocontact ms=713 swing=646 d=2.02/2.00 v=0.00/1.00 spd=4.0 yaw=-0 mounted=0,5.28
+20619,melee,12621,mordor,warrior,12693,haradrim,warrior,2.02,landed,14.52
+20653,melee,12658,mordor,warrior,12720,haradrim,warrior,2.14,landed,20.74
+20687,melee,12643,mordor,warrior,12695,haradrim,warrior,1.66,landed,19.4
+20687,melee,12652,mordor,warrior,12709,haradrim,warrior,2.22,landed,3.66
+20687,melee,12712,haradrim,warrior,12590,mordor,warrior,2.06,landed,28.31
+20720,melee,12586,mordor,warrior,12690,haradrim,warrior,1.68,landed,4.75
+20721,melee,12604,mordor,warrior,12699,haradrim,warrior,2.03,landed,13.65
+20721,melee,12616,mordor,warrior,12683,haradrim,warrior,1.61,landed,10.03
+20756,melee,12704,haradrim,warrior,12597,mordor,warrior,1.72,landed,23.61
+20790,melee,12709,haradrim,warrior,12657,mordor,warrior,1.76,landed,28.06
+20823,melee,12653,mordor,warrior,12688,haradrim,warrior,2.08,landed,18.6
+20959,melee,12605,mordor,warrior,12700,haradrim,warrior,2.26,landed,17.88
+20993,melee,12619,mordor,warrior,12697,haradrim,warrior,1.8,landed,23.37
+20994,melee,12688,haradrim,warrior,12581,mordor,warrior,1.92,landed,30.24
+21027,melee,12682,haradrim,warrior,12637,mordor,warrior,1.67,landed,26.3
+21028,melee,12705,haradrim,warrior,12629,mordor,warrior,1.86,landed,31.2
+21095,melee,12651,mordor,warrior,12689,haradrim,warrior,2.24,landed,11.64
+21129,melee,12681,haradrim,warrior,12623,mordor,warrior,1.6,landed,30.67
+21130,melee,12685,haradrim,warrior,12595,mordor,warrior,2.11,landed,23.93
+21130,melee,12719,haradrim,warrior,12648,mordor,warrior,2.12,landed,27.49
+21165,melee,12689,haradrim,warrior,12670,mordor,warrior,2.17,landed,20.89
+21196,melee,12577,mordor,warrior,12709,haradrim,warrior,1.7,landed,1.97
+21197,melee,12634,mordor,warrior,12714,haradrim,warrior,1.96,landed,13.04
+21301,melee,12716,haradrim,warrior,12599,mordor,warrior,2.2,landed,27.16
+21402,melee,12578,mordor,warrior,12698,haradrim,warrior,2.1,landed,2.88
+21403,melee,12680,haradrim,warrior,12610,mordor,warrior,2.35,landed,21.29
+21438,melee,12639,mordor,warrior,12719,haradrim,warrior,1.91,landed,16.01
+21474,melee,12615,mordor,warrior,12695,haradrim,warrior,2.36,landed,17.05
+21507,melee,12667,mordor,warrior,12699,haradrim,warrior,2.13,landed,11.52
+21541,melee,12660,mordor,warrior,12720,haradrim,warrior,2.2,landed,18.54
+21573,melee,12580,mordor,warrior,12704,haradrim,warrior,1.68,landed,8.25
+21607,melee,12592,mordor,warrior,12692,haradrim,warrior,2.08,landed,19.85
+21608,melee,12656,mordor,warrior,12686,haradrim,warrior,2.32,landed,15.81
+21609,melee,12720,haradrim,warrior,12614,mordor,warrior,1.73,landed,23.07
+21642,melee,12584,mordor,warrior,12686,haradrim,warrior,2.02,landed,13.79
+21642,death,12636,mordor,warrior,12694,haradrim,warrior,0,died,0
+21642,melee,12636,mordor,warrior,12694,haradrim,warrior,2.21,kill,0
+21642,melee,12645,mordor,warrior,12714,haradrim,warrior,0,nocontact ms=1840 swing=-1 d=2.41/2.00 v=0.00/1.00 spd=1.2 yaw=-0 mounted=0,13.04
+21676,melee,12581,mordor,warrior,12688,haradrim,warrior,0,nocontact ms=718 swing=650 d=2.07/2.00 v=0.00/1.00 spd=2.0 yaw=-0 mounted=0,18.6
+21677,melee,12683,haradrim,warrior,12616,mordor,warrior,1.64,landed,26.48
+21746,melee,12593,mordor,warrior,12704,haradrim,warrior,0,nocontact ms=1264 swing=481 d=2.78/2.00 v=0.00/1.00 spd=0.4 yaw=0 mounted=0,8.25
+21815,melee,12598,mordor,warrior,12690,haradrim,warrior,1.75,landed,2.15
+21849,melee,12602,mordor,warrior,12705,haradrim,warrior,2.34,landed,3.5
+21849,death,12641,mordor,warrior,12709,haradrim,warrior,0,died,0
+21849,melee,12641,mordor,warrior,12709,haradrim,warrior,2.19,kill,0
+21850,melee,12697,haradrim,warrior,12619,mordor,warrior,1.63,landed,26.19
+21883,melee,12693,haradrim,warrior,12621,mordor,warrior,1.82,landed,32.18
+21951,melee,12582,mordor,warrior,12687,haradrim,warrior,2.05,landed,5.94
+22024,melee,12589,mordor,warrior,12685,haradrim,warrior,2.03,landed,13.12
+22025,melee,12646,mordor,warrior,12700,haradrim,warrior,1.63,landed,15.44
+22025,melee,12670,mordor,warrior,12689,haradrim,warrior,1.63,landed,10.03
+22059,melee,12671,mordor,warrior,12700,haradrim,warrior,1.69,landed,12.9
+22093,melee,12642,mordor,warrior,12711,haradrim,warrior,1.62,landed,19.15
+22093,melee,12655,mordor,warrior,12680,haradrim,warrior,1.87,landed,27.75
+22094,melee,12659,mordor,warrior,12684,haradrim,warrior,2.32,landed,11.11
+22128,melee,12663,mordor,warrior,12687,haradrim,warrior,1.67,landed,4.27
+22161,melee,12607,mordor,warrior,12694,haradrim,warrior,2.29,lost,0
+22195,melee,12572,mordor,warrior,12712,haradrim,warrior,2.06,landed,1.02
+22195,melee,12575,mordor,warrior,12717,haradrim,warrior,1.71,landed,12.16
+22195,death,12587,mordor,warrior,12690,haradrim,warrior,0,died,0
+22195,melee,12587,mordor,warrior,12690,haradrim,warrior,2.09,kill,0
+22231,melee,12626,mordor,warrior,12699,haradrim,warrior,2.23,landed,9.3
+22232,melee,12715,haradrim,warrior,12615,mordor,warrior,1.71,landed,20.61
+22265,melee,12610,mordor,warrior,12716,haradrim,warrior,1.82,landed,6.68
+22265,melee,12614,mordor,warrior,12720,haradrim,warrior,0,nocontact ms=589 swing=383 d=2.54/2.00 v=0.00/1.00 spd=3.2 yaw=-0 mounted=0,18.55
+22298,melee,12583,mordor,warrior,12699,haradrim,warrior,1.89,landed,6.46
+22298,melee,12612,mordor,warrior,12717,haradrim,warrior,2.26,landed,9.9
+22299,melee,12654,mordor,warrior,12717,haradrim,warrior,1.71,landed,8.18
+22400,melee,12613,mordor,warrior,12699,haradrim,warrior,0,nocontact ms=449 swing=375 d=2.21/2.00 v=0.00/1.00 spd=2.4 yaw=-0 mounted=0,6.46
+22401,melee,12622,mordor,warrior,12721,haradrim,warrior,1.65,landed,16.91
+22435,melee,12574,mordor,warrior,12687,haradrim,warrior,0,nocontact ms=411 swing=377 d=2.11/2.00 v=0.00/1.00 spd=3.6 yaw=-0 mounted=0,4.27
+22503,melee,12597,mordor,warrior,12704,haradrim,warrior,2.1,landed,6.16
+22505,melee,12686,haradrim,warrior,12631,mordor,warrior,2.15,landed,13.39
+22539,melee,12638,mordor,warrior,12684,haradrim,warrior,1.86,landed,9.25
+22540,melee,12695,haradrim,warrior,12615,mordor,warrior,2.13,landed,17.41
+22572,melee,12609,mordor,warrior,12717,haradrim,warrior,0,nocontact ms=1409 swing=307 d=2.29/2.00 v=0.00/1.00 spd=0.8 yaw=-0 mounted=0,8.18
+22572,melee,12650,mordor,warrior,12684,haradrim,warrior,1.64,landed,6.79
+22573,melee,12698,haradrim,warrior,12578,mordor,warrior,2.04,landed,27.56
+22573,melee,12717,haradrim,warrior,12612,mordor,warrior,1.67,landed,27.22
+22605,melee,12588,mordor,warrior,12715,haradrim,warrior,2.3,landed,15.79
+22605,melee,12601,mordor,warrior,12714,haradrim,warrior,0,nocontact ms=1408 swing=825 d=2.20/2.00 v=0.00/1.00 spd=3.8 yaw=-0 mounted=0,13.05
+22742,melee,12644,mordor,warrior,12699,haradrim,warrior,1.7,landed,4.77
+22776,melee,12637,mordor,warrior,12682,haradrim,warrior,0,nocontact ms=444 swing=375 d=2.14/2.00 v=0.00/1.00 spd=2.8 yaw=0 mounted=0,2.51
+22777,melee,12721,haradrim,warrior,12622,mordor,warrior,1.65,landed,30.84
+22811,melee,12617,mordor,warrior,12692,haradrim,warrior,2.15,landed,16.64
+22846,melee,12628,mordor,warrior,12697,haradrim,warrior,1.99,landed,21.4
+22846,melee,12664,mordor,warrior,12718,haradrim,warrior,1.62,landed,14.59
+22880,death,12647,mordor,warrior,12712,haradrim,warrior,0,died,0
+22880,melee,12647,mordor,warrior,12712,haradrim,warrior,1.99,kill,0
+22948,melee,12596,mordor,warrior,12683,haradrim,warrior,2.02,landed,8.04
+22982,melee,12590,mordor,warrior,12679,haradrim,warrior,1.93,landed,0.28
+22982,melee,12611,mordor,warrior,12699,haradrim,warrior,2.26,landed,1.39
+22983,melee,12666,mordor,warrior,12714,haradrim,warrior,1.6,landed,10.66
+23016,death,12585,mordor,warrior,12713,haradrim,warrior,0,died,0
+23016,melee,12585,mordor,warrior,12713,haradrim,warrior,1.74,kill,0
+23051,melee,12630,mordor,warrior,12700,haradrim,warrior,1.88,landed,10.09
+23188,melee,12631,mordor,warrior,12686,haradrim,warrior,2.06,landed,11.75
+23357,melee,12616,mordor,warrior,12683,haradrim,warrior,2.14,landed,5.9
+23357,melee,12618,mordor,warrior,12713,haradrim,warrior,1.93,lost,0
+23359,melee,12688,haradrim,warrior,12653,mordor,warrior,2.12,landed,22.85
+23391,melee,12621,mordor,warrior,12705,haradrim,warrior,1.72,landed,1.8
+23391,melee,12623,mordor,warrior,12681,haradrim,warrior,1.92,landed,5.62
+23391,melee,12633,mordor,warrior,12697,haradrim,warrior,2.27,landed,17.99
+23426,melee,12692,haradrim,warrior,12592,mordor,warrior,1.63,landed,31.55
+23562,melee,12634,mordor,warrior,12714,haradrim,warrior,0,nocontact ms=442 swing=374 d=2.16/2.00 v=0.00/1.00 spd=1.6 yaw=0 mounted=0,10.66
+23563,melee,12658,mordor,warrior,12720,haradrim,warrior,2.17,landed,16.39
+23597,melee,12652,mordor,warrior,12680,haradrim,warrior,2.08,landed,24.65
+23633,melee,12662,mordor,warrior,12687,haradrim,warrior,1.64,landed,2.64
+23634,melee,12711,haradrim,warrior,12642,mordor,warrior,1.65,landed,31.53
+23665,melee,12643,mordor,warrior,12695,haradrim,warrior,2.22,landed,14.85
+23766,melee,12586,mordor,warrior,12719,haradrim,warrior,1.65,landed,14.39
+23766,melee,12591,mordor,warrior,12713,haradrim,warrior,1.9,lost,0
+23767,melee,12669,mordor,warrior,12711,haradrim,warrior,2.09,landed,16.02
+23767,melee,12687,haradrim,warrior,12663,mordor,warrior,2.28,landed,23.88
+23800,melee,12577,mordor,warrior,12700,haradrim,warrior,1.71,landed,7.53
+23834,melee,12653,mordor,warrior,12688,haradrim,warrior,2.08,landed,16.54
+23869,melee,12700,haradrim,warrior,12630,mordor,warrior,2.1,landed,18.99
+23869,melee,12704,haradrim,warrior,12597,mordor,warrior,2.2,landed,21.44
+23905,melee,12699,haradrim,warrior,12644,mordor,warrior,1.89,landed,30.05
+23937,melee,12651,mordor,warrior,12689,haradrim,warrior,2.33,landed,7.72
+24039,melee,12684,haradrim,warrior,12650,mordor,warrior,2.06,landed,20.73
+24072,melee,12584,mordor,warrior,12716,haradrim,warrior,1.83,landed,4.88
+24072,death,12604,mordor,warrior,12699,haradrim,warrior,0,died,0
+24072,melee,12604,mordor,warrior,12699,haradrim,warrior,2.27,kill,0
+24073,melee,12689,haradrim,warrior,12670,mordor,warrior,2.14,landed,17.71
+24142,melee,12605,mordor,warrior,12718,haradrim,warrior,1.86,landed,11.81
+24179,melee,12682,haradrim,warrior,12575,mordor,warrior,2.1,landed,22.32
+24213,melee,12716,haradrim,warrior,12610,mordor,warrior,2.27,landed,17.92
+24278,melee,12580,mordor,warrior,12720,haradrim,warrior,0,nocontact ms=410 swing=376 d=2.61/2.00 v=0.00/1.00 spd=0.3 yaw=-0 mounted=0,16.4
+24278,melee,12639,mordor,warrior,12693,haradrim,warrior,2.04,landed,11.49
+24312,melee,12573,mordor,warrior,12717,haradrim,warrior,1.67,landed,6.53
+24348,melee,12705,haradrim,warrior,12621,mordor,warrior,1.82,landed,30.39
+24348,melee,12719,haradrim,warrior,12639,mordor,warrior,0,nocontact ms=649 swing=377 d=2.16/2.00 v=0.00/1.00 spd=2.0 yaw=0 mounted=0,34
+24382,melee,12619,mordor,warrior,12697,haradrim,warrior,1.75,landed,16.25
+24414,melee,12640,mordor,warrior,12681,haradrim,warrior,2.37,landed,2.08
+24448,melee,12592,mordor,warrior,12692,haradrim,warrior,0,nocontact ms=444 swing=376 d=2.18/2.00 v=0.00/1.00 spd=3.5 yaw=0 mounted=0,16.65
+24450,melee,12667,mordor,warrior,12718,haradrim,warrior,2.29,landed,8.38
+24482,melee,12606,mordor,warrior,12680,haradrim,warrior,0,nocontact ms=1774 swing=-1 d=4.09/2.00 v=0.00/1.00 spd=3.3 yaw=-0 mounted=0,24.66
+24517,melee,12679,haradrim,warrior,12590,mordor,warrior,2.32,landed,26.03
+24584,melee,12594,mordor,warrior,12684,haradrim,warrior,2.25,landed,3.43
+24585,melee,12697,haradrim,warrior,12633,mordor,warrior,1.86,landed,28.71
+24618,melee,12598,mordor,warrior,12704,haradrim,warrior,1.9,landed,4.28
+24618,melee,12624,mordor,warrior,12685,haradrim,warrior,2.13,landed,9.95
+24653,melee,12661,mordor,warrior,12682,haradrim,warrior,1.62,landed,0.91
+24687,death,12660,mordor,warrior,12705,haradrim,warrior,0,died,0
+24687,melee,12660,mordor,warrior,12705,haradrim,warrior,2.16,kill,0
+24721,melee,12593,mordor,warrior,12705,haradrim,warrior,2.32,lost,0
+24724,melee,12680,haradrim,warrior,12652,mordor,warrior,2.3,landed,27.51
+24756,melee,12656,mordor,warrior,12718,haradrim,warrior,2.26,landed,4.99
+24757,melee,12693,haradrim,warrior,12648,mordor,warrior,1.9,landed,24.67
+24789,melee,12581,mordor,warrior,12688,haradrim,warrior,1.65,landed,14.91
+24790,melee,12685,haradrim,warrior,12589,mordor,warrior,1.63,landed,29.49
+24857,melee,12589,mordor,warrior,12685,haradrim,warrior,2.27,landed,7.68
+24857,melee,12602,mordor,warrior,12705,haradrim,warrior,1.68,lost,0
+24925,melee,12612,mordor,warrior,12717,haradrim,warrior,2.11,landed,4.44
+24959,melee,12587,mordor,warrior,12698,haradrim,warrior,1.81,landed,1.11
+25028,death,12663,mordor,warrior,12687,haradrim,warrior,0,died,0
+25028,melee,12663,mordor,warrior,12687,haradrim,warrior,2.14,kill,0
+25063,melee,12681,haradrim,warrior,12623,mordor,warrior,1.59,landed,29.12
+25063,melee,12715,haradrim,warrior,12588,mordor,warrior,1.74,landed,26.71
+25095,death,12572,mordor,warrior,12681,haradrim,warrior,0,died,0
+25096,melee,12572,mordor,warrior,12681,haradrim,warrior,2.18,kill,0
+25130,melee,12583,mordor,warrior,12704,haradrim,warrior,1.66,landed,2.62
+25130,melee,12668,mordor,warrior,12681,haradrim,warrior,1.58,lost,0
+25199,melee,12614,mordor,warrior,12720,haradrim,warrior,1.64,landed,14.77
+25233,melee,12610,mordor,warrior,12716,haradrim,warrior,1.99,landed,2.9
+25233,melee,12655,mordor,warrior,12708,haradrim,warrior,1.61,landed,2.91
+25268,melee,12622,mordor,warrior,12721,haradrim,warrior,0,nocontact ms=445 swing=377 d=2.12/2.00 v=0.00/1.00 spd=0.5 yaw=0 mounted=0,16.95
+25269,melee,12641,mordor,warrior,12686,haradrim,warrior,2,landed,9.77
+25270,melee,12659,mordor,warrior,12684,haradrim,warrior,1.67,landed,0.93
+25302,melee,12670,mordor,warrior,12689,haradrim,warrior,2.1,landed,5.62
+25303,melee,12717,haradrim,warrior,12573,mordor,warrior,1.99,landed,31.01
+25336,death,12611,mordor,warrior,12679,haradrim,warrior,0,died,0
+25336,melee,12611,mordor,warrior,12679,haradrim,warrior,2.27,kill,0
+25336,melee,12642,mordor,warrior,12711,haradrim,warrior,1.63,landed,14.41
+25370,melee,12613,mordor,warrior,12686,haradrim,warrior,0,nocontact ms=411 swing=376 d=2.41/2.00 v=0.00/1.00 spd=1.8 yaw=0 mounted=0,9.77
+25372,melee,12695,haradrim,warrior,12647,mordor,warrior,2.29,landed,27
+25404,melee,12595,mordor,warrior,12704,haradrim,warrior,2.25,landed,0.37
+25405,melee,12657,mordor,warrior,12714,haradrim,warrior,1.97,landed,8.71
+25438,melee,12578,mordor,warrior,12698,haradrim,warrior,0,nocontact ms=1604 swing=-1 d=4.39/2.00 v=0.00/1.00 spd=2.6 yaw=-0 mounted=0,1.11
+25543,melee,12646,mordor,warrior,12693,haradrim,warrior,2.1,landed,8.36
+25543,melee,12647,mordor,warrior,12695,haradrim,warrior,1.64,landed,13.23
+25576,death,12597,mordor,warrior,12704,haradrim,warrior,0,died,0
+25576,melee,12597,mordor,warrior,12704,haradrim,warrior,2.34,kill,0
+25644,melee,12588,mordor,warrior,12715,haradrim,warrior,2.25,landed,13.57
+25645,melee,12628,mordor,warrior,12697,haradrim,warrior,2.09,landed,13.12
+25678,death,12609,mordor,warrior,12708,haradrim,warrior,0,died,0
+25678,melee,12609,mordor,warrior,12708,haradrim,warrior,2.33,kill,0
+25679,melee,12644,mordor,warrior,12711,haradrim,warrior,2.36,landed,12.06
+25712,melee,12599,mordor,warrior,12715,haradrim,warrior,0,nocontact ms=444 swing=377 d=2.70/2.00 v=0.00/1.00 spd=0.2 yaw=-0 mounted=0,13.57
+25712,death,12650,mordor,warrior,12684,haradrim,warrior,0,died,0
+25713,melee,12650,mordor,warrior,12684,haradrim,warrior,1.98,kill,0
+25746,melee,12582,mordor,warrior,12680,haradrim,warrior,1.71,landed,22.96
+25747,melee,12607,mordor,warrior,12719,haradrim,warrior,2.36,landed,10.87
+25780,melee,12590,mordor,warrior,12679,haradrim,warrior,1.68,lost,0
+25781,melee,12666,mordor,warrior,12714,haradrim,warrior,1.78,landed,6.03
+25849,melee,12617,mordor,warrior,12695,haradrim,warrior,1.73,landed,11.51
+25883,melee,12664,mordor,warrior,12718,haradrim,warrior,1.62,landed,3.39
+25917,melee,12629,mordor,warrior,12705,haradrim,warrior,0,nocontact ms=1367 swing=375 d=2.78/2.00 v=0.68/1.00 spd=1.9 yaw=-0 mounted=0,0
+25917,melee,12630,mordor,warrior,12700,haradrim,warrior,1.65,landed,5.9
+25952,melee,12718,haradrim,warrior,12656,mordor,warrior,0,nocontact ms=444 swing=375 d=2.46/2.00 v=0.00/1.00 spd=2.0 yaw=-0 mounted=0,34
+26019,melee,12579,mordor,warrior,12704,haradrim,warrior,1.84,lost,0
+26019,melee,12618,mordor,warrior,12719,haradrim,warrior,0,nocontact ms=409 swing=374 d=2.18/2.00 v=0.00/1.00 spd=0.4 yaw=0 mounted=0,10.88
+26053,melee,12626,mordor,warrior,12689,haradrim,warrior,1.75,landed,3.89
+26088,death,12637,mordor,warrior,12682,haradrim,warrior,0,died,0
+26089,melee,12637,mordor,warrior,12682,haradrim,warrior,1.63,kill,0
+26089,melee,12648,mordor,warrior,12693,haradrim,warrior,1.93,landed,6.44
+26122,melee,12608,mordor,warrior,12692,haradrim,warrior,2,landed,13.67
+26122,melee,12625,mordor,warrior,12708,haradrim,warrior,2.01,lost,0
+26123,melee,12686,haradrim,warrior,12666,mordor,warrior,1.65,landed,26.04
+26156,melee,12603,mordor,warrior,12720,haradrim,warrior,0,nocontact ms=511 swing=376 d=2.12/2.00 v=0.00/1.00 spd=0.9 yaw=0 mounted=0,14.78
+26156,melee,12621,mordor,warrior,12714,haradrim,warrior,2.02,landed,4.02
+26157,melee,12665,mordor,warrior,12681,haradrim,warrior,1.6,lost,0
+26293,melee,12688,haradrim,warrior,12581,mordor,warrior,1.75,landed,28.54
+26327,melee,12623,mordor,warrior,12688,haradrim,warrior,1.68,landed,12.41
+26395,melee,12585,mordor,warrior,12695,haradrim,warrior,0,nocontact ms=785 swing=445 d=2.01/2.00 v=0.00/1.00 spd=5.0 yaw=-0 mounted=0,11.51
+26395,melee,12633,mordor,warrior,12697,haradrim,warrior,1.96,landed,10.19
+26395,melee,12643,mordor,warrior,12695,haradrim,warrior,0,nocontact ms=444 swing=376 d=2.50/2.00 v=0.00/1.00 spd=5.0 yaw=-0 mounted=0,11.51
+26396,death,12652,mordor,warrior,12698,haradrim,warrior,0,died,0
+26396,melee,12652,mordor,warrior,12698,haradrim,warrior,1.66,kill,0
+26463,melee,12600,mordor,warrior,12721,haradrim,warrior,2.26,landed,13.57
+26497,melee,12577,mordor,warrior,12715,haradrim,warrior,2.34,landed,11.23
+26565,melee,12573,mordor,warrior,12717,haradrim,warrior,1.97,landed,2.48
+26636,melee,12700,haradrim,warrior,12630,mordor,warrior,2.1,landed,16.92
+26735,melee,12604,mordor,warrior,12689,haradrim,warrior,1.7,landed,2.19
+26736,melee,12616,mordor,warrior,12715,haradrim,warrior,1.98,landed,8.26
+26736,melee,12669,mordor,warrior,12711,haradrim,warrior,1.98,landed,10.09
+26769,melee,12586,mordor,warrior,12700,haradrim,warrior,2.08,landed,2.78
+26769,melee,12591,mordor,warrior,12692,haradrim,warrior,2.11,landed,11.56
+26907,melee,12639,mordor,warrior,12692,haradrim,warrior,1.95,landed,9.63
+27009,melee,12605,mordor,warrior,12683,haradrim,warrior,0,nocontact ms=409 swing=375 d=2.12/2.00 v=0.00/1.00 spd=1.2 yaw=-0 mounted=0,5.94
+27044,melee,12584,mordor,warrior,12714,haradrim,warrior,1.6,landed,2.43
+27045,melee,12645,mordor,warrior,12689,haradrim,warrior,1.86,landed,0.34
+27045,melee,12662,mordor,warrior,12688,haradrim,warrior,1.63,landed,10.79
+27079,melee,12689,haradrim,warrior,12626,mordor,warrior,1.59,landed,31.11
+27113,melee,12581,mordor,warrior,12688,haradrim,warrior,1.71,landed,8.23
+27114,melee,12658,mordor,warrior,12720,haradrim,warrior,1.62,landed,13.17
+27114,melee,12667,mordor,warrior,12711,haradrim,warrior,2.17,landed,6.85
+27146,melee,12580,mordor,warrior,12695,haradrim,warrior,2.34,landed,8.01
+27147,melee,12640,mordor,warrior,12695,haradrim,warrior,1.66,landed,6.35
+27148,melee,12711,haradrim,warrior,12642,mordor,warrior,2.35,landed,29.22
+27283,melee,12594,mordor,warrior,12697,haradrim,warrior,1.84,landed,8.36
+27318,melee,12619,mordor,warrior,12697,haradrim,warrior,1.86,landed,5.58
+27351,death,12593,mordor,warrior,12714,haradrim,warrior,0,died,0
+27352,melee,12593,mordor,warrior,12714,haradrim,warrior,1.75,kill,0
+27386,melee,12634,mordor,warrior,12697,haradrim,warrior,2.02,landed,3.56
+27455,death,12592,mordor,warrior,12689,haradrim,warrior,0,died,0
+27455,melee,12592,mordor,warrior,12689,haradrim,warrior,1.69,kill,0
+27457,melee,12649,mordor,warrior,12682,haradrim,warrior,2.21,lost,0
+27458,melee,12661,mordor,warrior,12720,haradrim,warrior,1.61,landed,11.56
+27490,melee,12680,haradrim,warrior,12669,mordor,warrior,1.6,landed,31.89
+27557,melee,12683,haradrim,warrior,12641,mordor,warrior,1.7,landed,17.32
+27558,melee,12697,haradrim,warrior,12633,mordor,warrior,1.63,landed,27.11
+27558,melee,12715,haradrim,warrior,12616,mordor,warrior,1.85,landed,23.77
+27591,melee,12598,mordor,warrior,12693,haradrim,warrior,1.61,landed,4.03
+27626,melee,12660,mordor,warrior,12695,haradrim,warrior,2.3,landed,4.04
+27659,melee,12589,mordor,warrior,12685,haradrim,warrior,1.72,landed,5.99
+27659,melee,12601,mordor,warrior,12719,haradrim,warrior,1.6,landed,9.28
+27694,melee,12693,haradrim,warrior,12586,mordor,warrior,2.08,landed,30.33
+27727,melee,12615,mordor,warrior,12683,haradrim,warrior,2.08,landed,3.86
+27728,melee,12624,mordor,warrior,12714,haradrim,warrior,2.12,lost,0
+27732,melee,12719,haradrim,warrior,12607,mordor,warrior,2.12,landed,31.88
+27761,melee,12612,mordor,warrior,12717,haradrim,warrior,0,nocontact ms=443 swing=375 d=2.66/2.00 v=0.00/1.00 spd=1.7 yaw=-0 mounted=0,2.49
+27795,melee,12651,mordor,warrior,12689,haradrim,warrior,2.31,lost,0
+27795,melee,12656,mordor,warrior,12714,haradrim,warrior,2.06,lost,0
+27796,melee,12685,haradrim,warrior,12589,mordor,warrior,2.23,landed,27.29
+27829,melee,12610,mordor,warrior,12716,haradrim,warrior,2.24,landed,0.68
+27899,melee,12720,haradrim,warrior,12614,mordor,warrior,2.17,landed,20.96
+27933,melee,12716,haradrim,warrior,12610,mordor,warrior,2.07,landed,15.88
+28003,melee,12721,haradrim,warrior,12600,mordor,warrior,1.79,landed,27.59
+28035,melee,12646,mordor,warrior,12718,haradrim,warrior,2.12,landed,1.29
+28068,melee,12578,mordor,warrior,12721,haradrim,warrior,2.2,landed,11.38
+28102,melee,12614,mordor,warrior,12720,haradrim,warrior,2.3,landed,9.27
+28136,melee,12642,mordor,warrior,12711,haradrim,warrior,0,nocontact ms=405 swing=375 d=2.69/2.00 v=0.00/1.00 spd=2.1 yaw=-0 mounted=0,6.86
+28170,melee,12613,mordor,warrior,12686,haradrim,warrior,2.26,landed,7.54
+28207,melee,12635,mordor,warrior,12680,haradrim,warrior,2.29,landed,20.69
+28277,melee,12632,mordor,warrior,12720,haradrim,warrior,1.85,landed,7.41
+28277,melee,12637,mordor,warrior,12680,haradrim,warrior,2.07,landed,18.62
+28310,melee,12611,mordor,warrior,12686,haradrim,warrior,1.91,landed,5.63
+28310,melee,12622,mordor,warrior,12721,haradrim,warrior,1.82,landed,8.65
+28379,melee,12641,mordor,warrior,12683,haradrim,warrior,2.27,landed,1.6
+28447,melee,12609,mordor,warrior,12717,haradrim,warrior,1.91,landed,0.59
+28481,melee,12588,mordor,warrior,12715,haradrim,warrior,2.1,landed,6.17
+28583,melee,12597,mordor,warrior,12686,haradrim,warrior,2.3,landed,3.33
+28618,death,12664,mordor,warrior,12718,haradrim,warrior,0,died,0
+28618,melee,12664,mordor,warrior,12718,haradrim,warrior,2.36,kill,0
+28618,melee,12671,mordor,warrior,12695,haradrim,warrior,2.23,landed,1.82
+28685,death,12596,mordor,warrior,12683,haradrim,warrior,0,died,0
+28685,melee,12596,mordor,warrior,12683,haradrim,warrior,2.27,kill,0
+28753,melee,12602,mordor,warrior,12721,haradrim,warrior,1.99,landed,6.66
+28753,melee,12629,mordor,warrior,12711,haradrim,warrior,1.71,landed,4.3
+28753,melee,12663,mordor,warrior,12688,haradrim,warrior,0,nocontact ms=442 swing=374 d=2.38/2.00 v=0.00/1.00 spd=0.3 yaw=-0 mounted=0,8.24
+28787,melee,12630,mordor,warrior,12700,haradrim,warrior,1.67,landed,1.12
+28787,melee,12648,mordor,warrior,12693,haradrim,warrior,0,nocontact ms=408 swing=374 d=2.22/2.00 v=0.00/1.00 spd=2.2 yaw=-0 mounted=0,4.04
+28856,melee,12618,mordor,warrior,12692,haradrim,warrior,2.3,landed,7.34
+28889,melee,12583,mordor,warrior,12715,haradrim,warrior,0,nocontact ms=443 swing=374 d=2.55/2.00 v=0.00/1.00 spd=3.6 yaw=0 mounted=0,6.17
+28924,death,12625,mordor,warrior,12695,haradrim,warrior,0,died,0
+28924,melee,12625,mordor,warrior,12695,haradrim,warrior,1.9,kill,0
+28958,melee,12617,mordor,warrior,12692,haradrim,warrior,1.97,landed,5.38
+29025,melee,12575,mordor,warrior,12693,haradrim,warrior,2.05,landed,2.01
+29025,melee,12585,mordor,warrior,12688,haradrim,warrior,1.69,landed,6.56
+29094,melee,12621,mordor,warrior,12680,haradrim,warrior,2.09,landed,16.54
+29128,melee,12669,mordor,warrior,12680,haradrim,warrior,0,nocontact ms=409 swing=376 d=2.06/2.00 v=0.00/1.00 spd=4.0 yaw=-0 mounted=0,16.54
+29129,melee,12670,mordor,warrior,12692,haradrim,warrior,0,nocontact ms=578 swing=376 d=2.34/2.00 v=0.00/1.00 spd=3.3 yaw=-0 mounted=0,5.38
+29162,melee,12616,mordor,warrior,12719,haradrim,warrior,2.21,landed,7.1
+29197,melee,12688,haradrim,warrior,12581,mordor,warrior,1.94,landed,26.63
+29230,melee,12607,mordor,warrior,12719,haradrim,warrior,1.93,landed,4.21
+29264,melee,12603,mordor,warrior,12697,haradrim,warrior,1.74,landed,1.84
+29265,death,12608,mordor,warrior,12716,haradrim,warrior,0,died,0
+29265,melee,12608,mordor,warrior,12716,haradrim,warrior,1.59,kill,0
+29265,death,12633,mordor,warrior,12697,haradrim,warrior,0,died,0
+29265,melee,12633,mordor,warrior,12697,haradrim,warrior,1.67,kill,0
+29299,melee,12600,mordor,warrior,12692,haradrim,warrior,0,nocontact ms=443 swing=376 d=2.37/2.00 v=0.00/1.00 spd=3.5 yaw=-0 mounted=0,5.38
+29333,melee,12579,mordor,warrior,12719,haradrim,warrior,1.79,landed,2.42
+29333,melee,12595,mordor,warrior,12685,haradrim,warrior,2.3,landed,3.71
+29368,melee,12636,mordor,warrior,12719,haradrim,warrior,1.9,landed,0.52
+29401,death,12574,mordor,warrior,12719,haradrim,warrior,0,died,0
+29401,melee,12574,mordor,warrior,12719,haradrim,warrior,2.16,kill,0
+29436,melee,12582,mordor,warrior,12688,haradrim,warrior,2.04,landed,4.51
+29470,death,12628,mordor,warrior,12693,haradrim,warrior,0,died,0
+29470,melee,12628,mordor,warrior,12693,haradrim,warrior,2.18,kill,0
+29504,death,12573,mordor,warrior,12717,haradrim,warrior,0,died,0
+29504,melee,12573,mordor,warrior,12717,haradrim,warrior,1.6,kill,0
+29538,melee,12627,mordor,warrior,12716,haradrim,warrior,1.71,lost,0
+29606,melee,12644,mordor,warrior,12697,haradrim,warrior,2.26,lost,0
+29676,melee,12605,mordor,warrior,12716,haradrim,warrior,1.89,lost,0
+29745,melee,12668,mordor,warrior,12715,haradrim,warrior,2.27,landed,2.78
+29746,melee,12692,haradrim,warrior,12617,mordor,warrior,1.9,landed,26.37
+29778,melee,12586,mordor,warrior,12693,haradrim,warrior,1.83,lost,0
+29813,melee,12604,mordor,warrior,12715,haradrim,warrior,0,nocontact ms=446 swing=377 d=2.31/2.00 v=0.00/1.00 spd=6.1 yaw=0 mounted=0,2.78
+29846,melee,12587,mordor,warrior,12685,haradrim,warrior,1.95,landed,1.76
+29848,melee,12711,haradrim,warrior,12629,mordor,warrior,1.66,landed,29.63
+29982,melee,12658,mordor,warrior,12720,haradrim,warrior,1.67,landed,5.77
+30017,melee,12667,mordor,warrior,12720,haradrim,warrior,2.25,landed,3.52
+30084,melee,12638,mordor,warrior,12688,haradrim,warrior,2.03,landed,2.5
+30084,death,12653,mordor,warrior,12700,haradrim,warrior,0,died,0
+30084,melee,12653,mordor,warrior,12700,haradrim,warrior,1.9,kill,0
+30155,death,12577,mordor,warrior,12688,haradrim,warrior,0,died,0
+30155,melee,12577,mordor,warrior,12688,haradrim,warrior,2.05,kill,0
+30155,melee,12634,mordor,warrior,12700,haradrim,warrior,2.35,lost,0
+30155,melee,12652,mordor,warrior,12680,haradrim,warrior,2.09,landed,14.46
+30221,idle,12620,mordor,warrior,,,,-1,none,
+30221,melee,12650,mordor,warrior,12686,haradrim,warrior,1.97,landed,1.37
+30254,melee,12593,mordor,warrior,12680,haradrim,warrior,0,nocontact ms=442 swing=374 d=2.52/2.00 v=0.00/1.00 spd=1.4 yaw=-0 mounted=0,14.46
+30254,melee,12626,mordor,warrior,12719,haradrim,warrior,2.03,lost,0
+30254,death,12655,mordor,warrior,12686,haradrim,warrior,0,died,0
+30254,melee,12655,mordor,warrior,12686,haradrim,warrior,1.62,kill,0
+30255,melee,12662,mordor,warrior,12715,haradrim,warrior,1.77,landed,1.02
+30322,melee,12592,mordor,warrior,12692,haradrim,warrior,2.18,landed,3.21
+30323,melee,12623,mordor,warrior,12719,haradrim,warrior,1.98,lost,0
+30323,melee,12631,mordor,warrior,12717,haradrim,warrior,1.85,lost,0
+30460,melee,12572,mordor,warrior,12692,haradrim,warrior,1.64,landed,1.58
+30461,melee,12591,mordor,warrior,12686,haradrim,warrior,1.78,lost,0
+30463,melee,12680,haradrim,warrior,12621,mordor,warrior,2.13,landed,28.32
+30496,melee,12661,mordor,warrior,12680,haradrim,warrior,2.04,landed,11.4
+30564,melee,12666,mordor,warrior,12686,haradrim,warrior,2.08,lost,0
+30598,death,12589,mordor,warrior,12685,haradrim,warrior,0,died,0
+30598,melee,12589,mordor,warrior,12685,haradrim,warrior,1.85,kill,0
+30598,death,12598,mordor,warrior,12715,haradrim,warrior,0,died,0
+30598,melee,12598,mordor,warrior,12715,haradrim,warrior,1.97,kill,0
+30598,melee,12615,mordor,warrior,12685,haradrim,warrior,2.05,lost,0
+30598,melee,12624,mordor,warrior,12685,haradrim,warrior,0,nocontact ms=443 swing=377 d=2.37/2.00 v=0.68/1.00 spd=1.7 yaw=-0 mounted=0,0
+30598,melee,12665,mordor,warrior,12688,haradrim,warrior,2.27,lost,0
+30633,melee,12657,mordor,warrior,12715,haradrim,warrior,1.61,lost,0
+30737,melee,12659,mordor,warrior,12720,haradrim,warrior,2.22,landed,1.3
+30737,melee,12720,haradrim,warrior,12632,mordor,warrior,2.26,landed,26.53
+30803,melee,12646,mordor,warrior,12685,haradrim,warrior,1.79,lost,0
+30837,melee,12645,mordor,warrior,12685,haradrim,warrior,0,nocontact ms=549 swing=375 d=2.18/2.00 v=0.68/1.00 spd=1.1 yaw=0 mounted=0,0
+30871,melee,12649,mordor,warrior,12711,haradrim,warrior,2.05,landed,1.24
+30972,melee,12578,mordor,warrior,12685,haradrim,warrior,2.11,lost,0
+31041,death,12642,mordor,warrior,12711,haradrim,warrior,0,died,0
+31041,melee,12642,mordor,warrior,12711,haradrim,warrior,1.62,kill,0
+31109,melee,12581,mordor,warrior,12680,haradrim,warrior,1.86,landed,8.62
+31109,death,12614,mordor,warrior,12720,haradrim,warrior,0,died,0
+31109,melee,12614,mordor,warrior,12720,haradrim,warrior,1.72,kill,0
+31177,melee,12609,mordor,warrior,12680,haradrim,warrior,2.36,landed,5.08
+31177,melee,12637,mordor,warrior,12711,haradrim,warrior,1.72,lost,0
+31211,melee,12606,mordor,warrior,12711,haradrim,warrior,1.9,lost,0
+31245,idle,12599,mordor,warrior,,,,-1,none,
+31246,idle,12620,mordor,warrior,,,,-1,none,
+31280,death,12601,mordor,warrior,12692,haradrim,warrior,0,died,0
+31280,melee,12601,mordor,warrior,12692,haradrim,warrior,2.22,kill,0
+31347,idle,12590,mordor,warrior,,,,-1,none,
+31383,melee,12622,mordor,warrior,12721,haradrim,warrior,2.33,landed,4.36
+31451,melee,12602,mordor,warrior,12721,haradrim,warrior,2.17,landed,2.19
+31485,melee,12629,mordor,warrior,12711,haradrim,warrior,0,nocontact ms=478 swing=376 d=2.05/2.00 v=0.68/1.00 spd=1.5 yaw=-0 mounted=0,0
+31757,melee,12621,mordor,warrior,12680,haradrim,warrior,2.3,landed,2.79
+31792,death,12580,mordor,warrior,12721,haradrim,warrior,0,died,0
+31792,melee,12580,mordor,warrior,12721,haradrim,warrior,1.87,kill,0
+31827,melee,12648,mordor,warrior,12721,haradrim,warrior,2.03,lost,0
+31860,melee,12625,mordor,warrior,12721,haradrim,warrior,0,nocontact ms=443 swing=375 d=2.30/2.00 v=0.68/1.00 spd=2.6 yaw=-0 mounted=0,0
+31860,melee,12632,mordor,warrior,12721,haradrim,warrior,0,nocontact ms=477 swing=375 d=2.20/2.00 v=0.68/1.00 spd=2.6 yaw=-0 mounted=0,0
+32030,melee,12575,mordor,warrior,12721,haradrim,warrior,1.74,lost,0
+32133,melee,12603,mordor,warrior,12721,haradrim,warrior,2.04,lost,0
+32168,melee,12669,mordor,warrior,12680,haradrim,warrior,1.79,landed,0.11
+32236,melee,12647,mordor,warrior,12721,haradrim,warrior,2.17,lost,0
+32271,idle,12599,mordor,warrior,,,,-1,none,
+32271,idle,12620,mordor,warrior,,,,-1,none,
+32271,idle,12639,mordor,warrior,,,,-1,none,
+32271,idle,12640,mordor,warrior,12680,haradrim,warrior,0.85,FactionSeek,0.11
+32374,idle,12590,mordor,warrior,,,,-1,none,
+32509,idle,12584,mordor,warrior,,,,-1,none,
+32510,death,12671,mordor,warrior,12680,haradrim,warrior,0,died,0
+32510,melee,12671,mordor,warrior,12680,haradrim,warrior,1.84,kill,0
+32751,melee,12587,mordor,warrior,12680,haradrim,warrior,0,nocontact ms=412 swing=378 d=2.26/2.00 v=0.68/1.00 spd=0.4 yaw=0 mounted=0,0
+32784,melee,12594,mordor,warrior,12680,haradrim,warrior,1.76,lost,0
+32818,melee,12640,mordor,warrior,12680,haradrim,warrior,2.13,lost,0
+32989,idle,12651,mordor,warrior,,,,-1,none,
+32989,melee,12654,mordor,warrior,12680,haradrim,warrior,2.01,lost,0
+33298,idle,12599,mordor,warrior,,,,-1,none,
+33298,idle,12619,mordor,warrior,,,,-1,none,
+33298,idle,12620,mordor,warrior,,,,-1,none,
+33298,idle,12639,mordor,warrior,,,,-1,none,
+33332,idle,12635,mordor,warrior,,,,-1,none,
+33332,idle,12660,mordor,warrior,,,,-1,none,
+33400,idle,12590,mordor,warrior,,,,-1,none,
+33469,idle,12612,mordor,warrior,,,,-1,none,
+33469,idle,12613,mordor,warrior,,,,-1,none,
+33536,idle,12584,mordor,warrior,,,,-1,none,
+33673,idle,12656,mordor,warrior,,,,-1,none,
+33809,idle,12610,mordor,warrior,,,,-1,none,
+33809,idle,12611,mordor,warrior,,,,-1,none,
+34018,idle,12651,mordor,warrior,,,,-1,none,
+34323,idle,12596,mordor,warrior,,,,-1,none,
+34324,idle,12597,mordor,warrior,,,,-1,none,
+34324,idle,12599,mordor,warrior,,,,-1,none,
+34324,idle,12600,mordor,warrior,,,,-1,none,
+34324,idle,12617,mordor,warrior,,,,-1,none,
+34324,idle,12618,mordor,warrior,,,,-1,none,
+34324,idle,12619,mordor,warrior,,,,-1,none,
+34324,idle,12620,mordor,warrior,,,,-1,none,
+34324,idle,12641,mordor,warrior,,,,-1,none,
+34324,idle,12663,mordor,warrior,,,,-1,none,
+34324,idle,12664,mordor,warrior,,,,-1,none,
+34358,idle,12633,mordor,warrior,,,,-1,none,
+34358,idle,12635,mordor,warrior,,,,-1,none,
+34358,idle,12660,mordor,warrior,,,,-1,none,
+34426,idle,12588,mordor,warrior,,,,-1,none,
+34494,idle,12612,mordor,warrior,,,,-1,none,
+34494,idle,12613,mordor,warrior,,,,-1,none,
+34495,idle,12616,mordor,warrior,,,,-1,none,
+34529,idle,12579,mordor,warrior,,,,-1,none,
+34563,idle,12582,mordor,warrior,,,,-1,none,
+34563,idle,12583,mordor,warrior,,,,-1,none,
+34563,idle,12585,mordor,warrior,,,,-1,none,
+34597,idle,12573,mordor,warrior,,,,-1,none,
+34597,idle,12574,mordor,warrior,,,,-1,none,
+34665,idle,12627,mordor,warrior,,,,-1,none,
+34665,idle,12628,mordor,warrior,,,,-1,none,
+34665,idle,12630,mordor,warrior,,,,-1,none,
+34699,idle,12656,mordor,warrior,,,,-1,none,
+34835,idle,12610,mordor,warrior,,,,-1,none,
+35039,idle,12651,mordor,warrior,,,,-1,none,
+35072,idle,12667,mordor,warrior,,,,-1,none,
+35072,idle,12668,mordor,warrior,,,,-1,none,
+35072,idle,12670,mordor,warrior,,,,-1,none,
+35141,idle,12604,mordor,warrior,,,,-1,none,
+35141,idle,12605,mordor,warrior,,,,-1,none,
+35345,idle,12592,mordor,warrior,,,,-1,none,
+35345,idle,12596,mordor,warrior,,,,-1,none,
+35345,idle,12597,mordor,warrior,,,,-1,none,
+35345,idle,12599,mordor,warrior,,,,-1,none,
+35345,idle,12600,mordor,warrior,,,,-1,none,
+35346,idle,12617,mordor,warrior,,,,-1,none,
+35346,idle,12618,mordor,warrior,,,,-1,none,
+35346,idle,12619,mordor,warrior,,,,-1,none,
+35346,idle,12620,mordor,warrior,,,,-1,none,
+35346,idle,12638,mordor,warrior,,,,-1,none,
+35346,idle,12662,mordor,warrior,,,,-1,none,
+35346,idle,12663,mordor,warrior,,,,-1,none,
+35346,idle,12664,mordor,warrior,,,,-1,none,
+35381,idle,12634,mordor,warrior,,,,-1,none,
+35381,idle,12636,mordor,warrior,,,,-1,none,
+35381,idle,12658,mordor,warrior,,,,-1,none,
