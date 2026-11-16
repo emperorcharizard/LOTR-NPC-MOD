@@ -566,7 +566,7 @@ Install `lotrnpcs_0.0.143-test.zip`; restart fully. DebugCommands on, battle log
 
 - [x] 143.1 3 Rohan riders v 10 Dunlending warriors, twice: the Dunlendings' "out of reach when the blow fell" is well under the 85 of 108 and 100 of 140 of 2026-11-15, without their landed blows dropping much (they still strike riders who stand or charge at them).
   - 2026-11-16 (`211710`, `212122`, both stalled by Synergy after 1-2 min): out of reach 28 of 43 and 36 of 65 (55-65%, was 71-79%), landed about as often as on 0.0.142. Partly met; superseded by 146.1 (pass).
-- [ ] 143.2 `/recruits mountspike` no longer exists.
+- [x] 143.2 `/recruits mountspike` no longer exists. (2026-11-16: the subcommand list no longer has it.)
 
 ## 144. Foot soldiers don't swing at riders who'll be gone when the blow falls (0.0.144)
 
