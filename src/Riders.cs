@@ -166,10 +166,17 @@ namespace LotrNpcs
         public const long SwingHoldMs = 600;
         public static bool SwingPending(long swingMs, long now) => swingMs > 0 && now - swingMs < SwingHoldMs;
 
-        /// <summary>0.0.143: is a rider (dx, dz from the attacker to it) riding away from the attacker at a gallop
-        /// (mountSpeed from its ChargeState)? Then a foot soldier's blow would fall out of reach.</summary>
-        public static bool Outrunning(double dx, double dz, float mountYaw, double mountSpeed) =>
-            mountSpeed >= SprintSpeed && Math.Sin(mountYaw) * dx + Math.Cos(mountYaw) * dz > 0;
+        /// <summary>0.0.144: will a rider (dx, dz from the attacker to it), whose horse moves mx, mz blocks a tick (Pos.Motion,
+        /// 60 ticks a second), be farther than reach (centers, horizontally) when a blow due in hitMs falls? Then a foot
+        /// soldier's swing would miss. Replaces 0.0.143's Outrunning, which missed riders charging past.</summary>
+        public static bool GoneByBlow(double dx, double dz, double mx, double mz, long hitMs, double reach)
+        {
+            double ticks = hitMs * 0.06, px = dx + mx * ticks, pz = dz + mz * ticks;
+            return px * px + pz * pz > reach * reach;
+        }
+
+        /// <summary>Half the width of a rider's selection box, added to a foot soldier's reach (to the box) in GoneByBlow.</summary>
+        public const double RiderHalfWidth = 0.4;
 
         /// <summary>0.0.142: a mounted rider's blow is due damageAtMs after its swing started (no facing needed).</summary>
         public static bool BlowDue(long startedMs, long damageAtMs, long now) => startedMs > 0 && now - startedMs >= damageAtMs;

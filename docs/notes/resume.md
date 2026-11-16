@@ -3,7 +3,9 @@ name: resume
 description: Where the lotrnpcs work stands and what's next; read first, update before stopping
 ---
 
-# Where we are (updated 2026-11-15, 0.0.142 installed and tested)
+# Where we are (updated 2026-11-16, 0.0.144 built, PC has 0.0.143)
+
+**2026-11-16, release work (release doc https://claude.ai/artifact/EzQti2A9DBbNxvuea6Vp9e):** 0.0.143 rider test done (143.1 partly met: out-of-reach Dunlending swings 55-65%, were 71-79%). 0.0.144 (`Riders.GoneByBlow`, replaces Outrunning: foot soldiers predict the rider's place at the blow from the horse's motion) built, not installed; next: install it, run 144.1 twice with Synergy's activation range off, then the release doc's step 3 groups.
 
 **Latest build:** 0.0.124 (idle wild allies within JoinFightRange, 32, join a fight in hops, `CallIdleAllies`; 0.0.123 used 16) on top of 0.0.122: wild NPCs fight without battle lines (`WildBattleLines`, false by default; recruits in formation keep lines), 0.0.120/0.0.121 pairing removed (owner chose "Back to 0.0.119 fighting"). In game (17:51): Dunlendings 24-2, only 24 of 38 orcs fought (0.0.123: 27, 26-10); 14 orcs stayed alive and never joined, so the call range isn't the cause (see lotrnpcs-0113.md 0.0.124). 0.0.121 (pair by position) ran 28-0 to the Dunlendings and is superseded. Before it, 0.0.119, GitHub release v0.0.119. Commits up to `1a1c32e` and later doc commits on `main`.
 
