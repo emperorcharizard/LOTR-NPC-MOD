@@ -874,8 +874,9 @@ public static class Program {
             "0.0.139: a ride-out turns back 12 blocks from the focus; a rider's swing holds its mount on the target for at most 0.6 s, and only a mounted rider's swing begun at a charge is a charge hit; 0.0.141: a mount its rider hasn't steered for over 0.5 s stops; 0.0.142: a mounted rider's blow is due 400 ms into its swing; 0.0.144: a foot soldier holds its swing at a rider whose horse will have carried it out of reach (away or past) when the blow falls; 0.0.146: a blow at a rider who was in reach in its last 200 ms lands; 0.0.148: an NPC rider's mount isn't steered from keys on the client");
         Check(Riders.PassesOver(true, false) && !Riders.PassesOver(true, true) && !Riders.PassesOver(false, false) && Riders.FocusOnHunted(true, false) && !Riders.FocusOnHunted(true, true) && !Riders.FocusOnHunted(false, false),
             "0.0.151: a mounted NPC passes over enemies but archers (taking the nearest when no archer is there) and moves its focus to the archer it rides for, unless it already finishes one");
-        Check(Riders.AntiCavalry("captain", true) == 2.5f && Riders.AntiCavalry("captain", false) == 1f && Riders.AntiCavalry("warrior", true) == 1f && Riders.AntiCavalry(null, true) == 1f,
-            "0.0.152: a captain's hits on a mounted enemy do 2.5 times the damage; nobody else's change");
+        Check(Riders.RankMatchup("captain", false, false, true) == 2.5f && Riders.RankMatchup("captain", false, false, false) == 1f && Riders.RankMatchup("warrior", false, false, true) == 1f && Riders.RankMatchup(null, false, false, true) == 1f
+            && Riders.RankMatchup("rider", true, true, false) == 2f && Riders.RankMatchup("rider", true, false, false) == 1f && Riders.RankMatchup("warrior", false, true, false) == 1f && Riders.RankMatchup("captain", true, true, true) == 5f,
+            "0.0.152: a captain's hits on a mounted enemy do 2.5 times the damage, a mounted NPC's hits on an archer twice; nobody else's change");
         // 0.0.137 back hits: the rear cone and the stacking.
         {
             float north = (float)Math.Atan2(0, 1); // facing +z

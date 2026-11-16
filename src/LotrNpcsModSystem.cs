@@ -459,7 +459,7 @@ namespace LotrNpcs
             bool window = target.IsActivityRunning("invulnerable");
             // 0.0.133: a rider's blow at a gallop is a charge hit (double damage, the target pushed along the charge).
             bool charge = Riders.IsChargeHit(entity);
-            float amount = damage * (charge ? Riders.ChargeDamageMultiplier : 1) * Riders.AntiCavalry(rank, (target as EntityAgent)?.MountedOn != null) * (factions?.Config.HitScaleFor(target) ?? 1) * GlobalConstants.CreatureDamageModifier;
+            float amount = damage * (charge ? Riders.ChargeDamageMultiplier : 1) * Riders.RankMatchup(rank, (entity as EntityAgent)?.MountedOn != null, Recruit.IsArcher(target), (target as EntityAgent)?.MountedOn != null) * (factions?.Config.HitScaleFor(target) ?? 1) * GlobalConstants.CreatureDamageModifier;
             bool received = target.ReceiveDamage(source, amount);
             if (charge && received)
             {

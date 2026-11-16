@@ -2281,10 +2281,13 @@ namespace LotrNpcs
             // than 2 on one enemy).
             if (!found && targetEntity == null && lastSearchTotalMs != searchedBefore)
             {
-                Entity fallback = nonArcherFallback != null && nonArcherFallback.Alive ? nonArcherFallback
-                    : pairedFallback != null && pairedFallback.Alive ? pairedFallback
-                    : fullFallback != null && fullFallback.Alive ? fullFallback
-                    : crowdedFallback != null && crowdedFallback.Alive && !(factions?.Lines.Wants(entity, crowdedFallback) ?? false) ? crowdedFallback : null;
+                Entity paired = pairedFallback != null && pairedFallback.Alive ? pairedFallback : null;
+                Entity full = fullFallback != null && fullFallback.Alive ? fullFallback : null;
+                Entity crowded = crowdedFallback != null && crowdedFallback.Alive && !(factions?.Lines.Wants(entity, crowdedFallback) ?? false) ? crowdedFallback : null;
+                // 0.0.152 (in game: a third rider fought a warrior for 22 swings while the archers were taken): a rider
+                // joins an archer someone else already fights before it takes a free enemy that isn't one.
+                Entity fallback = (entity as EntityAgent)?.MountedOn != null ? (Recruit.IsArcher(paired) ? paired : Recruit.IsArcher(full) ? full : Recruit.IsArcher(crowded) ? crowded : null) : null;
+                fallback = fallback ?? (nonArcherFallback != null && nonArcherFallback.Alive ? nonArcherFallback : null) ?? paired ?? full ?? crowded;
                 if (fallback != null)
                 {
                     targetEntity = fallback;

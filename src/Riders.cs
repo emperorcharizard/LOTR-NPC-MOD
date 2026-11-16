@@ -196,7 +196,12 @@ namespace LotrNpcs
         /// anti-cavalry rank. On 0.0.150 a rider beat 2 warriors and was beating a captain too, the captain swinging only
         /// 6 times in 218 s while it chased; its hits on a mounted enemy do this much more.</summary>
         public const float CaptainVsRiderMultiplier = 2.5f;
-        public static float AntiCavalry(string attackerRank, bool targetMounted) => targetMounted && attackerRank == "captain" ? CaptainVsRiderMultiplier : 1f;
+        /// <summary>0.0.152 (in game 2026-11-16, 0.0.151: three riders hit two archers 16 times for 41 damage and killed
+        /// none while the archers shot two of them down): a mounted NPC's hits on an archer do this much more.</summary>
+        public const float RiderVsArcherMultiplier = 2f;
+        /// <summary>0.0.152: the rank matchups, captain over rider over archer.</summary>
+        public static float RankMatchup(string attackerRank, bool attackerMounted, bool targetIsArcher, bool targetMounted) =>
+            (targetMounted && attackerRank == "captain" ? CaptainVsRiderMultiplier : 1f) * (attackerMounted && targetIsArcher ? RiderVsArcherMultiplier : 1f);
 
         public static bool NpcControls(Entity controller) => controller != null && !(controller is EntityPlayer) && controller.Code?.Domain == "lotrnpcs";
 
