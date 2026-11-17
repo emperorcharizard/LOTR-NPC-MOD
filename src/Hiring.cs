@@ -1542,6 +1542,8 @@ namespace LotrNpcs
             tasks.StopTask<AiTaskMeleeAttack>();
             tasks.StopTask<AiTaskSeekEntity>();
             tasks.StopTask<AiTaskFactionShoot>();
+            // 1.0.2: a rider drops its focus too, or its mount kept charging the enemy it was finishing.
+            Riders.SetFocus(npc, null);
         }
 
         void Disengage(EntityAgent npc)
@@ -1961,7 +1963,16 @@ namespace LotrNpcs
             if (task is AiTaskWander || task is AiTaskZonePatrol) return Recruit.OwnerUidOf(entity) == null && entity.World.ElapsedMilliseconds > talkingUntilMs;
             // Recruits standing in a formation face its way instead of looking about.
             if (task is AiTaskLookAround) return !(Recruit.OwnerUidOf(entity) != null && Recruit.HasFacing(entity));
-            if (task is AiTaskSeekEntity || task is AiTaskMeleeAttack) return Recruit.OwnerUidOf(entity) == null || Recruit.StanceOf(entity) != Recruit.Passive;
+            // 1.0.2 (owner, 2026-11-17: Retreat "pulls them away from an enemy, then they almost immediately re lock back
+            // onto the nearest enemy"): the target search already skipped enemies while breaking off, but the game's own
+            // strike-back at whoever just hit them didn't; now no fight task starts at all until the break-off ends (a
+            // Charge order still fights).
+            if (task is AiTaskSeekEntity || task is AiTaskMeleeAttack || task is AiTaskFactionShoot)
+            {
+                if (Recruit.OwnerUidOf(entity) == null) return true;
+                if (Recruit.StanceOf(entity) == Recruit.Passive && !(task is AiTaskFactionShoot)) return false;
+                return hiring == null || hiring.Charging(entity) || !hiring.Disengaging(entity);
+            }
             return true;
         }
 
