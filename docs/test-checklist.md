@@ -852,3 +852,12 @@ In game 2026-11-17 (0.0.162 and 0.0.163, 1 rider v 2 warriors): ride-out after r
 - [ ] 167.1 1 Rohan rider v 2 Dunlending warriors: far fewer rider blows "out of reach when the blow fell" (0.0.166: 22 of 36), and the rider wins.
   - 2026-11-17 on 0.0.167 (log 232003): out of reach down to 12 of 27 (44%, was 61%), but the rider died at ~203 s: 46 damage dealt, 41 taken, no kill; the warriors landed 20 of 23. Fight stayed beside the player. Riders now lose 1 v 2 since foot soldiers swing at passing riders (0.0.164); owner asked about rider strength.
 - [ ] 165.2 3 riders v 5 warriors + 3 archers: the riders still kill the archers first (161.1 numbers).
+
+## 168. Riders x1.25 (0.0.168)
+
+Owner, 2026-11-17 (card): "Riders x1.25 stats". A rider without its own entry has 1.25 times its warrior's health and damage (42 health, 4.94 damage).
+
+- [x] 168.1 1 Rohan rider v 2 Dunlending warriors: the rider wins.
+  - 2026-11-17 (log 232915): rider won 2-0 at ~305 s, 95 damage dealt v 39 taken, 24 of 40 blows landed, 9 charge hits; fight stayed beside the player.
+- [x] 168.2 1 Rohan rider v 1 Dunlending captain: the captain still wins.
+  - 2026-11-17 (log 233435): captain won at ~237 s, 65 v 48 damage (13 of 18 landed); closer than on 0.0.165 (28 v 7).
