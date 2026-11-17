@@ -4,6 +4,8 @@ suites, then releases/lotrnpcs_<version>-test.zip. Runs on Windows and Linux (Gi
     python tools/build.py              build, test, zip
     python tools/build.py --no-zip     build and test only (CI)
     python tools/build.py --publish    also upload the zip as GitHub release v<version> (needs `gh auth login` once)
+    python tools/build.py --release    an official release: releases/lotrnpcs_<version>.zip (no -test), with modicon.png and
+                                       LICENSE; with --publish, the release notes come from docs/release-notes.md
 
 Run with plain `python`, not `python -I`: the generator needs Pillow, which may live in the user's site-packages.
 """
@@ -98,6 +100,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-zip", action="store_true")
     ap.add_argument("--publish", action="store_true")
+    ap.add_argument("--release", action="store_true")
     opts = ap.parse_args()
     dn = dotnet()
 
@@ -134,11 +137,15 @@ def main():
         return
     version = json.load(open(os.path.join(GEN, "modinfo.json"), encoding="utf-8"))["version"]
     os.makedirs(os.path.join(ROOT, "releases"), exist_ok=True)
-    out = os.path.join(ROOT, "releases", f"lotrnpcs_{version}-test.zip")
+    out = os.path.join(ROOT, "releases", f"lotrnpcs_{version}.zip" if opts.release else f"lotrnpcs_{version}-test.zip")
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
         z.write(os.path.join(GEN, "modinfo.json"), "modinfo.json")
         z.write(os.path.join(ROOT, "src", "out", "lotrnpcs.dll"), "lotrnpcs.dll")
         z.write(os.path.join(ROOT, "tools", "CREDITS.txt"), "CREDITS.txt")
+        # Release extras (1.0.0): the mod icon the game shows in its mod list, and the license.
+        for extra, name in ((os.path.join(ROOT, "tools", "modicon.png"), "modicon.png"), (os.path.join(ROOT, "LICENSE"), "LICENSE")):
+            if os.path.isfile(extra):
+                z.write(extra, name)
         for folder, _, files in os.walk(os.path.join(GEN, "assets")):
             for name in sorted(files):
                 path = os.path.join(folder, name)
@@ -148,8 +155,12 @@ def main():
 
     if opts.publish:
         gh = shutil.which("gh") or r"C:\Program Files\GitHub CLI\gh.exe"
-        run([gh, "release", "create", f"v{version}", out, "--title", f"lotrnpcs {version} (test)",
-             "--notes", f"Test build {version}. What to check: docs/test-checklist.md."])
+        if opts.release:
+            run([gh, "release", "create", f"v{version}", out, "--title", f"LOTR NPCs {version}",
+                 "--notes-file", os.path.join(ROOT, "docs", "release-notes.md")])
+        else:
+            run([gh, "release", "create", f"v{version}", out, "--title", f"lotrnpcs {version} (test)",
+                 "--notes", f"Test build {version}. What to check: docs/test-checklist.md."])
 
 
 if __name__ == "__main__":

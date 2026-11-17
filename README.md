@@ -1,8 +1,10 @@
 # lotrnpcs
 
-LOTR NPC factions for Vintage Story 1.22.7: wild faction NPCs in admin spawn zones, hiring, orders and formations, battle lines, per-faction balance tiers.
+LOTR NPC factions for Vintage Story 1.22: wild faction NPCs in admin spawn zones, joining a faction, hiring, orders and formations, promotion, riders, equal-stat battles.
 
-Current version: 0.0.114 (see `tools/gen_testnpcs.py` and `docs/test-checklist.md`, sections 98-114). Last in-game test: 0.0.109 on 2026-11-09 (results in `docs/notes/lotrnpcs-0109.md`).
+Current version: 0.0.168, preparing **1.0.0** (version in `tools/gen_testnpcs.py`; history in `CHANGELOG.md`, `docs/notes/lotrnpcs-0113.md` and `docs/test-checklist.md`).
+
+**Guides:** players `docs/player-guide.md`, admins `docs/config-guide.md`, release notes `docs/release-notes.md`.
 
 ## Layout
 
@@ -17,9 +19,9 @@ Current version: 0.0.114 (see `tools/gen_testnpcs.py` and `docs/test-checklist.m
 
 `build-inputs/` holds the asset zips the build reads: LRC 0.4.1 (bundled with the authors' permission, credits in `tools/CREDITS.txt`), and the owner's haradrim-armor 0.1.3 and gundabad-bone-armor 0.3.0 with their original files.
 
-## Test builds
+## Builds
 
-Test zips are GitHub Releases (`v<version>`), built into `releases/` locally (ignored by git since 0.0.112; zips up to 0.0.111 are in git history).
+Test zips (`lotrnpcs_<version>-test.zip`) and the official release zip (`lotrnpcs_<version>.zip`, `--release`) are built into `releases/` locally (ignored by git). Test builds up to 0.0.119 were also published as GitHub Releases.
 
 ## Notes and decisions
 
@@ -32,5 +34,6 @@ Needs the .NET 10 SDK and Python 3 with Pillow (`pip install pillow`).
 - `python tools/build.py` builds the DLL, generates and bundles the assets into `build/`, runs both offline test suites and writes `releases/lotrnpcs_<version>-test.zip`.
 - `--no-zip` stops after the tests (what GitHub Actions runs on every push, `.github/workflows/test.yml`).
 - `--publish` also uploads the zip as GitHub release `v<version>` (run `gh auth login` once first).
+- `--release` names the zip without `-test` and adds `tools/modicon.png` and `LICENSE`; with `--publish` the release text is `docs/release-notes.md`.
 
 Use plain `python`, not `python -I` (it hides user site-packages, where Pillow may be). The version is in `tools/gen_testnpcs.py` (`"version"` in modinfo).

@@ -7,7 +7,7 @@ $repo = Split-Path (Split-Path $PSScriptRoot)
 & "$o\focus.ps1" | Out-Null; Start-Sleep -Milliseconds 300; & "$o\click.ps1" 727 578 | Out-Null; Start-Sleep -Seconds 2
 & "$o\click.ps1" 110 523 | Out-Null; Start-Sleep -Seconds 8
 if (Get-Process Vintagestory -ErrorAction SilentlyContinue) { "still running"; return }
-$zip = Get-ChildItem "$repo\releases" -Filter "lotrnpcs_*-test.zip" | Sort-Object LastWriteTime | Select-Object -Last 1
+$zip = Get-ChildItem "$repo\releases" -Filter "lotrnpcs_*.zip" | Sort-Object LastWriteTime | Select-Object -Last 1
 Get-ChildItem "C:\Users\Mason\AppData\Roaming\VintagestoryData\Mods" -Filter "lotrnpcs_*.zip" | Where-Object Name -ne $zip.Name | Remove-Item
 Copy-Item $zip.FullName "C:\Users\Mason\AppData\Roaming\VintagestoryData\Mods\" -Force
 Start-Process "C:\Users\Mason\AppData\Roaming\Vintagestory\Vintagestory.exe"; Start-Sleep -Seconds 25

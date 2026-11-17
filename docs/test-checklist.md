@@ -324,18 +324,22 @@ Install `lotrnpcs_0.0.109-test.zip` (instead of any older lotrnpcs zip); restart
 - [x] 102.2 No more than 4 NPCs attack one NPC at once; the rest find another enemy or wait. (2026-11-16 `215004`: distinct attackers on one target within 3 s: 1 in 178 blows, 2 in 85, 3 in 20, 4 in 10, 5-6 in 2 (a swap inside the window))
 - [ ] 104.1 A marching column of your recruits doesn't walk through each other, and NPCs walking past a standing group steer round it.
 - [ ] 104.2 Two groups of wild NPCs meeting form lines and fight one-on-one along the front; the side with more then wraps round the enemy.
-- [ ] 104.3 Hiring or promoting past the captain limit (Men 2, orcs and goblins 3, elves and dwarves 1, Uruks and Dunlendings 2) is refused with a message.
+- [x] 104.3 Hiring or promoting past the captain limit (Men 2, orcs and goblins 3, elves and dwarves 1, Uruks and Dunlendings 2) is refused with a message.
+  - 2026-11-17 closed: overtaken: 0.0.138 replaced the per-faction captain limit with 1 captain per player (138.1).
 - [ ] 105.1 An archer on a wall more than 2 blocks above its target keeps shooting instead of jumping down into melee.
 - [ ] 106.1 In a follow formation, captains stand front-middle, then warriors, then recruits; archers at the back or the ends.
-- [ ] 107.1 Mordor/Angmar/Gundabad orcs follow up to 6 at a time.
+- [x] 107.1 Mordor/Angmar/Gundabad orcs follow up to 6 at a time.
+  - 2026-11-17 closed: overtaken: every faction follows 3 since 0.0.135.
 - [x] 108.1 Melee NPCs swing about every 2.6 to 3 s. Fighting a group of 3 or more: say if it now feels too fast or too slow. (2026-11-16 `215004` 9 v 9: swings every 2.95 s (Gondor) and 3.05 s (Mordor) median, 2.8-3.5 s middle half; the feel question is the owner's)
-- [ ] 108.2 Hire prices match the new table (for example Mordor 5/12/29/12, Elves 6/19/50/20); promotion costs the new rank's price minus 3 (captain minus 4).
+- [x] 108.2 Hire prices match the new table (for example Mordor 5/12/29/12, Elves 6/19/50/20); promotion costs the new rank's price minus 3 (captain minus 4).
+  - 2026-11-17 closed: overtaken: prices equal for every faction since 0.0.135.
 - [x] 109.1 The big one: 100 Mordor orcs against 50 Haradrim (a shared zone or creative spawns), battle log on. Send the totals. Then set `NpcHitsIgnoreHurtWindow` to true in lotrnpcs-factions.json, `/recruits faction reload`, and repeat with the log on again. (2026-11-16 on 0.0.147 (`221011`, NpcHitsIgnoreHurtWindow already true by default since 0.0.112, so run once): 100 Mordor orcs v 50 Haradrim in batches of 5 within ~30 blocks, Synergy on. 93 s: mordor 99 NPCs, 691/839 landed (103 out of reach), 1362 damage, 49 kills, 0 deaths, 81 back hits; haradrim 49 NPCs, 266/313 (47), 528 damage, 0 kills, 49 deaths, 243 back hits (surrounded). The 50th Haradrim was dead at cleanup)
 - [x] 109.2 During that fight, note the server's lag (any "Server overloaded" lines in server-main.log) and whether many NPCs stand around not fighting; the log's "idle while fighting" counts those. (2026-11-16: no "Server overloaded" or running-behind lines in any server log during the fight, no lotrnpcs errors; idle while fighting: mordor 76 NPC-seconds, haradrim 3)
 
 ## 110. Extras on the flanks (0.0.110)
 
-- [ ] 110.1 Rerun 38 Misty Mountains orc warriors against 26 Dunlending warriors with the battle log on. Before contact the orcs form one long rank (no rank behind), wider than the Dunlendings' line at both ends. At contact the middle pairs off one-on-one and the extra orcs wrap round the Dunlendings' end men instead of swarming the middle. Send the CSV: the win margin should be closer than 26 to 2.
+- [x] 110.1 Rerun 38 Misty Mountains orc warriors against 26 Dunlending warriors with the battle log on. Before contact the orcs form one long rank (no rank behind), wider than the Dunlendings' line at both ends. At contact the middle pairs off one-on-one and the extra orcs wrap round the Dunlendings' end men instead of swarming the middle. Send the CSV: the win margin should be closer than 26 to 2.
+  - 2026-11-17 closed: dropped: owner accepted the blob with solid bodies (2026-11-13).
 
 ## 111. Why NPCs stand idle (0.0.111)
 
@@ -422,7 +426,8 @@ Install `lotrnpcs_0.0.119-test.zip`; restart fully.
 
 Install `lotrnpcs_0.0.120-test.zip`; restart fully.
 
-- [ ] 120.1 Staged 38 goblin warriors v 26 Dunlending warriors as in 110.1 (batches of 5, columns 40 blocks apart, player at about 1500 15 300, battle log on). For at least 20 s after contact the two lines stay two lines: each front fighter fights the enemy across from it, and the extras come in at the ends instead of the middle folding into one blob. In the CSV, no Dunlending is hit by more than 2 different orcs in any 5 s stretch (dead targets aside), and the result is closer than 0.0.119's 24-4.
+- [x] 120.1 Staged 38 goblin warriors v 26 Dunlending warriors as in 110.1 (batches of 5, columns 40 blocks apart, player at about 1500 15 300, battle log on). For at least 20 s after contact the two lines stay two lines: each front fighter fights the enemy across from it, and the extras come in at the ends instead of the middle folding into one blob. In the CSV, no Dunlending is hit by more than 2 different orcs in any 5 s stretch (dead targets aside), and the result is closer than 0.0.119's 24-4.
+  - 2026-11-17 closed: dropped: owner accepted the blob with solid bodies (2026-11-13).
 - [ ] 120.2 Your recruits following in Line with a Passive stance next to a forming line of yours aren't pulled into it (they stay with you, and the line's march doesn't stall).
 
 ## 125. Riders sit still, prefer spears, reach farther (0.0.125)
@@ -604,14 +609,16 @@ Install `lotrnpcs_0.0.148-test.zip`; restart fully.
 
 Install `lotrnpcs_0.0.149-test.zip`; restart fully. Synergy's activation range off for the test, back on after.
 
-- [ ] 149.1 Owner, 2026-11-16: "isnt the warriors supposed to be 50/50 with the riders?" A Rohan rider has 51 health and hits for about 5.9 (warrior 34 and 3.95). 3 Rohan riders v 13 Dunlending warriors (equal coin), a few runs: each side wins about half (on 0.0.147, 2.24x: riders 13-0 with no losses).
+- [x] 149.1 Owner, 2026-11-16: "isnt the warriors supposed to be 50/50 with the riders?" A Rohan rider has 51 health and hits for about 5.9 (warrior 34 and 3.95). 3 Rohan riders v 13 Dunlending warriors (equal coin), a few runs: each side wins about half (on 0.0.147, 2.24x: riders 13-0 with no losses).
+  - 2026-11-17 closed: overtaken: riders 1.0 in 0.0.150, 1.25 in 0.0.168 (168.1).
   - 2026-11-16 on 0.0.149, owner's target changed to "3 riders should beat 5-7 warriors": 3 v 6 Dunlendings 6-0 (155 s, 0 rider deaths, riders 221 damage, Dunlendings 63); 3 v 8 8-0 (290 s, 0 rider deaths, 268 v 68 damage, 26 charge hits). Still too strong: superseded by 150.
 
 ## 150. Riders at a warrior's numbers: 3 riders beat 5-7 warriors (0.0.150)
 
 Install `lotrnpcs_0.0.150-test.zip`; restart fully. Synergy's activation range off for the test, back on after.
 
-- [ ] 150.1 Owner, 2026-11-16: "3 riders should beat 5-7 warriors". A Rohan rider has a warrior's 34 health and 3.95 damage (x2 on charge hits). 3 Rohan riders beat 6 Dunlending warriors with losses, and 3 v 8 or 9 is about even.
+- [x] 150.1 Owner, 2026-11-16: "3 riders should beat 5-7 warriors". A Rohan rider has a warrior's 34 health and 3.95 damage (x2 on charge hits). 3 Rohan riders beat 6 Dunlending warriors with losses, and 3 v 8 or 9 is about even.
+  - 2026-11-17 closed: overtaken: riders 1.25 in 0.0.168 (168.1).
 
 ## 151. Every faction's units against each other, in game (owner, 2026-11-16)
 
@@ -766,7 +773,8 @@ Each side spends about 60 coins at its live hire prices (`/recruits faction list
 
 - [x] 151.C1 1 Rohan rider v 2 Dunlending warriors: the rider wins.
   - 2026-11-16 on 0.0.150: rider won in 276 s with 20 of 34 health left (73 v 14 damage; warriors chased 77% of the time).
-- [ ] 151.C2 1 Rohan rider v 1 Dunlending captain: the captain wins.
+- [x] 151.C2 1 Rohan rider v 1 Dunlending captain: the captain wins.
+  - 2026-11-17 closed: passed as 164.1 and 168.2 (captain wins).
   - 2026-11-16 on 0.0.150: FAILED, the rider was winning when stopped at 218 s (52 v 17 damage, captain landed 5 of 6 swings but swung only 6 times). By stats a captain (48/7) is weaker than 2 warriors (34/3.95 each), so no rider strength gives 'beats 2 warriors, loses to a captain'; owner decision asked.
 - [ ] 151.C3 3 Rohan riders v 5 Dunlending warriors + 3 archers behind them: the riders ride past the warriors to the archers and kill them first (0.0.151).
   - 2026-11-17 on 0.0.160 (log 193403, 244 s): PARTLY. The 3 archers died first (100, 126, 140 s, all to riders) and no warrior died; a warrior killed one rider at 152 s. But every rider opened on the warriors in its path and reached an archer only 37-80 s in. Riders landed 57 of 122 swings (65 out of reach, median 3.4 blocks v reach 2.5; archers step back). Dunlending warriors spent ~860 NPC-seconds chasing riders ~9 blocks off they never caught.
@@ -813,18 +821,22 @@ In game 2026-11-17 (151.C3, log 193403): riders opened on the warriors in their 
   - 2026-11-17 on 0.0.161 (log 194429): riders targeted archers from 14-17 s, but the swing hold stopped nearly every blow (8 swings in 104 s, was 51 in 90 s): a galloping horse always carries the blow past. 0.0.162 drops the hold; a rider's blow lands if the target was in reach within 200 ms of it falling (as foot soldiers' blows at riders since 0.0.146).
 - [x] 161.1 Redo 151.C3 (3 Rohan riders 20 blocks from 5 Dunlending warriors with 3 archers 10 blocks behind them): the riders go for the archers from the start (first archer hit well before 37 s) and kill them first.
   - 2026-11-17 on 0.0.162 (log 194948): first archer hits at 12, 20 and 28 s (0.0.160: 45, 68, 94); all 3 archers dead by 83.5 s (0.0.160: 140 s); then 1 warrior; 1 rider lost.
-- [ ] 161.2 (0.0.162) Same run: riders swing about as often as on 0.0.160 (51 swings in 90 s) but far fewer blows are "out of reach when the blow fell" (was 65 of 122), and riders still land charge hits.
+- [x] 161.2 (0.0.162) Same run: riders swing about as often as on 0.0.160 (51 swings in 90 s) but far fewer blows are "out of reach when the blow fell" (was 65 of 122), and riders still land charge hits.
+  - 2026-11-17 closed: overtaken: 0.0.167 made the pass window count for riders (167.1).
   - 2026-11-17 on 0.0.162 (log 194948): first 90 s 52 swings, 26 out of reach (same as 0.0.160), but aimed at archers (39 of 52); whole run 46 of 81 landed (0.0.160: 57 of 122). Most misses are archers stepping back (rider slow, 3.3-4.3 blocks), not gallop overshoot. Left open.
-- [ ] 161.3 151.C1 still holds: 1 Rohan rider v 2 Dunlending warriors, the rider wins.
+- [x] 161.3 151.C1 still holds: 1 Rohan rider v 2 Dunlending warriors, the rider wins.
+  - 2026-11-17 closed: overtaken: 168.1 (rider beats 2 warriors on 0.0.168).
   - 2026-11-17 on 0.0.162 (log 195542): FAILED, the warriors won at ~390 s (rider dealt 42, took 46; warriors landed 23 of 25). The fight drifted ~48 blocks north with the rider's ride-outs and Synergy froze it until I teleported over (the 133.3 drift). Riders lost strength in 0.0.156 (MountedExtraReach 1 -> 0.5) and 0.0.146 (foot blows at riders riding through land).
 
 ## 163. Stronger charge (0.0.163)
 
 Owner, 2026-11-17 (card, after 161.3 failed): "Charge hits x2.5 (from x2)". Only a rider's blow landed at a gallop changes; standing swings stay x1.
 
-- [ ] 163.1 1 Rohan rider v 2 Dunlending warriors (stand at the fight so Synergy doesn't freeze it): the rider wins.
+- [x] 163.1 1 Rohan rider v 2 Dunlending warriors (stand at the fight so Synergy doesn't freeze it): the rider wins.
+  - 2026-11-17 closed: overtaken: 168.1.
   - 2026-11-17 on 0.0.163 (log 200639): rider ahead when the owner stopped the run at ~276 s: one warrior killed at 234 s, 65 v 14 damage, rider at 30.8 of 34. The fight drifted north ~40 blocks per 100 s (1796,300 -> 1781,337 -> 1774,378) and Synergy froze it twice; I teleported to it each time.
-- [ ] 163.2 1 Rohan rider v 1 Dunlending captain: the captain still wins.
+- [x] 163.2 1 Rohan rider v 1 Dunlending captain: the captain still wins.
+  - 2026-11-17 closed: overtaken: 164.1 and 168.2 (captain wins).
 
 ## 164. Foot soldiers swing at passing riders (0.0.164)
 
@@ -839,17 +851,20 @@ Owner, 2026-11-17, watching 1 rider v 1 captain on 0.0.163: "the rider can phase
 
 In game 2026-11-17 (0.0.162 and 0.0.163, 1 rider v 2 warriors): ride-out after ride-out went the same way with the warriors chasing, so the fight drifted ~40 blocks per 100 s until Synergy froze it. A rider now remembers where its fight began (its first focus's position); a ride-out that would carry it more than 8 blocks from there turns aside and back toward it.
 
-- [ ] 165.1 1 Rohan rider v 2 Dunlending warriors with the player standing still beside them: after 3 minutes the fight is still within about 15 blocks of where it began (no Synergy freeze), and the rider still charges and rides out.
+- [x] 165.1 1 Rohan rider v 2 Dunlending warriors with the player standing still beside them: after 3 minutes the fight is still within about 15 blocks of where it began (no Synergy freeze), and the rider still charges and rides out.
+  - 2026-11-17 closed: drift part passed (fight stayed beside the player on 0.0.165-0.0.168); rider result in 168.1.
   - 2026-11-17 on 0.0.165 (log 230424): no drift freeze (rider at most 33 blocks from the start, the fight mostly beside me), but the rider LOST at 199 s: 8 of 22 swings landed (14 out of reach, 2.5-4.3 blocks), 26 damage, 4 charge hits; the warriors landed 20 of 24 for 39. Its hits came 12-78 s apart (0.0.163: clusters 4-5 s apart), so the warrior healed back between them. Read: at AnchorRadius 8 the bent ride-outs end next to the chasing warriors, too close to line up a charge. 0.0.166 sets AnchorRadius 16 (166.1). (An earlier run, log 230312, is void: the captain from 164.1 was still alive and joined.)
 
 ## 166. Ride-outs bend only far from the fight (0.0.166)
 
-- [ ] 166.1 1 Rohan rider v 2 Dunlending warriors, player beside them: the rider wins (163.1) and passes come every few seconds again, and the fight stays within about 25 blocks (no Synergy freeze).
+- [x] 166.1 1 Rohan rider v 2 Dunlending warriors, player beside them: the rider wins (163.1) and passes come every few seconds again, and the fight stays within about 25 blocks (no Synergy freeze).
+  - 2026-11-17 closed: overtaken: 168.1.
   - 2026-11-17 on 0.0.166 (log 231307): stopped at 255 s with the rider ahead, 49 v 31 damage, no deaths; the fight stayed beside me. Rider still 22 of 36 out of reach: the 0.0.162 pass window never applied to riders (a mounted attacker never sets swingStarted). 0.0.167 fixes that (167.1).
 
 ## 167. A rider's blow counts a pass through reach (0.0.167)
 
-- [ ] 167.1 1 Rohan rider v 2 Dunlending warriors: far fewer rider blows "out of reach when the blow fell" (0.0.166: 22 of 36), and the rider wins.
+- [x] 167.1 1 Rohan rider v 2 Dunlending warriors: far fewer rider blows "out of reach when the blow fell" (0.0.166: 22 of 36), and the rider wins.
+  - 2026-11-17 closed: overtaken: 168.1.
   - 2026-11-17 on 0.0.167 (log 232003): out of reach down to 12 of 27 (44%, was 61%), but the rider died at ~203 s: 46 damage dealt, 41 taken, no kill; the warriors landed 20 of 23. Fight stayed beside the player. Riders now lose 1 v 2 since foot soldiers swing at passing riders (0.0.164); owner asked about rider strength.
 - [ ] 165.2 3 riders v 5 warriors + 3 archers: the riders still kill the archers first (161.1 numbers).
 
