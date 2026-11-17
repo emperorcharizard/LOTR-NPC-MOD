@@ -883,5 +883,6 @@ Owner, 2026-11-17 (card): "Riders x1.25 stats". A rider without its own entry ha
 
 Install `lotrnpcs_1.0.1.zip`; restart fully. Owner 2026-11-17: "When a spear user gets hit mid swing, their attack misses entirely"; "all animations should have the same attack landing timing".
 
-- [ ] 169.1 A spear soldier hit mid swing still lands its blow (400 ms after the swing starts, like every other weapon).
+- [ ] 169.1 (owner to confirm by eye) A spear soldier hit mid swing still lands its blow (400 ms after the swing starts, like every other weapon).
 - [ ] 169.2 9 Gondor v 9 Mordor warriors with `/recruits battlelog on`: the summary's "ended before their blow" count (noblow rows, with the weapon) is small and about the same on both sides; Gondor and Mordor about even over several fights.
+  - 2026-11-17 on 1.0.1: Gondor won 4 of 4 (logs 120543 9-0 Gondor west, 120830 9-3 east, 121100 9-1 north, 121339 9-4 south with Mordor spawned first). Blows per NPC-minute Gondor 16.7 (was 14.5 on 0.0.168), Mordor 16.0 (15.8); noblow 7 v 6 (~4%), all swing=-1 cancelled=0 ~1.9 s with the target inside reach (never faced it). Damage per hit ~1.97 both. Open: still one-sided (now Gondor).

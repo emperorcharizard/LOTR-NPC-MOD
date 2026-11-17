@@ -3,7 +3,7 @@ name: resume
 description: Where the lotrnpcs work stands and what's next; read first, update before stopping
 ---
 
-# Where we are (updated 2026-11-17: 1.0.0 RELEASED on GitHub, v1.0.0, installed in the test world. Open: Mordor beats Gondor 3/3 in equal 9 v 9s; owner sign-offs on hiring, menus, looks, two players, optional mods; the server without LRC)
+# Where we are (updated 2026-11-17: 1.0.0 RELEASED on GitHub; 1.0.1 (blow timing fix) installed in the test world, not released. Open: Gondor now beats Mordor 4/4 in equal 9 v 9s (was Mordor 3/3 on 0.0.168); owner sign-offs on hiring, menus, looks, two players, optional mods; the server without LRC)
 
 **0.0.156 (2026-11-16):** owner tested 154.1/154.2 by hand (work), then asked for one hire option and a "Let me change your class" page in the own menu; built, not installed. Owner also reported a broken shield texture on a Misty Mountains guard recruit (screenshot: kite shield with noisy black/white pattern).
 
