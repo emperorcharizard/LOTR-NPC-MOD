@@ -823,4 +823,5 @@ In game 2026-11-17 (151.C3, log 193403): riders opened on the warriors in their 
 Owner, 2026-11-17 (card, after 161.3 failed): "Charge hits x2.5 (from x2)". Only a rider's blow landed at a gallop changes; standing swings stay x1.
 
 - [ ] 163.1 1 Rohan rider v 2 Dunlending warriors (stand at the fight so Synergy doesn't freeze it): the rider wins.
+  - 2026-11-17 on 0.0.163 (log 200639): rider ahead when the owner stopped the run at ~276 s: one warrior killed at 234 s, 65 v 14 damage, rider at 30.8 of 34. The fight drifted north ~40 blocks per 100 s (1796,300 -> 1781,337 -> 1774,378) and Synergy froze it twice; I teleported to it each time.
 - [ ] 163.2 1 Rohan rider v 1 Dunlending captain: the captain still wins.
