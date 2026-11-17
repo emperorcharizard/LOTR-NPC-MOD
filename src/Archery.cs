@@ -10,20 +10,18 @@ using Vintagestory.GameContent;
 namespace LotrNpcs
 {
     /// <summary>
-    /// Archers (0.0.55, user, 2026-11-03: "creating archer units", then "bring up archer units, primarily for mordor, up
-    /// to the current spec that the npcs are at right now" and "The archers are just an additional unit, they don't have
-    /// ranks"). Shared pieces of the shooting task, the arrow and the seek task's stand-off. Pure math is static so the
-    /// tests can check it without a world.
+    /// Archers: an additional unit without ranks. Shared pieces of the shooting task, the arrow and the seek task's
+    /// stand-off. Pure math is static so the tests can check it without a world.
     /// </summary>
     public static class Archery
     {
-        /// <summary>Until 0.0.77: how close to the line of fire a friend could stand before the archer held its shot (blocks from the
-        /// arrow's path to the friend's middle).</summary>
+        /// <summary>How close to the line of fire a friend may stand for FriendInLine (blocks from the arrow's path
+        /// to the friend's middle). Unused in game: archers no longer hold their shot for friends.</summary>
         public const double FriendClearance = 0.75;
 
         public static Vec3d Eye(Entity e) => new Vec3d(e.Pos.X, e.Pos.InternalY + e.LocalEyePos.Y, e.Pos.Z);
 
-        /// <summary>Where an archer aims: the chest (user: no head shots), a little above the middle of the body.</summary>
+        /// <summary>Where an archer aims: the chest (no head shots), a little above the middle of the body.</summary>
         public static Vec3d Chest(Entity e) => new Vec3d(e.Pos.X, e.Pos.InternalY + (e.SelectionBox?.Y2 ?? 1.8f) * 0.62, e.Pos.Z);
 
         /// <summary>Shortest distance from point p to the segment a-b, and where along it (0 at a, 1 at b).</summary>
@@ -85,8 +83,8 @@ namespace LotrNpcs
 
         /// <summary>
         /// Who an archer must never hit: players and faction NPCs it doesn't want to fight (its own side, allies,
-        /// neutral factions, its owner's people). Arrows fly through them (since 0.0.77 the archer no longer holds its
-        /// shot while one stands in the way). Animals and monsters aren't friends.
+        /// neutral factions, its owner's people). Arrows fly through them, so the archer doesn't hold its shot while
+        /// one stands in the way. Animals and monsters aren't friends.
         /// </summary>
         public static bool IsFriend(FactionSystem factions, Entity shooter, Entity other)
         {
@@ -108,11 +106,11 @@ namespace LotrNpcs
     }
 
     /// <summary>
-    /// An archer's shot (lotrnpcs:shootattack). Targets are chosen by faction exactly as the melee and seek tasks choose
-    /// them (recruits by their owner's rules, guards inside their area). The archer stops, turns, draws for drawMs,
-    /// and looses one arrow aimed at the chest if the target is still in sight (friends in the way don't stop it since
-    /// 0.0.77: the arrow flies through them); it
-    /// steps back from an enemy that gets closer than minRange and lets the melee task fight when cornered.
+    /// An archer's shot (lotrnpcs:shootattack). Targets are chosen by faction exactly as the melee and seek tasks
+    /// choose them (recruits by their owner's rules, guards inside their area). The archer stops, turns, draws for
+    /// drawMs, and looses one arrow aimed at the chest if the target is still in sight (friends in the way don't stop
+    /// it: the arrow flies through them); it steps back from an enemy that gets closer than minRange and lets the
+    /// melee task fight when cornered.
     /// </summary>
     public class AiTaskFactionShoot : AiTaskBaseTargetable
     {
@@ -132,8 +130,8 @@ namespace LotrNpcs
         long standUntilMs;
         const int StandMs = 4000;
         const double CloseShotRange = 1.8;
-        // Closer than this the archer fights where it stands instead of stepping back (1.6 until 0.0.74, when minRange
-        // went from 4 to 2 blocks and 1.6 would have left almost no room to step back).
+        // Closer than this the archer fights where it stands instead of stepping back (with minRange 2 blocks, more
+        // would leave almost no room to step back).
         const double TooCloseToStep = 1.0;
         float curTurnRadPerSec;
         EntityBehaviorHeldWeapon weapon;
@@ -147,8 +145,7 @@ namespace LotrNpcs
             faction = FactionSystem.FactionOf(entity);
             rank = EntityBehaviorFactionMember.RankOf(entity);
             range = taskConfig["range"].AsFloat(24);
-            // 0.0.74 (user, 2026-11-04: "increase their shooting range to 24 blocks, and up to 20 blocks above or below
-            // them"): how far above or below a target may be. Until 0.0.74 it was 0.6 of the range (12 blocks).
+            // How far above or below a target may be (20 blocks by default).
             verticalRange = taskConfig["verticalRange"].AsFloat(20);
             minRange = taskConfig["minRange"].AsFloat(2);
             damage = taskConfig["damage"].AsFloat(3);
@@ -195,20 +192,21 @@ namespace LotrNpcs
         }
 
         /// <summary>True when the archer can see the target's chest with nothing solid in between. Friends in the way
-        /// no longer stop the shot (0.0.77, owner: "remove the hold fire rule"): our arrows fly through the archer's
-        /// friends without hurting them (LotrNpcsArrow.CanHitTarget), so holding only cost damage. Archery.FriendInLine
-        /// is kept for the tests and in case the rule comes back.</summary>
+        /// don't stop the shot: our arrows fly through the archer's friends without hurting them
+        /// (LotrNpcsArrow.CanHitTarget), so holding would only cost damage. Archery.FriendInLine is kept for the
+        /// tests and in case the rule comes back.</summary>
         public bool ClearShot(Entity target)
         {
             if (target.Pos.Dimension != entity.Pos.Dimension) return false;
-            // 0.0.94 (owner: archers "not try at all on a cliffs edge"): judged from where the arrow starts, ArrowAhead in
-            // front of the eye toward the target, as Shoot spawns it. From the eye itself, a steep line down from just
-            // behind a ledge clipped the ledge, so no target below was ever picked.
+            // Judged from where the arrow starts, ArrowAhead in front of the eye toward the target, as Shoot spawns
+            // it. From the eye itself, a steep line down from just behind a ledge clipped the ledge, so an archer on
+            // a cliff's edge never picked a target below.
             Vec3d from = Sight.Toward(Archery.Eye(entity), target.Pos.X, target.Pos.Z, Sight.ArrowAhead), to = Archery.Chest(target);
             return Sight.Clear(entity.World, this, from, to);
         }
 
-        /// <summary>In range with a clear shot (0.0.94: an archer that can shoot back at its attacker doesn't hide).</summary>
+        /// <summary>In range with a clear shot (an archer that can shoot back at its attacker doesn't
+        /// hide).</summary>
         public bool CanShootAt(Entity target) => target != null && target.Alive && InShootingRange(target) && ClearShot(target);
 
         bool InShootingRange(Entity e)
@@ -341,7 +339,7 @@ namespace LotrNpcs
 
             projectile.FiredBy = entity;
             factions?.Log.Attacked(entity, entity.World.ElapsedMilliseconds);
-            // 0.0.91: the faction's archer damage, varied by DamageSpread, read at each shot (the tier stays).
+            // The faction's archer damage, varied by DamageSpread, read at each shot (the tier stays).
             FactionConfig config = factions?.Config;
             projectile.Damage = FactionTiers.Spread(config?.DamageFor(faction, rank) ?? damage, config?.Spread ?? 0, entity.World.Rand.NextDouble()) * Riders.CaptainNpcFight(rank, NpcTypeInfo.Of(target)?.Rank, target is EntityPlayer) * (config?.HitScaleFor(target) ?? 1); // 0.0.155: captains tougher against NPCs; 0.0.135: NpcVsNpcDamageMultiplier
             projectile.DamageTier = damageTier;
@@ -394,8 +392,8 @@ namespace LotrNpcs
 
         protected override bool DealDamage(Entity target)
         {
-            // 0.0.109: like melee, an arrow skips the hurt window of anything but a player with NpcHitsIgnoreHurtWindow
-            // on, and the battle log hears how it went.
+            // Like melee, an arrow skips the hurt window of anything but a player with NpcHitsIgnoreHurtWindow on,
+            // and the battle log hears how it went.
             if (target != null && !(target is EntityPlayer)) IgnoreInvFrames = factions?.Config.NpcHitsIgnoreHurtWindow == true;
             bool alive = target?.Alive == true;
             bool window = target?.IsActivityRunning("invulnerable") == true && !IgnoreInvFrames;

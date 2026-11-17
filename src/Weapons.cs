@@ -16,16 +16,16 @@ namespace LotrNpcs
         public string AttackAnimation;
         /// <summary>The entity animation held between attacks, or null to let the arm hang as usual.</summary>
         public string HoldAnimation;
-        /// <summary>Held in both hands (the poleaxe): never carried with a shield (0.0.55).</summary>
+        /// <summary>Held in both hands (the poleaxe): never carried with a shield.</summary>
         public bool TwoHanded;
-        /// <summary>How likely it is picked against the others in the list (0.0.82, the owner's "prefer spears" and the
-        /// like): an entry with weight 3 comes up three times as often as one with weight 1. At least 1.</summary>
+        /// <summary>How likely it is picked against the others in the list: an entry with weight 3 comes up three
+        /// times as often as one with weight 1. At least 1.</summary>
         public int Weight = 1;
-        /// <summary>When the blow lands, in ms after the swing starts (0.0.99, each weapon's own wind-up); 0 keeps the
-        /// melee task's damagePlayerAtMs.</summary>
+        /// <summary>When the blow lands, in ms after the swing starts (each weapon's own wind-up); 0 keeps the melee
+        /// task's damagePlayerAtMs.</summary>
         public int HitMs;
-        /// <summary>The weapon in other poses, first match wins (0.0.59 the drawn bow; 0.0.73 the string pulled back by
-        /// stages). Empty when the weapon has one look.</summary>
+        /// <summary>The weapon in other poses, first match wins (the drawn bow, the string pulled back by stages).
+        /// Empty when the weapon has one look.</summary>
         public List<WeaponPose> Poses = new List<WeaponPose>();
     }
 
@@ -38,26 +38,27 @@ namespace LotrNpcs
     }
 
     /// <summary>
-    /// Gives an NPC a weapon to carry (0.0.45, user: Mordor orcs hold weapons that are "randomized, and do not affect
-    /// damage tier"). The server picks one at random the first time the NPC loads and keeps it in a watched attribute for
-    /// life; an NPC whose weapon is no longer listed picks again. The weapon is only for looks: just the client puts it in
-    /// the NPC's hand, so nothing on the server, vanilla or Combat Overhaul, ever sees a held item, and damage, tier and
-    /// timing stay the rank's own. The melee task asks this behavior which swing to play, and the hold animation (the
-    /// poleaxe's two-handed guard) runs between attacks.
+    /// Gives an NPC a weapon to carry, randomized and with no effect on damage tier. The server picks one at random
+    /// the first time the NPC loads and keeps it in a watched attribute for life; an NPC whose weapon is no longer
+    /// listed picks again. The weapon is only for looks: just the client puts it in the NPC's hand, so nothing on the
+    /// server, vanilla or Combat Overhaul, ever sees a held item, and damage, tier and timing stay the rank's own.
+    /// The melee task asks this behavior which swing to play, and the hold animation (the poleaxe's two-handed guard)
+    /// runs between attacks.
     /// </summary>
     public class EntityBehaviorHeldWeapon : EntityBehavior
     {
         public const string WeaponAttr = "lotrnpcsWeapon";
-        /// <summary>"on" or "off": whether the NPC carries its shield (0.0.55). Missing until the server decides.</summary>
+        /// <summary>"on" or "off": whether the NPC carries its shield. Missing until the server decides.</summary>
         public const string ShieldAttr = "lotrnpcsShield";
 
-        /// <summary>Which of its type's shields the NPC carries (0.0.76, dwarves have two), as "domain:code".</summary>
+        /// <summary>Which of its type's shields the NPC carries (some types have several), as
+        /// "domain:code".</summary>
         public const string ShieldItemAttr = "lotrnpcsShieldItem";
 
-        /// <summary>The shields its type may carry in the left hand (0.0.55 Mordor orcs; 0.0.76 a list, "shields").</summary>
+        /// <summary>The shields its type may carry in the left hand ("shields").</summary>
         public IReadOnlyList<string> ShieldItems { get; private set; } = Array.Empty<string>();
 
-        /// <summary>0.0.113 guards: the shield is always on, and the looks menu has no switch for it.</summary>
+        /// <summary>Guards: the shield is always on, and the looks menu has no switch for it.</summary>
         public bool AlwaysShield { get; private set; }
 
         /// <summary>The shield item this NPC carries in the left hand when its shield is on, or null: its type's only
@@ -127,7 +128,7 @@ namespace LotrNpcs
         public void Configure(JsonObject attributes)
         {
             weapons = ReadWeapons(attributes?["weapons"]);
-            // "shields": [..] (0.0.76), or the older single "shield".
+            // "shields": [..], or the older single "shield".
             List<string> shields = new List<string>();
             foreach (JsonObject one in attributes?["shields"].AsArray() ?? Array.Empty<JsonObject>()) shields.Add(Clean(one.AsString()));
             if (shields.Count == 0) shields.Add(Clean(attributes?["shield"].AsString()));
@@ -150,8 +151,8 @@ namespace LotrNpcs
                 if (item == null || attack == null || read.Any(w => w.Item == item)) continue;
                 if (!item.Contains(':')) item = "lotrnpcs:" + item;
                 NpcWeapon weapon = new NpcWeapon { Item = item, AttackAnimation = attack, HoldAnimation = Clean(entry["holdAnimation"].AsString()), TwoHanded = entry["twoHanded"].AsBool(false), Weight = Math.Max(1, entry["weight"].AsInt(1)), HitMs = Math.Max(0, entry["hitMs"].AsInt(0)) };
-                // "poses": [{ "item": ..., "while": { anim: [from, until] } }] (0.0.73), in order; the 0.0.59 form
-                // "drawnItem" + "drawnWhile": { anim: until } still reads, as one pose after them.
+                // "poses": [{ "item": ..., "while": { anim: [from, until] } }], in order; the older form "drawnItem"
+                // + "drawnWhile": { anim: until } still reads, as one pose after them.
                 foreach (JsonObject pose in entry["poses"].AsArray() ?? Array.Empty<JsonObject>())
                 {
                     if (ReadPose(pose["item"].AsString(), pose["while"].Token, true) is WeaponPose read1) weapon.Poses.Add(read1);
@@ -191,10 +192,10 @@ namespace LotrNpcs
         public static string PickWeapon(string current, NpcWeapon[] weapons, Random rand, bool fixedWeapon = false)
         {
             if (weapons.Length == 0) return null;
-            // An owner who took the weapon away (Looks.cs, 0.0.54) keeps it that way, unless it can't be taken away.
+            // An owner who took the weapon away (Looks.cs) keeps it that way, unless it can't be taken away.
             if (current == Looks.NoWeapon && !fixedWeapon) return current;
             if (current != null && Array.Exists(weapons, w => w.Item == current)) return current;
-            // By weight (0.0.82).
+            // By weight.
             int total = 0;
             foreach (NpcWeapon w in weapons) total += Math.Max(1, w.Weight);
             int roll = rand.Next(total);
@@ -222,9 +223,8 @@ namespace LotrNpcs
             item != null && weapons != null && weapons.Any(w => w.Item == item && w.TwoHanded);
 
         /// <summary>
-        /// Whether a new NPC carries its shield: by chance, and never with a two-handed weapon (user, 2026-11-03: "it
-        /// cant be used in conjunction with the poleaxe"). NPCs that were already in the world before 0.0.55 get none
-        /// until their owner gives them one.
+        /// Whether a new NPC carries its shield: by chance, and never with a two-handed weapon. NPCs from builds
+        /// before shields get none until their owner gives them one.
         /// </summary>
         public static bool RollShield(bool firstSpawn, string weapon, IReadOnlyList<NpcWeapon> weapons, double chance, Random rand) =>
             firstSpawn && !IsTwoHanded(weapon, weapons) && rand.NextDouble() < Math.Clamp(chance, 0, 1);
@@ -233,7 +233,7 @@ namespace LotrNpcs
         public void ChooseShield(bool firstSpawn, double chance, Random rand)
         {
             if (ShieldItems.Count == 0) return;
-            // Which shield, picked once from several (0.0.76).
+            // Which shield, picked once from several.
             string picked = Attrs.String(entity.WatchedAttributes, ShieldItemAttr);
             if (ShieldItems.Count > 1 && (picked == null || !ShieldItems.Contains(picked)))
             {
@@ -308,9 +308,9 @@ namespace LotrNpcs
         readonly Dictionary<string, long> poseSince = new Dictionary<string, long>();
 
         /// <summary>
-        /// The pose item to show (0.0.73): the first of the weapon's poses with an animation that runs and started between
-        /// its from and until milliseconds ago (until 0: any time after from). Null: the weapon itself. started holds when
-        /// each running pose animation started; animations that stopped are dropped.
+        /// The pose item to show: the first of the weapon's poses with an animation that runs and started between its
+        /// from and until milliseconds ago (until 0: any time after from). Null: the weapon itself. started holds
+        /// when each running pose animation started; animations that stopped are dropped.
         /// </summary>
         public static string PoseNow(NpcWeapon weapon, System.Func<string, bool> active, long now, Dictionary<string, long> started)
         {
@@ -340,8 +340,8 @@ namespace LotrNpcs
 
         /// <summary>
         /// The name the game tracks a running animation by: the shape animation (AnimationMetaData.Animation, such as
-        /// "bowaim"), not the entity's animation code. 0.0.59 asked for the code, which was never active, so the drawn bow
-        /// never showed (user, 2026-11-03: "the bow is held wrong"). Falls back to the code when the list lacks it.
+        /// "bowaim"), not the entity's animation code, which is never active. Falls back to the code when the list
+        /// lacks it.
         /// </summary>
         public static string TrackedAnimation(string code, AnimationMetaData[] animations) =>
             animations?.FirstOrDefault(a => a?.Code == code)?.Animation ?? code;

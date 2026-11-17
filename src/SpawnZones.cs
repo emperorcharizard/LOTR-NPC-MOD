@@ -20,7 +20,7 @@ namespace LotrNpcs
         public int Id;
         public int MinX, MinZ, MaxX, MaxZ;
         public List<string> Factions = new List<string>();
-        // 0.0.112: patrol points, x and z pairs (absolute block coordinates). With 2 or more, groups spawned here walk them.
+        // Patrol points, x and z pairs (absolute block coordinates). With 2 or more, groups spawned here walk them.
         public List<int> Patrol = new List<int>();
         public bool Patrols => Patrol != null && Patrol.Count >= 4;
 
@@ -36,40 +36,39 @@ namespace LotrNpcs
     }
 
     /// <summary>
-    /// Tunable spawn numbers, stored in the server's ModConfig/lotrnpcs-spawning.json (rewritten on every start, so new
-    /// settings appear and old ones go). User, 2026-11-02: at least one group every 3 to 5 minutes near a player in a
+    /// Tunable spawn numbers, stored in the server's ModConfig/lotrnpcs-spawning.json (rewritten on every start, so
+    /// new settings appear and old ones go). By default at least one group every 3 to 5 minutes near a player in a
     /// zone; small groups as in Fantasy Creatures' surface goblins; captains very rare, with an escort.
     /// </summary>
     public class SpawnConfig
     {
-        // How to edit the file (user, 2026-11-02: "add #instructions to the config"). Rewritten on every load.
+        // How to edit the file. Rewritten on every load.
         [JsonProperty("#Instructions")]
         public List<string> Instructions;
-        // 0.0.94: the file gets a version so a changed default can move files that still have the old one, and leave
-        // an admin's own value alone. Files from before 0.0.94 have none (0).
+        // The file's version, so a changed default can move files that still have the old one and leave an admin's
+        // own value alone. Files without one count as 0.
         public const int CurrentVersion = 1;
         public int Version;
         public double MinutesBetweenGroupsMin = 3;
         public double MinutesBetweenGroupsMax = 5;
-        // 0.0.52 (user, 2026-11-03: "the chances of a group spawns within this time, not that it is actually timed"):
-        // each window between those times rolls this chance; a miss means no group until the next window.
+        // The chance that a group spawns within each window between those times; a miss means no group until the next
+        // window.
         public double GroupChance = 0.5;
         public float GroupSizeAvg = 3;
         public float GroupSizeVar = 2;
         public int GroupSizeMax = 5;
         // Chance for each group member after the first (always a recruit) to be a warrior: about 3 recruits per warrior.
         public double WarriorShare = 0.35;
-        // 0.0.55 archers: the chance for each member after the first to be an archer, in factions that have them
-        // (Mordor for now). Rolled before WarriorShare.
+        // Archers: the chance for each member after the first to be an archer, in factions that have them. Rolled
+        // before WarriorShare.
         public double ArcherShare = 0.2;
         public double CaptainGroupChance = 0.12;
-        // 0.0.117 (owner, 2026-11-12: riders "could spawn naturally, but would be rarer than captains"; in groups, not
-        // leading them): the chance that one warrior of a group rides, in factions whose mount's mod is installed.
+        // The chance that one warrior of a group rides, in factions whose mount's mod is installed. Riders are rarer
+        // than captains and never lead the group.
         public double RiderChance = 0.06;
-        // 0.0.56 (user, 2026-11-03: "For two factions that are in the same zone and hostile, or in an overlapping zone
-        // area, increase the spawn chance of enemy groups next to each other"): when a group spawns on ground that a
-        // zone also gives to a faction it is at war with, the chance that a group of that enemy spawns
-        // RivalDistanceMin to RivalDistanceMax blocks from it, so the two meet.
+        // When a group spawns on ground that a zone also gives to a faction it is at war with (the same zone or an
+        // overlapping one), the chance that a group of that enemy spawns RivalDistanceMin to RivalDistanceMax blocks
+        // from it, so the two meet.
         public double RivalGroupChance = 0.5;
         public int RivalDistanceMin = 16;
         public int RivalDistanceMax = 32;
@@ -77,20 +76,20 @@ namespace LotrNpcs
         public int CaptainEscortMax = 3;
         public int MinDistanceToPlayer = 40;
         public int MaxDistanceToPlayer = 80;
-        // 0.0.94 (owner, 2026-11-05: "For spawning within zones, increase the max natural cap by at least 3x"): 24, was 8.
+        // The most zone NPCs near a player.
         public int MaxNearby = 24;
         public const int OldMaxNearby = 8;
         public int NearbyRange = 128;
         public int MaxBlockLight = 7;
         public double DespawnAfterMinutesAway = 5;
-        // 0.0.91 (owner, 2026-11-05: "have recruits that arent hired, despawn over time so areas dont get utterly
-        // flooded", chose "A"): a zone NPC alive longer than MaxLifetimeMinutes disappears as soon as it isn't fighting
-        // and no player is within LifetimeDespawnDistance blocks, so it never vanishes in front of anyone. 0 turns it off.
+        // Unhired zone NPCs despawn over time so areas don't get flooded: one alive longer than MaxLifetimeMinutes
+        // disappears as soon as it isn't fighting and no player is within LifetimeDespawnDistance blocks, so it never
+        // vanishes in front of anyone. 0 turns it off.
         public double MaxLifetimeMinutes = 20;
         public int LifetimeDespawnDistance = 64;
         public int DespawnDistance = 128;
 
-        /// <summary>Brings a file from an older build up to date (0.0.94: an unchanged MaxNearby 8 becomes 24).</summary>
+        /// <summary>Brings a file from an older build up to date (an unchanged MaxNearby 8 becomes 24).</summary>
         public void Migrate()
         {
             if (Version < 1 && MaxNearby == OldMaxNearby) MaxNearby = 24;
@@ -116,24 +115,23 @@ namespace LotrNpcs
     }
 
     /// <summary>
-    /// Natural spawning inside admin-marked zones (user, 2026-11-02). Each online player has a timer: every 3 to 5
-    /// minutes (config) one group of a faction listed by the zone spawns on the surface 40 to 80 blocks from them,
-    /// inside a zone. Groups are recruits with some warriors, and now and then a captain with an escort. Zone NPCs that
-    /// stay far from every player for 5 minutes despawn, so new groups keep coming. Zones may overlap and may list
-    /// several factions. Admins manage zones with /recruits zone; zones are saved with the world. Creative spawn items
-    /// are unaffected, and their NPCs never despawn.
+    /// Natural spawning inside admin-marked zones. Each online player has a timer: every 3 to 5 minutes (config) one
+    /// group of a faction listed by the zone spawns on the surface 40 to 80 blocks from them, inside a zone. Groups
+    /// are recruits with some warriors, and now and then a captain with an escort. Zone NPCs that stay far from every
+    /// player for 5 minutes despawn, so new groups keep coming. Zones may overlap and may list several factions.
+    /// Admins manage zones with /recruits zone; zones are saved with the world. Creative spawn items are unaffected,
+    /// and their NPCs never despawn.
     /// </summary>
     public class SpawnZoneSystem : ModSystem
     {
-        // Every faction with ranked NPCs (0.0.35: all of them, not just the orcs). The Shire has only recruits, its
-        // hobbit farmers (user, 2026-11-02: "make them recruit equivalent", 0.0.36).
+        // Every faction with ranked NPCs. The Shire has only recruits, its hobbit farmers.
         public static readonly string[] Factions = { "mordor", "angmar", "mistymountains", "gundabad", "isengard", "gondor", "rohan", "dale", "arnor", "haradrim",
             "dunlendings", "blacknumenoreans", "easterlings", "dwarves", "wickeddwarves", "elves", "tormentedelves", "shire" };
         const string SaveKey = "lotrnpcs:spawnzones";
         const string ConfigFile = "lotrnpcs-spawning.json";
         public const string OriginAttr = "lotrnpcsOrigin";
         const string AwayAttr = "lotrnpcsAwaySeconds";
-        // 0.0.91: how long a zone NPC has been alive (seconds of server ticks), for MaxLifetimeMinutes.
+        // How long a zone NPC has been alive (seconds of server ticks), for MaxLifetimeMinutes.
         public const string AgeAttr = "lotrnpcsZoneAgeSeconds";
         const int TickMs = 5000;
 
@@ -192,7 +190,7 @@ namespace LotrNpcs
 
             CommandArgumentParsers parsers = api.ChatCommands.Parsers;
             string factionList = string.Join(", ", Factions);
-            // 0.0.89: was /recruits zone; now a branch of the mod's one command (ModCommands).
+            // /recruits zone, a branch of the mod's one command (ModCommands).
             ModCommands.RootOf(api)
                 .BeginSubCommand("zone")
                 .WithDescription("Admins: LOTR NPC spawn zones, rectangles where faction NPCs spawn naturally. Factions: " + factionList)
@@ -347,7 +345,7 @@ namespace LotrNpcs
             if (typesByFactionRank == null) typesByFactionRank = ReadTypes();
             Vec3d at = player.Pos;
             List<Entity> nearby = ZoneNpcsAround(at, config.NearbyRange);
-            // 0.0.90: NPCs count by their faction's share (a goblin 5/8 of a man), as their groups are bigger.
+            // NPCs count by their faction's share (a goblin 5/8 of a man), as their groups are bigger.
             double nearbyWeight = nearby.Sum(e => Weight(FactionSystem.FactionOf(e)));
             if (nearbyWeight >= config.MaxNearby - 1e-6) return SpawnResult.Full;
 
@@ -421,7 +419,7 @@ namespace LotrNpcs
 
         List<string> GroupRanks(bool captainGroup, bool archers, string faction) => GroupRanks(config, rand, captainGroup, archers, GroupScale(faction));
 
-        // 0.0.117: one of the group's warriors rides, at RiderChance, when the faction has riders and their mount exists.
+        // One of the group's warriors rides, at RiderChance, when the faction has riders and their mount exists.
         List<string> WithRider(string faction, List<string> ranks) =>
             typesByFactionRank.TryGetValue(faction + "/rider", out EntityProperties riderType) && Riders.CanHaveMount(sapi?.World, riderType)
                 ? WithRider(ranks, rand, config.RiderChance) : ranks;
@@ -434,9 +432,8 @@ namespace LotrNpcs
             return ranks;
         }
 
-        // 0.0.90 (owner chose "A": wild groups scale with the follow limit): a faction's group size over the baseline's
-        // (its MaxFollowers over the file's baseline; orcs 6/5 since 0.0.107, elves 4/5), and what one of its NPCs counts for in
-        // MaxNearby (1 over that).
+        // Wild groups scale with the follow limit: a faction's group size over the baseline's (its MaxFollowers over
+        // the file's baseline; orcs 6/5, elves 4/5), and what one of its NPCs counts for in MaxNearby (1 over that).
         double GroupScale(string faction)
         {
             if (groupScale == null)
@@ -463,14 +460,15 @@ namespace LotrNpcs
             if (captainGroup)
             {
                 ranks.Add("captain");
-                // 0.0.90: the escort's most grows with the faction (Men 1 to 3, orcs 1 to 4, elves 1 to 2).
+                // The escort's most grows with the faction (Men 1 to 3, orcs 1 to 4, elves 1 to 2).
                 int escortMax = Math.Max(config.CaptainEscortMin, FactionTiers.Round(config.CaptainEscortMax * scale));
                 int escort = rand.Next(Math.Max(0, config.CaptainEscortMin), escortMax + 1);
                 for (int i = 0; i < escort; i++) ranks.Add(Member(1 / 3.0));
                 return ranks;
             }
             // Bell curve over avg +- var, rounded up or down at random by its fraction, as vanilla does for herds.
-            // 0.0.90: average, variation and most scaled with the faction (Men 1 to 5, orcs 1 to 7, goblins 1 to 8, elves 1 to 4).
+            // Average, variation and most scale with the faction (Men 1 to 5, orcs 1 to 7, goblins 1 to 8, elves 1 to
+            // 4).
             float size = new NatFloat((float)(config.GroupSizeAvg * scale), (float)(config.GroupSizeVar * scale), EnumDistribution.GAUSSIAN).nextFloat(1, rand);
             int count = (int)size + (size - (int)size > rand.NextDouble() ? 1 : 0);
             count = GameMath.Clamp(count, 1, Math.Max(1, FactionTiers.Round(config.GroupSizeMax * scale)));
@@ -510,7 +508,7 @@ namespace LotrNpcs
         void SpawnGroup(string faction, List<string> ranks, BlockPos leaderFeet)
         {
             long herdId = sapi.WorldManager.GetNextUniqueId();
-            // 0.0.112: in a zone of this faction with a patrol, the whole group starts for the point nearest the leader.
+            // In a zone of this faction with a patrol, the whole group starts for the point nearest the leader.
             SpawnZone patrol = zones.FirstOrDefault(z => z.Patrols && z.Factions.Contains(faction) && z.Contains(leaderFeet.X + 0.5, leaderFeet.Z + 0.5));
             int start = patrol == null ? 0 : NearestPoint(patrol.Patrol, leaderFeet.X, leaderFeet.Z);
             for (int i = 0; i < ranks.Count; i++)
@@ -565,7 +563,7 @@ namespace LotrNpcs
         }
 
         // Zone NPCs that no player has come within DespawnDistance of for DespawnAfterMinutesAway disappear, like
-        // vanilla wildlife, so an area doesn't fill up with groups nobody fights; since 0.0.91 also those older than
+        // vanilla wildlife, so an area doesn't fill up with groups nobody fights; so do those older than
         // MaxLifetimeMinutes that aren't fighting and have no player within LifetimeDespawnDistance. Creative-spawned
         // NPCs and recruits stay.
         void DespawnFarZoneNpcs(float dt, List<PlayerSpot> players)
@@ -580,7 +578,7 @@ namespace LotrNpcs
                 float age = entity.Attributes.GetFloat(AgeAttr) + dt;
                 entity.Attributes.SetFloat(AgeAttr, age);
                 if (away >= config.DespawnAfterMinutesAway * 60) entity.Die(EnumDespawnReason.Expire);
-                // 0.0.91 lifetime: old, not fighting, and out of every player's sight range.
+                // Lifetime: old, not fighting, and out of every player's sight range.
                 else if (config.MaxLifetimeMinutes > 0 && age >= config.MaxLifetimeMinutes * 60
                     && !AnyPlayerNear(players, entity, Math.Max(0, config.LifetimeDespawnDistance)) && !Fighting(entity))
                     entity.Die(EnumDespawnReason.Expire);

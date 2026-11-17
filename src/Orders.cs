@@ -24,12 +24,11 @@ namespace LotrNpcs
         public double X, Y, Z;
         // The way the player looked (across the ground).
         public double Fx, Fz;
-        // 0.0.136 charge: the entity the player looked at (0 for none); X, Y, Z is then the block looked at.
+        // Charge: the entity the player looked at (0 for none); X, Y, Z is then the block looked at.
         public long TargetId;
     }
 
-    /// <summary>Server to client: open the orders menu (0.0.89, /recruits orders, which was the client command
-    /// /recruits orders).</summary>
+    /// <summary>Server to client: open the orders menu (/recruits orders).</summary>
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public class OpenOrdersMenu
     {
@@ -44,8 +43,8 @@ namespace LotrNpcs
     }
 
     /// <summary>
-    /// Formations for hold, move and follow orders (user, 2026-11-03: "with them arranging themselves into the
-    /// formations"). Offsets are (right, forward) in blocks from the anchor, for a group facing forward.
+    /// Formations for hold, move and follow orders. Offsets are (right, forward) in blocks from the anchor, for a
+    /// group facing forward.
     /// </summary>
     public static class Formation
     {
@@ -142,9 +141,8 @@ namespace LotrNpcs
         }
 
         /// <summary>
-        /// Like Assign, but members marked "back" (archers, 0.0.55) take the rearmost spots, so they shoot over the
-        /// others. Depth comes from each spot's offset (larger Y is further forward). Returns the spot index for each
-        /// member.
+        /// Like Assign, but members marked "back" (archers) take the rearmost spots, so they shoot over the others.
+        /// Depth comes from each spot's offset (larger Y is further forward). Returns the spot index for each member.
         /// </summary>
         public static int[] Assign(IList<Vec3d> members, IList<Vec3d> spots, IList<Vec2d> offsets, IList<bool> back)
         {
@@ -166,15 +164,15 @@ namespace LotrNpcs
             return spotOf;
         }
 
-        /// <summary>A member's place in the formation order (0.0.106): captains, warriors, recruits (and rankless), archers.</summary>
+        /// <summary>A member's place in the formation order: captains, warriors, recruits (and rankless),
+        /// archers.</summary>
         public static int OrderOfRank(string rank) => Promotion.BaseRank(rank) switch { "captain" => 0, "warrior" => 1, "archer" => 3, _ => 2 };
 
         /// <summary>
-        /// 0.0.106 (owner, 2026-11-09: "captains to try and be in the front middle, then warriors, then recruits", "with
-        /// archers trying to be at the back or ends of formations"): spots ranked front first, then middle first (larger
-        /// Y forward, smaller |X| inside); captains take the best of them, then warriors, then recruits, and archers what
-        /// is left, which is the back rows or, in a single line, the ends. Within one group each spot goes to the
-        /// nearest member still free, so members of a rank don't cross each other. Returns the spot index per member.
+        /// Spots ranked front first, then middle first (larger Y forward, smaller |X| inside); captains take the best
+        /// of them, then warriors, then recruits, and archers what is left, which is the back rows or, in a single
+        /// line, the ends. Within one group each spot goes to the nearest member still free, so members of a rank
+        /// don't cross each other. Returns the spot index per member.
         /// </summary>
         public static int[] AssignByRank(IList<Vec3d> members, IList<Vec3d> spots, IList<Vec2d> offsets, IList<int> order)
         {
@@ -219,10 +217,10 @@ namespace LotrNpcs
     }
 
     /// <summary>
-    /// The orders menu (user, 2026-11-02/03): hold R (rebindable in Settings, Controls) for a small menu below the
-    /// crosshair, modelled on the Minecraft Recruits mod but only its movement and combat pages. Click a choice or
-    /// press its number (0 for the tenth); the mouse wheel or Tab switches page; letting go of the key closes it.
-    /// Orders reach the player's recruits within HiringSystem.CommandRange.
+    /// The orders menu: hold R (rebindable in Settings, Controls) for a small menu below the crosshair, modelled on
+    /// the Minecraft Recruits mod but only its movement and combat pages. Click a choice or press its number (0 for
+    /// the tenth); the mouse wheel or Tab switches page; letting go of the key closes it. Orders reach the player's
+    /// recruits within HiringSystem.CommandRange.
     /// </summary>
     public class RecruitOrdersSystem : ModSystem
     {
@@ -271,8 +269,7 @@ namespace LotrNpcs
             // After the chat closes, so the menu keeps the focus.
             clientChannel.SetMessageHandler<OpenOrdersMenu>(_ => api.Event.EnqueueMainThreadTask(() => OpenMenu("command"), "lotrnpcs-openorders"));
             SetUpHotkey(api);
-            // Low-level key events as a second way in and out (0.0.39). They didn't open the menu in the user's game
-            // either, so each refusal is logged (OnRawKeyDown).
+            // Low-level key events as a second way in and out; each refusal is logged (OnRawKeyDown).
             api.Event.KeyDown += OnRawKeyDown;
             api.Event.KeyUp += OnRawKeyUp;
             api.Event.LevelFinalize += ReportSharedKey;
@@ -283,13 +280,13 @@ namespace LotrNpcs
             try
             {
                 // The game keeps its hotkey list after leaving a world, so on the next world the key is still there.
-                // Registering it again threw and stopped this whole system from starting (0.0.57, user: the menu
-                // "no longer works (opens) when holding R", nor on Caps Lock), so an existing key is reused.
+                // Registering it again would throw and stop this whole system from starting, so an existing key is
+                // reused.
                 HotKey hotkey = api.Input.GetHotKeyByCode(HotkeyCode);
                 if (hotkey == null)
                 {
-                    // First in the hotkey list (0.0.40): the user's Claims Radar binds "Show claims" to R as well, and the
-                    // game gives a key to the first hotkey on it, so in 0.0.38 and 0.0.39 holding R only reached Claims Radar.
+                    // First in the hotkey list: Claims Radar binds "Show claims" to R as well, and the game gives a
+                    // key to the first hotkey on it.
                     api.Input.RegisterHotKeyFirst(HotkeyCode, Lang.Get("lotrnpcs:hotkey-orders"), GlKeys.R, HotkeyType.CharacterControls);
                     hotkey = api.Input.GetHotKeyByCode(HotkeyCode);
                 }
@@ -468,7 +465,7 @@ namespace LotrNpcs
 
             if (page == 0)
             {
-                // Two to a row, so "2. Hold position" fits (0.0.44 added Guard here).
+                // Two to a row, so "2. Hold position" fits.
                 ElementBounds[] moves = Grid(y, MoveOrders, 2);
                 Button(c, "lotrnpcs:orders-follow", () => Order(Recruit.Follow), moves[0]);
                 Button(c, "lotrnpcs:orders-hold", () => Order(Recruit.Hold), moves[1]);
@@ -493,7 +490,7 @@ namespace LotrNpcs
                 c.AddStaticText(string.Join("\n", Recruit.Stances.Select(st => Lang.Get("lotrnpcs:stance-" + st) + ": " + Lang.Get("lotrnpcs:stance-desc-" + st))),
                     detailFont, ElementBounds.Fixed(0, y, Width, 64));
                 y += 68;
-                // 0.0.136: Retreat and Charge, on the next number keys after the stances.
+                // Retreat and Charge, on the next number keys after the stances.
                 ElementBounds[] acts = Grid(y, 2, 2);
                 Button(c, "lotrnpcs:orders-retreat", () => Order("retreat"), acts[0]);
                 Button(c, "lotrnpcs:orders-charge", () => Order("charge"), acts[1]);
@@ -504,7 +501,7 @@ namespace LotrNpcs
             y += 20;
             c.AddStaticText(Lang.Get("lotrnpcs:orders-hint", KeyName()), detailFont.Clone().WithColor(GuiStyle.DialogDefaultTextColor), ElementBounds.Fixed(0, y, Width, 16));
             y += 20;
-            // 0.0.113: the roster screen, which stays open after the orders key is let go.
+            // The roster screen, which stays open after the orders key is let go.
             c.AddSmallButton(Lang.Get("lotrnpcs:orders-roster"), () =>
             {
                 TryClose();
@@ -518,10 +515,10 @@ namespace LotrNpcs
             else SingleComposer.ToggleButtonsSetValue("stance", Array.IndexOf(Recruit.Stances, stance));
         }
 
-        // Follow me, Hold position, Move there, Guard here, and Guard here for my group (0.0.49).
+        // Follow me, Hold position, Move there, Guard here, and Guard here for my group.
         public const int MoveOrders = 5;
 
-        // Labels like "6. Column" and "3. Aggressive" didn't fit six or four to a row (user's screenshots, 2026-11-03).
+        // Labels like "6. Column" and "3. Aggressive" don't fit six or four to a row.
         public static int Rows(int count, int perRow) => (count + perRow - 1) / perRow;
 
         /// <summary>The number key for the pick at this index: 1 to 9, then 0.</summary>

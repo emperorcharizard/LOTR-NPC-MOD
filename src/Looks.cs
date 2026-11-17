@@ -15,22 +15,20 @@ namespace LotrNpcs
     public class LooksRequest
     {
         public string Name;
-        /// <summary>A helmet item code from the NPC's choices, or "none" (0.0.58); "on" and "off" still work.</summary>
+        /// <summary>A helmet item code from the NPC's choices, or "none"; "on" and "off" still work.</summary>
         public string Helmet;
         /// <summary>A weapon item code from the NPC's list, or "none".</summary>
         public string Weapon;
-        /// <summary>"on" or "off": the Mordor orcs' shield (0.0.55).</summary>
+        /// <summary>"on" or "off": the NPC's shield.</summary>
         public string Shield;
         /// <summary>Skin part code -> variant code.</summary>
         public Dictionary<string, string> Parts;
     }
 
     /// <summary>
-    /// Looks and names (0.0.54, user, 2026-11-03: "randomize whether the npcs are wearing helmets or not, and add a
-    /// function in their specific menu to customize how they look (whether helmet on or off, and facial features) and
-    /// what their name is. In addition, when hired have their name be randomized anyway to names befitting the race."
-    /// and "also what weapons they hold to customize that"). Only cosmetic: protection comes from the rank
-    /// (lotrnpcs:rankarmor), never from the gear worn, and weapons are drawn on the client only (Weapons.cs).
+    /// Looks and names: random helmets, a menu for the owner to choose helmet, face, weapon and name, and a random
+    /// race-fitting name on hiring. Only cosmetic: protection comes from the rank (lotrnpcs:rankarmor), never from
+    /// the gear worn, and weapons are drawn on the client only (Weapons.cs).
     /// </summary>
     public static class Looks
     {
@@ -52,12 +50,12 @@ namespace LotrNpcs
 
         // ---- Helmets ----
 
-        /// <summary>Whether a newly spawned NPC of this rank wears its helmet. 0.0.82 (owner's loadout list): a type
-        /// that may not spawn bare-headed (helmetOptional false) always does; its owner can still take it off.</summary>
+        /// <summary>Whether a newly spawned NPC of this rank wears its helmet. A type that may not spawn bare-headed
+        /// (helmetOptional false) always does; its owner can still take it off.</summary>
         public static bool WearsHelmet(string rank, double chance, bool captainsAlways, Random rand, bool helmetOptional = true) =>
             !helmetOptional || (captainsAlways && rank == "captain") || rand.NextDouble() < chance;
 
-        // On an NPC's watched attributes, sends just this key, not all of them (0.0.114, Recruit.DropWatched).
+        // On an NPC's watched attributes, sends just this key, not all of them (Recruit.DropWatched).
         static void DropKept(ITreeAttribute attrs)
         {
             if (attrs is SyncedTreeAttribute synced) Recruit.DropWatched(synced, KeptHelmetAttr);
@@ -108,9 +106,8 @@ namespace LotrNpcs
         public static string CodeOf(ItemStack stack) => stack?.Collectible?.Code?.ToString();
 
         /// <summary>
-        /// The helmets an owner may choose (0.0.58, user, 2026-11-03: "the helmets only have the switch on and off, not
-        /// the option to choose the helmet"): the type's own helmets that exist in this world, in order, then the one it
-        /// wears and the one it keeps when they aren't among them. "No helmet" isn't in the list.
+        /// The helmets an owner may choose: the type's own helmets that exist in this world, in order, then the one
+        /// it wears and the one it keeps when they aren't among them. "No helmet" isn't in the list.
         /// </summary>
         public static string[] HelmetChoices(string[] typeHelmets, System.Func<string, bool> exists, ItemStack worn, ItemStack kept)
         {
@@ -285,19 +282,18 @@ namespace LotrNpcs
         {
             EntityBehaviorHeldWeapon held = Behavior<EntityBehaviorHeldWeapon>(npc);
             IReadOnlyList<NpcWeapon> weapons = held?.Weapons;
-            // An archer's bow isn't the owner's to change (0.0.55).
+            // An archer's bow isn't the owner's to change.
             if (weapons == null || weapons.Count == 0 || held.Fixed) return Array.Empty<string>();
             NpcWeapon[] line = LineWeapons(npc);
             if (line.Length > 0) weapons = line;
             return weapons.Select(w => w.Item).Append(NoWeapon).ToArray();
         }
 
-        // ---- A warrior's loadout picks its class (0.0.115) ----
+        // ---- A warrior's loadout picks its class ----
 
         /// <summary>
-        /// The class a warrior's loadout makes (user, 2026-11-12: "based on whether or not they have the two handed
-        /// weapons, or the one handed with or without the shield, it changes their class"): a two-handed weapon makes a
-        /// shock trooper, a shield a guard, neither a plain warrior.
+        /// The class a warrior's loadout makes: a two-handed weapon makes a shock trooper, a shield a guard, neither
+        /// a plain warrior.
         /// </summary>
         public static string ClassFor(bool twoHanded, bool shieldOn) => twoHanded ? "shock" : shieldOn ? "guard" : "warrior";
 
@@ -343,7 +339,7 @@ namespace LotrNpcs
         public static ShieldRule ShieldOf(Entity npc)
         {
             EntityBehaviorHeldWeapon held = Behavior<EntityBehaviorHeldWeapon>(npc);
-            // In a warrior line the shield is always the owner's to choose: it makes the guard (0.0.115).
+            // In a warrior line the shield is always the owner's to choose: it makes the guard.
             Dictionary<string, JsonObject> line = held == null ? null : LineConfigs(npc);
             if (line != null && line.Count > 0 && line.Values.Any(h => (h["shields"].AsArray()?.Length ?? 0) > 0 || h["shield"].Exists))
                 return new ShieldRule { TwoHanded = LineWeapons(npc).Where(w => w.TwoHanded).Select(w => w.Item).ToArray() };
@@ -374,7 +370,7 @@ namespace LotrNpcs
             string weapon = req.Weapon?.Trim().ToLowerInvariant();
             if (weapon != null && Array.IndexOf(weapons, weapon) < 0) return "looks-badweapon";
             bool? helmetOn = req.Helmet == "on" ? true : req.Helmet == "off" ? false : (bool?)null;
-            // A chosen helmet (0.0.58): one of the NPC's choices, or none, which takes it off as "off" does.
+            // A chosen helmet: one of the NPC's choices, or none, which takes it off as "off" does.
             string helmetCode = null;
             bool helmetNone = req.Helmet == NoHelmet;
             if (req.Helmet != null && helmetOn == null && !helmetNone)
@@ -386,8 +382,8 @@ namespace LotrNpcs
             if (helmetOn != null && (head == null || (head.Empty && !npc.WatchedAttributes.HasAttribute(KeptHelmetAttr)))) return "looks-nohelmet";
             bool? shieldOn = req.Shield == "on" ? true : req.Shield == "off" ? false : (bool?)null;
             if (req.Shield != null && (shieldOn == null || shield == null)) return "looks-badshield";
-            // Never the shield with the poleaxe (user, 2026-11-03): asking for both is refused; choosing the poleaxe
-            // alone puts the shield away.
+            // Never the shield with the poleaxe: asking for both is refused; choosing the poleaxe alone puts the
+            // shield away.
             string weaponAfter = weapon ?? Attrs.String(npc.WatchedAttributes, EntityBehaviorHeldWeapon.WeaponAttr);
             bool twoHanded = shield != null && Array.IndexOf(shield.TwoHanded, weaponAfter) >= 0;
             if (shieldOn == true && twoHanded) return "looks-shieldtwohanded";

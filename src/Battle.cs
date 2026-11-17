@@ -5,40 +5,30 @@ using Vintagestory.API.MathTools;
 namespace LotrNpcs
 {
     /// <summary>
-    /// Battle spacing (0.0.53, user, 2026-11-03: "in combat I have noticed all the npcs clump all together in one spot.
-    /// maybe put a minimum distance npcs have to one another when fighting ... I want it to feel more like an actual
-    /// battle"). Vanilla seek picks the nearest target and walks onto its position, so a whole group piles onto one or
-    /// two enemies. This keeps, for every NPC being fought, which NPCs are chasing or hitting it right now:
-    /// - an enemy NPC that already has MaxAttackers other attackers is skipped when looking for a target (players never
-    ///   are, the NPC's own target always stays valid, and striking back ignores the limit);
+    /// Battle spacing, so fights look like battles instead of one clump. Vanilla seek picks the nearest target and
+    /// walks onto its position, so a whole group piles onto one or two enemies. This keeps, for every NPC being
+    /// fought, which NPCs are chasing or hitting it right now:
+    /// - an enemy NPC that already has MaxAttackers other attackers is skipped when looking for a target (players
+    /// never are, the NPC's own target always stays valid, and striking back ignores the limit);
     /// - each attacker gets its own side of its target, evenly spread around it, in the order they stand around it;
     /// - fighting NPCs closer than Spacing to another NPC are pushed apart (EntityBehaviorFactionMember).
+    /// Attackers stand 1.0 to 1.6 blocks from their target's center (DuelMin, DuelMax: they stop anywhere in that
+    /// band instead of walking to an exact point, so they don't jitter); two attackers on one NPC flank it 90 degrees
+    /// apart instead of from opposite sides; only NPCs of the same side keep Spacing apart, enemies only DuelMin, so
+    /// a fighter isn't shoved out of reach by the enemies fighting its neighbours. Lines: BattleLines.cs.
     /// Times are server elapsed milliseconds. Server main thread only.
-    ///
-    /// 0.0.82 (owner, 2026-11-04, after the combat questions: NPC battles "jitter" (turning in place, stepping in and
-    /// out) and end in "one whole blob"; "the spacing between npcs might be too far ... there should be a minimum, and a
-    /// maximum range"): attackers stand 1.0 to 1.6 blocks from their target's center (DuelMin, DuelMax; they stop
-    /// anywhere in that band instead of walking to an exact point), two attackers on one NPC flank it 90 degrees apart
-    /// instead of from opposite sides, at most 2 go for one NPC by default (owner: "wrap the flanks", "never more than
-    /// 2"), and only NPCs of the same side keep Spacing (1.5 by default) apart; enemies only keep DuelMin, so a fighter
-    /// is no longer shoved out of reach by the enemies fighting its neighbours. Lines: BattleLines.cs.
     /// </summary>
     public sealed class BattleSpacing
     {
         /// <summary>How long a claim lasts unless the seek or melee task renews it. Renewed every half second while
         /// chasing and on every swing, so a claim outlives a short pause but not an attacker that left or died.</summary>
         public const long ClaimMs = 6000;
-        // 0.0.82: 3 became 2 (config version 17 moves an unchanged 3). 0.0.85 (owner, 2026-11-04: "remove the limit for
-        // how many npcs can target 1 npc as that seems to be causing the issue"): no limit by default (config version 18
-        // moves an unchanged 2; 17 moves an unchanged 3 straight to no limit). 0.0.102 (owner, 2026-11-09: "Implement it
-        // again, do 4 per though"): 4 by default (config version 24 moves an unchanged 0).
+        // The most attackers on one enemy NPC (4 by default, 0 = no limit).
         public const int Default085MaxAttackers = 0, DefaultMaxAttackers = 4;
-        // 0.0.55 (user, 2026-11-03: "make npcs inclined to spread out when fighting as a big group just a bit more"):
-        // 1.5 became 2.0. 0.0.82 (owner: 1.5 blocks between neighbours in a line): back to 1.5, now only between NPCs of
-        // the same side (config version 17 moves an unchanged 2.0).
+        // Blocks between fighting NPCs of the same side.
         public const double DefaultSpacing = 1.5, MinSpacing = 0.8, MaxSpacing = 4;
-        // 0.0.82 (owner: "1.0 to 1.6 blocks"): how far from its target's center an attacker stands. Melee reaches 2 blocks
-        // from the attacker's front to the target's body (0.3 each for our NPCs), so 1.6 is well in reach.
+        // How far from its target's center an attacker stands. Melee reaches 2 blocks from the attacker's front to
+        // the target's body (0.3 each for our NPCs), so 1.6 is well in reach.
         public const double DefaultDuelMin = 1.0, DefaultDuelMax = 1.6, MinDuel = 0.6, MaxDuel = 2.2;
         /// <summary>Farthest an attacker stands from its target's center. Melee reaches 2 blocks from the attacker's
         /// front to the target's body (0.3 each for our NPCs), so 2.2 keeps every attacker in reach whatever the
@@ -57,8 +47,8 @@ namespace LotrNpcs
         public double Spacing { get => spacing; set => spacing = ClampSpacing(value); }
         /// <summary>Where an attacker aims to stand from its target's center: the middle of the duel band.</summary>
         public double SurroundRadius => (duelMin + duelMax) / 2;
-        /// <summary>The duel band (0.0.82): closer than DuelMin an attacker steps back, farther than DuelMax it closes in,
-        /// in between it stands and fights. Set together with SetDuel.</summary>
+        /// <summary>The duel band: closer than DuelMin an attacker steps back, farther than DuelMax it closes in, in
+        /// between it stands and fights. Set together with SetDuel.</summary>
         public double DuelMin => duelMin;
         public double DuelMax => duelMax;
 
@@ -74,8 +64,8 @@ namespace LotrNpcs
         /// <summary>Is a center distance inside the duel band?</summary>
         public bool InDuelBand(double distance) => distance >= duelMin && distance <= duelMax;
 
-        /// <summary>Live claims on a target other than this attacker's (0.0.82, pairing: a free enemy is taken before
-        /// one already being fought).</summary>
+        /// <summary>Live claims on a target other than this attacker's (pairing: a free enemy is taken before one
+        /// already being fought).</summary>
         public int OthersOn(long attacker, long target, long now)
         {
             if (!byTarget.TryGetValue(target, out Claims c)) return 0;
@@ -93,10 +83,9 @@ namespace LotrNpcs
             public int Count;
         }
 
-        // 0.0.98 (owner, 2026-11-08: in a 3 on 1 "they all swing at the same time, but only ones damage is applied"; owner
-        // chose staggered swings over skipping the game's hurt window): after any hit the game drops further damage to
-        // that entity for 500 ms ("invulnerable" activity, EntityBehaviorHealth). Target -> earliest time the next of our
-        // melee hits on it may land, so attackers take turns at least HitGapMs apart instead of hitting in unison.
+        // Staggered swings: after any hit the game drops further damage to that entity for 500 ms ("invulnerable"
+        // activity, EntityBehaviorHealth), so in a 3 on 1 swinging in unison only one hit counted. Target -> earliest
+        // time the next of our melee hits on it may land, so attackers take turns at least HitGapMs apart.
         public const int HitGapMs = 550, HitJitterMs = 200;
         readonly Dictionary<long, long> nextHitAt = new Dictionary<long, long>();
         readonly List<long> hitSweepKeys = new List<long>();
@@ -228,11 +217,11 @@ namespace LotrNpcs
             SurroundAngle(attacker, target, bearing, now, out angle, out _);
 
         /// <summary>
-        /// 0.0.87 (owner's screenshot of a big group on two enemies: one pile; owner: "do your suggested fix"): only as
-        /// many attackers as there is Room for stand in the inner ring (the duel band, SurroundRadius); the others, in the
-        /// order they came, stand in an outer ring OuterRadius out, facing in, and step in when an inner place opens
-        /// (claims are kept in arrival order, so the first outer one moves up). inner: which ring this attacker is in.
-        /// Each ring spreads its own attackers as before.
+        /// Only as many attackers as there is Room for stand in the inner ring (the duel band, SurroundRadius); the
+        /// others, in the order they came, stand in an outer ring OuterRadius out, facing in, and step in when an
+        /// inner place opens (claims are kept in arrival order, so the first outer one moves up). This stops a big
+        /// group piling onto two enemies. inner: which ring this attacker is in. Each ring spreads its own attackers
+        /// as before.
         /// </summary>
         public bool SurroundAngle(long attacker, long target, double bearing, long now, out double angle, out bool inner)
         {
@@ -248,10 +237,10 @@ namespace LotrNpcs
             int lo = inner ? 0 : room, hi = inner ? Math.Min(n, room) : n, count = hi - lo;
             if (count <= 1) return true;
 
-            // Rank of each attacker of this ring going round the target from the ring's first claimant's bearing (so the
-            // order doesn't jump where angles wrap round; ties go by claim order), and the turn that best fits everyone's
-            // bearing to evenly spaced places in that order. 0.0.82: two attackers flank 90 degrees apart (owner: "wrap
-            // the flanks"), not from opposite sides; three or more spread all round.
+            // Rank of each attacker of this ring going round the target from the ring's first claimant's bearing (so
+            // the order doesn't jump where angles wrap round; ties go by claim order), and the turn that best fits
+            // everyone's bearing to evenly spaced places in that order. Two attackers flank 90 degrees apart, not
+            // from opposite sides; three or more spread all round.
             double step = AngleStep(count);
             double first = c.Bearing[lo], sin = 0, cos = 0;
             int rank = 0;
@@ -275,15 +264,15 @@ namespace LotrNpcs
             return true;
         }
 
-        /// <summary>How many attackers fit in the inner ring: as many as stand Spacing apart round SurroundRadius
-        /// (5 with the defaults), at least one (0.0.87).</summary>
+        /// <summary>How many attackers fit in the inner ring: as many as stand Spacing apart round SurroundRadius (5
+        /// with the defaults), at least one.</summary>
         public int Room => Math.Max(1, (int)Math.Floor(GameMath.TWOPI * SurroundRadius / spacing + 1e-9));
-        /// <summary>The outer ring's distance from the target's center: one Spacing beyond the inner ring (2.8 with the
-        /// defaults), out of melee reach (0.0.87).</summary>
+        /// <summary>The outer ring's distance from the target's center: one Spacing beyond the inner ring (2.8 with
+        /// the defaults), out of melee reach.</summary>
         public double OuterRadius => SurroundRadius + spacing;
 
-        /// <summary>Is there room for this attacker in the inner ring around the target (it is already in it, or fewer
-        /// than Room others are)? (0.0.87: an NPC goes for an enemy with room before one that is full.)</summary>
+        /// <summary>Is there room for this attacker in the inner ring around the target (it is already in it, or
+        /// fewer than Room others are)? An NPC goes for an enemy with room before one that is full.</summary>
         public bool HasRoom(long attacker, long target, long now)
         {
             if (!byTarget.TryGetValue(target, out Claims c)) return true;
@@ -309,14 +298,10 @@ namespace LotrNpcs
             z = tz + Math.Cos(angle) * radius;
         }
 
-        /// <summary>
-        /// Adds the push away from one neighbor, (dx, dz) being from the neighbor to this NPC: nothing at spacing or
-        /// farther, growing to 1 as they overlap. Two NPCs in exactly the same spot split in a direction picked from
-        /// the entity id, so the two go opposite ways. True if the neighbor was too close.
-        /// </summary>
-        /// <summary>0.0.137 (owner, 2026-11-14: "npcs to receive 1.5x damage in the back"): is a hit from (dx, dz) (from the
-        /// NPC to where the hit came from) inside the rear cone of arcDegrees, i.e. more than 180 - arc/2 degrees off the
-        /// facing (yaw, the game's convention: forward is (sin yaw, cos yaw))? A hit from the NPC's own spot isn't.</summary>
+        /// <summary>Is a hit from (dx, dz) (from the NPC to where the hit came from) inside the rear cone of
+        /// arcDegrees, i.e. more than 180 - arc/2 degrees off the facing (yaw, the game's convention: forward is (sin
+        /// yaw, cos yaw))? Back hits do extra damage (BackHitMultiplier). A hit from the NPC's own spot
+        /// isn't.</summary>
         public static bool FromBehind(float yaw, double dx, double dz, double arcDegrees)
         {
             double len = Math.Sqrt(dx * dx + dz * dz);
@@ -325,13 +310,12 @@ namespace LotrNpcs
             return Math.Acos(cos) * 180 / Math.PI > 180 - Math.Min(arcDegrees, 360) / 2;
         }
 
-        /// <summary>0.0.137: walking backwards: moving (mx, mz) more than BackStepDegrees off the facing.</summary>
+        /// <summary>Walking backwards: moving (mx, mz) more than BackStepDegrees off the facing.</summary>
         public const double BackStepDegrees = 100, BackWalkSpeed = 0.02, FaceScan = 6;
         public static bool Backing(float yaw, double mx, double mz) => FromBehind(yaw, mx, mz, 2 * (180 - BackStepDegrees));
 
-        /// <summary>0.0.130 (owner, 2026-11-14: "the mobs dont intersect each other, like they have a solid surface"):
-        /// how close two NPCs' centers may come (blocks, horizontally). The game has no creature-to-creature collision,
-        /// only soft pushes the AI walks through.</summary>
+        /// <summary>How close two NPCs' centers may come (blocks, horizontally), so they don't walk through each
+        /// other. The game has no creature-to-creature collision, only soft pushes the AI walks through.</summary>
         public const double BodyContact = 0.7, ContactScan = 1.3;
 
         /// <summary>The step that takes this NPC out of an overlap with one neighbour, (dx, dz) from the neighbour to
@@ -350,6 +334,11 @@ namespace LotrNpcs
             return true;
         }
 
+        /// <summary>
+        /// Adds the push away from one neighbor, (dx, dz) being from the neighbor to this NPC: nothing at spacing or
+        /// farther, growing to 1 as they overlap. Two NPCs in exactly the same spot split in a direction picked from
+        /// the entity id, so the two go opposite ways. True if the neighbor was too close.
+        /// </summary>
         public static bool AddPush(ref double px, ref double pz, double dx, double dz, double spacing, long tieBreak)
         {
             double d2 = dx * dx + dz * dz;
@@ -368,23 +357,22 @@ namespace LotrNpcs
             return true;
         }
 
-        // 0.0.104 (owner: "check their neighbors in a small block radius around themselves, between 4-6"; chose "Push
-        // always + 5-block look-ahead"): out of a fight NPCs of one side keep BodySpacing apart; a walking NPC (Motion
-        // above WalkingMotion blocks a tick) looks LookAhead blocks ahead within AvoidWidth of its way.
+        // Out of a fight NPCs of one side keep BodySpacing apart; a walking NPC (Motion above WalkingMotion blocks a
+        // tick) looks LookAhead blocks ahead within AvoidWidth of its way.
         public const double BodySpacing = 1.0, LookAhead = 5, AvoidWidth = 1.2, BrakeDistance = 1.6, BrakeWidth = 0.6, BrakeShare = 0.15;
         public const double WalkingMotion = 0.004;
 
-        /// <summary>Is this NPC catching up with a neighbour ahead (0.0.104)? Speeds along its heading, in blocks a tick:
-        /// the neighbour is slower by more than ClosingShare of its own speed.</summary>
+        /// <summary>Is this NPC catching up with a neighbour ahead? Speeds along its heading, in blocks a tick: the
+        /// neighbour is slower by more than ClosingShare of its own speed.</summary>
         public const double ClosingShare = 0.3;
         public static bool Closing(double mine, double theirs) => mine > 0 && mine - theirs > mine * ClosingShare;
 
         /// <summary>
-        /// Adds the steer around one neighbour ahead (0.0.104). (hx, hz) is the unit heading, (dx, dz) from this NPC to
-        /// the neighbour. Nothing for one behind, farther than LookAhead or more than AvoidWidth off the way; otherwise a
+        /// Adds the steer around one neighbour ahead. (hx, hz) is the unit heading, (dx, dz) from this NPC to the
+        /// neighbour. Nothing for one behind, farther than LookAhead or more than AvoidWidth off the way; otherwise a
         /// sideways push away from the way it is on, stronger the nearer and the more in the way it is (a neighbour
-        /// right on the line splits by the entity id), and a brake for one within BrakeDistance and BrakeWidth. True if
-        /// the neighbour was in the way.
+        /// right on the line splits by the entity id), and a brake for one within BrakeDistance and BrakeWidth. True
+        /// if the neighbour was in the way.
         /// </summary>
         public static bool AddAvoid(ref double px, ref double pz, ref double brake, double hx, double hz, double dx, double dz, long tieBreak)
         {
