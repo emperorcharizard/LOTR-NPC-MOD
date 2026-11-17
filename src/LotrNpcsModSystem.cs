@@ -400,7 +400,11 @@ namespace LotrNpcs
             // 0.0.162 (0.0.161's run 194429: holding a rider's swing whenever its horse would carry it past cut its swings
             // from 26 to 6 in the first 90 s): a rider's own blow, like a blow at a rider, lands if the target was in reach
             // within PassWindowMs of it falling (a rider swinging as it rides past).
-            if (swingStarted && !struck && ((entity as EntityAgent)?.MountedOn != null || (targetEntity as EntityAgent)?.MountedOn != null)
+            // 0.0.167 (battle logs 230424, 231307: rider blows "out of reach" at 2.5-4.3 blocks against a standing warrior):
+            // a mounted attacker never sets swingStarted (its swing isn't waited for above), so 0.0.162's window never
+            // counted for riders; it counts from the swing's start now.
+            bool mountedSwing = (entity as EntityAgent)?.MountedOn != null;
+            if ((swingStarted || mountedSwing) && !struck && (mountedSwing || (targetEntity as EntityAgent)?.MountedOn != null)
                 && hasDirectContact(targetEntity, minDist, minVerDist)) riderContactMs = entity.World.ElapsedMilliseconds;
             bool go = base.ContinueExecute(dt);
             if (!go) RiderLog(struck ? "done" : "ended without a blow (ContinueExecute false)");

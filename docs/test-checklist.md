@@ -845,4 +845,9 @@ In game 2026-11-17 (0.0.162 and 0.0.163, 1 rider v 2 warriors): ride-out after r
 ## 166. Ride-outs bend only far from the fight (0.0.166)
 
 - [ ] 166.1 1 Rohan rider v 2 Dunlending warriors, player beside them: the rider wins (163.1) and passes come every few seconds again, and the fight stays within about 25 blocks (no Synergy freeze).
+  - 2026-11-17 on 0.0.166 (log 231307): stopped at 255 s with the rider ahead, 49 v 31 damage, no deaths; the fight stayed beside me. Rider still 22 of 36 out of reach: the 0.0.162 pass window never applied to riders (a mounted attacker never sets swingStarted). 0.0.167 fixes that (167.1).
+
+## 167. A rider's blow counts a pass through reach (0.0.167)
+
+- [ ] 167.1 1 Rohan rider v 2 Dunlending warriors: far fewer rider blows "out of reach when the blow fell" (0.0.166: 22 of 36), and the rider wins.
 - [ ] 165.2 3 riders v 5 warriors + 3 archers: the riders still kill the archers first (161.1 numbers).
