@@ -16,7 +16,7 @@ Soldiers of every people of Middle-earth for Vintage Story. They spawn in zones 
 ## Requirements
 
 - Vintage Story 1.22 (tested on 1.22.7).
-- **Player Model Lib** 1.23.8 or newer (tested with 1.24.0; this mod fixes that version's camera near-plane bug for NPCs).
+- **Player Model Lib** 1.23.8 or newer (tested with 1.23.8; the mod also guards against the camera near-plane bug some Player Model Lib versions have with NPCs).
 - The race models come with this mod (from LOTR Races and Classes, with its authors' permission). LOTR Races and Classes itself is **not** required.
 
 ## Optional mods

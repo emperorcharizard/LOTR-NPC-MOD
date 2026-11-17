@@ -506,6 +506,7 @@ Install `lotrnpcs_0.0.135-test.zip`; restart fully. Battle log on, each side on 
 
 - [x] 135.1 `/recruits faction list`: every faction shows follow 3, roster 16, health 22/34/48/35/43/27, damage 3.15/3.95/7/3.05/3.16/4.94; ModConfig/lotrnpcs-factions.json is Version 31 with NpcVsNpcDamageMultiplier 0.5. (2026-11-16 on 0.0.147: every faction follow 3, roster 16, health 22/34/48/35/43/27, damage 3.15/3.95/7/3.05/3.16/4.94; the file is now Version 32 (0.0.138) with NpcVsNpcDamageMultiplier 0.5)
 - [ ] 135.2 9 Gondor warriors v 9 Mordor warriors, twice: about even (each side wins some), and the fight lasts roughly twice as long as a 0.0.134 fight of the same size (battle log damage per NPC hit about half the warrior's 3.95, so about 1.6-2.4). *2026-11-14 on 0.0.138: not even, Gondor won 3 of 3 (9-2, 9-7, 9-3); 1.96-1.97 per hit; 71-114 s from first blow (pre-0.0.135 about 25 s), so 3-4x longer. Same swing rate both sides; orc weapons land later (mean 462 v 367 ms). Owner deciding.*
+  - 2026-11-17 on 0.0.168: Mordor won 3 of 3 (logs 234927 9-0, 235112 9-2, 235316 9-3; north/south both ways and west/east). Same health, damage per hit (1.95) and swing cadence (3.0 s) on both sides; Mordor struck first by ~0.4 s and focused kills. Open: a Gondor- or Mordor-specific cause.
 - [ ] 135.3 A warrior hitting you does its full damage (not halved), and your hits on NPCs are unchanged.
 - [ ] 135.4 The hire menu shows 3 followers for every faction, and a third follower of any faction fills the band.
 - [ ] 135.5 Wild zone groups of orcs or goblins are no bigger than men's.
@@ -866,7 +867,8 @@ In game 2026-11-17 (0.0.162 and 0.0.163, 1 rider v 2 warriors): ride-out after r
 - [x] 167.1 1 Rohan rider v 2 Dunlending warriors: far fewer rider blows "out of reach when the blow fell" (0.0.166: 22 of 36), and the rider wins.
   - 2026-11-17 closed: overtaken: 168.1.
   - 2026-11-17 on 0.0.167 (log 232003): out of reach down to 12 of 27 (44%, was 61%), but the rider died at ~203 s: 46 damage dealt, 41 taken, no kill; the warriors landed 20 of 23. Fight stayed beside the player. Riders now lose 1 v 2 since foot soldiers swing at passing riders (0.0.164); owner asked about rider strength.
-- [ ] 165.2 3 riders v 5 warriors + 3 archers: the riders still kill the archers first (161.1 numbers).
+- [x] 165.2 3 riders v 5 warriors + 3 archers: the riders still kill the archers first (161.1 numbers).
+  - 2026-11-17 on 0.0.168 (log 234556): all 3 archers dead by 69 s, killed by riders (31, 65, 69 s); one rider lost to an archer at 45 s. Riders then lost to the 5 warriors (4 kills, 3 deaths, 197 s).
 
 ## 168. Riders x1.25 (0.0.168)
 

@@ -1,0 +1,37 @@
+LOTR NPCs (lotrnpcs) for Vintage Story
+
+1. Code: MIT License
+
+Copyright (c) 2026 Emperorcharizar
+
+The MIT License below covers the source code of this mod: the C# files in src/, the Python and PowerShell
+tools in tools/, the test projects in tools/tests/, and the JSON files those tools generate (entity, item,
+lang, patch and modinfo files).
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of
+the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+IN THE SOFTWARE.
+
+2. Assets: all rights reserved
+
+The MIT License does NOT cover the art in this mod. These stay their authors' property, all rights reserved,
+and may not be copied or reused outside this mod without their authors' permission:
+
+- Race models, skins, faces and textures from LOTR Races and Classes, by Dango Dango Dango, Shakgriig and
+  Buggoi, bundled with their permission (assets/lotrnpcs/config/customplayermodels, shapes/entity,
+  shapes/seraphfaces, textures/entity and textures/icons in the mod zip; build-inputs/lrc-*.zip in the repo).
+- Weapon, shield and armor models and textures provided by the server's owner (assets/lotrnpcs/shapes/item,
+  assets/lotrnpcs/textures/item in the mod zip; tools/weapons and build-inputs in the repo).
+- The mod icon (modicon.png).
+
+Vintage Story game assets referenced by this mod belong to Anego Studios and are not included.
