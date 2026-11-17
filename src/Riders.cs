@@ -14,13 +14,13 @@ using Vintagestory.GameContent;
 namespace LotrNpcs
 {
     /// <summary>
-    /// 0.0.117 mounted riders (docs/notes/feverstone-mounts.md; owner, 2026-11-12: "the goal is to have [the mount]
-    /// spawn as a part of the unit", "the behavior should remain the same for commanding the unit"). A rider is a rank of
-    /// its own, promoted from the warrior line next to captain. Its mount comes from another mod (Feverstone's horses and
-    /// dire wolves, vanilla elk, Teapot's giant boars), so the mod works without them: no mount type, no rider rank.
-    /// Found in the spike: vanilla seats take only players (CanMount is patched for our NPCs), the game's tack path throws
-    /// on the server (tack goes straight into the mount's container), and a ridden mount only moves from a player's keys
-    /// on that player's client (the server pushes it by its walk vector toward where the rider's own AI is walking).
+    /// Mounted riders. A rider is a rank of its own, promoted from the warrior line next to captain, and its mount
+    /// spawns with it as part of the unit; orders work as for any recruit. The mount comes from another mod
+    /// (Feverstone's horses and dire wolves, vanilla elk, Teapot's giant boars), so the mod works without them: no
+    /// mount type, no rider rank. Vanilla seats take only players (CanMount is patched for our NPCs), the game's tack
+    /// path throws on the server (tack goes straight into the mount's container), and a ridden mount only moves from
+    /// a player's keys on that player's client, so the server pushes it by its walk vector toward where the rider's
+    /// own AI is walking. Background: docs/notes/feverstone-mounts.md.
     /// </summary>
     public static class Riders
     {
@@ -30,8 +30,8 @@ namespace LotrNpcs
         public const string MountIdAttr = "lotrnpcsMountId";
         /// <summary>Watched: true once its mount is gone (died, or lost): it fights on foot and gets no new one.</summary>
         public const string MountLostAttr = "lotrnpcsMountLost";
-        /// <summary>The mount walk vector lengths per tick for walking and running. Measured in game (2026-11-12): 0.06
-        /// galloped a horse about 16 blocks a second, so these are about 8 (run) and 4 (walk).</summary>
+        /// <summary>The mount walk vector lengths per tick for walking and running. Measured in game: 0.06 galloped a
+        /// horse about 16 blocks a second, so these are about 8 (run) and 4 (walk).</summary>
         public const double WalkSpeed = 0.017, SprintSpeed = 0.033;
         /// <summary>How fast a mount turns toward where its rider wants to go, in radians a second.</summary>
         public const double TurnRate = 5;
@@ -54,15 +54,17 @@ namespace LotrNpcs
             return Math.Abs(diff) <= maxStep ? want : yaw + (float)(Math.Sign(diff) * maxStep);
         }
 
-        /// <summary>0.0.126: the rider task move speed from which a mount may run. Wander (0.012), patrol (0.02) and a
-        /// recruit's walking follow (0.027) walk the mount; seek (0.03), hide (0.04) and a running follow (0.055) may run.
-        /// Until 0.0.125 a wandering rider galloped off at about 8 blocks a second and out of Synergy's range.</summary>
+        /// <summary>The rider task move speed from which a mount may run. Wander (0.012), patrol (0.02) and a
+        /// recruit's walking follow (0.027) walk the mount; seek (0.03), hide (0.04) and a running follow (0.055) may
+        /// run. Without this a wandering rider galloped off at about 8 blocks a second and out of Synergy's
+        /// range.</summary>
         public const float RunTaskSpeed = 0.029f;
-        /// <summary>How close the mount comes to a waypoint before it stands (0.0.126: half a block, was a block, which
-        /// parked it a block short of a waypoint the path follower was still waiting for).</summary>
+        /// <summary>How close the mount comes to a waypoint before it stands. Half a block: a whole block parked it
+        /// short of a waypoint the path follower was still waiting for.</summary>
         public const double StopDistance = 0.5;
-        /// <summary>0.0.126: in a fight with no path to follow, the mount walks in until its enemy is this close
-        /// (centers, horizontally), inside a rider's reach from the saddle (MountedReach), instead of parking out of reach.</summary>
+        /// <summary>In a fight with no path to follow, the mount walks in until its enemy is this close (centers,
+        /// horizontally), inside a rider's reach from the saddle (MountedReach), instead of parking out of
+        /// reach.</summary>
         public const double CloseInDistance = 2.25;  // 0.0.156: inside the shorter reach (2 + MountedExtraReach)
 
         /// <summary>Stand, walk or run: stand at the waypoint, walk for slow tasks (taskSpeed below RunTaskSpeed), else
@@ -70,15 +72,14 @@ namespace LotrNpcs
         public static double SpeedFor(double waypointDistance, bool riderSprints, float taskSpeed) =>
             waypointDistance <= StopDistance ? 0 : taskSpeed < RunTaskSpeed ? WalkSpeed : riderSprints || waypointDistance > 3 ? SprintSpeed : WalkSpeed;
 
-        /// <summary>0.0.131: within this many blocks of its melee target (centers, horizontally), or while it swings,
-        /// a rider's mount stops following the seek path and only turns to the enemy (walking in past CloseInDistance).
-        /// Until 0.0.130 the mount kept walking about 4 blocks a second during the swing, so the blow often fell with
-        /// the enemy out of reach (battle logs 233500, 233700: riders went 10-17 s without a hit while surrounded).</summary>
+        /// <summary>Within this many blocks of its melee target (centers, horizontally), or while it swings, a
+        /// rider's mount stops following the seek path and only turns to the enemy (walking in past CloseInDistance).
+        /// A mount that kept walking during the swing carried the enemy out of reach before the blow fell.</summary>
         public const double HoldFightDistance = 3.5;
 
-        /// <summary>0.0.132: a mounted rider keeps its melee target (its focus) while that target lives and is within this
-        /// many blocks (centers, horizontally), instead of hitting whichever enemy is nearest or struck it last. In 0.0.131
-        /// three riders dealt 134 damage to ten 28-health Dunlendings but killed one: the hits were spread.</summary>
+        /// <summary>A mounted rider keeps its melee target (its focus) while that target lives and is within this
+        /// many blocks (centers, horizontally), instead of hitting whichever enemy is nearest or struck it last;
+        /// spread hits killed nobody.</summary>
         public const double FocusRange = 16; // 0.0.133: 16 (was 6), so ride-outs keep it
 
         sealed class Focus { public Entity Target; }
@@ -103,9 +104,9 @@ namespace LotrNpcs
             if (rider != null) focus.GetValue(rider, _ => new Focus()).Target = target;
         }
 
-        // ---- 0.0.133 (owner chose "Charge and wheel away"): approach, charge, ride through, wheel, repeat ----
+        // ---- Charge and wheel away: approach, charge, ride through, wheel, repeat ----
 
-        /// <summary>What a mounted rider's mount is doing in a fight: Hold (the 0.0.131 standing fight), Charge (gallop
+        /// <summary>What a mounted rider's mount is doing in a fight: Hold (a standing fight), Charge (gallop
         /// straight at the focus) or RideOut (gallop on along the charge's heading, then wheel back).</summary>
         public enum ChargePhase { Hold, Charge, RideOut }
 
@@ -114,13 +115,13 @@ namespace LotrNpcs
         /// BoxedMove blocks in BoxedMs, then it holds for BoxedHoldMs. Followers ride out at most FollowerLeash blocks
         /// from their leader, guards and holders stay in their post's area.</summary>
         public const double ChargeMin = 5, ChargeMax = 16, RideOutDistance = 7, PassDistance = 1.5, BoxedMove = 0.3, FollowerLeash = 12;
-        /// <summary>0.0.139 (the 103125 test: riders ended up more than 100 blocks away, past Synergy's freeze): a ride-out
-        /// turns back once the focus is this far.</summary>
+        /// <summary>A ride-out turns back once the focus is this far, so riders don't end up out of Synergy's
+        /// range.</summary>
         public const double RideOutMax = 12;
         public const long BoxedMs = 1500, BoxedHoldMs = 3000;
         /// <summary>A blow landed at a gallop: damage times this, and the target is pushed along the mount's heading
         /// (ChargeKnockback blocks a tick of motion, about 1.5 blocks on the ground; NPCs only, a player's motion is
-        /// its own client's). 0.0.163 (owner card 2026-11-17, after 1 rider lost to 2 warriors on 0.0.162): x2.5 (was x2).</summary>
+        /// its own client's).</summary>
         public const float ChargeDamageMultiplier = 2.5f;
         public const double ChargeKnockback = 0.45;
 
@@ -142,13 +143,11 @@ namespace LotrNpcs
             }
         }
 
-        /// <summary>0.0.165 (in game 2026-11-17: a 1 rider v 2 warriors fight drifted ~40 blocks in 100 s, ride-out after
-        /// ride-out the same way with the warriors chasing, until Synergy froze it): a ride-out that would carry the rider
-        /// farther than AnchorRadius from where its fight began turns aside, half across the charge line and half back
-        /// toward that spot, so the fight stays where it started. ox, oz: from the anchor to the rider.</summary>
-        /// 0.0.166 (in game 2026-11-17, 0.0.165: the fight stayed within ~33 blocks, but at 8 the bent ride-outs ended next
-        /// to the chasing warriors, passes came 10-20 s apart instead of 0.0.163's 4-5 s and the rider lost 1 v 2): 16, so
-        /// only a fight that has already wandered off bends its ride-outs.
+        /// <summary>A ride-out that would carry the rider farther than AnchorRadius from where its fight began turns
+        /// aside, half across the charge line and half back toward that spot, so the fight stays beside the player
+        /// instead of drifting off ride-out after ride-out with the enemy chasing. 16 bends only a fight that has
+        /// already wandered off; a tighter radius ended the bent ride-outs next to the chasers and made passes rare.
+        /// ox, oz: from the anchor to the rider.</summary>
         public const double AnchorRadius = 16;
         public static (double X, double Z) RideOutHeading(double hx, double hz, double ox, double oz)
         {
@@ -165,10 +164,10 @@ namespace LotrNpcs
             public ChargePhase Phase;
             public double Speed, HeadX, HeadZ, StartX, StartZ, CheckX, CheckZ;
             public long CheckMs, BoxedUntilMs;
-            // 0.0.139: the swing in progress: when it started (0: none) and whether it started at a charge.
+            // The swing in progress: when it started (0: none) and whether it started at a charge.
             public long SwingMs; public bool SwingCharge;
             public bool HitThisPass;
-            // 0.0.165: where this fight began (the focus's position when the rider took its first focus).
+            // Where this fight began (the focus's position when the rider took its first focus).
             public bool HasAnchor; public double AnchorX, AnchorZ;
         }
 
@@ -180,25 +179,24 @@ namespace LotrNpcs
         public static bool IsChargeHit(Entity rider) =>
             (rider as EntityAgent)?.MountedOn != null && charges.TryGetValue(rider, out ChargeState c) && c.SwingCharge;
 
-        /// <summary>0.0.139 (rider test 2026-11-14 103125: riders galloped past mid-swing and never struck): while a swing
-        /// hasn't struck, for at most SwingHoldMs, the mount rides straight at its target instead of riding out.</summary>
+        /// <summary>While a swing hasn't struck, for at most SwingHoldMs, the mount rides straight at its target
+        /// instead of riding out, so the rider doesn't gallop past mid-swing.</summary>
         public const long SwingHoldMs = 600;
         public static bool SwingPending(long swingMs, long now) => swingMs > 0 && now - swingMs < SwingHoldMs;
 
-        /// <summary>0.0.144: will a rider (dx, dz from the attacker to it), whose horse moves mx, mz blocks a tick (Pos.Motion,
-        /// 60 ticks a second), be farther than reach (centers, horizontally) when a blow due in hitMs falls? Then a foot
-        /// soldier's swing would miss. Replaces 0.0.143's Outrunning, which missed riders charging past.</summary>
+        /// <summary>Will a rider (dx, dz from the attacker to it), whose horse moves mx, mz blocks a tick
+        /// (Pos.Motion, 60 ticks a second), be farther than reach (centers, horizontally) when a blow due in hitMs
+        /// falls? Then a foot soldier's swing would miss.</summary>
         public static bool GoneByBlow(double dx, double dz, double mx, double mz, long hitMs, double reach)
         {
             double ticks = hitMs * 0.06, px = dx + mx * ticks, pz = dz + mz * ticks;
             return px * px + pz * pz > reach * reach;
         }
 
-        /// <summary>0.0.164 (owner, 2026-11-17: "the rider can phase right through the captain and still the captain wont
-        /// swing"): GoneByBlow only looked where the horse would be when the blow fell, so a rider charging straight through
-        /// a soldier was always "gone" (past it by then) and the swing was held. A soldier now holds only when the rider
-        /// stays out of reach for the whole PassWindowMs before the blow, the window in which a blow still counts
-        /// (PassedInReach). Closest approach of the straight path over that window.</summary>
+        /// <summary>Whether a foot soldier should hold its swing at a rider: only when the rider stays out of reach
+        /// for the whole PassWindowMs before the blow, the window in which a blow still counts (PassedInReach).
+        /// Looking only at where the horse is when the blow falls would hold every swing at a rider charging straight
+        /// through the soldier. Closest approach of the straight path over that window.</summary>
         public static bool MissesPass(double dx, double dz, double mx, double mz, long hitMs, double reach)
         {
             double t0 = Math.Max(0, hitMs - PassWindowMs) * 0.06, t1 = hitMs * 0.06, mm = mx * mx + mz * mz;
@@ -207,56 +205,57 @@ namespace LotrNpcs
             return px * px + pz * pz > reach * reach;
         }
 
-        /// <summary>0.0.146: a foot soldier's blow at a rider lands if the rider was in reach at most this long before it fell
-        /// (a galloping horse moves about 1.8 blocks in that time), so a rider riding through the swing is struck.</summary>
+        /// <summary>A foot soldier's blow at a rider lands if the rider was in reach at most this long before it fell
+        /// (a galloping horse moves about 1.8 blocks in that time), so a rider riding through the swing is
+        /// struck.</summary>
         public const long PassWindowMs = 200;
         public static bool PassedInReach(long lastContactMs, long now) => lastContactMs > 0 && now - lastContactMs <= PassWindowMs;
 
         /// <summary>Half the width of a rider's selection box, added to a foot soldier's reach (to the box) in GoneByBlow.</summary>
         public const double RiderHalfWidth = 0.4;
 
-        /// <summary>0.0.148: a mount's controlling passenger is one of our NPCs (not a player), so the client mustn't read
-        /// its keys (it has none there).</summary>
-        /// <summary>0.0.151 (owner, 2026-11-16: riders should "be a harassing unit for archers"): a mounted NPC passes over
-        /// any enemy but an archer while an archer is there to pick; with none, it takes the nearest as before.</summary>
+        /// <summary>Riders harass archers: a mounted NPC passes over any enemy but an archer while an archer is there
+        /// to pick; with none, it takes the nearest as before.</summary>
         public static bool PassesOver(bool mounted, bool targetIsArcher) => mounted && !targetIsArcher;
 
-        /// <summary>0.0.161 (in game 2026-11-17, 151.C3: riders reached the archers only 37-80 s in): a rider's seek
-        /// (seekingRange 36 in gen) finds archers that far off, but passes over anyone else beyond the usual 24.</summary>
+        /// <summary>A rider's seek (seekingRange 36 in gen) finds archers that far off, so it reaches them early, but
+        /// passes over anyone else beyond the usual 24.</summary>
         public const double NonArcherSeekRange = 24;
 
 
-        /// <summary>0.0.151: the rider's focus moves to the archer its seek is riding for, unless it already finishes one.</summary>
+        /// <summary>The rider's focus moves to the archer its seek is riding for, unless it already finishes
+        /// one.</summary>
         public static bool FocusOnHunted(bool huntedIsArcher, bool focusIsArcher) => huntedIsArcher && !focusIsArcher;
 
-        /// <summary>0.0.152 gave captains x2.5 on mounted enemies; 0.0.153 (owner chose "Stronger captains overall") takes it
-        /// out for stronger captains (FactionTiers.CaptainHealth/CaptainDamage).</summary>
+        /// <summary>Extra damage of captains on mounted enemies: none, captains get their strength from
+        /// FactionTiers.CaptainHealth/CaptainDamage and CaptainVsNpcMultiplier. Kept as a tuning knob.</summary>
         public const float CaptainVsRiderMultiplier = 1f;
-        /// <summary>0.0.152 (in game 2026-11-16, 0.0.151: three riders hit two archers 16 times for 41 damage and killed
-        /// none while the archers shot two of them down): a mounted NPC's hits on an archer do this much more.</summary>
+        /// <summary>A mounted NPC's hits on an archer do this much more, so riders can kill the archers they
+        /// harass.</summary>
         public const float RiderVsArcherMultiplier = 2f;
-        /// <summary>0.0.152: the rank matchups (0.0.153: only riders over archers now).</summary>
+        /// <summary>The rank matchups (only riders over archers now).</summary>
         public static float RankMatchup(string attackerRank, bool attackerMounted, bool targetIsArcher, bool targetMounted) =>
             (targetMounted && attackerRank == "captain" ? CaptainVsRiderMultiplier : 1f) * (attackerMounted && targetIsArcher ? RiderVsArcherMultiplier : 1f);
 
-        /// <summary>0.0.155 (owner, 2026-11-16: "We need to keep this within reason for players to be able to kill in
-        /// equivalent armor and weapons", "Aka for captains, iron and steel"): captains are back to 48 health and 7 damage,
-        /// what players in iron and steel were tuned against, and keep 0.0.153's strength against NPCs only: a captain's
-        /// hits on NPCs do CaptainVsNpcMultiplier times the damage, and NPC hits on a captain (melee and arrows)
-        /// CaptainFromNpcMultiplier times. 1.5 x 2 is the 3 times of 96 health x 10.5 damage.</summary>
+        /// <summary>Captains have 48 health and 7 damage, what players in iron and steel armor are tuned to beat, but
+        /// are stronger against NPCs: a captain's hits on NPCs do CaptainVsNpcMultiplier times the damage, and NPC
+        /// hits on a captain (melee and arrows) CaptainFromNpcMultiplier times. 1.5 x 2 is the 3 times of 96 health x
+        /// 10.5 damage.</summary>
         public const float CaptainVsNpcMultiplier = 1.5f, CaptainFromNpcMultiplier = 0.5f;
         public static float CaptainNpcFight(string attackerRank, string targetRank, bool targetIsPlayer) =>
             targetIsPlayer ? 1f : (attackerRank == "captain" ? CaptainVsNpcMultiplier : 1f) * (targetRank == "captain" ? CaptainFromNpcMultiplier : 1f);
 
+        /// <summary>A mount's controlling passenger is one of our NPCs (not a player), so the client mustn't read its keys
+        /// (it has none there).</summary>
         public static bool NpcControls(Entity controller) => controller != null && !(controller is EntityPlayer) && controller.Code?.Domain == "lotrnpcs";
 
-        /// <summary>0.0.142: a mounted rider's blow is due damageAtMs after its swing started (no facing needed).</summary>
+        /// <summary>A mounted rider's blow is due damageAtMs after its swing started (no facing needed).</summary>
         public static bool BlowDue(long startedMs, long damageAtMs, long now) => startedMs > 0 && now - startedMs >= damageAtMs;
 
-        /// <summary>0.0.141 (rider test 2026-11-14 103125: riders ended more than 100 blocks away and the fight stalled): a
-        /// mount is driven only by its rider's behavior, which sets its controls every 100 ms. When the rider stops ticking
-        /// (Synergy freezes creatures far from players, the chunk unloads) the mount kept its last gallop and ran on in a
-        /// straight line. A mount whose rider hasn't steered it for this long stops.</summary>
+        /// <summary>A mount is driven only by its rider's behavior, which sets its controls every 100 ms. When the
+        /// rider stops ticking (Synergy freezes creatures far from players, the chunk unloads) the mount would keep
+        /// its last gallop and run on in a straight line. A mount whose rider hasn't steered it for this long
+        /// stops.</summary>
         public const long MountStaleMs = 500;
         public static bool MountStale(long lastSteerMs, long now) => now - lastSteerMs > MountStaleMs;
 
@@ -309,10 +308,8 @@ namespace LotrNpcs
         /// <summary>Standing in a fight: walk toward the enemy while it is farther than CloseInDistance.</summary>
         public static double CloseInSpeed(double enemyDistance) => enemyDistance > CloseInDistance ? WalkSpeed : 0;
 
-        /// <summary>The extra horizontal reach from the saddle. 0.0.125 (owner, 2026-11-13: "a bit longer attack range to
-        /// compensate for the height difference"): a block (was half a block, the mount's body only). 0.0.156 (owner,
-        /// 2026-11-16: foot soldiers "cannot get a swing off in time before the rider hits them, knocks them back then rides
-        /// off ... maybe their range is too long now"): half a block again.</summary>
+        /// <summary>The extra horizontal reach from the saddle, for the height difference: half a block. A whole
+        /// block let riders hit, knock back and ride off before foot soldiers could swing.</summary>
         public const float MountedExtraReach = 0.5f;
 
         /// <summary>How much farther (horizontally, vertically) a mounted NPC's melee reaches: MountedExtraReach, and the
@@ -328,8 +325,8 @@ namespace LotrNpcs
         static readonly HashSet<string> legAnimations = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             { "walk", "sprint", "run", "walkback", "idle", "idle1", "swim", "swimidle", "jump", "newjump", "land" };
 
-        /// <summary>0.0.125 (owner: "the legs were moving constantly for the passengers"): animations a seated rider
-        /// doesn't play, so only the seat's riding pose (the game's rideelk animations) moves its legs.</summary>
+        /// <summary>Animations a seated rider doesn't play (its legs moved constantly), so only the seat's riding
+        /// pose (the game's rideelk animations) moves its legs.</summary>
         public static bool IsLegAnimation(AnimationMetaData meta) =>
             meta != null && (legAnimations.Contains(meta.Code ?? "") || legAnimations.Contains(meta.Animation ?? ""));
 
@@ -414,9 +411,9 @@ namespace LotrNpcs
         const string HarmonyId = "lotrnpcs.riders";
         static Harmony harmony;
         ICoreServerAPI sapi;
-        // Mounts whose rider died: they run off for a few seconds and are gone (owner: "mount runs off").
+        // Mounts whose rider died: they run off for a few seconds and are gone.
         readonly Dictionary<long, (Entity Mount, double AwayX, double AwayZ, long UntilMs)> runningOff = new Dictionary<long, (Entity, double, double, long)>();
-        // 0.0.141: mounts our riders steer, and when they last did (Riders.MountStale).
+        // Mounts our riders steer, and when they last did (Riders.MountStale).
         readonly Dictionary<long, (Entity Mount, long LastMs)> steered = new Dictionary<long, (Entity, long)>();
 
         public override void Start(ICoreAPI api)
@@ -427,10 +424,10 @@ namespace LotrNpcs
             if (canMount == null) { api.Logger.Warning("[lotrnpcs] EntityRideableSeat.CanMount not found; riders stay on foot."); return; }
             harmony = new Harmony(HarmonyId);
             harmony.Patch(canMount, new HarmonyMethod(typeof(RiderSystem).GetMethod(nameof(NpcMayMount), BindingFlags.Static | BindingFlags.NonPublic)));
-            // 0.0.148 (owner, 2026-11-16: "The animals ride around without animations"): on each client, the game's
-            // EntityBehaviorRideable.SeatsToMotion reads the controlling passenger's keys every frame and, with the Hold
-            // control scheme and no key held, sets the mount's gait to idle. An NPC rider has no keys on the client, so the
-            // client kept stopping the walk and gallop the server set. Skipped on the client for a mount an NPC controls.
+            // On each client, the game's EntityBehaviorRideable.SeatsToMotion reads the controlling passenger's keys
+            // every frame and, with the Hold control scheme and no key held, sets the mount's gait to idle. An NPC
+            // rider has no keys on the client, so the client kept stopping the walk and gallop the server set and
+            // mounts slid around without animations. Skipped on the client for a mount an NPC controls.
             MethodInfo seatsToMotion = AccessTools.TypeByName("Vintagestory.GameContent.EntityBehaviorRideable")?.GetMethod("SeatsToMotion", new[] { typeof(float) });
             if (seatsToMotion == null) api.Logger.Warning("[lotrnpcs] EntityBehaviorRideable.SeatsToMotion not found; NPC mounts may not animate.");
             else harmony.Patch(seatsToMotion, new HarmonyMethod(typeof(RiderSystem).GetMethod(nameof(NpcSteersOnClient), BindingFlags.Static | BindingFlags.NonPublic)));
@@ -474,13 +471,13 @@ namespace LotrNpcs
             runningOff[mount.EntityId] = (mount, dx / len, dz / len, sapi.World.ElapsedMilliseconds + 8000);
         }
 
-        /// <summary>0.0.141: a rider steered its mount just now.</summary>
+        /// <summary>A rider steered its mount just now.</summary>
         public void Steered(Entity mount, long now)
         {
             if (mount != null) steered[mount.EntityId] = (mount, now);
         }
 
-        // 0.0.141: stop mounts whose rider stopped steering them (see Riders.MountStale).
+        // Stop mounts whose rider stopped steering them (see Riders.MountStale).
         void TickStale()
         {
             if (steered.Count == 0) return;
@@ -603,24 +600,24 @@ namespace LotrNpcs
             EntityBehaviorGait gait = mount.GetBehavior<EntityBehaviorGait>();
             var active = rider.GetBehavior<EntityBehaviorTaskAI>()?.TaskManager?.ActiveTasksBySlot;
             AiTaskChestMeleeAttack swing = active?.OfType<AiTaskChestMeleeAttack>().FirstOrDefault(t => t.TargetEntity != null && t.TargetEntity.Alive);
-            // 0.0.132: the rider's focus first, so the mount stays with the enemy it is finishing.
+            // The rider's focus first, so the mount stays with the enemy it is finishing.
             Entity kept = Riders.FocusOf(rider);
             Entity foe = kept ?? swing?.TargetEntity ?? active?.OfType<AiTaskBaseTargetable>().Select(t => t.TargetEntity).FirstOrDefault(e => e != null && e.Alive);
             double foeDist = foe == null ? double.MaxValue : Math.Sqrt((foe.Pos.X - mount.Pos.X) * (foe.Pos.X - mount.Pos.X) + (foe.Pos.Z - mount.Pos.Z) * (foe.Pos.Z - mount.Pos.Z));
             bool holding = foe != null && (kept != null || Riders.HoldsForFight(foeDist, swing != null));
-            // 0.0.133: charge and wheel away while the rider has a focus.
+            // Charge and wheel away while the rider has a focus.
             Riders.ChargeState cs = Riders.ChargeOf(rider);
             long now = rider.World.ElapsedMilliseconds;
             if (kept != null && !cs.HasAnchor) { cs.HasAnchor = true; cs.AnchorX = kept.Pos.X; cs.AnchorZ = kept.Pos.Z; }
             if (kept == null) { cs.Phase = Riders.ChargePhase.Hold; cs.HitThisPass = false; cs.HasAnchor = false; }
             else if (cs.Phase == Riders.ChargePhase.Hold && Riders.SwingPending(cs.SwingMs, now) && swing?.TargetEntity != null)
             {
-                // 0.0.142 (in game 2026-11-15: 8 swings begun standing turned into a ride-out at once, the focus being
-                // within ChargeMin): a swing begun standing finishes standing; the mount faces the foe below.
+                // A swing begun standing finishes standing (the focus within ChargeMin would otherwise turn it into a
+                // ride-out at once); the mount faces the foe below.
             }
             else if (cs.Phase != Riders.ChargePhase.Hold && Riders.SwingPending(cs.SwingMs, now) && swing?.TargetEntity is Entity struck)
             {
-                // 0.0.139: swing first: straight at the one it swings at until the blow falls.
+                // Swing first: straight at the one it swings at until the blow falls.
                 mount.Pos.Yaw = Riders.TurnToward(mount.Pos.Yaw, (float)Math.Atan2(struck.Pos.X - mount.Pos.X, struck.Pos.Z - mount.Pos.Z), Riders.TurnRate * dt);
                 speed = cs.Speed > 0 ? cs.Speed : Riders.SprintSpeed;
                 holding = false;
@@ -643,7 +640,7 @@ namespace LotrNpcs
                     // Ride on the way the charge went (from standing: straight away from the focus).
                     double hx = cs.Phase == Riders.ChargePhase.Charge ? Math.Sin(mount.Pos.Yaw) : -fx, hz = cs.Phase == Riders.ChargePhase.Charge ? Math.Cos(mount.Pos.Yaw) : -fz, hl = Math.Sqrt(hx * hx + hz * hz);
                     cs.HeadX = hl < 1e-6 ? Math.Sin(mount.Pos.Yaw) : hx / hl; cs.HeadZ = hl < 1e-6 ? Math.Cos(mount.Pos.Yaw) : hz / hl;
-                    // 0.0.165: not farther from where the fight began.
+                    // Not farther from where the fight began.
                     if (cs.HasAnchor) (cs.HeadX, cs.HeadZ) = Riders.RideOutHeading(cs.HeadX, cs.HeadZ, mount.Pos.X - cs.AnchorX, mount.Pos.Z - cs.AnchorZ);
                     cs.StartX = mount.Pos.X; cs.StartZ = mount.Pos.Z;
                 }
@@ -661,8 +658,9 @@ namespace LotrNpcs
             if (!charging && speed > 0 && !holding) mount.Pos.Yaw = Riders.TurnToward(mount.Pos.Yaw, (float)Math.Atan2(tx, tz), Riders.TurnRate * dt);
             else if (!charging && foe != null)
             {
-                // Standing in a fight: face the enemy, since a rider turns only a little in the saddle and melee contact
-                // is measured from just ahead of the rider (AiTaskBaseTargetable.hasDirectContact); 0.0.126: and walk in to reach it.
+                // Standing in a fight: face the enemy, since a rider turns only a little in the saddle and melee
+                // contact is measured from just ahead of the rider (AiTaskBaseTargetable.hasDirectContact), and walk
+                // in to reach it.
                 double fx = foe.Pos.X - mount.Pos.X, fz = foe.Pos.Z - mount.Pos.Z;
                 mount.Pos.Yaw = Riders.TurnToward(mount.Pos.Yaw, (float)Math.Atan2(fx, fz), Riders.TurnRate * dt);
                 speed = Riders.CloseInSpeed(Math.Sqrt(fx * fx + fz * fz));

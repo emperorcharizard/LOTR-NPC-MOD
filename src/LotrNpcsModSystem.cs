@@ -26,38 +26,38 @@ namespace LotrNpcs
             api.RegisterEntityBehaviorClass("lotrnpcs:edgeguard", typeof(EntityBehaviorEdgeGuard));
             api.RegisterEntityBehaviorClass("lotrnpcs:rankarmor", typeof(EntityBehaviorRankArmor));
             api.RegisterEntityBehaviorClass("lotrnpcs:factionmember", typeof(EntityBehaviorFactionMember));
-            // 0.0.112: what a dead NPC's harvestable body holds, from the config (BodyLoot.cs).
+            // What a dead NPC's harvestable body holds, from the config (BodyLoot.cs).
             api.RegisterEntityBehaviorClass("lotrnpcs:bodyloot", typeof(EntityBehaviorBodyLoot));
-            // Cosmetic weapons in the hand, with their own swings (0.0.45, Weapons.cs).
+            // Cosmetic weapons in the hand, with their own swings (Weapons.cs).
             api.RegisterEntityBehaviorClass("lotrnpcs:heldweapon", typeof(EntityBehaviorHeldWeapon));
             AiTaskRegistry.Register<AiTaskChestMeleeAttack>("lotrnpcs:meleeattack");
             AiTaskRegistry.Register<AiTaskFactionSeek>("lotrnpcs:seekentity");
-            // Archers (0.0.55, Archery.cs): their shot and their arrow.
+            // Archers (Archery.cs): their shot and their arrow.
             AiTaskRegistry.Register<AiTaskFactionShoot>("lotrnpcs:shootattack");
             AiTaskRegistry.Register<AiTaskFactionHide>("lotrnpcs:hide");
             api.RegisterEntity("LotrNpcsArrow", typeof(EntityNpcArrow));
-            // Hiring (0.0.37): the talk menu and recruit behavior on NPCs, the owner behavior on players, following.
+            // Hiring: the talk menu and recruit behavior on NPCs, the owner behavior on players, following.
             api.RegisterEntityBehaviorClass("lotrnpcs:hireable", typeof(EntityBehaviorHireable));
             api.RegisterEntityBehaviorClass("lotrnpcs:recruitowner", typeof(EntityBehaviorRecruitOwner));
             AiTaskRegistry.Register<AiTaskFollowOwner>("lotrnpcs:followowner");
-            // 0.0.112: wild groups walk their zone's patrol points (ZonePatrol.cs).
+            // Wild groups walk their zone's patrol points (ZonePatrol.cs).
             AiTaskRegistry.Register<AiTaskZonePatrol>("lotrnpcs:zonepatrol");
-            // Spawn items drawn as head-and-shoulders portraits (0.0.38).
+            // Spawn items drawn as head-and-shoulders portraits.
             api.RegisterCollectibleBehaviorClass("lotrnpcs:npcportrait", typeof(CollectibleBehaviorNpcPortrait));
             ChestHitDamage.FindCombatOverhaul();
         }
 
         bool cameraGuardApplied;
 
-        // Unchanged NPC gear is not resent to players on every save (0.0.114).
+        // Unchanged NPC gear is not resent to players on every save.
         public override void StartServerSide(ICoreServerAPI api) => GearSyncGuard.Apply(api);
 
         public override void StartClientSide(ICoreClientAPI api)
         {
             cameraGuardApplied = NpcCameraGuard.Apply(api);
-            // The XP line under a recruit's health (0.0.76, Promotion.cs).
+            // The XP line under a recruit's health (Promotion.cs).
             XpInfoText.Apply(api);
-            // Far NPCs animate less often (0.0.116, AnimationLod.cs).
+            // Far NPCs animate less often (AnimationLod.cs).
             AnimationLod.Apply(api);
             // Spawn item portraits are built a few at a time once the player is in creative mode, so opening the LOTR
             // NPCs tab doesn't stall the game.
@@ -120,11 +120,11 @@ namespace LotrNpcs
     }
 
     /// <summary>
-    /// Stops an NPC's unchanged gear from being sent to every player each time the game saves the NPC or sends it to a
-    /// player. The game's gear behavior stores the gear in the watched attributes and marks it for sending on every
+    /// Stops an NPC's unchanged gear from being sent to every player each time the game saves the NPC or sends it to
+    /// a player. The game's gear behavior stores the gear in the watched attributes and marks it for sending on every
     /// save (EntityBehaviorContainer.ToBytes calls storeInv), and each client then reloads the gear and rebuilds the
-    /// NPC's whole model (5-19 ms each), so an autosave rebuilt every NPC in view at once (0.0.114, client log
-    /// 2026-11-11). Only this mod's NPCs, on the server; a real gear change differs and is stored as before.
+    /// NPC's whole model (5-19 ms each), so an autosave rebuilt every NPC in view at once. Only this mod's NPCs, on
+    /// the server; a real gear change differs and is stored as before.
     /// </summary>
     public static class GearSyncGuard
     {
@@ -174,11 +174,11 @@ namespace LotrNpcs
     }
 
     /// <summary>
-    /// Melee attack that always lands on the chest (user: no head shots). With Combat Overhaul, a player hit
-    /// lands on a random body part and head hits deal double damage, so player hits are sent as Combat
-    /// Overhaul's own located damage aimed at the upper torso. Without Combat Overhaul it is the vanilla attack.
-    /// An NPC carrying a weapon (Weapons.cs) swings that weapon's animation instead of the unarmed one; damage,
-    /// tier and timing are the same either way.
+    /// Melee attack that always lands on the chest (no head shots). With Combat Overhaul, a player hit lands on a
+    /// random body part and head hits deal double damage, so player hits are sent as Combat Overhaul's own located
+    /// damage aimed at the upper torso. Without Combat Overhaul it is the vanilla attack. An NPC carrying a weapon
+    /// (Weapons.cs) swings that weapon's animation instead of the unarmed one; damage, tier and timing are the same
+    /// either way.
     /// </summary>
     public class AiTaskChestMeleeAttack : AiTaskMeleeAttack
     {
@@ -188,19 +188,19 @@ namespace LotrNpcs
         readonly AnimationMetaData unarmedAnimation;
         EntityBehaviorHeldWeapon weapon;
         bool weaponLookedUp;
-        // The damage the task's config gives (0.0.90), used when the faction has none for this rank, and the rank.
+        // The damage the task's config gives, used when the faction has none for this rank, and the rank.
         readonly float baseDamage;
         readonly string rank;
-        // The task's own damagePlayerAtMs, used when the weapon has no wind-up of its own (0.0.99).
+        // The task's own damagePlayerAtMs, used when the weapon has no wind-up of its own.
         readonly int baseHitMs;
-        // 0.0.99 swing sync: when this attack started, and whether its swing animation has begun.
+        // Swing sync: when this attack started, and whether its swing animation has begun.
         long startedMs, swingStartedMs, riderContactMs;
         bool swingStarted;
         // Longest the damage timer waits for the NPC to turn to its target before the vanilla timing takes over (so
         // an attack on a target it can never face still ends).
         const long MaxTurnWaitMs = 1000;
-        // 0.0.117 riders: the reach the config gives on foot. From the saddle the rider sits higher by its seat's height
-        // and a mount's length further off, so the direct-contact check gets that much more (Riders.MountedReach).
+        // Riders: the reach the config gives on foot. From the saddle the rider sits higher by its seat's height and
+        // a mount's length further off, so the direct-contact check gets that much more (Riders.MountedReach).
         readonly float footMinDist, footMinVerDist;
 
         public AiTaskChestMeleeAttack(EntityAgent entity, JsonObject taskConfig, JsonObject aiConfig) : base(entity, taskConfig, aiConfig)
@@ -250,9 +250,9 @@ namespace LotrNpcs
             }
         }
 
-        // 0.0.82 (owner: fighting NPCs "turning in place"): vanilla swings at the nearest enemy in reach, which in a
-        // crowd was often another than the one this NPC had walked to, so it turned to and fro between them. While the
-        // NPC it claimed (its duel partner) is in reach and not striking back at someone else, that one is hit instead.
+        // Vanilla swings at the nearest enemy in reach, which in a crowd was often another than the one this NPC had
+        // walked to, so it turned to and fro between them. While the NPC it claimed (its duel partner) is in reach
+        // and not striking back at someone else, that one is hit instead.
         public override bool ShouldExecute()
         {
             FitReachToMount();
@@ -267,12 +267,12 @@ namespace LotrNpcs
                     if (partner != null && partner.Alive && hasDirectContact(partner, minDist, minVerDist)) targetEntity = partner;
                 }
             }
-            // 0.0.132: a mounted rider finishes its focus (Riders.FocusOf) before striking anyone else; while the focus is
-            // out of reach it waits (its mount walks it in), and a new focus is taken only when the old one is gone.
+            // A mounted rider finishes its focus (Riders.FocusOf) before striking anyone else; while the focus is out
+            // of reach it waits (its mount walks it in), and a new focus is taken only when the old one is gone.
             if ((entity as EntityAgent)?.MountedOn != null && targetEntity != null)
             {
                 Entity kept = Riders.FocusOf(entity);
-                // 0.0.151: the archer its seek rides for becomes the focus (riders harass archers).
+                // The archer its seek rides for becomes the focus (riders harass archers).
                 Entity hunted = Seek?.TargetEntity;
                 if (hunted != null && hunted.Alive && hunted != kept && Riders.FocusOnHunted(Recruit.IsArcher(hunted), kept != null && Recruit.IsArcher(kept)))
                 {
@@ -286,15 +286,12 @@ namespace LotrNpcs
                     targetEntity = kept;
                 }
             }
-            // 0.0.99: this weapon's own wind-up (gen HIT_MS), set before the turn check below, which uses it.
+            // This weapon's own wind-up (gen HIT_MS), set before the turn check below, which uses it.
             int weaponHitMs = Weapon?.HitMs ?? 0;
             damagePlayerAtMs = weaponHitMs > 0 ? weaponHitMs : baseHitMs;
-            // 0.0.143 (in game 2026-11-15: Dunlendings' blows at riders fell out of reach 85 of 108 and 100 of 140 times)
-            // held swings at riders galloping away; that left 36 of 65 (run 212122): the rest were riders charging past.
-            // 0.0.144: a soldier on foot doesn't swing at a rider whose horse, at its present speed and heading, will be out
-            // of reach when the blow falls. It looks again shortly (a rider standing, or riding into it, is still struck).
-            // 0.0.164: held only if the rider stays out of reach for the whole pass window before the blow (Riders.MissesPass),
-            // so a rider charging through the soldier is swung at.
+            // A soldier on foot doesn't swing at a rider who stays out of reach for the whole pass window before the
+            // blow (Riders.MissesPass): such a blow would only fall at a horse galloping away. It looks again
+            // shortly. A rider standing, riding into it or charging through it is swung at.
             if ((entity as EntityAgent)?.MountedOn == null && targetEntity is EntityAgent rider && rider.MountedOn?.Entity is Entity horse
                 && Riders.MissesPass(rider.Pos.X - entity.Pos.X, rider.Pos.Z - entity.Pos.Z, horse.Pos.Motion.X, horse.Pos.Motion.Z, damagePlayerAtMs, minDist + Riders.RiderHalfWidth))
             {
@@ -302,11 +299,11 @@ namespace LotrNpcs
                 targetEntity = null;
                 return false;
             }
-            // 0.0.98 staggered swings (BattleSpacing.HitWaitMs): a hit that would land inside the target's hurt window
-            // after another NPC's hit would be thrown away, so this NPC waits its turn. It looks again when the turn is
-            // due (at least TurnRetryMs later), not every tick, so waiting costs no extra target searches.
+            // Staggered swings (BattleSpacing.HitWaitMs): a hit that would land inside the target's hurt window after
+            // another NPC's hit would be thrown away, so this NPC waits its turn. It looks again when the turn is due
+            // (at least TurnRetryMs later), not every tick, so waiting costs no extra target searches.
             long now = entity.World.ElapsedMilliseconds;
-            // 0.0.109: with NpcHitsIgnoreHurtWindow on, a hit on anything but a player lands anyway, so no turn is kept.
+            // With NpcHitsIgnoreHurtWindow on, a hit on anything but a player lands anyway, so no turn is kept.
             if (IgnoresWindow(targetEntity)) return true;
             long wait = factions.Spacing.HitWaitMs(targetEntity.EntityId, now + damagePlayerAtMs);
             if (wait > 0)
@@ -325,7 +322,7 @@ namespace LotrNpcs
 
         public override void StartExecute()
         {
-            // Battle spacing (0.0.53): a swing renews this NPC's place on its target, or takes one if it had none.
+            // Battle spacing: a swing renews this NPC's place on its target, or takes one if it had none.
             if (factions != null && targetEntity != null)
             {
                 long now = entity.World.ElapsedMilliseconds;
@@ -335,9 +332,9 @@ namespace LotrNpcs
                 factions.Log.Attacked(entity, now);
                 factions.Spacing.BookHit(targetEntity.EntityId, lastCheckOrAttackMs + damagePlayerAtMs, entity.World.Rand.Next(BattleSpacing.HitJitterMs + 1));
             }
-            // 0.0.91: the faction's damage for this rank, read at each swing so /recruits faction reload applies at
-            // once, varied by DamageSpread (owner: "add a +-20% spread on hits"). The damage tier stays (it sets armor
-            // penetration against players).
+            // The faction's damage for this rank, read at each swing so /recruits faction reload applies at once,
+            // varied by DamageSpread (+-20% by default). The damage tier stays (it sets armor penetration against
+            // players).
             FactionConfig config = factions?.Config;
             damage = FactionTiers.Spread(config?.DamageFor(faction, rank) ?? baseDamage, config?.Spread ?? 0, entity.World.Rand.NextDouble());
             // Chosen before the vanilla task starts the animation, which it does once the NPC faces its target.
@@ -351,7 +348,7 @@ namespace LotrNpcs
             Riders.SwingStarted(entity, startedMs);
             RiderLog("swing at " + (targetEntity?.EntityId ?? 0));
             base.StartExecute();
-            // 0.0.164: at a rider, a soldier on foot swings at once instead of after turning to face it.
+            // At a rider, a soldier on foot swings at once instead of after turning to face it.
             if ((entity as EntityAgent)?.MountedOn == null && (targetEntity as EntityAgent)?.MountedOn != null && animMeta != null)
             {
                 entity.AnimManager?.StartAnimation(animMeta);
@@ -362,7 +359,7 @@ namespace LotrNpcs
 
         bool struck;
 
-        // 0.0.139: with DebugCommands on, a mounted rider's swings go to the server log (start, blow, end).
+        // With DebugCommands on, a mounted rider's swings go to the server log (start, blow, end).
         void RiderLog(string what)
         {
             if ((entity as EntityAgent)?.MountedOn == null || factions?.Config?.DebugCommands != true) return;
@@ -370,23 +367,23 @@ namespace LotrNpcs
                 entity.World.ElapsedMilliseconds - startedMs, Riders.ChargeOf(entity).Phase);
         }
 
-        // 0.0.99 swing sync (owner chose "Swing sync + weapon wind-ups"): vanilla counts down to the blow from when the
-        // NPC decided to attack, but starts the swing only once it faces its target, so after a turn the damage landed
-        // while the weapon was barely raised. Until the swing starts, the countdown (lastCheckOrAttackMs) is held at now,
-        // so the blow lands damagePlayerAtMs after the swing really starts, and the attack lasts its full length from
-        // there. The swing starts inside base.ContinueExecute, the same tick it is held for the last time. The game keys
-        // active animations by their shape animation (animMeta.Animation, e.g. "axehit"), not the config code.
+        // Swing sync: vanilla counts down to the blow from when the NPC decided to attack, but starts the swing only
+        // once it faces its target, so after a turn the damage landed while the weapon was barely raised. Until the
+        // swing starts, the countdown (lastCheckOrAttackMs) is held at now, so the blow lands damagePlayerAtMs after
+        // the swing really starts, and the attack lasts its full length from there. The swing starts inside
+        // base.ContinueExecute, the same tick it is held for the last time. The game keys active animations by their
+        // shape animation (animMeta.Animation, e.g. "axehit"), not the config code.
         public override bool ContinueExecute(float dt)
         {
-            // 0.0.139: a seated rider can't turn in the saddle, so it doesn't wait to face its target (the blow fell after
-            // its mount had carried it past).
+            // A seated rider can't turn in the saddle, so it doesn't wait to face its target (the blow would fall
+            // after its mount had carried it past).
             bool atRider = (targetEntity as EntityAgent)?.MountedOn != null;
             if (!swingStarted && (entity as EntityAgent)?.MountedOn == null && !atRider)
             {
                 long now = entity.World.ElapsedMilliseconds;
-                // 1.0.1 (owner, 2026-11-17: "When a spear user gets hit mid swing, their attack misses entirely"; "all
-                // animations should have the same attack landing timing"): the swing also counts as started once the NPC
-                // faces its target (the moment the game starts the animation), whatever the animation manager says.
+                // The swing also counts as started once the NPC faces its target (the moment the game starts the
+                // animation), whatever the animation manager says. Every weapon then lands its blow the same time
+                // after its swing starts, even if the NPC was hit mid swing.
                 if ((animMeta != null && entity.AnimManager?.IsAnimationActive(animMeta.Animation) == true) || FacesTarget()) { swingStarted = true; swingStartedMs = now; }
                 else if (now - startedMs <= MaxTurnWaitMs) lastCheckOrAttackMs = now;
             }
@@ -394,22 +391,16 @@ namespace LotrNpcs
             // turned it or cut its animation since (the game's own blow also needs it to face its target at that moment).
             if (!struck && swingStarted && (entity as EntityAgent)?.MountedOn == null && !atRider
                 && Riders.BlowDue(swingStartedMs, damagePlayerAtMs, entity.World.ElapsedMilliseconds)) attackTarget();
-            // 0.0.142 (in game 2026-11-15: 58 of 66 rider swings ran their full 900 ms without a blow): the game's own
-            // blow needs the attacker to face its target, and a seated rider faces where its mount goes. A mounted
-            // rider's blow falls on time here instead; attackTarget checks reach and logs a miss as out of reach.
-            // 0.0.164 (owner, 2026-11-17: a rider "can phase right through the captain and still the captain wont swing ...
-            // They just dont try to swing in time"): a soldier on foot swinging at a rider doesn't wait to face it either
-            // (a galloping rider is past before it turns): its swing starts at once (StartExecute) and its blow falls on time.
+            // The game's own blow needs the attacker to face its target, and a seated rider faces where its mount
+            // goes, so a mounted rider's blow falls on time here instead; attackTarget checks reach and logs a miss
+            // as out of reach. A soldier on foot swinging at a rider doesn't wait to face it either (a galloping
+            // rider is past before it turns): its swing starts at once (StartExecute) and its blow falls on time.
             if (!struck && ((entity as EntityAgent)?.MountedOn != null || atRider) && Riders.BlowDue(startedMs, damagePlayerAtMs, entity.World.ElapsedMilliseconds)) attackTarget();
-            // 0.0.146 (battle log 213618: every blow of a foot soldier that missed a rider was at a horse galloping ~9 blocks a
-            // second, the soldier facing it, 0-4.5 blocks past reach): a swing that the rider rode through is a hit. While
-            // the swing runs, the last moment a mounted target was in reach is kept; attackTarget accepts it (PassedInReach).
-            // 0.0.162 (0.0.161's run 194429: holding a rider's swing whenever its horse would carry it past cut its swings
-            // from 26 to 6 in the first 90 s): a rider's own blow, like a blow at a rider, lands if the target was in reach
-            // within PassWindowMs of it falling (a rider swinging as it rides past).
-            // 0.0.167 (battle logs 230424, 231307: rider blows "out of reach" at 2.5-4.3 blocks against a standing warrior):
-            // a mounted attacker never sets swingStarted (its swing isn't waited for above), so 0.0.162's window never
-            // counted for riders; it counts from the swing's start now.
+            // A swing that a rider rode through is a hit. While the swing runs, the last moment a mounted target was
+            // in reach is kept; attackTarget accepts it (PassedInReach). A rider's own blow, like a blow at a rider,
+            // lands if the target was in reach within PassWindowMs of it falling (a rider swinging as it rides past).
+            // A mounted attacker never sets swingStarted (its swing isn't waited for above), so the window counts
+            // from the swing's start.
             bool mountedSwing = (entity as EntityAgent)?.MountedOn != null;
             if ((swingStarted || mountedSwing) && !struck && (mountedSwing || (targetEntity as EntityAgent)?.MountedOn != null)
                 && hasDirectContact(targetEntity, minDist, minVerDist)) riderContactMs = entity.World.ElapsedMilliseconds;
@@ -449,17 +440,17 @@ namespace LotrNpcs
             return faction == null || factions == null ? base.IsTargetableEntity(e, range) : e.Alive && CanSense(e, range) && factions.WantsToAttack(faction, e) && !Crowded(e);
         }
 
-        // An enemy NPC that already has its share of attackers is left to them (battle spacing, 0.0.53).
+        // An enemy NPC that already has its share of attackers is left to them (battle spacing).
         bool Crowded(Entity e) => factions.Spacing.Crowded(entity.EntityId, e.EntityId, e is EntityPlayer, entity.World.ElapsedMilliseconds);
 
-        /// <summary>0.0.109: whether this NPC's hits on target skip its hurt window (config NpcHitsIgnoreHurtWindow;
-        /// never on players).</summary>
+        /// <summary>Whether this NPC's hits on target skip its hurt window (config NpcHitsIgnoreHurtWindow; never on
+        /// players).</summary>
         bool IgnoresWindow(Entity target) => target != null && !(target is EntityPlayer) && factions?.Config.NpcHitsIgnoreHurtWindow == true;
 
-        /// <summary>0.0.145 battle log: why a blow fell out of reach. ms = since the swing was decided, swing = since its
-        /// animation started (-1: never), d/v = distance and height gap from the attacker's reach point to the target's box
-        /// (contact needs d under minDist, v under minVerDist), spd = the target's (or its mount's) speed in blocks a second,
-        /// yaw = how far the attacker faces off the target in degrees.</summary>
+        /// <summary>Battle log: why a blow fell out of reach. ms = since the swing was decided, swing = since its
+        /// animation started (-1: never), d/v = distance and height gap from the attacker's reach point to the
+        /// target's box (contact needs d under minDist, v under minVerDist), spd = the target's (or its mount's)
+        /// speed in blocks a second, yaw = how far the attacker faces off the target in degrees.</summary>
         string MissDetail()
         {
             Entity t = targetEntity;
@@ -476,20 +467,20 @@ namespace LotrNpcs
 
         protected override void attackTarget()
         {
-            // 0.0.142: one blow a swing (a rider's may already have fallen in ContinueExecute).
+            // One blow a swing (a rider's may already have fallen in ContinueExecute).
             if (struck) return;
             struck = true;
             Riders.SwingDone(entity);
             RiderLog("blow" + (targetEntity != null && hasDirectContact(targetEntity, minDist, minVerDist) ? "" : " (out of reach)"));
-            // 0.0.98: the hit lands now, which is later than booked if the NPC was still turning to face its target.
+            // The hit lands now, which is later than booked if the NPC was still turning to face its target.
             if (factions != null && targetEntity != null) factions.Spacing.BookHit(targetEntity.EntityId, entity.World.ElapsedMilliseconds, 0);
             if (!hasDirectContact(targetEntity, minDist, minVerDist) && !Riders.PassedInReach(riderContactMs, entity.World.ElapsedMilliseconds))
             {
                 if (targetEntity != null) factions?.Log.Attack(entity, targetEntity, false, 0, BattleLog.Result.NoContact, false, entity.World.ElapsedMilliseconds, factions.Log.On ? MissDetail() : null);
                 return;
             }
-            // 0.0.109: vanilla's attackTarget, done here so the hit can skip the hurt window (IgnoresWindow) and the
-            // battle log learns how it went. A player is struck in the chest under Combat Overhaul (0.0.14).
+            // Vanilla's attackTarget, done here so the hit can skip the hurt window (IgnoresWindow) and the battle
+            // log learns how it went. A player is struck in the chest under Combat Overhaul.
             Entity target = targetEntity;
             bool chest = target is EntityPlayer && ChestHitDamage.Available;
             DamageSource source = chest ? ChestHitDamage.Create(damageType, damageTier) : new DamageSource { Type = damageType, DamageTier = damageTier };
@@ -499,7 +490,7 @@ namespace LotrNpcs
             source.IgnoreInvFrames = IgnoresWindow(target);
             bool alive = target.Alive;
             bool window = target.IsActivityRunning("invulnerable");
-            // 0.0.133: a rider's blow at a gallop is a charge hit (double damage, the target pushed along the charge).
+            // A rider's blow at a gallop is a charge hit (extra damage, the target pushed along the charge).
             bool charge = Riders.IsChargeHit(entity);
             float amount = damage * (charge ? Riders.ChargeDamageMultiplier : 1) * Riders.RankMatchup(rank, (entity as EntityAgent)?.MountedOn != null, Recruit.IsArcher(target), (target as EntityAgent)?.MountedOn != null) * Riders.CaptainNpcFight(rank, NpcTypeInfo.Of(target)?.Rank, target is EntityPlayer) * (factions?.Config.HitScaleFor(target) ?? 1) * GlobalConstants.CreatureDamageModifier;
             bool received = target.ReceiveDamage(source, amount);
@@ -615,10 +606,10 @@ namespace LotrNpcs
     {
         string[] itemCodes;
         string[][] setCodes;
-        // 0.0.78: sets worn only when none of setCodes is complete (Haradrim: the owner's armor mod first, the 0.0.41
-        // outfits without it), so the two never mix on a server that has both.
+        // Sets worn only when none of setCodes is complete (Haradrim: the armor mod's set first, the built-in outfits
+        // without it), so the two never mix on a server that has both.
         string[][] fallbackSetCodes;
-        // A hat worn only now and then (0.0.55, hobbits: "maybe a hat on rare occasion"): one of hatCodes, by hatChance.
+        // A hat worn only now and then (hobbits): one of hatCodes, by hatChance.
         string[] hatCodes;
         double hatChance;
 
@@ -691,9 +682,9 @@ namespace LotrNpcs
             Looks.RollHelmet(entity, entity.Api.ModLoader.GetModSystem<FactionSystem>()?.Config);
         }
 
-        // The gear behavior puts each item in the slot that fits it, such as body armor in the body slot. A code ending
-        // in "@slot" goes straight into that gear slot instead, if it is free, so an NPC can wear two pieces made for
-        // the same slot (user, 2026-11-03: a helmet over a chain coif, a cape and a fur wrap).
+        // The gear behavior puts each item in the slot that fits it, such as body armor in the body slot. A code
+        // ending in "@slot" goes straight into that gear slot instead, if it is free, so an NPC can wear two pieces
+        // made for the same slot (a helmet over a chain coif, a cape and a fur wrap).
         void Give(string code)
         {
             Item item = GearCode.Item(entity.World, code);
