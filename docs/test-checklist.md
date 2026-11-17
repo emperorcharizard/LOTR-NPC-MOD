@@ -833,3 +833,10 @@ Owner, 2026-11-17, watching 1 rider v 1 captain on 0.0.163: "the rider can phase
 - [ ] 164.1 1 Rohan rider v 1 Dunlending captain: the captain swings as the rider charges through or past it, and wins.
 - [ ] 164.2 The 0.0.146 numbers still hold or improve: foot soldiers' blows at riders "out of reach when the blow fell" stay low (3 riders v 10 Dunlending warriors).
 - [ ] 164.3 Foot soldiers' swings at riders show the weapon swing (not a blow with no animation).
+
+## 165. Fights stay where they began (0.0.165)
+
+In game 2026-11-17 (0.0.162 and 0.0.163, 1 rider v 2 warriors): ride-out after ride-out went the same way with the warriors chasing, so the fight drifted ~40 blocks per 100 s until Synergy froze it. A rider now remembers where its fight began (its first focus's position); a ride-out that would carry it more than 8 blocks from there turns aside and back toward it.
+
+- [ ] 165.1 1 Rohan rider v 2 Dunlending warriors with the player standing still beside them: after 3 minutes the fight is still within about 15 blocks of where it began (no Synergy freeze), and the rider still charges and rides out.
+- [ ] 165.2 3 riders v 5 warriors + 3 archers: the riders still kill the archers first (161.1 numbers).

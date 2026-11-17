@@ -1258,6 +1258,9 @@ public static class Program {
                 && MountsOf("test-elf-rider").SequenceEqual(new[] { "game:tameddeer-caribou-male-adult" }) && MountsOf("test-haradrim-rider").All(m => m.StartsWith("feverstonewilds:horse-tamed-")) && MountsOf("test-goblin-rider").All(m => m.StartsWith("feverstonewilds:tame-direwolf-")) && MountsOf("test-dwarf-rider").All(m => m.StartsWith("teapotsgiantboar:tame-giantboar-")),
                 "0.0.117: riders for Men of the West on horses, Shadow orcs on dire wolves, elves on caribou (0.0.157) and dwarves on giant boars, each with the rider behavior and its mounts");
             double SeekRange(string c) => entityFiles[c]["server"]["behaviors"].First(b => (string)b["code"] == "taskai")["aitasks"].First(t => (string)t["code"] == "lotrnpcs:seekentity").Value<double>("seekingRange");
+            (double X, double Z) roAway = Riders.RideOutHeading(0, 1, 0, 10), roNear = Riders.RideOutHeading(0, 1, 0, 5), roBack = Riders.RideOutHeading(0, 1, 0, -10);
+            Check(roNear == (0, 1) && roBack == (0, 1) && roAway.Z < 0 && Math.Abs(roAway.X) > 0.5 && Math.Abs(roAway.X * roAway.X + roAway.Z * roAway.Z - 1) < 1e-9,
+                "0.0.165: a ride-out that would carry the rider farther than 8 blocks from where its fight began turns aside and back toward it");
             Check(!Riders.MissesPass(0, 2, 0, -0.25, 400, 2.4) && Riders.GoneByBlow(0, 2, 0, -0.25, 400, 2.4) && Riders.MissesPass(0, 2, 0, 0.13, 400, 2.4) && !Riders.MissesPass(0, 2, 0, 0, 400, 2.4) && Riders.MissesPass(3, 2, 0, -0.3, 400, 2.4),
                 "0.0.164: a soldier swings at a rider charging straight through it (in reach during the pass window), not at one riding away or passing wide");
             Check(riderCodes.All(c => SeekRange(c) == 36) && SeekRange("test-rohan-warrior") == 24 && SeekRange("test-rohan-archer") == 24 && Riders.NonArcherSeekRange == 24,

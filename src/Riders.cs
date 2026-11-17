@@ -142,6 +142,20 @@ namespace LotrNpcs
             }
         }
 
+        /// <summary>0.0.165 (in game 2026-11-17: a 1 rider v 2 warriors fight drifted ~40 blocks in 100 s, ride-out after
+        /// ride-out the same way with the warriors chasing, until Synergy froze it): a ride-out that would carry the rider
+        /// farther than AnchorRadius from where its fight began turns aside, half across the charge line and half back
+        /// toward that spot, so the fight stays where it started. ox, oz: from the anchor to the rider.</summary>
+        public const double AnchorRadius = 8;
+        public static (double X, double Z) RideOutHeading(double hx, double hz, double ox, double oz)
+        {
+            if (ox * ox + oz * oz <= AnchorRadius * AnchorRadius || hx * ox + hz * oz <= 0) return (hx, hz);
+            double px = -hz, pz = hx;
+            if (px * -ox + pz * -oz < 0) { px = -px; pz = -pz; }
+            double ol = Math.Sqrt(ox * ox + oz * oz), bx = px - ox / ol, bz = pz - oz / ol, bl = Math.Sqrt(bx * bx + bz * bz);
+            return bl < 1e-6 ? (px, pz) : (bx / bl, bz / bl);
+        }
+
         /// <summary>One rider's charge state (server side).</summary>
         public sealed class ChargeState
         {
@@ -151,6 +165,8 @@ namespace LotrNpcs
             // 0.0.139: the swing in progress: when it started (0: none) and whether it started at a charge.
             public long SwingMs; public bool SwingCharge;
             public bool HitThisPass;
+            // 0.0.165: where this fight began (the focus's position when the rider took its first focus).
+            public bool HasAnchor; public double AnchorX, AnchorZ;
         }
 
         static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Entity, ChargeState> charges = new System.Runtime.CompilerServices.ConditionalWeakTable<Entity, ChargeState>();
@@ -592,7 +608,8 @@ namespace LotrNpcs
             // 0.0.133: charge and wheel away while the rider has a focus.
             Riders.ChargeState cs = Riders.ChargeOf(rider);
             long now = rider.World.ElapsedMilliseconds;
-            if (kept == null) { cs.Phase = Riders.ChargePhase.Hold; cs.HitThisPass = false; }
+            if (kept != null && !cs.HasAnchor) { cs.HasAnchor = true; cs.AnchorX = kept.Pos.X; cs.AnchorZ = kept.Pos.Z; }
+            if (kept == null) { cs.Phase = Riders.ChargePhase.Hold; cs.HitThisPass = false; cs.HasAnchor = false; }
             else if (cs.Phase == Riders.ChargePhase.Hold && Riders.SwingPending(cs.SwingMs, now) && swing?.TargetEntity != null)
             {
                 // 0.0.142 (in game 2026-11-15: 8 swings begun standing turned into a ride-out at once, the focus being
@@ -623,6 +640,8 @@ namespace LotrNpcs
                     // Ride on the way the charge went (from standing: straight away from the focus).
                     double hx = cs.Phase == Riders.ChargePhase.Charge ? Math.Sin(mount.Pos.Yaw) : -fx, hz = cs.Phase == Riders.ChargePhase.Charge ? Math.Cos(mount.Pos.Yaw) : -fz, hl = Math.Sqrt(hx * hx + hz * hz);
                     cs.HeadX = hl < 1e-6 ? Math.Sin(mount.Pos.Yaw) : hx / hl; cs.HeadZ = hl < 1e-6 ? Math.Cos(mount.Pos.Yaw) : hz / hl;
+                    // 0.0.165: not farther from where the fight began.
+                    if (cs.HasAnchor) (cs.HeadX, cs.HeadZ) = Riders.RideOutHeading(cs.HeadX, cs.HeadZ, mount.Pos.X - cs.AnchorX, mount.Pos.Z - cs.AnchorZ);
                     cs.StartX = mount.Pos.X; cs.StartZ = mount.Pos.Z;
                 }
                 if (next == Riders.ChargePhase.Charge && cs.Phase != Riders.ChargePhase.Charge) cs.HitThisPass = false;
