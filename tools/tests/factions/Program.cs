@@ -1258,9 +1258,8 @@ public static class Program {
                 && MountsOf("test-elf-rider").SequenceEqual(new[] { "game:tameddeer-caribou-male-adult" }) && MountsOf("test-haradrim-rider").All(m => m.StartsWith("feverstonewilds:horse-tamed-")) && MountsOf("test-goblin-rider").All(m => m.StartsWith("feverstonewilds:tame-direwolf-")) && MountsOf("test-dwarf-rider").All(m => m.StartsWith("teapotsgiantboar:tame-giantboar-")),
                 "0.0.117: riders for Men of the West on horses, Shadow orcs on dire wolves, elves on caribou (0.0.157) and dwarves on giant boars, each with the rider behavior and its mounts");
             double SeekRange(string c) => entityFiles[c]["server"]["behaviors"].First(b => (string)b["code"] == "taskai")["aitasks"].First(t => (string)t["code"] == "lotrnpcs:seekentity").Value<double>("seekingRange");
-            Check(riderCodes.All(c => SeekRange(c) == 36) && SeekRange("test-rohan-warrior") == 24 && SeekRange("test-rohan-archer") == 24 && Riders.NonArcherSeekRange == 24
-                && Riders.GoneByBlow(0, 2.2, 0, -0.3, 400, 2.8) && !Riders.GoneByBlow(0, 2.2, 0, 0, 400, 2.8) && Riders.FootHalfWidth == 0.3,
-                "0.0.161: riders seek archers up to 36 blocks off (others within 24 as before) and hold a swing their horse would carry them out of reach of");
+            Check(riderCodes.All(c => SeekRange(c) == 36) && SeekRange("test-rohan-warrior") == 24 && SeekRange("test-rohan-archer") == 24 && Riders.NonArcherSeekRange == 24,
+                "0.0.161: riders seek archers up to 36 blocks off (others within 24 as before)");
             var riderConfig = new FactionConfig { Version = FactionConfig.CurrentVersion }; riderConfig.FillDefaults();
             Check(Promotion.StatRank("rider") == "warrior" && Promotion.PriceRank("rider") == "captain" && Promotion.StatRank("guard") == "warrior" && Promotion.PriceRank("shock") == "warrior"
                 && HiringSystem.PriceFor(new FactionDef { HirePrices = new Dictionary<string, int> { ["captain"] = 40, ["warrior"] = 15 } }, "rider") == 40,

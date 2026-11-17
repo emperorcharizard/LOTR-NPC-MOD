@@ -810,6 +810,7 @@ Owner, 2026-11-16, after testing 154.1-154.2: "I think though it should just be,
 
 In game 2026-11-17 (151.C3, log 193403): riders opened on the warriors in their path and reached the archers only 37-80 s in; 65 of their 122 blows fell out of reach (median 3.4 blocks v a 2.5 reach). Riders now seek archers up to 36 blocks off (others still within 24), and a rider holds a swing when its horse's or the target's motion will carry the target out of reach by the time the blow falls.
 
+  - 2026-11-17 on 0.0.161 (log 194429): riders targeted archers from 14-17 s, but the swing hold stopped nearly every blow (8 swings in 104 s, was 51 in 90 s): a galloping horse always carries the blow past. 0.0.162 drops the hold; a rider's blow lands if the target was in reach within 200 ms of it falling (as foot soldiers' blows at riders since 0.0.146).
 - [ ] 161.1 Redo 151.C3 (3 Rohan riders 20 blocks from 5 Dunlending warriors with 3 archers 10 blocks behind them): the riders go for the archers from the start (first archer hit well before 37 s) and kill them first.
-- [ ] 161.2 Same run: far fewer rider blows "out of reach when the blow fell" (was 65 of 122), and riders still land charge hits.
+- [ ] 161.2 (0.0.162) Same run: riders swing about as often as on 0.0.160 (51 swings in 90 s) but far fewer blows are "out of reach when the blow fell" (was 65 of 122), and riders still land charge hits.
 - [ ] 161.3 151.C1 still holds: 1 Rohan rider v 2 Dunlending warriors, the rider wins.
