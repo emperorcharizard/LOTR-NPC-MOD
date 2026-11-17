@@ -11,12 +11,12 @@ using Vintagestory.GameContent;
 namespace LotrNpcs
 {
     /// <summary>
-    /// 0.0.127 (owner, 2026-11-14: "Can the gear be simplified at all to not be so heavy on performance", chose "Strip
-    /// tiny details only"; docs/notes/gear-pieces.md): a geared NPC is 100 to 420 shape elements, and the client poses
-    /// every element of every visible NPC each frame. On this client, when worn gear is added to one of this mod's NPCs'
-    /// shapes (the game's EntityBehaviorContainer.addGearToShape, which loads a fresh copy of the gear shape and then
-    /// calls Shape.StepParentShape with it), the gear's tiny leaf elements (rivets, studs: every side under TinyGearSize
+    /// Lighter gear for performance: a geared NPC is 100 to 420 shape elements, and the client poses every element of
+    /// every visible NPC each frame. On this client, when worn gear is added to one of this mod's NPCs' shapes (the
+    /// game's EntityBehaviorContainer.addGearToShape, which loads a fresh copy of the gear shape and then calls
+    /// Shape.StepParentShape with it), the gear's tiny leaf elements (rivets, studs: every side under TinyGearSize
     /// voxels) are left out. Players, other mods' entities, the server and the armor mods' files are untouched.
+    /// Background: docs/notes/gear-pieces.md.
     /// </summary>
     public static class GearDetail
     {

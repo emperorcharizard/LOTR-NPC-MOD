@@ -141,7 +141,7 @@ namespace LotrNpcs
         public bool WantsToAttack(string faction, Entity target)
         {
             if (faction == null || target == null || !target.Alive) return false;
-            if (target is EntityPlayer player) return HasGrudge(faction, player.EntityId) || (IsAggressive(faction) && !IsFriend(faction, player));
+            if (target is EntityPlayer player) return HasGrudge(faction, player.EntityId) || (IsAggressive(faction) && !SideOf(player).AlliedTo.Contains(faction));
             if (Recruit.OwnerUidOf(target) is string ownerUid) return WouldAttackRecruit(faction, target, ownerUid);
             string other = FactionOf(target);
             if (HasGrudge(faction, target.EntityId)) return other == null || Relation(faction, other) != FactionRelation.Ally;
@@ -159,7 +159,7 @@ namespace LotrNpcs
             if (HasGrudge(faction, recruit.EntityId)) return true;
             HiringOwner owner = Hiring?.Owner(ownerUid);
             if (owner != null && owner.EntityId != 0 && HasGrudge(faction, owner.EntityId)) return true;
-            return IsAggressive(faction) && !SideOf(ownerUid).FriendOf.Contains(faction);
+            return IsAggressive(faction) && !SideOf(ownerUid).AlliedTo.Contains(faction);
         }
 
         /// <summary>Would this NPC fight that entity (counting a battle line's enemies)?</summary>

@@ -11,7 +11,7 @@ using Vintagestory.GameContent;
 namespace LotrNpcs
 {
     /// <summary>
-    /// The owner's appearance dialog (0.0.54): name, helmet (which one since 0.0.58), weapon and face. Every change is sent to the server at once,
+    /// The owner's appearance dialog: name, helmet, weapon and face. Every change is sent to the server at once,
     /// which checks it and applies it to the NPC, so the owner watches it change in the world. Cancel puts back what
     /// it had when the dialog opened; Done (or closing) keeps it.
     /// </summary>
@@ -25,10 +25,10 @@ namespace LotrNpcs
         // Shown values: index into each part's variants, the weapon, and the helmet.
         readonly Dictionary<string, int> chosen = new Dictionary<string, int>();
         int weaponIndex;
-        // The helmets to choose from, then "none" (0.0.58); empty when the NPC has no helmet to choose.
+        // The helmets to choose from, then "none"; empty when the NPC has no helmet to choose.
         readonly string[] helmets;
         int helmetIndex;
-        // The Mordor orcs' shield (0.0.55): null when the NPC has none.
+        // The NPC's shield: null when the NPC has none.
         readonly Looks.ShieldRule shield;
         bool shieldOn;
         readonly LooksRequest original;
@@ -66,8 +66,7 @@ namespace LotrNpcs
             Compose();
         }
 
-        // 600 wide since 0.0.59 (user, 2026-11-03: the captain's "servant of the eye option, but hte text is cropped out"): a
-        // value now has 400 px, enough for "Servant of the Eye Helmet (Red Mask) (1 of 2)" on one line.
+        // 600 wide: a value has 400 px, enough for "Servant of the Eye Helmet (Red Mask) (1 of 2)" on one line.
         const int Width = 600, RowHeight = 34, LabelWidth = 120, ArrowWidth = 30;
 
         void Compose()

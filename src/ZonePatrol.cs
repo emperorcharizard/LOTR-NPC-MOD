@@ -7,10 +7,9 @@ using Vintagestory.GameContent;
 namespace LotrNpcs
 {
     /// <summary>
-    /// 0.0.112 (owner, review Q11: "admin gives a zone 2+ points, groups walk between them"): a wild NPC spawned in a
-    /// zone with a patrol walks its points in order, round and round, pausing a little at each. Fights come first
-    /// (seek and melee are higher priority); hiring it ends the patrol. The route is in the NPC's own attributes, so it
-    /// survives the zone being changed or removed.
+    /// A wild NPC spawned in a zone with a patrol (2 or more points) walks its points in order, round and round,
+    /// pausing a little at each. Fights come first (seek and melee are higher priority); hiring it ends the patrol.
+    /// The route is in the NPC's own attributes, so it survives the zone being changed or removed.
     /// </summary>
     public class AiTaskZonePatrol : AiTaskBase
     {

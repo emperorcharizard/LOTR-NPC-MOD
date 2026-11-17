@@ -1502,7 +1502,9 @@ MOUNTS_OF = {"gondor": HORSES, "rohan": HORSES, "dale": HORSES, "arnor": HORSES,
              # 0.0.156 (owner: "add a rider to all of the factions, horses are the default unless otherwise stated"). The
              # Shire has no warriors, so no rider.
              "dunlending": HORSES, "haradrim": HORSES, "easterling": HORSES, "blacknumenorean": HORSES,
-             "wickeddwarf": HORSES, "tormentedelf": HORSES,
+             "tormentedelf": HORSES,
+             # Wicked dwarves ride giant boars like the dwarves (owner, 2026-11-17).
+             "wickeddwarf": GIANT_BOARS,
              "elf": CARIBOU, "dwarf": GIANT_BOARS}
 TEST_NPCS += [(code.removesuffix("-warrior") + "-rider", name.removesuffix(" warrior") + " rider", model, skin, gear)
               for code, name, model, skin, gear in list(TEST_NPCS)
@@ -2160,7 +2162,7 @@ with open(os.path.join(out, "modinfo.json"), "w") as f:
         "type": "code",
         "modid": "lotrnpcs",
         "name": "LOTR NPCs",
-        "version": "1.0.2",
+        "version": "1.0.3",
         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Race models from "
                        "LOTR Races and Classes by Dango Dango Dango, Shakgriig and Buggoi, used with their permission.",

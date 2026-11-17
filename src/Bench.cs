@@ -43,10 +43,10 @@ namespace LotrNpcs
     }
 
     /// <summary>
-    /// /recruits bench (owner, 2026-11-12: a fixed fight any player can run so other PCs can be measured): an admin
-    /// spawns two armies, Gondor against Mordor, in front of them; after a short wait their client times every frame
-    /// and the server times its ticks for the same span, and both print the numbers to chat and their log.
-    /// /recruits bench clear removes the bench NPCs, bodies included.
+    /// /recruits bench, a fixed fight any player can run so PCs can be compared: an admin spawns two armies, Gondor
+    /// against Mordor, in front of them; after a short wait their client times every frame and the server times its
+    /// ticks for the same span, and both print the numbers to chat and their log. /recruits bench clear removes the
+    /// bench NPCs, bodies included.
     /// </summary>
     public class BenchSystem : ModSystem
     {

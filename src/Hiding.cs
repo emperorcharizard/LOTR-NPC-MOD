@@ -9,15 +9,14 @@ using Vintagestory.GameContent;
 namespace LotrNpcs
 {
     /// <summary>
-    /// Lines of sight (0.0.94). Owner, 2026-11-05: "npcs seem to be trying to target npcs through walls, can that be
-    /// changed to be enemies like, not behind walls?" (chose A: sight to pick a target, about 5 s of memory once
-    /// fighting). Only blocks block sight, by their collision boxes (glass and leaves block, open doors and tall grass
-    /// don't); other creatures never do.
+    /// Lines of sight, so NPCs don't pick targets through walls: sight is needed to pick a target, with about 5 s of
+    /// memory once fighting. Only blocks block sight, by their collision boxes (glass and leaves block, open doors
+    /// and tall grass don't); other creatures never do.
     /// </summary>
     public static class Sight
     {
-        /// <summary>A target this many blocks lower may also be seen from PeekAhead blocks toward it, as from the edge of
-        /// a drop the NPC can step up to (0.0.94, owner: archers "not try at all on a cliffs edge").</summary>
+        /// <summary>A target this many blocks lower may also be seen from PeekAhead blocks toward it, as from the
+        /// edge of a drop the NPC can step up to (so archers on a cliff's edge still shoot down).</summary>
         public const double PeekDrop = 2.5, PeekAhead = 1.5;
         /// <summary>How far in front of the archer's eye an arrow starts (Shoot), so a shot is judged from there.</summary>
         public const double ArrowAhead = 0.4;
@@ -55,12 +54,11 @@ namespace LotrNpcs
     }
 
     /// <summary>
-    /// Flee and hide (0.0.94). Owner, 2026-11-05: "for units that are being damaged but cannot reach their attacker,
-    /// have them flee and hide behind cover"; "yes for recruits". An NPC hit from beyond melee reach by an enemy it
-    /// can't get to (much higher or lower, or a second hit while chasing it has not closed the gap) runs to the nearest
-    /// spot within SearchRadius the attacker can't see, or away from it when there is none, and stays out of sight until
-    /// StayMs pass without a hit. An attacker that comes within reach is fought. An archer with a clear shot back shoots
-    /// instead. Recruits stay near their leader (12 blocks), their hold spot (8) or inside their guard area.
+    /// Flee and hide. An NPC hit from beyond melee reach by an enemy it can't get to (much higher or lower, or a
+    /// second hit while chasing it has not closed the gap) runs to the nearest spot within SearchRadius the attacker
+    /// can't see, or away from it when there is none, and stays out of sight until StayMs pass without a hit. An
+    /// attacker that comes within reach is fought. An archer with a clear shot back shoots instead. Recruits do it
+    /// too, but stay near their leader (12 blocks), their hold spot (8) or inside their guard area.
     /// </summary>
     public class AiTaskFactionHide : AiTaskBaseTargetable
     {

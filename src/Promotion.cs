@@ -15,14 +15,11 @@ using Vintagestory.GameContent;
 namespace LotrNpcs
 {
     /// <summary>
-    /// Recruits earn XP and are promoted (0.0.76, user, 2026-11-04):
-    /// "I want recruits that hit a target that dies within the next 10 seconds to get 1 xp, at 15 xp, they have the option
-    /// to rank up to warrior or archer for 10 coins, then another 40 xp for warrior to rank up to captain for 30 coins,
-    /// theres no second rank for archers"; "they promote in the right clicked menu as a chat option ... Xp is capped when
-    /// they hit the requirement and doesnt carry over. NPCS only, not animals. Archers and captains do not earn xp. It can
-    /// be shown under their name and under health labeled 'XP: (x/x)' ... keep as much of the owners choices as possible
-    /// and swap the armor to the new rank"; "count only npcs from this mod. the owner of the recruit and the others in the
-    /// group sees the xp. The helmet line is correct."
+    /// Recruits earn XP and are promoted. A recruit that hit a target that dies within the next 10 seconds gets 1 XP
+    /// (only NPCs from this mod count, not animals). At 15 XP it may rank up to warrior or archer, and a warrior at
+    /// 40 XP to captain, for coins, as a talk menu option. XP is capped at the requirement and doesn't carry over;
+    /// archers and captains earn none. The owner and the others in their group see it under the health as "XP:
+    /// (x/y)". A promotion keeps as many of the owner's choices as it can and swaps the armor to the new rank's.
     /// </summary>
     public static class Promotion
     {
@@ -37,16 +34,15 @@ namespace LotrNpcs
         public static int Need(string rank) => BaseRank(rank) == "recruit" ? 15 : BaseRank(rank) == "warrior" ? 40 : 0;
 
         /// <summary>
-        /// 0.0.113 (design-roster-promotion.md, owner: "branching promotion is good"): promotion-only sidegrades of the
-        /// warrior. Guard: health x1.25, damage x0.8, always a shield. Shock: health x0.8, damage x1.25, a two-handed
-        /// weapon. Both count as warriors everywhere else (prices they lack, body loot, order lists) and lead to captain.
+        /// Promotion-only sidegrades of the warrior. Guard: health x1.25, damage x0.8, always a shield. Shock: health
+        /// x0.8, damage x1.25, a two-handed weapon. Both count as warriors everywhere else (prices they lack, body
+        /// loot, order lists) and lead to captain. Design: docs/design-roster-promotion.md.
         /// </summary>
         public static readonly string[] Branches = { "guard", "shock" };
         /// <summary>
-        /// 0.0.154 (owner, 2026-11-16: "Do the same for recruit", chose "Pick it when hiring", "They should also still be
-        /// able to be changed after hire"): the recruit's classes, guard recruit (health x1.25, damage x0.8, always a
-        /// shield) and shock recruit (the other way round, a two-handed weapon). Picked in the hire menu at the recruit's
-        /// price and changed for free in the talk menu; they count as recruits everywhere else.
+        /// The recruit's classes, guard recruit (health x1.25, damage x0.8, always a shield) and shock recruit (the
+        /// other way round, a two-handed weapon). Picked in the hire menu at the recruit's price and changed for free
+        /// in the talk menu; they count as recruits everywhere else.
         /// </summary>
         public static readonly string[] RecruitBranches = { "recruitguard", "recruitshock" };
         /// <summary>A recruit's classes, in menu order.</summary>
@@ -55,17 +51,17 @@ namespace LotrNpcs
         public static readonly string[] AllBranches = { "guard", "shock", "recruitguard", "recruitshock" };
         /// <summary>The rank a branch stands in for (warrior or recruit), else the rank itself.</summary>
         public static string BaseRank(string rank) => Array.IndexOf(Branches, rank) >= 0 ? "warrior" : Array.IndexOf(RecruitBranches, rank) >= 0 ? "recruit" : rank;
-        /// <summary>0.0.154: a guard-like branch (more health, less damage).</summary>
+        /// <summary>A guard-like branch (more health, less damage).</summary>
         public static bool GuardLike(string branch) => branch == "guard" || branch == "recruitguard";
 
         /// <summary>The ranks a rank can be promoted to, in menu order.</summary>
         public static string[] Targets(string rank) => BaseRank(rank) == "recruit" ? new[] { "warrior", "guard", "shock", "archer" } : BaseRank(rank) == "warrior" ? new[] { "captain", "rider" } : Array.Empty<string>();
 
-        /// <summary>0.0.117: the rank whose health, damage and body loot a rank takes when the config lists none of its
-        /// own (riders fight as warriors; the mount is what they gain), else BaseRank.</summary>
+        /// <summary>The rank whose health, damage and body loot a rank takes when the config lists none of its own
+        /// (riders fight as warriors; the mount is what they gain), else BaseRank.</summary>
         public static string StatRank(string rank) => rank == "rider" ? "warrior" : BaseRank(rank);
-        /// <summary>0.0.117: the rank whose hire and promotion price a rank takes when the config lists none (a rider
-        /// costs what a captain does).</summary>
+        /// <summary>The rank whose hire and promotion price a rank takes when the config lists none (a rider costs
+        /// what a captain does).</summary>
         public static string PriceRank(string rank) => rank == "rider" ? "captain" : BaseRank(rank);
 
         public static int Xp(Entity e) => e?.WatchedAttributes?.GetInt(XpAttr) ?? 0;
@@ -147,7 +143,7 @@ namespace LotrNpcs
             hiring = api.ModLoader.GetModSystem<HiringSystem>();
             Find = id => api.World.GetEntityById(id);
             api.Event.RegisterGameTickListener(_ => Purge(), 10000);
-            // 0.0.114 (owner: "add an option to add xp to a unit, admin wise").
+            // Admin: add XP to a unit.
             ModCommands.RootOf(api)
                 .BeginSubCommand("xp")
                 .WithDescription("Admins: give XP to the hired recruit or warrior you are looking at (a negative amount takes it away). It stays between 0 and what its rank needs.")
@@ -225,7 +221,7 @@ namespace LotrNpcs
             {
                 EntityProperties type = npc.World.GetEntityType(Promotion.CodeAtRank(npc.Code, target));
                 if (type == null) continue;
-                // 0.0.117: no rider rank without its mount's mod (Feverstone Wilds, Teapot's giant boars).
+                // No rider rank without its mount's mod (Feverstone Wilds, Teapot's giant boars).
                 if (target == "rider" && !Riders.CanHaveMount(npc.World, type)) continue;
                 Dictionary<string, int> prices = def?.PromotePrices ?? FactionTiers.Men.Promote;
                 offers[target] = prices.TryGetValue(target, out int price) || prices.TryGetValue(Promotion.PriceRank(target), out price) ? Math.Max(0, price) : 0;
@@ -274,7 +270,7 @@ namespace LotrNpcs
 
     /// <summary>
     /// Client: adds "XP: (x/y)" at the end of a recruit's hover text, after the game's own lines (its name above and
-    /// its health), for its owner and the players in the owner's /group (0.0.76). A Harmony postfix on EntityAgent's
+    /// its health), for its owner and the players in the owner's /group. A Harmony postfix on EntityAgent's
     /// GetInfoText, since the game appends its lines after every behavior's.
     /// </summary>
     public static class XpInfoText

@@ -9,7 +9,7 @@ using Vintagestory.API.Server;
 
 namespace LotrNpcs
 {
-    /// <summary>Server to client: the whitelist menu's contents (0.0.76).</summary>
+    /// <summary>Server to client: the whitelist menu's contents.</summary>
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public class WhitelistState
     {
@@ -30,9 +30,8 @@ namespace LotrNpcs
     }
 
     /// <summary>
-    /// The whitelist menu (0.0.76, user, 2026-11-04: "the whitelist menu would be good for this round. A diplomacy button
-    /// for this menu can be discussed later."): /recruits whitelist with nothing after it opens it. The server keeps the
-    /// list (HiringSystem); the menu only asks it to add or remove a player, on its own channel. The typed add, remove and
+    /// The whitelist menu: /recruits whitelist with nothing after it opens it. The server keeps the list
+    /// (HiringSystem); the menu only asks it to add or remove a player, on its own channel. The typed add, remove and
     /// list commands still work.
     /// </summary>
     public class WhitelistMenuSystem : ModSystem
@@ -159,7 +158,7 @@ namespace LotrNpcs
             y += 6;
             c.AddDynamicText(state.Notice ?? "", text.Clone().WithColor(GuiStyle.ColorTime1), ElementBounds.Fixed(0, y, Width, 40), "notice");
             y += 44;
-            // A Diplomacy button is to be discussed later (owner, 2026-11-04); it would sit beside Close.
+            // A Diplomacy button may come later; it would sit beside Close.
             c.AddSmallButton(Lang.Get("lotrnpcs:whitelist-close"), () => TryClose(), ElementBounds.Fixed(EnumDialogArea.RightFixed, 0, y, 0, 0).WithFixedPadding(10, 5))
              .EndChildElements();
             SingleComposer = c.Compose();

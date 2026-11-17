@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.3 (2026-11-17)
+- Sides: each faction in `lotrnpcs-factions.json` has an `Enemies` line and an `Allies` line. Move a name from one to the other to change a pair; the mod copies it to the other faction. A faction in neither line is neutral. Config version 35.
+- Default sides: the Free Peoples (Gondor, Rohan, Dale, Arnor, dwarves, the Shire, elves) are allies, the Shadow (Mordor, Angmar, Misty Mountains, Gundabad, Isengard, Haradrim, Easterlings, Black Númenóreans, wicked dwarves) are allies, and the two are enemies. Dunlendings and tormented elves fight everyone. Old pair entries in `Relations` are dropped once, except alliances with `ShareFriends`.
+- Players are safe from NPCs of factions allied to their own, but hire only from their own faction (unless the alliance has `ShareFriends`).
+- Wicked dwarf riders ride Teapot's giant boars, like the dwarves.
+- Code: plain comments and smaller files; the config notes are regrouped and shorter. No behaviour change.
+
 ## 1.0.2 (2026-11-17)
 - Retreat: followers start no fight task until it ends, including striking back at whoever hits them; riders drop the enemy they were finishing. Charge still fights. Movement orders' 5 s break-off works the same way.
 

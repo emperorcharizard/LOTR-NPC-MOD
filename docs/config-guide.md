@@ -1,6 +1,6 @@
 # LOTR NPCs: config guide
 
-Nov 17, 2026 (updated for 0.0.165, faction file version 34, spawning file version 1; release 1.0.0) · @Emperorcharizar
+Nov 17, 2026 (updated for 1.0.3, faction file version 35, spawning file version 1; release 1.0.0) · @Emperorcharizar
 
 ## Overview
 
@@ -60,7 +60,7 @@ One entry per faction, keyed by its id: gondor, rohan, dale, arnor, haradrim, du
 | `Health` | recruit 22, warrior 34, captain 48, archer 35 (every faction) | Health per rank, a whole number. Guard and shock get the warrior's x1.25 and x0.8, guard and shock recruits the recruit's. A rider without its own entry has the warrior's x1.25. Loaded NPCs take a change after `/recruits faction reload`. |
 | `Damage` | recruit 3.15, warrior 3.95, captain 7, archer 3.05 (every faction) | The damage of one hit per rank, melee and arrows (an archer's is its arrow and its shove). Guard and shock get the warrior's x0.8 and x1.25. |
 
-A player is a member of the faction they picked or an admin set. Members are never attacked on sight and can hire the faction's NPCs, and so can members of a faction allied to it with `ShareFriends` on.
+A player is a member of the faction they picked or an admin set. Members can hire the faction's NPCs, and so can members of a faction allied to it with `ShareFriends` on. Members of the faction and of its allies are never attacked on sight.
 
 ### Equal factions (since 0.0.135)
 
@@ -80,19 +80,30 @@ You can still give factions their own numbers: edit `Health`, `Damage`, prices a
 
 **Lowering limits.** When a player joins, or after `/recruits faction reload`, a player over the new limits loses the most recently hired recruits until they fit (far-away ones when they next load), and any borrowed shared guards go back to keep watch first.
 
-### Relations between factions (under `Relations`)
+### Sides: `Enemies` and `Allies` (each faction)
 
-Each entry has `A`, `B`, `Relation` and `ShareFriends`. Two factions with no entry are enemies.
+Each faction has two lines, the factions it fights and the ones it fights beside:
+
+```json
+"gondor": {
+  "Enemies": ["haradrim", "dunlendings", "blacknumenoreans", "easterlings", "wickeddwarves", "tormentedelves", "mordor", "angmar", "mistymountains", "gundabad", "isengard"],
+  "Allies": ["rohan", "dale", "arnor", "dwarves", "shire", "elves"],
+  ...
+```
 
 | Relation | Effect |
 | --- | --- |
-| `ally` | Never fight. They come to help each other within `CallForHelpRange`. |
-| `neutral` | Leave each other's NPCs alone. |
-| `enemy` | Attack each other's NPCs on sight. |
+| Allies | Never fight. They come to help each other within `CallForHelpRange`. |
+| In neither line | Neutral: they leave each other's NPCs alone. |
+| Enemies | Attack each other's NPCs on sight. |
 
-With `ShareFriends: true` on an alliance, each faction's members are also safe from the other's NPCs and can hire them. Without it, a player is only safe from their own faction.
+**Default sides.** The Free Peoples (gondor, rohan, dale, arnor, dwarves, shire, elves) are allies of each other, and so is the Shadow (mordor, angmar, mistymountains, gundabad, isengard, haradrim, easterlings, blacknumenoreans, wickeddwarves). The two are enemies. The Dunlendings and the tormented elves are enemies of everyone (owner's choice).
 
-No factions are allies by default. The file ships with one entry, Gondor and Rohan as enemies, an example of the format that changes nothing.
+**Changing a pair.** Move the name from one line to the other in either faction, then `/recruits faction reload`. One faction's line is enough: the mod copies the change into the other faction's lines and writes the file back. Allies win: if either faction lists the other as an ally, they are allies, so to make two allies enemies again, move the name back in both factions. A name in neither line of either faction makes the pair neutral.
+
+**`Relations` (optional).** Entries for one pair, `{"A": "gondor", "B": "dale", "Relation": "ally", "ShareFriends": true}`, win over the lines. The only reason to use one is `ShareFriends: true` on an alliance: each faction's members are then also safe from the other's NPCs and can hire them. Without it, a player is only safe from their own faction. Empty by default.
+
+Players: a member is safe from the NPCs of their own faction and of its allies (a Gondor player walks past Rohan NPCs), but hires only from their own faction unless the alliance has `ShareFriends` (owner's choice).
 
 ### Promotion and classes
 
@@ -107,7 +118,7 @@ Promotion needs both the XP and the coins in `PromotePrices`. The owner promotes
 
 - **Captains.** `MaxCaptains` (1) per player, whatever their faction. Hiring or promoting past it is refused; the promotion screen says "Captain places full". Riders don't count.
 - **Recruit classes** (0.0.154). A recruit can be a plain, guard or shock recruit. The owner changes it for free with "Let me change your class." in the talk menu.
-- **Riders** (0.0.117). A warrior, guard or shock trooper with 40 XP can become a rider, on its own saddled mount, which follows its orders. Riders fight with the warrior's health and damage x1.25 unless `Health` and `Damage` list `rider`. Their charge hits do x2.5. Mounts come from other mods and are optional: Feverstone Wilds horses (Gondor, Rohan, Dale, Arnor, Dunlendings, Haradrim, Easterlings, Black Númenóreans, wicked dwarves, tormented elves) and tame dire wolves (Mordor, Angmar, Gundabad, Misty Mountains, Isengard), Teapot's Giant Boar boars (dwarves), and the game's own caribou, made rideable by this mod (elves). Without the mount's mod that faction has no rider rank. The Shire has no riders.
+- **Riders** (0.0.117). A warrior, guard or shock trooper with 40 XP can become a rider, on its own saddled mount, which follows its orders. Riders fight with the warrior's health and damage x1.25 unless `Health` and `Damage` list `rider`. Their charge hits do x2.5. Mounts come from other mods and are optional: Feverstone Wilds horses (Gondor, Rohan, Dale, Arnor, Dunlendings, Haradrim, Easterlings, Black Númenóreans, tormented elves) and tame dire wolves (Mordor, Angmar, Gundabad, Misty Mountains, Isengard), Teapot's Giant Boar boars (dwarves and wicked dwarves), and the game's own caribou, made rideable by this mod (elves). Without the mount's mod that faction has no rider rank. The Shire has no riders.
 
 ### Everything else (top of the file)
 

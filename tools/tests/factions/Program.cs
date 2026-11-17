@@ -20,7 +20,25 @@ public static class Program {
     }
 
     // 0.0.92: race and /group count only with RaceAndGroupMembership; the checks written before 0.0.92 test that rule.
-    static void SetLegacy(FactionSystem f, FactionConfig c) { c.RaceAndGroupMembership = true; f.SetConfig(c); }
+    static void SetLegacy(FactionSystem f, FactionConfig c) { c.RaceAndGroupMembership = true; Use(f, c); }
+    // Most checks were written when every faction was an enemy of every other: a faction without Enemies and Allies
+    // lines gets that here instead of the shipped sides. The "shipped sides" checks use SetConfig itself.
+    static void Use(FactionSystem f, FactionConfig c) { Hostile(c); f.SetConfig(c); }
+    static bool Shipped(string f, FactionDef d, IEnumerable<string> all) {
+        var (e, a) = FactionConfig.DefaultLines(f, all);
+        return d.Enemies != null && d.Allies != null && d.Enemies.SequenceEqual(e) && d.Allies.SequenceEqual(a);
+    }
+    static FactionRelationDef Pair(FactionConfig c, string a, string b) {
+        c.Relations = c.Relations ?? new List<FactionRelationDef>();
+        var r = c.Relations.FirstOrDefault(x => FactionConfig.SamePair(x, a, b));
+        if (r == null) c.Relations.Add(r = new FactionRelationDef { A = a, B = b, Relation = "enemy" });
+        return r;
+    }
+    static void Hostile(FactionConfig c) {
+        c.Factions = c.Factions ?? FactionConfig.DefaultFactions();
+        foreach (var kv in c.Factions)
+            if (kv.Value != null && ((kv.Value.Enemies == null && kv.Value.Allies == null) || Shipped(kv.Key, kv.Value, c.Factions.Keys))) { kv.Value.Enemies = c.Factions.Keys.Where(k => k != kv.Key).ToList(); kv.Value.Allies = new List<string>(); }
+    }
 
     public static int Main(string[] argv) {
         var types = new Dictionary<string, EntityProperties>();
@@ -145,9 +163,9 @@ public static class Program {
         Check(!fs.WantsToAttack("dwarves", rohirrim) && !fs.WantsToAttack("rohan", dwarf) && fs.IsFriend("dwarves", null, none, "rohan"), "ShareFriends on an alliance: each side spares the other's friends");
         Check(fs.WantsToAttack("gondor", rohirrim) && fs.WantsToAttack("gondor", dwarf) && fs.WantsToAttack("rohan", gondorian), "...and only those two factions");
         Check(!fs.IsFriend("mordor", null, none, "gondor") && !fs.IsFriend("dunlendings", "lrc:harfoot", none), "ShareFriends does nothing between enemies or neutral factions");
-        Check(fs.SharesFriends("rohan", "dwarves") && fs.SharesFriends("dwarves", "rohan") && !fs.SharesFriends("gondor", "rohan") && fs.Relation("gondor", "rohan") == FactionRelation.Enemy, "the default gondor/rohan example entry changes nothing");
-        var example = cfg.Relations.First(r => r.A == "gondor" && r.B == "rohan"); example.Relation = "ally"; example.ShareFriends = true; SetLegacy(fs, cfg);
-        Check(!fs.WantsToAttack("rohan", gondorian) && !fs.WantsToAttack("gondor", rohirrim) && fs.Relation("gondor", "rohan") == FactionRelation.Ally && !fs.WantsToAttack("gondor", Npc("test-rohan-warrior")), "editing the example to an ally that shares friends works");
+        Check(fs.SharesFriends("rohan", "dwarves") && fs.SharesFriends("dwarves", "rohan") && !fs.SharesFriends("gondor", "rohan") && fs.Relation("gondor", "rohan") == FactionRelation.Enemy, "Gondor and Rohan stay enemies without an entry");
+        var example = Pair(cfg, "gondor", "rohan"); example.Relation = "ally"; example.ShareFriends = true; SetLegacy(fs, cfg);
+        Check(!fs.WantsToAttack("rohan", gondorian) && !fs.WantsToAttack("gondor", rohirrim) && fs.Relation("gondor", "rohan") == FactionRelation.Ally && !fs.WantsToAttack("gondor", Npc("test-rohan-warrior")), "an ally entry that shares friends works");
         Console.WriteLine("   > " + string.Join("\n   > ", fs.DescribeFactions().Split('\n').Skip(17)));
 
         var stanceCfg = new FactionConfig(); stanceCfg.FillDefaults(); stanceCfg.Factions["gondor"].Stance = "Defensive"; stanceCfg.Factions["shire"].Stance = "Aggressive";
@@ -165,9 +183,34 @@ public static class Program {
 
         // migrating older files
         var freshCfg = FactionConfig.FromFile(null, out bool storeFresh);
-        Check(storeFresh && freshCfg.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 34 && json.Contains("\"Version\": 34") && json.Contains("\"NpcVsNpcDamageMultiplier\": 0.5") && !json.Contains("\"RosterPerCaptain\":") && json.Contains("\"MaxCaptains\": 1") && json.Contains("\"RecruitExtraFollowers\": 1") && !json.Contains("MaxHirelings") && json.Contains("\"ShieldChance\": 0.5") && json.Contains("\"HelmetChance\": 0.6") && json.Contains("\"CaptainsAlwaysHelmeted\": false") && json.Contains("\"MaxAttackersPerTarget\": 4") && json.Contains("\"CombatSpacing\": 1.5") && json.Contains("\"BattleLines\": true") && json.Contains("\"DuelDistanceMin\": 1.0") && json.Contains("\"DuelDistanceMax\": 1.6") && json.Contains("\"LineHoldRange\": 6.0") && json.Contains("\"MaxRecruits\": 16") && json.Contains("\"MaxFollowers\": 3") && json.Contains("\"GuardRadius\": 16") && json.Contains("\"HealthRegenSpeed\": 30.0") && json.Contains("\"ShareFriends\": false") && json.Contains("\"Relation\": \"enemy\"") && !freshCfg.Relations.Any(r => r.Relation == "ally") && freshCfg.Relations.Count == 1, "a new file is written with version 34 (no MaxHirelings, no alliance), the example entry, the battle spacing, helmet and shield settings, the regen settings, the guard radius and the hire and follow caps");
+        Check(storeFresh && freshCfg.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 35 && json.Contains("\"Version\": 35") && json.Contains("\"NpcVsNpcDamageMultiplier\": 0.5") && !json.Contains("\"RosterPerCaptain\":") && json.Contains("\"MaxCaptains\": 1") && json.Contains("\"RecruitExtraFollowers\": 1") && !json.Contains("MaxHirelings") && json.Contains("\"ShieldChance\": 0.5") && json.Contains("\"HelmetChance\": 0.6") && json.Contains("\"CaptainsAlwaysHelmeted\": false") && json.Contains("\"MaxAttackersPerTarget\": 4") && json.Contains("\"CombatSpacing\": 1.5") && json.Contains("\"BattleLines\": true") && json.Contains("\"DuelDistanceMin\": 1.0") && json.Contains("\"DuelDistanceMax\": 1.6") && json.Contains("\"LineHoldRange\": 6.0") && json.Contains("\"MaxRecruits\": 16") && json.Contains("\"MaxFollowers\": 3") && json.Contains("\"GuardRadius\": 16") && json.Contains("\"HealthRegenSpeed\": 30.0") && json.Contains("\"Allies\": [\"rohan\", \"dale\", \"arnor\", \"dwarves\", \"shire\", \"elves\"]") && json.Contains("\"Allies\": []") && freshCfg.Relations.Count == 0, "a new file is written with version 35 (no MaxHirelings), each faction's Enemies and Allies on one line and no pair entries, the battle spacing, helmet and shield settings, the regen settings, the guard radius and the hire and follow caps");
         var current = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(json.Replace("\"Stance\": \"aggressive\"", "\"Stance\": \"defensive\"")), out bool storeCurrent);
         Check(!storeCurrent && current.Factions["gondor"].Stance == "defensive", "a current file is left alone, even with defensive factions");
+        // Shipped sides and the Enemies and Allies lines (config version 35)
+        {
+            var sfs = new FactionSystem(); var sc = new FactionConfig(); sfs.SetConfig(sc);
+            string[] freeP = FactionConfig.FreePeoples, shadow = FactionConfig.Shadow, lone = { "dunlendings", "tormentedelves" };
+            bool All(IEnumerable<string> xs, IEnumerable<string> ys, FactionRelation rel) => xs.All(a => ys.All(b => a == b || sfs.Relation(a, b) == rel));
+            Check(All(freeP, freeP, FactionRelation.Ally) && All(shadow, shadow, FactionRelation.Ally), "shipped sides: the Free Peoples are allies, and so is the Shadow");
+            Check(All(freeP, shadow, FactionRelation.Enemy) && All(lone, sc.Factions.Keys, FactionRelation.Enemy) && sc.Factions.Count == freeP.Length + shadow.Length + lone.Length, "...the two are enemies, and the Dunlendings and tormented elves fight everyone");
+            Check(!sfs.LinesChanged && sc.Factions["gondor"].Allies.SequenceEqual(new[] { "rohan", "dale", "arnor", "dwarves", "shire", "elves" }) && !sc.Factions["gondor"].Enemies.Contains("rohan"), "the shipped lines need no rewrite");
+            var gp = Player(null); sfs.SetAssigned(gp.PlayerUID, "Gp", "gondor");
+            Check(!sfs.WantsToAttack("rohan", gp) && !sfs.WantsToAttack("shire", gp) && sfs.WantsToAttack("mordor", gp) && sfs.WantsToAttack("dunlendings", gp) && sfs.IsFriend("gondor", gp) && !sfs.IsFriend("rohan", gp),
+                "a Gondor player is safe from allied Rohan NPCs but can hire only Gondor's (owner's choice); the Shadow and the Dunlendings attack them");
+            var mv = new FactionConfig(); mv.FillDefaults(); mv.Factions["dale"].Enemies.Remove("mordor"); mv.Factions["dale"].Allies.Add("mordor"); sfs.SetConfig(mv);
+            Check(sfs.Relation("mordor", "dale") == FactionRelation.Ally && sfs.LinesChanged && mv.Factions["mordor"].Allies.Contains("dale") && !mv.Factions["mordor"].Enemies.Contains("dale") && sfs.Relation("mordor", "gondor") == FactionRelation.Enemy,
+                "moving a name to one faction's Allies line makes the pair allies, and the other faction's lines are rewritten to match");
+            var nt = new FactionConfig(); nt.FillDefaults(); nt.Factions["shire"].Enemies.Remove("dunlendings"); nt.Factions["dunlendings"].Enemies.Remove("shire"); sfs.SetConfig(nt);
+            Check(sfs.Relation("shire", "dunlendings") == FactionRelation.Neutral && sfs.Relation("shire", "mordor") == FactionRelation.Enemy, "a faction in neither line of either faction is neutral");
+            var ow = new FactionConfig(); ow.FillDefaults(); ow.Relations.Add(new FactionRelationDef { A = "gondor", B = "rohan", Relation = "enemy" }); sfs.SetConfig(ow);
+            Check(sfs.Relation("gondor", "rohan") == FactionRelation.Enemy && ow.Factions["gondor"].Allies.Contains("rohan"), "a Relations entry wins over the lines, which stay as written");
+            var old34 = Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(json.Replace("\"Version\": 35", "\"Version\": 34"));
+            foreach (var od in old34.Factions.Values) { od.Enemies = null; od.Allies = null; }
+            old34.Relations = new List<FactionRelationDef> { new FactionRelationDef { A = "gondor", B = "rohan", Relation = "enemy" }, new FactionRelationDef { A = "dunlendings", B = "rohan", Relation = "enemy" }, new FactionRelationDef { A = "elves", B = "dwarves", Relation = "ally", ShareFriends = true } };
+            var m35 = FactionConfig.FromFile(old34, out bool store35); sfs.SetConfig(m35);
+            Check(store35 && m35.Version == 35 && m35.Relations.Count == 1 && sfs.Relation("gondor", "rohan") == FactionRelation.Ally && sfs.SharesFriends("elves", "dwarves") && m35.Factions["rohan"].Enemies.Contains("dunlendings"),
+                "a version 34 file takes the shipped sides; its pair entries go except alliances that share friends");
+        }
         // 0.0.112: files before version 19 are no longer converted step by step (both servers run 0.0.108 or later).
 
         // ---- 0.0.35: the factions the user listed, admin-set factions, hire prices, instructions ----
@@ -362,7 +405,7 @@ public static class Program {
         hiring.Owner(bu).Groups = new List<string> { "fellowship" };
         Check(!fs.RecruitWantsToAttack(sword, bu, groupie) && fs.AlliedPlayers(bu, groupie.PlayerUID) && !fs.AlliedPlayers(bu, outsider.PlayerUID), "raid: players sharing a /group with the owner are allies");
         var cfgA = new FactionConfig(); cfgA.FillDefaults();
-        cfgA.Relations.First(r => (r.A == "gondor" && r.B == "rohan") || (r.A == "rohan" && r.B == "gondor")).Relation = "ally"; SetLegacy(fs, cfgA);
+        Pair(cfgA, "gondor", "rohan").Relation = "ally"; SetLegacy(fs, cfgA);
         Check(!fs.RecruitWantsToAttack(sword, bu, rohanNpc) && !fs.RecruitWantsToAttack(sword, bu, Member(null, "rohan")) && fs.RecruitWantsToAttack(sword, bu, Wild("test-dale-recruit")), "raid: allied factions' NPCs and members are spared, the rest aren't");
         SetLegacy(fs, new FactionConfig());
         Recruit.SetStance(sword, Recruit.Aggressive);
@@ -708,7 +751,7 @@ public static class Program {
         Check(fs.RecruitWantsToAttack(sentry, cu, intruder) && !fs.RecruitWantsToAttack(sentry, cu, passerby), "an aggressive guard attacks a stranger inside its area, not one passing outside");
         Check(!fs.RecruitWantsToAttack(sentry, cu, At(chief, 105, 64, 105)) && !fs.RecruitWantsToAttack(sentry, cu, countryman) && !fs.RecruitWantsToAttack(sentry, cu, mate), "...never the owner, a member of the owner's faction, or the owner's /group mate");
         var cfgG = new FactionConfig(); cfgG.FillDefaults();
-        cfgG.Relations.First(r => (r.A == "gondor" && r.B == "rohan") || (r.A == "rohan" && r.B == "gondor")).Relation = "ally"; SetLegacy(fs, cfgG);
+        Pair(cfgG, "gondor", "rohan").Relation = "ally"; SetLegacy(fs, cfgG);
         Check(!fs.RecruitWantsToAttack(sentry, cu, At(Member(null, "rohan"), 105, 64, 105)) && fs.RecruitWantsToAttack(sentry, cu, At(Member(null, "dale"), 105, 64, 105)), "...nor a member of a faction allied to the owner's; members of other factions are strangers");
         SetLegacy(fs, new FactionConfig());
         var theirMan = At(Hired("test-gondor-recruit", intruder.PlayerUID), 105, 64, 105); var theirManOutside = At(Hired("test-gondor-recruit", intruder.PlayerUID), 130, 64, 100);
@@ -1257,6 +1300,8 @@ public static class Program {
                 && MountsOf("test-rohan-rider").All(m => m.StartsWith("feverstonewilds:horse-tamed-")) && MountsOf("test-uruk-rider").All(m => m.StartsWith("feverstonewilds:tame-direwolf-"))
                 && MountsOf("test-elf-rider").SequenceEqual(new[] { "game:tameddeer-caribou-male-adult" }) && MountsOf("test-haradrim-rider").All(m => m.StartsWith("feverstonewilds:horse-tamed-")) && MountsOf("test-goblin-rider").All(m => m.StartsWith("feverstonewilds:tame-direwolf-")) && MountsOf("test-dwarf-rider").All(m => m.StartsWith("teapotsgiantboar:tame-giantboar-")),
                 "0.0.117: riders for Men of the West on horses, Shadow orcs on dire wolves, elves on caribou (0.0.157) and dwarves on giant boars, each with the rider behavior and its mounts");
+            Check(MountsOf("test-wickeddwarf-rider").Length > 0 && MountsOf("test-wickeddwarf-rider").SequenceEqual(MountsOf("test-dwarf-rider")) && MountsOf("test-wickeddwarf-rider").All(m => m.StartsWith("teapotsgiantboar:")),
+                "wicked dwarves ride giant boars like the dwarves");
             double SeekRange(string c) => entityFiles[c]["server"]["behaviors"].First(b => (string)b["code"] == "taskai")["aitasks"].First(t => (string)t["code"] == "lotrnpcs:seekentity").Value<double>("seekingRange");
             (double X, double Z) roAway = Riders.RideOutHeading(0, 1, 0, Riders.AnchorRadius + 2), roNear = Riders.RideOutHeading(0, 1, 0, Riders.AnchorRadius - 3), roBack = Riders.RideOutHeading(0, 1, 0, -Riders.AnchorRadius - 2);
             Check(roNear == (0, 1) && roBack == (0, 1) && roAway.Z < 0 && Math.Abs(roAway.X) > 0.5 && Math.Abs(roAway.X * roAway.X + roAway.Z * roAway.Z - 1) < 1e-9,
@@ -1738,7 +1783,7 @@ public static class Program {
         {
             var d16 = new FactionConfig(); d16.FillDefaults();
             Check(d16.Factions.All(kv => kv.Value.PromotePrices.All(p => FactionTiers.Of(kv.Key).Promote[p.Key] == p.Value)) && d16.Factions["gondor"].PromotePrices["warrior"] == 12 && d16.Factions["gondor"].PromotePrices["captain"] == 36
-                && FactionConfig.InstructionText.Any(l => l.StartsWith("PromotePrices")) && FactionConfig.InstructionText.Any(l => l.Contains("No factions are allies by default")),
+                && FactionConfig.InstructionText.Any(l => l.StartsWith("PromotePrices")) && FactionConfig.InstructionText.Any(l => l.StartsWith("Enemies and Allies") && l.Contains("move the name")),
                 "every faction promotes for its tier's price (0.0.93: Men 12 coins to warrior or archer and 36 to captain), and #Instructions explain it");
             var pp = Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(@"{ ""Version"": 16, ""Factions"": { ""dale"": { ""PromotePrices"": { ""Captain"": 0 } } } }"); pp.FillDefaults();
             Check(pp.Factions["dale"].PromotePrices["captain"] == 0 && pp.Factions["dale"].PromotePrices["warrior"] == 12, "a file's promotion price replaces the default, ranks it leaves out get the default");
@@ -2222,7 +2267,7 @@ public static class Program {
             }
             v27["Factions"]["angmar"]["HirePrices"]["captain"] = 30; v27["Factions"]["isengard"]["PromotePrices"]["warrior"] = 20; v27["Factions"]["elves"]["Damage"]["captain"] = 12;
             var m27 = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(v27.ToString()), out bool store27);
-            Check(store27 && m27.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 34
+            Check(store27 && m27.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 35
                 && H4(m27.Factions["mordor"].HirePrices) == "5/15/40/15" && P3(m27.Factions["mordor"].PromotePrices) == "12/12/36" && T4(m27.Factions["mordor"].Health) == "22/34/48/35"
                 && H4(m27.Factions["angmar"].HirePrices) == "4/11/30/11" && P3(m27.Factions["angmar"].PromotePrices) == "8/8/25" && T4(m27.Factions["angmar"].Damage) == "3.15/3.95/7/3.05"
                 && H4(m27.Factions["isengard"].HirePrices) == "5/15/40/15" && P3(m27.Factions["isengard"].PromotePrices) == "20/14/40"
@@ -2372,7 +2417,7 @@ public static class Program {
                 && FactionTiers.ScaledHealth(48, 1.33f) == 64 && FactionTiers.ScaledHealth(22, 1.05f) == 23 && FactionTiers.ScaledHealth(34, 1.05f) == 36 && FactionTiers.ScaledHealth(22, 1f) == 22
                 && FactionTiers.ScaledHealth(5, 0.1f) == 1 && FactionTiers.ScaledHealth(0, 2f) == 0 && FactionTiers.Round(12.5) == 13 && FactionTiers.Round(28.57) == 29,
                 "health under a multiplier: orc recruit 15, warrior 22, captain 32; goblin recruit 13; dwarf captain 64; Uruk recruit 23; never below 1");
-            var fs90 = new FactionSystem(); fs90.SetConfig(FactionConfig.FromFile(null, out _));
+            var fs90 = new FactionSystem(); Use(fs90, FactionConfig.FromFile(null, out _));
             TestAgent Hp90(string code, float baseMax, float cur) { var e = Npc(code); var h = new TreeAttribute(); h.SetFloat("basemaxhealth", baseMax); h.SetFloat("maxhealth", baseMax); h.SetFloat("currenthealth", cur); e.WatchedAttributes["health"] = h; return e; }
             float Hv(TestAgent e, string k) => e.WatchedAttributes.GetTreeAttribute("health").GetFloat(k);
             var orcNew = Hp90("test-mordororc-recruit", 19, 19); var orcHurt = Hp90("test-mordororc-captain", 40, 32); var manNew = Hp90("test-gondor-recruit", 22, 22); var dwNew = Hp90("test-dwarf-captain", 63, 63);
@@ -2468,17 +2513,17 @@ public static class Program {
         // making a character"; groups stop counting, "A"; every faction with Joinable, "A") ----
         {
             var c92 = FactionConfig.FromFile(null, out _);
-            var fs92 = new FactionSystem(); fs92.SetConfig(c92);
+            var fs92 = new FactionSystem(); Use(fs92, c92);
             Check(!c92.RaceAndGroupMembership && c92.Factions.Values.All(d => d.Joinable) && Newtonsoft.Json.JsonConvert.SerializeObject(c92).Contains("\"RaceAndGroupMembership\":false"),
                 "a new file: race and groups don't count (RaceAndGroupMembership false) and every faction is Joinable");
             Check(!fs92.IsFriend("shire", "lrc:harfoot", new List<string>()) && !fs92.IsFriend("elves", "lrc:noldor", new List<string>()) && !fs92.IsFriend("gondor", null, new List<string> { "gondor" })
                 && fs92.IsFriend("rohan", "lrc:noldor", new List<string>(), "rohan") && !fs92.IsFriend("elves", "lrc:noldor", new List<string>(), "rohan"),
                 "a harfoot isn't Shire and a Noldor isn't Elves by race, a group doesn't make anyone a member; the picked faction is the one that counts");
-            var gr = c92.Relations.First(r => FactionConfig.SamePair(r, "gondor", "rohan")); gr.Relation = "ally"; gr.ShareFriends = true; fs92.SetConfig(c92);
+            var gr = Pair(c92, "gondor", "rohan"); gr.Relation = "ally"; gr.ShareFriends = true; Use(fs92, c92);
             Check(fs92.IsFriend("gondor", null, null, "rohan") && !fs92.IsFriend("dale", null, null, "rohan"),
                 "a ShareFriends ally still counts the player as a friend (and lets them hire); other factions don't");
             // The menu's list and the pick.
-            c92.Factions["wickeddwarves"].Joinable = false; fs92.SetConfig(c92);
+            c92.Factions["wickeddwarves"].Joinable = false; Use(fs92, c92);
             var opts = JoinSystem.Options(c92);
             Check(opts.Count == 17 && opts[0].Faction == "shire" && opts[1].Faction == "gondor" && opts.All(o => o.Faction != "wickeddwarves")
                 && opts.First(o => o.Faction == "mordor").Followers == 3 && opts.First(o => o.Faction == "mordor").Roster == 16 && opts.First(o => o.Faction == "shire").Stance == "defensive",

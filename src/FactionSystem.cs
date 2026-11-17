@@ -17,9 +17,9 @@ namespace LotrNpcs
 {
     /// <summary>
     /// Who NPC factions fight: players by faction membership (the join menu, or race and /group with
-    /// RaceAndGroupMembership), other factions by the config's Relations (no entry: enemies), and monsters. Allies
-    /// never fight and help each other when attacked. A player is safe from their own factions, and from those
-    /// factions' allies only where an admin set ShareFriends on the alliance.
+    /// RaceAndGroupMembership), other factions by each faction's Enemies and Allies lines, and monsters. Allies
+    /// never fight and help each other when attacked. A player is safe from their own factions and their allies, but
+    /// hires only from their own (and from allies where an admin set ShareFriends on the alliance).
     /// The AI tasks ask WantsToAttack and RecruitWantsToAttack; NPCs carry their faction in the lotrnpcsFaction
     /// entity type attribute. Everything here runs on the server's main thread.
     /// </summary>
@@ -182,7 +182,7 @@ namespace LotrNpcs
             }
             FactionConfig config = FactionConfig.FromFile(loaded, out bool store);
             SetConfig(config);
-            if (store) sapi.StoreModConfig(config, ConfigFile);
+            if (store || LinesChanged) sapi.StoreModConfig(config, ConfigFile);
             sapi.Logger.Notification("[lotrnpcs] Factions from " + ConfigFile + ": " + string.Join(", ", Config.Factions.Keys) + ".");
         }
 
@@ -219,6 +219,8 @@ namespace LotrNpcs
                 if (def.Stance != "aggressive" && def.Stance != "defensive") Warn("faction " + id + " has the unknown stance \"" + def.Stance + "\", so it fights only when attacked.");
                 def.FriendlyRaces = Clean(def.FriendlyRaces);
                 def.FriendlyGroups = Clean(def.FriendlyGroups);
+                if (def.Enemies != null) def.Enemies = Clean(def.Enemies);
+                if (def.Allies != null) def.Allies = Clean(def.Allies);
                 factions[id] = def;
             }
             config.Factions = factions;
@@ -242,9 +244,12 @@ namespace LotrNpcs
             monsterStamp = ++stampCounter;
             aggressive = new HashSet<string>(factions.Where(kv => kv.Value.Stance == "aggressive").Select(kv => kv.Key));
 
-            // Relations: the first entry for a pair counts. Pairs of known factions without an entry are enemies.
+            // Relations: the first entry for a pair counts. Pairs without an entry follow the factions' Enemies and
+            // Allies lines: allies if either lists the other as an ally (so moving a name to one faction's Allies is
+            // enough), else enemies if either lists it as an enemy, else neutral.
             relations = new Dictionary<string, Dictionary<string, FactionRelation>>();
             sharedFriends = new HashSet<string>();
+            HashSet<string> fromEntries = new HashSet<string>();
             void SetPair(string a, string b, FactionRelation rel)
             {
                 if (!relations.TryGetValue(a, out Dictionary<string, FactionRelation> row)) relations[a] = row = new Dictionary<string, FactionRelation>();
@@ -268,14 +273,36 @@ namespace LotrNpcs
                 }
                 SetPair(a, b, rel);
                 SetPair(b, a, rel);
+                fromEntries.Add(a + "|" + b); fromEntries.Add(b + "|" + a);
                 if (rel == FactionRelation.Ally && r.ShareFriends) { sharedFriends.Add(a + "|" + b); sharedFriends.Add(b + "|" + a); }
+            }
+            foreach (KeyValuePair<string, FactionDef> kv in factions)
+            {
+                foreach (string other in kv.Value.Enemies.Concat(kv.Value.Allies).Where(o => o != kv.Key && !factions.ContainsKey(o)).Distinct())
+                    Warn("faction " + kv.Key + " lists \"" + other + "\", which isn't a faction, so it is ignored.");
             }
             foreach (string a in factions.Keys)
             {
                 foreach (string b in factions.Keys)
                 {
-                    if (a != b && !(relations.TryGetValue(a, out Dictionary<string, FactionRelation> row) && row.ContainsKey(b))) SetPair(a, b, FactionRelation.Enemy);
+                    if (a == b || (relations.TryGetValue(a, out Dictionary<string, FactionRelation> row) && row.ContainsKey(b))) continue;
+                    FactionDef da = factions[a], db = factions[b];
+                    SetPair(a, b, da.Allies.Contains(b) || db.Allies.Contains(a) ? FactionRelation.Ally
+                        : da.Enemies.Contains(b) || db.Enemies.Contains(a) ? FactionRelation.Enemy : FactionRelation.Neutral);
                 }
+            }
+            // Each faction's lines are rewritten to what was worked out, so both factions of a pair show it. A pair
+            // with a Relations entry keeps its lines as written (the entry wins over them).
+            LinesChanged = false;
+            foreach (KeyValuePair<string, FactionDef> kv in factions)
+            {
+                bool Listed(string o, List<string> line, FactionRelation rel) =>
+                    o != kv.Key && (fromEntries.Contains(kv.Key + "|" + o) ? line.Contains(o) : Relation(kv.Key, o) == rel);
+                List<string> enemies = factions.Keys.Where(o => Listed(o, kv.Value.Enemies, FactionRelation.Enemy)).ToList();
+                List<string> allies = factions.Keys.Where(o => Listed(o, kv.Value.Allies, FactionRelation.Ally)).ToList();
+                if (!enemies.SequenceEqual(kv.Value.Enemies) || !allies.SequenceEqual(kv.Value.Allies)) LinesChanged = true;
+                kv.Value.Enemies = enemies;
+                kv.Value.Allies = allies;
             }
 
             alliesOf = factions.Keys.ToDictionary(f => f, f => new[] { f }.Concat(factions.Keys.Where(o => o != f && Relation(f, o) == FactionRelation.Ally)).ToArray());
@@ -289,6 +316,10 @@ namespace LotrNpcs
             (list ?? new List<string>()).Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim().ToLowerInvariant()).Distinct().ToList();
 
         public static string FactionOf(Entity entity) => NpcTypeInfo.Of(entity)?.Faction;
+
+        /// <summary>SetConfig rewrote some faction's Enemies or Allies line (a pair listed on one side only, or in
+        /// a different order), so the file should be written back.</summary>
+        public bool LinesChanged { get; private set; }
 
         public FactionRelation Relation(string a, string b)
         {

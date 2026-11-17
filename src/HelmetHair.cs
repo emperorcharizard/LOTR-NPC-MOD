@@ -12,25 +12,24 @@ using Vintagestory.GameContent;
 namespace LotrNpcs
 {
     /// <summary>
-    /// 0.0.80 (owner, 2026-11-04, Haradrim test: "when the helmet is on, hide the hair options underneath"): while an NPC
-    /// wears head armor, the shapes of its hair skin parts (hairbase, hairextra; not beards or mustaches) are left out of
-    /// its model, so hair doesn't poke through or hang out of helmets. Every faction's helmets, not only the Haradrim's.
+    /// While an NPC wears head armor, the shapes of its hair skin parts (hairbase, hairextra; not beards or
+    /// mustaches) are left out of its model, so hair doesn't poke through or hang out of helmets. Every faction's
+    /// helmets.
     ///
-    /// The game hides parts under gear by element name, and the game's hair shapes can't be listed ahead of time, so the
-    /// names are read from the hair shapes themselves: the race model's customplayermodels file gives each part's shape
-    /// template, the NPC's skinConfig gives the chosen variant. Names that also exist in the NPC's body shape are never
-    /// removed. Client only; runs after seraphinventory has added the gear, so a helmet taken off brings the hair back
-    /// on the next redraw.
+    /// The game hides parts under gear by element name, and the game's hair shapes can't be listed ahead of time, so
+    /// the names are read from the hair shapes themselves: the race model's customplayermodels file gives each part's
+    /// shape template, the NPC's skinConfig gives the chosen variant. Names that also exist in the NPC's body shape
+    /// are never removed. Client only; runs after seraphinventory has added the gear, so a helmet taken off brings
+    /// the hair back on the next redraw.
     ///
-    /// 0.0.81 (owner, 2026-11-04, Haradrim test: "beards cannot be worn with these helmets either. but when the helmet is
-    /// toggled off, the hair and beard should come back as was"): helmets matching the behavior's "hideBeardUnder" codes
-    /// (wildcards; gen gives the Haradrim armor mod's helmets, whose veils and masks cover the face) also hide the beard and
-    /// mustache parts. Nothing is changed in the NPC's skin config: the parts are only left out of the drawn shape while
-    /// the helmet is worn, so taking it off (looks menu) redraws the same hair, beard and mustache.
+    /// Helmets matching the behavior's "hideBeardUnder" codes (wildcards; gen gives the Haradrim armor mod's helmets,
+    /// whose veils and masks cover the face) also hide the beard and mustache parts. Nothing is changed in the NPC's
+    /// skin config: the parts are only left out of the drawn shape while the helmet is worn, so taking it off (looks
+    /// menu) redraws the same hair, beard and mustache.
     ///
-    /// 0.0.96 (owner, 2026-11-07: "with the new gundabad helmet, the ears stick out from the sides"): helmets matching
-    /// "hideEarsUnder" also hide the ears part. Ear variants name their shape directly (variant shape.base) rather than
-    /// through the part's shapeTemplate, so HairShapePath reads that too.
+    /// Helmets matching "hideEarsUnder" (such as the Gundabad helmet) also hide the ears part. Ear variants name
+    /// their shape directly (variant shape.base) rather than through the part's shapeTemplate, so HairShapePath reads
+    /// that too.
     /// </summary>
     public class EntityBehaviorHelmetHidesHair : EntityBehavior
     {
@@ -61,7 +60,7 @@ namespace LotrNpcs
         public static string[] PartsUnder(AssetLocation helmet, IEnumerable<AssetLocation> beardPatterns) =>
             PartsUnder(helmet, beardPatterns, null);
 
-        /// <summary>The skin parts to leave out under this helmet, ears too when it matches earPatterns (0.0.96).</summary>
+        /// <summary>The skin parts to leave out under this helmet, ears too when it matches earPatterns.</summary>
         public static string[] PartsUnder(AssetLocation helmet, IEnumerable<AssetLocation> beardPatterns, IEnumerable<AssetLocation> earPatterns)
         {
             if (helmet == null) return null;
@@ -84,7 +83,7 @@ namespace LotrNpcs
             JObject def = (model["SkinnableParts"] as JArray)?.OfType<JObject>().FirstOrDefault(p => (string)p["code"] == part);
             string template = (string)def?["shapeTemplate"]?["base"];
             if (template != null) return template.Replace("{code}", variant);
-            // 0.0.96: a variant with its own shape (the ears).
+            // A variant with its own shape (the ears).
             JObject v = (def?["variants"] as JArray)?.OfType<JObject>().FirstOrDefault(x => (string)x["code"] == variant);
             return (string)v?["shape"]?["base"];
         }

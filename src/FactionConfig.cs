@@ -27,6 +27,10 @@ namespace LotrNpcs
     /// <summary>One NPC faction in ModConfig/lotrnpcs-factions.json.</summary>
     public class FactionDef
     {
+        // The factions this one fights and the ones it fights beside, each on one line of the file. A faction in
+        // neither list is neutral to it. Null until FillDefaults: the shipped sides (FactionConfig.DefaultLines).
+        [JsonConverter(typeof(OneLineList))]
+        public List<string> Enemies, Allies;
         // "aggressive": attacks players who aren't its friends on sight. "defensive": only fights players who attack
         // it or its allies. Both attack enemy factions' NPCs and monsters on sight.
         public string Stance = "aggressive";
@@ -62,6 +66,22 @@ namespace LotrNpcs
         public bool ShouldSerializeOldDamageMultiplier() => false;
     }
 
+    /// <summary>Writes a list of strings on one line of the file ("Enemies": ["mordor", "angmar"]), so each faction's
+    /// sides read at a glance. Reads any JSON list.</summary>
+    public class OneLineList : JsonConverter
+    {
+        public override bool CanConvert(Type objectType) => objectType == typeof(List<string>);
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) =>
+            reader.TokenType == JsonToken.Null ? null : serializer.Deserialize<List<string>>(reader);
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            if (!(value is List<string> list)) { writer.WriteNull(); return; }
+            writer.WriteRawValue("[" + string.Join(", ", list.Select(s => JsonConvert.ToString(s))) + "]");
+        }
+    }
+
     /// <summary>A player whose faction an admin set with /recruits faction set, saved with the world.</summary>
     public class AssignedPlayer
     {
@@ -69,8 +89,8 @@ namespace LotrNpcs
     }
 
     /// <summary>
-    /// How two factions treat each other: "ally", "enemy" or "neutral". Factions without an entry are enemies.
-    /// ShareFriends (allies only): each faction's members are also safe from the other's NPCs and can hire them.
+    /// An entry for one pair of factions: "ally", "enemy" or "neutral". It wins over the factions' Allies and Enemies
+    /// lines. ShareFriends (allies only): each faction's members are also safe from the other's NPCs and can hire them.
     /// </summary>
     public class FactionRelationDef
     {
@@ -91,7 +111,7 @@ namespace LotrNpcs
         [JsonProperty("#Instructions")]
         public List<string> Instructions;
         // File format. Migrate() updates older files once and then stores them.
-        public const int CurrentVersion = 34;
+        public const int CurrentVersion = 35;
         public int Version;
 
         // ---- Factions and relations ----
@@ -186,8 +206,7 @@ namespace LotrNpcs
         public void FillDefaults()
         {
             Factions = Factions ?? DefaultFactions();
-            // No factions are allies by default: only the example entry, which allies nobody.
-            Relations = Relations ?? new List<FactionRelationDef> { ExampleRelation() };
+            Relations = Relations ?? new List<FactionRelationDef>();
             WildBodyLoot = WildBodyLoot ?? DefaultBodyLoot();
             HiredBodyLoot = HiredBodyLoot ?? DefaultBodyLoot();
             MonsterCodes = MonsterCodes ?? new List<string> { "game:drifter-*", "game:bowtorn-*", "game:shiver-*", "game:bell-*", "game:locust-*" };
@@ -196,6 +215,13 @@ namespace LotrNpcs
                 FactionDef def = kv.Value;
                 if (def == null) continue;
                 FactionTier tier = FactionTiers.Of(kv.Key);
+                if (def.Enemies == null && def.Allies == null)
+                {
+                    (List<string> enemies, List<string> allies) = DefaultLines(kv.Key?.Trim().ToLowerInvariant(), Factions.Keys);
+                    def.Enemies = enemies; def.Allies = allies;
+                }
+                def.Enemies = def.Enemies ?? new List<string>();
+                def.Allies = def.Allies ?? new List<string>();
                 def.HireCoin = string.IsNullOrWhiteSpace(def.HireCoin) ? DefaultHireCoin : def.HireCoin.Trim();
                 // Ranks the file leaves out cost the faction's tier price. Rank names compare in lower case; if a
                 // file names one twice ("Captain" and "captain"), the first counts.
@@ -354,8 +380,11 @@ namespace LotrNpcs
             "Health and Damage (by rank): health and damage per hit for recruit, warrior, captain, archer, guard and shock. Every faction ships the same numbers: health 22/34/48/35, damage 3.15/3.95/7/3.05 (recruit/warrior/captain/archer). Riders use warrior numbers x1.25. Captains hit other NPCs x1.5 and take x0.5 from them.",
             "FriendlyRaces and FriendlyGroups: only used when RaceAndGroupMembership is true.",
             "--- Between factions ---",
-            "Relations: \"ally\", \"enemy\" or \"neutral\" for a pair of factions (A, B). Pairs without an entry are enemies. No factions are allies by default. Allies never fight and help each other; neutral factions leave each other alone.",
-            "ShareFriends (allies only): true lets each faction's members hire the other's NPCs and keeps them safe from those NPCs.",
+            "Enemies and Allies (in each faction): the factions it fights and the ones it fights beside. A faction in neither line is neutral: they leave each other alone. To change a pair, move the name from one line to the other; one faction's line is enough, and the mod copies the change to the other faction on /recruits faction reload. Allies win: if either lists the other as an ally they are allies. To make allies enemies again, move the name back in both factions.",
+            "Default sides: the Free Peoples (gondor, rohan, dale, arnor, dwarves, shire, elves) are allies; the Shadow (mordor, angmar, mistymountains, gundabad, isengard, haradrim, easterlings, blacknumenoreans, wickeddwarves) are allies; the two are enemies. Dunlendings and tormentedelves are enemies of everyone.",
+            "Allies never fight each other and come to help each other. A player is safe from NPCs of their own faction and its allies, but hires only from their own faction.",
+            "Relations (optional): entries for one pair, {\"A\": \"gondor\", \"B\": \"dale\", \"Relation\": \"ally\", \"ShareFriends\": true}, which win over the lines.",
+            "ShareFriends (allies only, in a Relations entry): true lets each faction's members hire the other's NPCs and keeps them safe from those NPCs.",
             "Hiring: right-click an NPC to talk. Members of its faction (and of allies with ShareFriends) can hire it, paying from hotbar and backpack.",
             "RaceAndGroupMembership (default false): true also makes a player a member by race (FriendlyRaces, e.g. lrc:harfoot) or /group (FriendlyGroups), unless the menu or an admin already set their faction.",
             "MonsterCodes: creatures every faction attacks on sight (* = wildcard).",
@@ -389,8 +418,18 @@ namespace LotrNpcs
             "Version: the file format. Don't change it; the mod updates older files once.",
         };
 
-        // Every pair without an entry is enemies anyway; the entry is there so admins see the format and the switches.
-        static FactionRelationDef ExampleRelation() => new FactionRelationDef { A = "gondor", B = "rohan", Relation = "enemy", ShareFriends = false };
+        // The shipped sides: each alliance's members are allies, the two alliances enemies, and a faction in neither
+        // (Dunlendings, tormented elves, any faction an admin adds) is an enemy of everyone.
+        public static readonly string[] FreePeoples = { "gondor", "rohan", "dale", "arnor", "dwarves", "shire", "elves" };
+        public static readonly string[] Shadow = { "mordor", "angmar", "mistymountains", "gundabad", "isengard", "haradrim", "easterlings", "blacknumenoreans", "wickeddwarves" };
+
+        /// <summary>A faction's shipped Enemies and Allies lines among these factions.</summary>
+        public static (List<string> Enemies, List<string> Allies) DefaultLines(string faction, IEnumerable<string> all)
+        {
+            string[] side = Array.IndexOf(FreePeoples, faction) >= 0 ? FreePeoples : Array.IndexOf(Shadow, faction) >= 0 ? Shadow : new string[0];
+            List<string> others = all.Select(f => f?.Trim().ToLowerInvariant()).Where(f => !string.IsNullOrEmpty(f) && f != faction).Distinct().ToList();
+            return (others.Where(f => Array.IndexOf(side, f) < 0).ToList(), others.Where(f => Array.IndexOf(side, f) >= 0).ToList());
+        }
 
         /// <summary>The config to use for what LoadModConfig returned (null: no file yet), with defaults filled in
         /// and older formats updated. store: write it back to the file.</summary>
@@ -510,6 +549,10 @@ namespace LotrNpcs
                     if (SameTable(kv.Value.Damage, FactionTiers.OrcDamage091)) kv.Value.Damage = new Dictionary<string, float>(FactionTiers.Orc.Damage);
                 }
             }
+            // Version 35: sides move into each faction's Enemies and Allies lines (filled with the shipped sides by
+            // FillDefaults); old pair entries go, except alliances that share friends, which the lines can't say.
+            if (Version < 35 && Version > 0 && Relations != null)
+                Relations = Relations.Where(r => r != null && r.ShareFriends && r.Relation?.Trim().ToLowerInvariant() == "ally").ToList();
             // Version 34: a captain still at 96 health or 10.5 damage (version 33's) goes back to 48 or 7, so players
             // in equal armor can kill captains.
             if (Version < 34 && Version > 0)

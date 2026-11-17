@@ -1,4 +1,11 @@
-# LOTR NPCs 1.0.2
+# LOTR NPCs 1.0.3
+
+## New in 1.0.3
+
+- **Sides you can read:** each faction in the config has an `Enemies` line and an `Allies` line. To change who fights whom, move a name from one line to the other and run `/recruits faction reload`.
+- **Default sides:** the Free Peoples are allies, the Shadow are allies, and the two are at war. The Dunlendings and tormented elves fight everyone.
+- **Safe among allies:** players are not attacked by NPCs of factions allied to their own, but still hire only from their own faction.
+- **Wicked dwarf riders** ride giant boars, like the dwarves.
 
 ## Fixes since 1.0.0
 

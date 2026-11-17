@@ -13,11 +13,11 @@ using Vintagestory.GameContent;
 namespace LotrNpcs
 {
     /// <summary>
-    /// Spawn item icons as head-and-shoulders portraits, like vanilla's villager and trader items (user, 2026-11-03):
-    /// the NPC's race model with its face, hair, ears and beard, wearing the armor its rank starts in. The item's
-    /// "lotrnpcsPortrait" attribute names the Player Model Lib model, the skin, the preferred facial expression and
-    /// the armor (the same "sets" and "items" as lotrnpcs:startinggear). Built once per item on the client, ahead of
-    /// time by PortraitWarmUp or else on first render; if anything fails, the item keeps its plain full-body mesh.
+    /// Spawn item icons as head-and-shoulders portraits, like vanilla's villager and trader items: the NPC's race
+    /// model with its face, hair, ears and beard, wearing the armor its rank starts in. The item's "lotrnpcsPortrait"
+    /// attribute names the Player Model Lib model, the skin, the preferred facial expression and the armor (the same
+    /// "sets" and "items" as lotrnpcs:startinggear). Built once per item on the client, ahead of time by
+    /// PortraitWarmUp or else on first render; if anything fails, the item keeps its plain full-body mesh.
     /// </summary>
     public class CollectibleBehaviorNpcPortrait : CollectibleBehavior
     {
@@ -34,9 +34,8 @@ namespace LotrNpcs
 
     /// <summary>
     /// Builds the spawn items' portraits a few at a time once the player is in creative mode, where the LOTR NPCs tab
-    /// shows them. Until 0.0.43 all of them (about fifty) were built on the tab's first frame, which stalled the game.
-    /// Survival players never see the items, so they never pay for them. Anything not built yet when it's first
-    /// drawn is built then, as before.
+    /// shows them; building all of them (about fifty) on the tab's first frame stalled the game. Survival players
+    /// never see the items, so they never pay for them. Anything not built yet when it's first drawn is built then.
     /// </summary>
     public static class PortraitWarmUp
     {
@@ -222,8 +221,8 @@ namespace LotrNpcs
             string wanted = spec["parts"][code].AsString(null);
             JObject chosen = list.FirstOrDefault(v => (string)v["code"] == wanted);
             if (chosen != null) return chosen;
-            // A bald head with the model's default pale features looked faceless (user, 2026-11-03), so hair comes
-            // first unless the race has none, as orcs.
+            // A bald head with the model's default pale features looks faceless, so hair comes first unless the race
+            // has none, as orcs.
             if (code == "hairbase") return list.FirstOrDefault(v => !Bald.Contains((string)v["code"] ?? "")) ?? list[0];
             return list[0];
         }
@@ -302,17 +301,14 @@ namespace LotrNpcs
             return b[0] > b[3] ? null : b;
         }
 
-        // How much of the bare bust, from the top, the portrait shows: the head and the top of the shoulders (user,
-        // 2026-11-03: "the head, some shoulder, and the armor"). 0.0.38 showed it down to the elbows.
+        // How much of the bare bust, from the top, the portrait shows: the head and the top of the shoulders.
         public const float CropShare = 0.68f;
         // Item units across a GUI slot at guiTransform scale 1: slots are 48 wide and items are drawn 25.6 wide
         // (GuiElementPassiveItemSlot.unscaledSlotSize and unscaledItemSize), and each slot clips what sticks out.
         public const float SlotUnits = 48f / 25.6f;
-        // Where the portrait sits in the slot, as shares of the slot's size. 0.0.39 and 0.0.40 centred the bare bust
-        // and filled about three quarters of the slot, so helmets, crests and pauldrons were clipped at the slot's
-        // edge and the cut chest floated above its bottom (user, 2026-11-03: "the npcs are still cropped weirdly").
-        // Now the cut sits on the bottom edge, the bare bust fills BustHeight of the slot, and the portrait shrinks
-        // when its gear would reach past TopLimit or HalfWidth from the middle.
+        // Where the portrait sits in the slot, as shares of the slot's size. The cut sits on the bottom edge, the
+        // bare bust fills BustHeight of the slot, and the portrait shrinks when its gear would reach past TopLimit or
+        // HalfWidth from the middle, so helmets, crests and pauldrons aren't clipped at the slot's edge.
         public const float BottomEdge = -0.02f, BustHeight = 0.8f, TopLimit = 0.96f, HalfWidth = 0.47f;
 
         /// <summary>Crops the bust to the head and shoulders, then scales and places it in the item's space so the
@@ -449,8 +445,7 @@ namespace LotrNpcs
                 pos = null;
                 // The body's own textures first, as in game, where Player Model Lib's texture source answers before
                 // the worn gear's. Vanilla clothing and armor add their textures without a prefix, so one named like
-                // the skin ("seraph") replaced it, darkening the tormented elf captain's and the Haradrim's heads
-                // (user, 2026-11-03: "some texture issues").
+                // the skin ("seraph") would replace it and darken the head.
                 if (locations.TryGetValue(textureCode, out AssetLocation loc))
                 {
                     CompositeTexture ct = new CompositeTexture(loc);

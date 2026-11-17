@@ -13,7 +13,7 @@ using Vintagestory.GameContent;
 
 namespace LotrNpcs
 {
-    /// <summary>Client to server (0.0.113): "open", "refresh", "call", "dismiss", "promote-menu" or "promote".</summary>
+    /// <summary>Client to server: "open", "refresh", "call", "dismiss", "promote-menu" or "promote".</summary>
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public class RosterRequest
     {
@@ -26,7 +26,8 @@ namespace LotrNpcs
     public class RosterRow
     {
         public long Id;
-        // Known: false for a recruit hired before 0.0.113 that hasn't loaded since (only its faction is known).
+        // Known: false for a recruit hired before the roster existed that hasn't loaded since (only its faction is
+        // known).
         public bool Loaded, Known;
         public string Code, Name, Rank, Faction, Order, Stance, Borrower;
         public int Xp, Need, Dimension, MinutesAgo;
@@ -65,10 +66,10 @@ namespace LotrNpcs
     }
 
     /// <summary>
-    /// 0.0.113 (design-roster-promotion.md; owner: "a roster screen is a good idea, branching promotion is good"): the
-    /// roster screen (/recruits roster, or the Roster button in the orders menu) lists every recruit wherever it is, and
-    /// the promotion screen (Promote... in the talk menu or on the roster) shows one card per rank a recruit can become.
-    /// The server checks everything again (HiringSystem.RosterAction, PromoteRecruit).
+    /// The roster screen (/recruits roster, or the Roster button in the orders menu) lists every recruit wherever it
+    /// is, and the promotion screen (Promote... in the talk menu or on the roster) shows one card per rank a recruit
+    /// can become. The server checks everything again (HiringSystem.RosterAction, PromoteRecruit). Design:
+    /// docs/design-roster-promotion.md.
     /// </summary>
     public class RosterSystem : ModSystem
     {

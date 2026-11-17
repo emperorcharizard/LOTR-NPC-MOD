@@ -65,7 +65,7 @@ namespace LotrNpcs
         /// <summary>In a fight with no path to follow, the mount walks in until its enemy is this close (centers,
         /// horizontally), inside a rider's reach from the saddle (MountedReach), instead of parking out of
         /// reach.</summary>
-        public const double CloseInDistance = 2.25;  // 0.0.156: inside the shorter reach (2 + MountedExtraReach)
+        public const double CloseInDistance = 2.25;  // inside the reach from the saddle (2 + MountedExtraReach)
 
         /// <summary>Stand, walk or run: stand at the waypoint, walk for slow tasks (taskSpeed below RunTaskSpeed), else
         /// run while the rider sprints or its next waypoint is more than 3 blocks off.</summary>
@@ -80,7 +80,7 @@ namespace LotrNpcs
         /// <summary>A mounted rider keeps its melee target (its focus) while that target lives and is within this
         /// many blocks (centers, horizontally), instead of hitting whichever enemy is nearest or struck it last;
         /// spread hits killed nobody.</summary>
-        public const double FocusRange = 16; // 0.0.133: 16 (was 6), so ride-outs keep it
+        public const double FocusRange = 16; // far enough that ride-outs keep it
 
         sealed class Focus { public Entity Target; }
         static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Entity, Focus> focus = new System.Runtime.CompilerServices.ConditionalWeakTable<Entity, Focus>();

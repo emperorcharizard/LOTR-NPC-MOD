@@ -892,3 +892,13 @@ Install `lotrnpcs_1.0.1.zip`; restart fully. Owner 2026-11-17: "When a spear use
 Owner 2026-11-17: Retreat "pulls them away from an enemy, then they almost immediately re lock back onto the nearest enemy". Now no seek, melee or shoot task starts for a recruit while it is breaking off (Retreat's RetreatSeconds, or a movement order's 5 s), not even striking back at whoever hits it; a Charge still fights. Riders drop their focus.
 
 - [ ] 170.1 Followers in a fight (foot, archers and a rider), Retreat: they run back and start nothing for 10 s even when chased and hit; then they fight again.
+
+## 171. Sides on Enemies and Allies lines (1.0.3)
+
+Owner 2026-11-17: "set all the relationships for the factions ... a faction name, then a line for enemy factions, then a line for friendly factions"; "as simple as moving the name from the enemy row to the friend row". Card choices: Dunlendings and tormented elves enemies of everyone; players safe from allied NPCs but hire their own faction only. Also: wicked dwarves ride giant boars.
+
+- [ ] 171.1 After install, `ModConfig/lotrnpcs-factions.json` is version 35, each faction has `Enemies` and `Allies` on one line each, and `Relations` is empty.
+- [ ] 171.2 Gondor and Rohan warriors spawned together don't fight; Gondor and Mordor do; Dunlendings fight both.
+- [ ] 171.3 A Gondor player walks past wild Rohan NPCs unharmed, and the talk menu won't hire them.
+- [ ] 171.4 Move "mordor" from Dale's Enemies to Allies, `/recruits faction reload`: Dale and Mordor stop fighting, and Mordor's lines in the file now list "dale" under Allies.
+- [ ] 171.5 A wicked dwarf promoted to rider gets a giant boar (with Teapot's Giant Boar installed).

@@ -7,17 +7,17 @@ using Vintagestory.GameContent;
 namespace LotrNpcs
 {
     /// <summary>
-    /// Keeps NPCs from walking off drops deeper than MaxSafeDrop (0.0.88, owner, 2026-11-04: "when navigating paths over
-    /// deep pits, the npcs have no regard for safety and will fling themselves off the edge").
+    /// Keeps NPCs from walking off drops deeper than MaxSafeDrop.
     ///
-    /// The game's pathfinder plans no fall deeper than about 4 blocks, but several moves skip the plan: when no path is
-    /// found, the follow task and vanilla seek's repath walk straight at their goal; vanilla seek (and our battle places)
-    /// point the last stretch of a path straight at a moving target every tick; archers step back in a straight line.
-    /// So instead of fixing each, this checks every step: on the server, right after the AI has set where the NPC walks
-    /// this tick (the behavior is listed after "taskai"), it looks EdgeLookAhead blocks ahead along that walk; if the
-    /// ground there is more than MaxSafeDrop blocks down (or lava), the walk stops: the path is dropped and the walk and
-    /// outward motion are zeroed. The task then ends and picks again; standing at the edge is the safe outcome. Water
-    /// below counts as a safe landing; a wall or step ahead is not a drop. Not while airborne, swimming or mounted.
+    /// The game's pathfinder plans no fall deeper than about 4 blocks, but several moves skip the plan: when no path
+    /// is found, the follow task and vanilla seek's repath walk straight at their goal; vanilla seek (and our battle
+    /// places) point the last stretch of a path straight at a moving target every tick; archers step back in a
+    /// straight line. So instead of fixing each, this checks every step: on the server, right after the AI has set
+    /// where the NPC walks this tick (the behavior is listed after "taskai"), it looks EdgeLookAhead blocks ahead
+    /// along that walk; if the ground there is more than MaxSafeDrop blocks down (or lava), the walk stops: the path
+    /// is dropped and the walk and outward motion are zeroed. The task then ends and picks again; standing at the
+    /// edge is the safe outcome. Water below counts as a safe landing; a wall or step ahead is not a drop. Not while
+    /// airborne, swimming or mounted.
     /// </summary>
     public class EntityBehaviorEdgeGuard : EntityBehavior
     {
@@ -25,9 +25,8 @@ namespace LotrNpcs
         public const int MaxSafeDrop = 4;
         /// <summary>How far ahead of its middle the ground is checked: half the NPC's width and a step.</summary>
         public const double EdgeLookAhead = 0.6;
-        /// <summary>0.0.105 (owner, 2026-11-09: archers "end up jumping off walls in order to enter melee combat"): archers
-        /// step down at most this far while fighting, so they stay up on walls and hills (out of a fight they follow
-        /// their leader down like anyone).</summary>
+        /// <summary>Archers step down at most this far while fighting, so they stay up on walls and hills instead of
+        /// jumping down into melee (out of a fight they follow their leader down like anyone).</summary>
         public const int ArcherMaxDrop = 1;
         int archer = -1;
         EntityBehaviorFactionMember member;

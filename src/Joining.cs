@@ -11,14 +11,14 @@ using Vintagestory.API.Util;
 
 namespace LotrNpcs
 {
-    /// <summary>One faction a player may join, as the join menu shows it (0.0.92).</summary>
+    /// <summary>One faction a player may join, as the join menu shows it.</summary>
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public class JoinOption
     {
         public string Faction, Stance;
         public int Followers, Roster;
-        // 0.0.93: the menu's section ("free", "shadow" or "other", JoinSystem.BlocOf) and the entity code whose
-        // creative-tab portrait the card shows (null: none).
+        // The menu's section ("free", "shadow" or "other", JoinSystem.BlocOf) and the entity code whose creative-tab
+        // portrait the card shows (null: none).
         public string Bloc, Portrait;
     }
 
@@ -45,14 +45,10 @@ namespace LotrNpcs
     }
 
     /// <summary>
-    /// The faction join menu (0.0.92). Owner, 2026-11-05: race didn't put players in factions ("when selecting a race with
-    /// the lotr characters mod, it doesnt apply the player to the associated faction"), so "when a fresh player spawns in
-    /// they have a menu pop up asking what faction they intend to join. as well as a selectable menu command for all
-    /// players. This can only be changed once (when they select the first time). (after that its changed by admins)";
-    /// "instead of applying the race allegiance, have them select right after making a character"; groups stop counting
-    /// ("A"); every faction with Joinable ("A"); the menu may be closed and opened again with /recruits join ("A");
-    /// "if they press escape without selecting a faction, give them a reminder of the command to open the menu in their
-    /// local chat".
+    /// The faction join menu. A fresh player picks a faction right after making a character (race alone doesn't put
+    /// players in factions), and any player can open it with /recruits join. The pick can be made only once; after
+    /// that admins change it. Every faction with Joinable is listed. Closing the menu without a pick reminds the
+    /// player of /recruits join in their own chat.
     /// The pick is stored where admins' /recruits faction set stores a faction (FactionSystem.SetAssigned), so admins
     /// change it the same way, and /recruits faction clear lets the player pick again.
     /// </summary>
@@ -66,11 +62,9 @@ namespace LotrNpcs
         public static readonly string[] Order = { "shire", "gondor", "rohan", "arnor", "dale", "dwarves", "elves", "mordor", "angmar",
             "mistymountains", "gundabad", "isengard", "haradrim", "easterlings", "dunlendings", "blacknumenoreans", "wickeddwarves", "tormentedelves" };
 
-        // The menu's sections (0.0.93, owner chose the grouped cards, "A"): the lore blocs of the design doc. The design
-        // doc leaves Gundabad, the wicked dwarves and the tormented elves unset and calls the Dunlendings independent;
-        // Gundabad goes with the Shadow and the other three under Others (my call, shown to the owner in the mockup).
-        // Factions an admin adds are Others. Only the layout uses this: it allies nobody. 0.0.95 (owner: "move wicked
-        // dwarves to the shadow faction"): the wicked dwarves under Shadow.
+        // The menu's sections, the lore blocs of the design doc: Free Peoples, Shadow (with Gundabad and the wicked
+        // dwarves) and Others (the Dunlendings, the tormented elves and any faction an admin adds). Only the layout
+        // uses this: it allies nobody.
         public static readonly string[] Blocs = { "free", "shadow", "other" };
         static readonly Dictionary<string, string> BlocByFaction = new Dictionary<string, string>
         {
@@ -277,11 +271,10 @@ namespace LotrNpcs
     }
 
     /// <summary>
-    /// Client: the join menu. 0.0.93 (owner, 2026-11-05: "beautify it", chose the grouped cards, "A"; "change it to
-    /// followers then instead of roster total"): the factions sit under Free Peoples, Shadow and Others, three cards a
-    /// row, each with the faction's portrait, its name, and "N followers · M total"; only a stance other than aggressive
-    /// showed as a tag until 0.0.94 (owner: "just say hobbits"); one line under the cards explains followers and total. A click on a card asks to confirm, with the
-    /// card shown again; closing without a pick reminds the player of /recruits join in their own chat.
+    /// Client: the join menu. The factions sit under Free Peoples, Shadow and Others, three cards a row, each with
+    /// the faction's portrait, its name, and "N followers · M total"; one line under the cards explains followers and
+    /// total. A click on a card asks to confirm, with the card shown again; closing without a pick reminds the player
+    /// of /recruits join in their own chat.
     /// </summary>
     public class GuiDialogJoinFaction : GuiDialog
     {
@@ -435,9 +428,9 @@ namespace LotrNpcs
         }
     }
 
-    /// <summary>A faction card in the join menu (0.0.93): a dark panel with room for the portrait on the left, the name
-    /// (up to two lines) and the stats line (no stance tag since 0.0.94, owner: "Make it just say hobbits"). Highlighted under the mouse; a click (press and
-    /// release on the card) calls onPick.</summary>
+    /// <summary>A faction card in the join menu: a dark panel with room for the portrait on the left, the name (up to
+    /// two lines) and the stats line. Highlighted under the mouse; a click (press and release on the card) calls
+    /// onPick.</summary>
     public class GuiElementFactionCard : GuiElement
     {
         public const int PortraitSize = 48, PortraitInset = 4, TextLeft = PortraitInset + PortraitSize + 8;
@@ -481,8 +474,8 @@ namespace LotrNpcs
             double left = x + scaled(TextLeft), width = w - scaled(TextLeft) - scaled(6);
             CairoFont nameFont = CairoFont.WhiteSmallText().WithWeight(FontWeight.Bold).WithColor(NameText);
             CairoFont statsFont = CairoFont.WhiteDetailText().WithColor(MutedText);
-            // 0.0.94 (owner's 0.0.93 screenshot: the stats came out large and dark): DrawTextLine draws with whatever font
-            // and colour the context has, so set the stats font up first. Shrink it if it would run past the card.
+            // DrawTextLine draws with whatever font and colour the context has, so set the stats font up first (else
+            // it comes out large and dark). Shrink it if it would run past the card.
             statsFont.SetupContext(ctx);
             if (statsFont.GetTextExtents(stats).Width > width)
             {
@@ -546,7 +539,8 @@ namespace LotrNpcs
         }
     }
 
-    /// <summary>A section heading in the join menu (0.0.93): the title in its colour, then a thin rule to the right edge.</summary>
+    /// <summary>A section heading in the join menu: the title in its colour, then a thin rule to the right
+    /// edge.</summary>
     public class GuiElementSectionHeader : GuiElement
     {
         readonly string title;

@@ -27,12 +27,11 @@ namespace LotrNpcs
     }
 
     /// <summary>
-    /// Animation LOD for this mod's NPCs (2026-11-12, owner: "research ways optimization / fps can be improved then act
-    /// on it"; prompts/fps-optimization.md). The client frame with many NPCs is mostly the game's per-NPC pose
+    /// Animation LOD for this mod's NPCs. The client frame with many NPCs is mostly the game's per-NPC pose
     /// calculation (AnimationManager.OnClientFrame, profiled as esr-afteranim, about 30 µs per drawn NPC). The game
-    /// already skips it for NPCs off screen; this skips it on some frames for far ones, handing the skipped time to the
-    /// next run so animations keep their pace. OptiTime has the same idea for all entities but turns it off when Combat
-    /// Overhaul's legacy library patches this method, so this one only ever touches lotrnpcs entities.
+    /// already skips it for NPCs off screen; this skips it on some frames for far ones, handing the skipped time to
+    /// the next run so animations keep their pace. OptiTime has the same idea for all entities but turns it off when
+    /// Combat Overhaul's legacy library patches this method, so this one only ever touches lotrnpcs entities.
     /// </summary>
     public static class AnimationLod
     {
@@ -98,7 +97,7 @@ namespace LotrNpcs
             ClientConfig config = null;
             try { config = api.LoadModConfig<ClientConfig>(ClientConfig.File); }
             catch (Exception e) { api.Logger.Warning("[lotrnpcs] Could not read ModConfig/{0}, using the defaults: {1}", ClientConfig.File, e.Message); }
-            // Written back every start, so settings added in a newer version (0.0.127: StripTinyGearDetail) show up in the file.
+            // Written back every start, so settings added in a newer version show up in the file.
             config ??= new ClientConfig();
             config.Instructions = new ClientConfig().Instructions;
             try { api.StoreModConfig(config, ClientConfig.File); } catch (Exception) { }

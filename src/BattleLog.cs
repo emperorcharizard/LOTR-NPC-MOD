@@ -11,11 +11,10 @@ using Vintagestory.GameContent;
 namespace LotrNpcs
 {
     /// <summary>
-    /// 0.0.109 battle log (owner, 2026-11-09, chose "Yes, add it first": a testing tool before the in-game pass). Off by
-    /// default; an admin turns it on with /recruits battlelog on. While on, every melee hit and arrow from a faction NPC,
-    /// every faction NPC death, and the time fighting NPCs spend without attacking are counted per faction, and each
-    /// event is written as a line of a CSV file in the game's Logs folder. /recruits battlelog shows the totals.
-    /// Nothing is kept between restarts.
+    /// Battle log, a testing tool. Off by default; an admin turns it on with /recruits battlelog on (needs
+    /// DebugCommands). While on, every melee hit and arrow from a faction NPC, every faction NPC death, and the time
+    /// fighting NPCs spend without attacking are counted per faction, and each event is written as a line of a CSV
+    /// file in the game's Logs folder. /recruits battlelog shows the totals. Nothing is kept between restarts.
     /// </summary>
     public class BattleLog
     {
@@ -30,7 +29,7 @@ namespace LotrNpcs
             public double DamageDealt;
             public int Kills, Deaths, TurnWaits, ChargeHits, BackHits;
             public double IdleSeconds;
-            /// <summary>0.0.111: idle seconds by what the NPC was doing (IdleReason).</summary>
+            /// <summary>Idle seconds by what the NPC was doing (IdleReason).</summary>
             public readonly Dictionary<string, double> IdleBy = new Dictionary<string, double>();
         }
 
@@ -86,17 +85,16 @@ namespace LotrNpcs
             return t;
         }
 
-        /// <summary>The result of a hit: landed, lost to the target's hurt window, or lost otherwise (target already
-        /// dead, or the damage refused).</summary>
-        /// <summary>0.0.131: NoContact, a melee blow whose target was out of reach when it fell (e.g. a rider's mount
-        /// moved on during the swing).</summary>
+        /// <summary>The result of a hit: landed, lost to the target's hurt window, lost otherwise (target already
+        /// dead, or the damage refused), NoContact (a melee blow whose target was out of reach when it fell, e.g. a
+        /// rider's mount moved on during the swing), or NoBlow (a swing that ended before its blow).</summary>
         public enum Result { Landed, LostWindow, LostOther, NoContact, NoBlow }
 
         /// <summary>How a hit on target went, read before the hit (window, alive) and from ReceiveDamage's answer.</summary>
         public static Result Classify(bool received, bool aliveBefore, bool windowBefore) =>
             received ? Result.Landed : aliveBefore && windowBefore ? Result.LostWindow : Result.LostOther;
 
-        /// <param name="detail">0.0.145: appended to the row's result (a nocontact row says why it missed).</param>
+        /// <param name="detail">Appended to the row's result (a nocontact row says why it missed).</param>
         public void Attack(Entity attacker, Entity target, bool arrow, float damage, Result result, bool killed, long now, string detail = null)
         {
             if (!On || attacker == null) return;
@@ -126,14 +124,14 @@ namespace LotrNpcs
             lastAttackMs[attacker.EntityId] = now;
         }
 
-        /// <summary>0.0.137: an NPC of this faction was hit in the back.</summary>
+        /// <summary>An NPC of this faction was hit in the back.</summary>
         public void BackHit(Entity npc)
         {
             if (!On || npc == null) return;
             Of(FactionSystem.FactionOf(npc)).BackHits++;
         }
 
-        /// <summary>0.0.133: a rider's charge hit landed.</summary>
+        /// <summary>A rider's charge hit landed.</summary>
         public void ChargeHit(Entity attacker)
         {
             if (!On || attacker == null) return;
@@ -156,10 +154,9 @@ namespace LotrNpcs
             Write(now, "death", killer, npc, 0, "died");
         }
 
-        /// <summary>Called once a second for each faction NPC: a fighting NPC that hasn't attacked for IdleAfterMs adds
-        /// the second to its faction's idle time. 0.0.111 (owner chose "Swing duty fix": NPCs swung half as often as they
-        /// could, the time lost in 6 s pauses between targets): each idle second is also written as an "idle" row with
-        /// why (IdleReason in the result column), its target and the distance to it (in the damage column).</summary>
+        /// <summary>Called once a second for each faction NPC: a fighting NPC that hasn't attacked for IdleAfterMs
+        /// adds the second to its faction's idle time. Each idle second is also written as an "idle" row with why
+        /// (IdleReason in the result column), its target and the distance to it (in the damage column).</summary>
         public void Tick(Entity npc, bool fighting, double seconds, long now, BattleLineSystem lines = null)
         {
             if (!On || npc == null || !fighting) return;
