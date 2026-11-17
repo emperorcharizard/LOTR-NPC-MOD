@@ -293,8 +293,10 @@ namespace LotrNpcs
             // held swings at riders galloping away; that left 36 of 65 (run 212122): the rest were riders charging past.
             // 0.0.144: a soldier on foot doesn't swing at a rider whose horse, at its present speed and heading, will be out
             // of reach when the blow falls. It looks again shortly (a rider standing, or riding into it, is still struck).
+            // 0.0.164: held only if the rider stays out of reach for the whole pass window before the blow (Riders.MissesPass),
+            // so a rider charging through the soldier is swung at.
             if ((entity as EntityAgent)?.MountedOn == null && targetEntity is EntityAgent rider && rider.MountedOn?.Entity is Entity horse
-                && Riders.GoneByBlow(rider.Pos.X - entity.Pos.X, rider.Pos.Z - entity.Pos.Z, horse.Pos.Motion.X, horse.Pos.Motion.Z, damagePlayerAtMs, minDist + Riders.RiderHalfWidth))
+                && Riders.MissesPass(rider.Pos.X - entity.Pos.X, rider.Pos.Z - entity.Pos.Z, horse.Pos.Motion.X, horse.Pos.Motion.Z, damagePlayerAtMs, minDist + Riders.RiderHalfWidth))
             {
                 lastCheckOrAttackMs = entity.World.ElapsedMilliseconds - attackDurationMs + TurnRetryMs * 2;
                 targetEntity = null;
@@ -349,6 +351,13 @@ namespace LotrNpcs
             Riders.SwingStarted(entity, startedMs);
             RiderLog("swing at " + (targetEntity?.EntityId ?? 0));
             base.StartExecute();
+            // 0.0.164: at a rider, a soldier on foot swings at once instead of after turning to face it.
+            if ((entity as EntityAgent)?.MountedOn == null && (targetEntity as EntityAgent)?.MountedOn != null && animMeta != null)
+            {
+                entity.AnimManager?.StartAnimation(animMeta);
+                swingStarted = true;
+                swingStartedMs = startedMs;
+            }
         }
 
         bool struck;
@@ -371,7 +380,8 @@ namespace LotrNpcs
         {
             // 0.0.139: a seated rider can't turn in the saddle, so it doesn't wait to face its target (the blow fell after
             // its mount had carried it past).
-            if (!swingStarted && (entity as EntityAgent)?.MountedOn == null)
+            bool atRider = (targetEntity as EntityAgent)?.MountedOn != null;
+            if (!swingStarted && (entity as EntityAgent)?.MountedOn == null && !atRider)
             {
                 long now = entity.World.ElapsedMilliseconds;
                 if (animMeta != null && entity.AnimManager?.IsAnimationActive(animMeta.Animation) == true) { swingStarted = true; swingStartedMs = now; }
@@ -380,7 +390,10 @@ namespace LotrNpcs
             // 0.0.142 (in game 2026-11-15: 58 of 66 rider swings ran their full 900 ms without a blow): the game's own
             // blow needs the attacker to face its target, and a seated rider faces where its mount goes. A mounted
             // rider's blow falls on time here instead; attackTarget checks reach and logs a miss as out of reach.
-            if (!struck && (entity as EntityAgent)?.MountedOn != null && Riders.BlowDue(startedMs, damagePlayerAtMs, entity.World.ElapsedMilliseconds)) attackTarget();
+            // 0.0.164 (owner, 2026-11-17: a rider "can phase right through the captain and still the captain wont swing ...
+            // They just dont try to swing in time"): a soldier on foot swinging at a rider doesn't wait to face it either
+            // (a galloping rider is past before it turns): its swing starts at once (StartExecute) and its blow falls on time.
+            if (!struck && ((entity as EntityAgent)?.MountedOn != null || atRider) && Riders.BlowDue(startedMs, damagePlayerAtMs, entity.World.ElapsedMilliseconds)) attackTarget();
             // 0.0.146 (battle log 213618: every blow of a foot soldier that missed a rider was at a horse galloping ~9 blocks a
             // second, the soldier facing it, 0-4.5 blocks past reach): a swing that the rider rode through is a hit. While
             // the swing runs, the last moment a mounted target was in reach is kept; attackTarget accepts it (PassedInReach).

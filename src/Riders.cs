@@ -175,6 +175,19 @@ namespace LotrNpcs
             return px * px + pz * pz > reach * reach;
         }
 
+        /// <summary>0.0.164 (owner, 2026-11-17: "the rider can phase right through the captain and still the captain wont
+        /// swing"): GoneByBlow only looked where the horse would be when the blow fell, so a rider charging straight through
+        /// a soldier was always "gone" (past it by then) and the swing was held. A soldier now holds only when the rider
+        /// stays out of reach for the whole PassWindowMs before the blow, the window in which a blow still counts
+        /// (PassedInReach). Closest approach of the straight path over that window.</summary>
+        public static bool MissesPass(double dx, double dz, double mx, double mz, long hitMs, double reach)
+        {
+            double t0 = Math.Max(0, hitMs - PassWindowMs) * 0.06, t1 = hitMs * 0.06, mm = mx * mx + mz * mz;
+            double t = mm < 1e-9 ? t1 : Math.Min(t1, Math.Max(t0, -(dx * mx + dz * mz) / mm));
+            double px = dx + mx * t, pz = dz + mz * t;
+            return px * px + pz * pz > reach * reach;
+        }
+
         /// <summary>0.0.146: a foot soldier's blow at a rider lands if the rider was in reach at most this long before it fell
         /// (a galloping horse moves about 1.8 blocks in that time), so a rider riding through the swing is struck.</summary>
         public const long PassWindowMs = 200;

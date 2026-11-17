@@ -825,3 +825,11 @@ Owner, 2026-11-17 (card, after 161.3 failed): "Charge hits x2.5 (from x2)". Only
 - [ ] 163.1 1 Rohan rider v 2 Dunlending warriors (stand at the fight so Synergy doesn't freeze it): the rider wins.
   - 2026-11-17 on 0.0.163 (log 200639): rider ahead when the owner stopped the run at ~276 s: one warrior killed at 234 s, 65 v 14 damage, rider at 30.8 of 34. The fight drifted north ~40 blocks per 100 s (1796,300 -> 1781,337 -> 1774,378) and Synergy froze it twice; I teleported to it each time.
 - [ ] 163.2 1 Rohan rider v 1 Dunlending captain: the captain still wins.
+
+## 164. Foot soldiers swing at passing riders (0.0.164)
+
+Owner, 2026-11-17, watching 1 rider v 1 captain on 0.0.163: "the rider can phase right through the captain and still the captain wont swing", "the captain lost the 1v1 due to this", "They just dont try to swing in time". Two causes: the 0.0.144 hold predicted only where the horse would be when the blow fell, so a rider charging straight through was always "gone"; and a soldier on foot waited to turn and face the rider before its swing (and blow) started. Now a soldier holds only if the rider stays out of reach for the whole 200 ms before the blow, and at a rider it swings at once with the blow falling on time (as riders do).
+
+- [ ] 164.1 1 Rohan rider v 1 Dunlending captain: the captain swings as the rider charges through or past it, and wins.
+- [ ] 164.2 The 0.0.146 numbers still hold or improve: foot soldiers' blows at riders "out of reach when the blow fell" stay low (3 riders v 10 Dunlending warriors).
+- [ ] 164.3 Foot soldiers' swings at riders show the weapon swing (not a blow with no animation).
