@@ -355,7 +355,7 @@ public static class Program {
             double W(string f) => (double)weight.Invoke(sys, new object[] { f });
             Check(Math.Abs(W("mistymountains") - 1) < 1e-9 && Math.Abs(W("elves") - 1) < 1e-9 && Math.Abs(W("gondor") - 1) < 1e-9,
                 "every faction's NPCs weigh one in MaxNearby (0.0.135)");
-            Check(SpawnConfig.InstructionText.Any(l => l.StartsWith("GroupSizeAvg") && l.Contains("orcs up to 7")) && SpawnConfig.InstructionText.Any(l => l.StartsWith("MaxNearby") && l.Contains("5/8")),
+            Check(SpawnConfig.InstructionText.Any(l => l.StartsWith("GroupSizeAvg") && l.Contains("all groups are alike")) && SpawnConfig.InstructionText.Any(l => l.StartsWith("MaxNearby") && l.Contains("1 each")),
                 "#Instructions explain the scaled groups and the weighted MaxNearby");
         }
 

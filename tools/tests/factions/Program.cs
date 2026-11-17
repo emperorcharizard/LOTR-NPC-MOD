@@ -1258,7 +1258,7 @@ public static class Program {
                 && MountsOf("test-elf-rider").SequenceEqual(new[] { "game:tameddeer-caribou-male-adult" }) && MountsOf("test-haradrim-rider").All(m => m.StartsWith("feverstonewilds:horse-tamed-")) && MountsOf("test-goblin-rider").All(m => m.StartsWith("feverstonewilds:tame-direwolf-")) && MountsOf("test-dwarf-rider").All(m => m.StartsWith("teapotsgiantboar:tame-giantboar-")),
                 "0.0.117: riders for Men of the West on horses, Shadow orcs on dire wolves, elves on caribou (0.0.157) and dwarves on giant boars, each with the rider behavior and its mounts");
             double SeekRange(string c) => entityFiles[c]["server"]["behaviors"].First(b => (string)b["code"] == "taskai")["aitasks"].First(t => (string)t["code"] == "lotrnpcs:seekentity").Value<double>("seekingRange");
-            (double X, double Z) roAway = Riders.RideOutHeading(0, 1, 0, 10), roNear = Riders.RideOutHeading(0, 1, 0, 5), roBack = Riders.RideOutHeading(0, 1, 0, -10);
+            (double X, double Z) roAway = Riders.RideOutHeading(0, 1, 0, Riders.AnchorRadius + 2), roNear = Riders.RideOutHeading(0, 1, 0, Riders.AnchorRadius - 3), roBack = Riders.RideOutHeading(0, 1, 0, -Riders.AnchorRadius - 2);
             Check(roNear == (0, 1) && roBack == (0, 1) && roAway.Z < 0 && Math.Abs(roAway.X) > 0.5 && Math.Abs(roAway.X * roAway.X + roAway.Z * roAway.Z - 1) < 1e-9,
                 "0.0.165: a ride-out that would carry the rider farther than 8 blocks from where its fight began turns aside and back toward it");
             Check(!Riders.MissesPass(0, 2, 0, -0.25, 400, 2.4) && Riders.GoneByBlow(0, 2, 0, -0.25, 400, 2.4) && Riders.MissesPass(0, 2, 0, 0.13, 400, 2.4) && !Riders.MissesPass(0, 2, 0, 0, 400, 2.4) && Riders.MissesPass(3, 2, 0, -0.3, 400, 2.4),
@@ -1354,7 +1354,7 @@ public static class Program {
             var reachSpacing = new BattleSpacing();
             // Melee reaches 2 blocks from the attacker's front (0.3 ahead of its middle) to the target's body (0.3 wide).
             Check(reachSpacing.DuelMax - 0.3 - 0.3 < 2.0, "attackers at the far end of the duel band (1.6 blocks from their target's middle) are still inside melee reach");
-            Check(FactionConfig.InstructionText.Any(l => l.StartsWith("ShieldChance") && l.Contains("poleaxe")), "#Instructions explain ShieldChance");
+            Check(FactionConfig.InstructionText.Any(l => l.StartsWith("ShieldChance") && l.Contains("two-handed")), "#Instructions explain ShieldChance");
 
             // Shared orc helmets.
             JArray Sets(string code) => (JArray)GearSets(entityFiles[code]);

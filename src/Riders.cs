@@ -146,7 +146,10 @@ namespace LotrNpcs
         /// ride-out the same way with the warriors chasing, until Synergy froze it): a ride-out that would carry the rider
         /// farther than AnchorRadius from where its fight began turns aside, half across the charge line and half back
         /// toward that spot, so the fight stays where it started. ox, oz: from the anchor to the rider.</summary>
-        public const double AnchorRadius = 8;
+        /// 0.0.166 (in game 2026-11-17, 0.0.165: the fight stayed within ~33 blocks, but at 8 the bent ride-outs ended next
+        /// to the chasing warriors, passes came 10-20 s apart instead of 0.0.163's 4-5 s and the rider lost 1 v 2): 16, so
+        /// only a fight that has already wandered off bends its ride-outs.
+        public const double AnchorRadius = 16;
         public static (double X, double Z) RideOutHeading(double hx, double hz, double ox, double oz)
         {
             if (ox * ox + oz * oz <= AnchorRadius * AnchorRadius || hx * ox + hz * oz <= 0) return (hx, hz);

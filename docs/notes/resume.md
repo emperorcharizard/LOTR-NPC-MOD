@@ -3,7 +3,7 @@ name: resume
 description: Where the lotrnpcs work stands and what's next; read first, update before stopping
 ---
 
-# Where we are (updated 2026-11-16, 0.0.155 installed, 0.0.156 built; Synergy activation range set back ON for the next game start)
+# Where we are (updated 2026-11-17: 0.0.165 installed, 0.0.166 built; release 1.0.0 with rusty gears; config guide + player guide done; next: 166.1, then the release doc steps)
 
 **0.0.156 (2026-11-16):** owner tested 154.1/154.2 by hand (work), then asked for one hire option and a "Let me change your class" page in the own menu; built, not installed. Owner also reported a broken shield texture on a Misty Mountains guard recruit (screenshot: kite shield with noisy black/white pattern).
 

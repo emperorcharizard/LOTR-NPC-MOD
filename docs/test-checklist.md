@@ -830,7 +830,8 @@ Owner, 2026-11-17 (card, after 161.3 failed): "Charge hits x2.5 (from x2)". Only
 
 Owner, 2026-11-17, watching 1 rider v 1 captain on 0.0.163: "the rider can phase right through the captain and still the captain wont swing", "the captain lost the 1v1 due to this", "They just dont try to swing in time". Two causes: the 0.0.144 hold predicted only where the horse would be when the blow fell, so a rider charging straight through was always "gone"; and a soldier on foot waited to turn and face the rider before its swing (and blow) started. Now a soldier holds only if the rider stays out of reach for the whole 200 ms before the blow, and at a rider it swings at once with the blow falling on time (as riders do).
 
-- [ ] 164.1 1 Rohan rider v 1 Dunlending captain: the captain swings as the rider charges through or past it, and wins.
+- [x] 164.1 1 Rohan rider v 1 Dunlending captain: the captain swings as the rider charges through or past it, and wins.
+  - 2026-11-17 on 0.0.165 (log 230154): captain won in under 60 s, 5 of 6 swings landed (1 out of reach), 28 damage, 0 deaths; the rider landed 4 of 6 for 7 (2 charge hits).
 - [ ] 164.2 The 0.0.146 numbers still hold or improve: foot soldiers' blows at riders "out of reach when the blow fell" stay low (3 riders v 10 Dunlending warriors).
 - [ ] 164.3 Foot soldiers' swings at riders show the weapon swing (not a blow with no animation).
 
@@ -839,4 +840,9 @@ Owner, 2026-11-17, watching 1 rider v 1 captain on 0.0.163: "the rider can phase
 In game 2026-11-17 (0.0.162 and 0.0.163, 1 rider v 2 warriors): ride-out after ride-out went the same way with the warriors chasing, so the fight drifted ~40 blocks per 100 s until Synergy froze it. A rider now remembers where its fight began (its first focus's position); a ride-out that would carry it more than 8 blocks from there turns aside and back toward it.
 
 - [ ] 165.1 1 Rohan rider v 2 Dunlending warriors with the player standing still beside them: after 3 minutes the fight is still within about 15 blocks of where it began (no Synergy freeze), and the rider still charges and rides out.
+  - 2026-11-17 on 0.0.165 (log 230424): no drift freeze (rider at most 33 blocks from the start, the fight mostly beside me), but the rider LOST at 199 s: 8 of 22 swings landed (14 out of reach, 2.5-4.3 blocks), 26 damage, 4 charge hits; the warriors landed 20 of 24 for 39. Its hits came 12-78 s apart (0.0.163: clusters 4-5 s apart), so the warrior healed back between them. Read: at AnchorRadius 8 the bent ride-outs end next to the chasing warriors, too close to line up a charge. 0.0.166 sets AnchorRadius 16 (166.1). (An earlier run, log 230312, is void: the captain from 164.1 was still alive and joined.)
+
+## 166. Ride-outs bend only far from the fight (0.0.166)
+
+- [ ] 166.1 1 Rohan rider v 2 Dunlending warriors, player beside them: the rider wins (163.1) and passes come every few seconds again, and the fight stays within about 25 blocks (no Synergy freeze).
 - [ ] 165.2 3 riders v 5 warriors + 3 archers: the riders still kill the archers first (161.1 numbers).
