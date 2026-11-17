@@ -486,7 +486,10 @@ SHIELD_IN = {"dwtowershield": 1.0, "dwshield": 1.0, "elfshield": 1.0, "boromirsh
 _NEW_SHIELD_ROT = dict(SHIELD["hand"]["rotation"], z=SHIELD["hand"]["rotation"]["z"] - 90)
 # 0.0.156 (owner, 2026-11-16: "whatever shield this is, has a messed up texture"): the kite shield's emblem is a mosaic of
 # tiny elements whose down faces carry it; the game draws a down face's UV flipped top to bottom against Blockbench, which
-# shreds the picture (big plain faces hide it). flipDown flips those UVs back. Untested guess (flip v, not rotate 180).
+# shreds the picture (big plain faces hide it). flipDown turns those UVs back.
+# 0.0.160 (owner, 2026-11-17: "the kite shield is still messed up"; 0.0.158 drew the trunk as two lines): the game's down
+# face is Blockbench's turned 180 degrees (vsapi CubeMeshUtil: down runs u toward -x where up runs it toward +x), so swap
+# both u and v, not just v. An offline render with the game's down-face corners shows 0.0.158's two-line trunk and a clean tree now.
 KITE_SHIELD = {"model": "numenorean_kite_shield.json", "atlas": "numenorean_kite_shield.png", "name": "Numenorean shield", "flipDown": True,
                "hand": place_grip(SHIELD["hand"], MORDOR_GRIP, (8.0, 21.9, 12.8 - SHIELD_OUT + SHIELD_IN["kiteshield"]), _NEW_SHIELD_ROT)}
 DW_TOWER_SHIELD = {"model": "dwarven_tower_shield.json", "atlas": "dwarven_tower_shield.png", "name": "Dwarven tower shield",
@@ -863,7 +866,7 @@ def write_weapons():
                     face = (e.get("faces") or {}).get("down")
                     if isinstance(face, dict) and face.get("uv"):
                         u0, v0, u1, v1 = face["uv"]
-                        face["uv"] = [u0, v1, u1, v0]
+                        face["uv"] = [u1, v1, u0, v0]
                     flip_down(e.get("children") or [])
             flip_down(shape["elements"])
         if "pull" in w:
@@ -2152,7 +2155,7 @@ with open(os.path.join(out, "modinfo.json"), "w") as f:
         "type": "code",
         "modid": "lotrnpcs",
         "name": "LOTR NPCs",
-        "version": "0.0.159",
+        "version": "0.0.160",
         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Race models from "
                        "LOTR Races and Classes by Dango Dango Dango, Shakgriig and Buggoi, used with their permission.",
