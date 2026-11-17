@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2 (2026-11-17)
+- Retreat: followers start no fight task until it ends, including striking back at whoever hits them; riders drop the enemy they were finishing. Charge still fights. Movement orders' 5 s break-off works the same way.
+
+## 1.0.1 (2026-11-17)
+- Every foot soldier's blow lands 400 ms after its swing starts, for every weapon, even if it is hit or turned mid swing (spearmen lost blows when hit). Battle log: `noblow` rows for swings that end without a blow.
+
 ## 1.0.0 (2026-11)
 
 First official release. Everything below was built and tested as test builds 0.0.1 to 0.0.168; the per-version history is in `docs/notes/` and `docs/test-checklist.md`.

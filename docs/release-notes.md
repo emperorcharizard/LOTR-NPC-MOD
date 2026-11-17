@@ -1,4 +1,10 @@
-# LOTR NPCs 1.0.0
+# LOTR NPCs 1.0.2
+
+## Fixes since 1.0.0
+
+- **Same blow timing for every weapon (1.0.1):** a soldier's blow lands 400 ms after its swing starts, whatever it holds. A spearman hit mid swing no longer loses the blow (spear-armed sides, like Gondor, lost about 15% of their swings before).
+- **Retreat holds (1.0.2):** retreating followers start no fights for the whole Retreat time, not even striking back at whoever hits them, and riders stop charging the enemy they were on. Charge still overrides it.
+
 
 Soldiers of every people of Middle-earth for Vintage Story. They spawn in zones you mark, fight each other and you by faction, and players can join a faction and hire, command and promote their own band.
 
