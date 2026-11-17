@@ -1289,8 +1289,9 @@ FACTION_SETS.update({
                     [trta("iseng", "head", "tierthreechain", "dunlendinghelmetmedium", last="clean"),
                      trta("iseng", "body", "tierfourchain", "dunlendingarmorheavy", last="clean"),
                      trta("iseng", "legs", "tierfourchain", "dunlendingleggingsheavy", last="clean")]],
-        "captain": [trta_set("iseng", "tierfiveplate", helmet, "dunlendingarmorheavier", "dunlendingleggingsheavier", "clean")
-                    for helmet in ("dunlendinghelmetheavier", "dunlendinghelmetheavier2")],
+        # 0.0.159: only the first Warlord helmet; the Isengard mod's dunlendinghelmetheavier2 draws nothing (its shape's
+        # step-parent is empty), so captains rolling it looked bareheaded.
+        "captain": [trta_set("iseng", "tierfiveplate", "dunlendinghelmetheavier", "dunlendingarmorheavier", "dunlendingleggingsheavier", "clean")],
     },
     # Black Numenoreans (Mordor mod's human armor): Black Numenorean (brown or black) for recruits, black Servant of
     # the Eye (bare or black mask) for warriors, Black Numenorean Lord (with or without the cloak) for captains.
@@ -2151,7 +2152,7 @@ with open(os.path.join(out, "modinfo.json"), "w") as f:
         "type": "code",
         "modid": "lotrnpcs",
         "name": "LOTR NPCs",
-        "version": "0.0.158",
+        "version": "0.0.159",
         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Race models from "
                        "LOTR Races and Classes by Dango Dango Dango, Shakgriig and Buggoi, used with their permission.",
