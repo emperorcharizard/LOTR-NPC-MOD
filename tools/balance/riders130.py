@@ -1,7 +1,7 @@
 """0.0.130 rider stats: riders at (captain/warrior price)^exponent times a warrior's numbers against the warriors the same coin buys."""
 import sys, os, random, runpy
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.argv = ["s", os.path.join(HERE, "..", "..", "src", "Factions.cs"), "1"]
+sys.argv = ["s", os.path.join(HERE, "..", "..", "src", "FactionTiers.cs"), "1"]
 g = runpy.run_path(os.path.join(HERE, "sim105.py"), run_name="sim")
 U,fight,T=g["U"],g["fight"],g["TIERS"]
 for ex in (0.82,):

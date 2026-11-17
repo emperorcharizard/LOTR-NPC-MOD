@@ -16,13 +16,12 @@ using Vintagestory.GameContent;
 namespace LotrNpcs
 {
     /// <summary>
-    /// Who NPC factions fight (design doc, decided 2026-10-30): players by race and /group membership, other
-    /// factions by the config's Relations (no entry: enemies), and monsters. Allies never fight and help each other
-    /// when attacked.
-    /// A player is safe from their own factions, and from those factions' allies only where an admin set
-    /// ShareFriends on the alliance (user, 2026-11-02).
-    /// The AI tasks ask WantsToAttack and RecruitWantsToAttack; NPCs carry their faction in the lotrnpcsFaction entity
-    /// type attribute. Everything here runs on the server's main thread.
+    /// Who NPC factions fight: players by faction membership (the join menu, or race and /group with
+    /// RaceAndGroupMembership), other factions by the config's Relations (no entry: enemies), and monsters. Allies
+    /// never fight and help each other when attacked. A player is safe from their own factions, and from those
+    /// factions' allies only where an admin set ShareFriends on the alliance.
+    /// The AI tasks ask WantsToAttack and RecruitWantsToAttack; NPCs carry their faction in the lotrnpcsFaction
+    /// entity type attribute. Everything here runs on the server's main thread.
     /// </summary>
     public partial class FactionSystem : ModSystem
     {
@@ -35,12 +34,12 @@ namespace LotrNpcs
 
         ICoreServerAPI sapi;
         public FactionConfig Config { get; private set; } = new FactionConfig();
-        /// <summary>Who is fighting whom, to spread battles out (0.0.53, Battle.cs).</summary>
+        /// <summary>Who is fighting whom, to spread battles out (Battle.cs).</summary>
         public readonly BattleSpacing Spacing = new BattleSpacing();
-        /// <summary>The 0.0.109 battle log (BattleLog.cs), off until an admin turns it on.</summary>
+        /// <summary>The battle log (BattleLog.cs), off until an admin turns it on.</summary>
         public readonly BattleLog Log = new BattleLog();
         BattleLineSystem lines;
-        /// <summary>Battle lines (0.0.82, BattleLines.cs).</summary>
+        /// <summary>Battle lines (BattleLines.cs).</summary>
         public BattleLineSystem Lines => lines ??= new BattleLineSystem(this);
         AssetLocation[] monsterCodes = Array.Empty<AssetLocation>();
         // Bumped on every SetConfig, so cached monster answers from an older list are worked out again.
@@ -48,7 +47,7 @@ namespace LotrNpcs
         int monsterStamp = -1;
         HashSet<string> aggressive = new HashSet<string>();
         // faction -> other faction -> how they treat each other, for every pair the config knows or names; worked out
-        // once per config (0.0.44: Relation searched the relations list, copying strings, on every call).
+        // once per config, since the AI asks on every target check.
         Dictionary<string, Dictionary<string, FactionRelation>> relations = new Dictionary<string, Dictionary<string, FactionRelation>>();
         // Pairs ("a|b", both orders) whose alliance shares friends.
         HashSet<string> sharedFriends = new HashSet<string>();
@@ -58,11 +57,11 @@ namespace LotrNpcs
         Dictionary<string, string[]> friendsFrom = new Dictionary<string, string[]>();
         // faction -> attacker entity id -> until when (server elapsed ms) its NPCs and their allies fight back.
         readonly Dictionary<string, Dictionary<long, long>> grudges = new Dictionary<string, Dictionary<long, long>>();
-        // Player UID -> the faction an admin set with /recruits faction set (user, 2026-11-02), saved with the world.
+        // Player UID -> the faction an admin set with /recruits faction set, saved with the world.
         Dictionary<string, AssignedPlayer> assigned = new Dictionary<string, AssignedPlayer>();
-        // Players' sides as last worked out (0.0.44): by entity while they play (no UID lookup on the hot path), and
-        // by UID from their recruits' owner record while they don't. Kept apart, so a player judged both ways (an
-        // owner who is also a target) doesn't keep replacing one with the other.
+        // Players' sides as last worked out: by entity while they play (no UID lookup on the hot path), and by UID
+        // from their recruits' owner record while they don't. Kept apart, so a player judged both ways (an owner who
+        // is also a target) doesn't keep replacing one with the other.
         readonly Dictionary<EntityPlayer, PlayerSide> sides = new Dictionary<EntityPlayer, PlayerSide>(ReferenceEqualityComparer.Instance);
         readonly Dictionary<string, PlayerSide> recordSides = new Dictionary<string, PlayerSide>();
         static readonly object NoRecord = new object();
@@ -104,7 +103,7 @@ namespace LotrNpcs
             api.Event.RegisterGameTickListener(dt => Log.Flush(), 5000);
             api.Event.ServerRunPhase(EnumServerRunPhase.Shutdown, () => Log.Stop());
             CommandArgumentParsers parsers = api.ChatCommands.Parsers;
-            // 0.0.89: was /recruits faction; now a branch of the mod's one command (ModCommands).
+            // A branch of the mod's one command (ModCommands).
             ModCommands.RootOf(api)
                 .BeginSubCommand("battlelog")
                 .WithDescription("Admins: battle log for testing. on starts it (a CSV file in the Logs folder), off stops it, no argument shows the totals so far")
@@ -187,8 +186,8 @@ namespace LotrNpcs
             sapi.Logger.Notification("[lotrnpcs] Factions from " + ConfigFile + ": " + string.Join(", ", Config.Factions.Keys) + ".");
         }
 
-        /// <summary>After /recruits faction reload (0.0.90): loaded NPCs take their faction's new health at once (damage
-        /// is read at each attack), and online players over new limits lose the newest recruits. Returns how many NPCs
+        /// <summary>After /recruits faction reload: loaded NPCs take their faction's new health at once (damage is
+        /// read at each attack), and online players over new limits lose the newest recruits. Returns how many NPCs
         /// changed health.</summary>
         public int AfterReload()
         {
@@ -327,7 +326,7 @@ namespace LotrNpcs
             {
                 if (!Config.Factions.TryGetValue(f, out FactionDef def)) continue;
                 if (assignedFaction == f) return true;
-                // Since 0.0.92 race and groups count only with RaceAndGroupMembership.
+                // Race and groups count only with RaceAndGroupMembership.
                 if (!Config.RaceAndGroupMembership) continue;
                 if (assignedFaction == null && race != null && def.FriendlyRaces.Contains(race)) return true;
                 if (groups == null) continue;

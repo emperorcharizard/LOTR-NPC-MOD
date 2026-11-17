@@ -26,17 +26,17 @@ namespace LotrNpcs
         FactionSystem factions;
         long lastHurtMs = long.MinValue / 2;
         float sinceRegenCheck;
-        // Battle spacing (0.0.53): until when this NPC counts as fighting, and the push away from NPCs standing too
-        // close, worked out a few times a second from the entity partitions (no allocation: the callback is cached).
+        // Battle spacing: until when this NPC counts as fighting, and the push away from NPCs standing too close,
+        // worked out a few times a second from the entity partitions (no allocation: the callback is cached).
         public const long FightingMs = 3000;
         const float ScanSeconds = 0.25f, IdleScanSeconds = 1f;
         long fightingUntil;
         float sinceScan;
         double pushX, pushZ, scanSpacing, enemySpacing, brake, headX, headZ;
         bool lookAhead, scanFighting;
-        // 0.0.130: neighbours within BattleSpacing.ContactScan at the last scan, kept out of this NPC's body every tick.
+        // Neighbours within BattleSpacing.ContactScan at the last scan, kept out of this NPC's body every tick.
         readonly List<Entity> contacts = new List<Entity>(8);
-        // 0.0.82: the turn toward the NPC it fights, at most FaceRadPerSec, while standing within FaceRange of it.
+        // The turn toward the NPC it fights, at most FaceRadPerSec, while standing within FaceRange of it.
         public const double FaceRange = 4, FaceRadPerSec = 6;
         long scanTarget;
         EntityPartitioning partitions;
@@ -54,12 +54,12 @@ namespace LotrNpcs
             if (entity.Api.Side != EnumAppSide.Server) return;
             factions = entity.Api.ModLoader.GetModSystem<FactionSystem>();
             StripTestName(entity);
-            // 0.0.90/0.0.91: the faction's health for this rank, so new NPCs spawn with it and older ones get it
-            // (keeping their wounds) when they load.
+            // The faction's health for this rank, so new NPCs spawn with it and older ones get it (keeping their
+            // wounds) when they load.
             SyncMaxHealth(entity, ScaledMaxHealth(entity, factions?.Config));
         }
 
-        /// <summary>The health this NPC should have: its faction's for its rank (0.0.91), else its type's.</summary>
+        /// <summary>The health this NPC should have: its faction's for its rank, else its type's.</summary>
         public static float ScaledMaxHealth(Entity entity, FactionConfig config)
         {
             float typeMax = TypeMaxHealth(entity.Properties);
@@ -79,9 +79,8 @@ namespace LotrNpcs
             if (tasks != null) tasks.OnShouldExecuteTask += AllowTask;
         }
 
-        // 0.0.82 (owner: fighting NPCs "turning in place"): no wandering off or looking about in a fight. Between swings
-        // or waiting in a battle line, the vanilla look-around task turned NPCs away from their enemy and the melee task
-        // turned them back.
+        // No wandering off or looking about in a fight: between swings, or waiting in a battle line, the look-around
+        // task would turn NPCs away from their enemy.
         bool AllowTask(IAiTask task) =>
             !((task is AiTaskWander || task is AiTaskLookAround) && Fighting(entity.World.ElapsedMilliseconds));
 
@@ -89,9 +88,9 @@ namespace LotrNpcs
         public static float TypeMaxHealth(EntityProperties properties) => NpcTypeInfo.Of(properties)?.MaxHealth ?? 0;
 
         /// <summary>Vanilla health keeps the max health an NPC spawned with, so after a change to the entity type
-        /// (0.0.43, user: "reduce the health of all the npcs by 6") NPCs already in a world are brought to the new
-        /// value when they load. A wounded NPC keeps its wounds, and one at full health stays full. True if changed.
-        /// Our behavior comes after "health" in the entity JSON, so the health tree exists by now.</summary>
+        /// NPCs already in a world are brought to the new value when they load. A wounded NPC keeps its wounds, and
+        /// one at full health stays full. True if changed. Our behavior comes after "health" in the entity JSON, so
+        /// the health tree exists by now.</summary>
         public static bool SyncMaxHealth(Entity entity, float typeMax)
         {
             ITreeAttribute tree = entity.WatchedAttributes.GetTreeAttribute("health");
@@ -113,7 +112,8 @@ namespace LotrNpcs
             return true;
         }
 
-        /// <summary>NPCs spawned before 0.0.38 keep the "Test: " name their name tag picked at spawn; drop it.</summary>
+        /// <summary>NPCs spawned by very old versions keep the "Test: " name their name tag picked at spawn; drop
+        /// it.</summary>
         public static bool StripTestName(Entity entity)
         {
             ITreeAttribute tag = entity.WatchedAttributes.GetTreeAttribute("nametag");
@@ -139,11 +139,11 @@ namespace LotrNpcs
         }
 
         // Fighting NPCs closer than CombatSpacing to another NPC drift apart, at up to BattleSpacing.PushSpeed blocks
-        // a second, sideways to whatever they are doing. 0.0.104 (owner, 2026-11-09: men "walking through each other",
-        // chose "Push always + 5-block look-ahead"): NPCs that aren't fighting keep BodySpacing apart too, and a walking
-        // NPC looks LookAhead blocks along its way for its own side, steering past them and slowing behind one that is
-        // right in front. Only neighbours from the entity partitions are looked at, never every NPC. Standing NPCs that
-        // aren't fighting scan once a second, walking or fighting ones four times a second.
+        // a second, sideways to whatever they are doing. NPCs that aren't fighting keep BodySpacing apart, and a
+        // walking NPC looks LookAhead blocks along its way for its own side, steering past them and slowing behind
+        // one right in front, so men don't walk through each other. Only neighbours from the entity partitions are
+        // looked at, never every NPC. Standing NPCs that aren't fighting scan once a second, walking or fighting ones
+        // four times a second.
         void Separate(float dt)
         {
             long now = entity.World.ElapsedMilliseconds;
@@ -174,9 +174,9 @@ namespace LotrNpcs
             }
         }
 
-        // 0.0.130: hard bodies. Each tick the NPC steps out of any overlap with a neighbour from its last scan, by half
-        // the overlap (the neighbour does the same on its own tick), never into a wall or off a ledge. Riders and
-        // mounts are left out (a rider sits inside its mount); players keep the game's own push.
+        // Hard bodies: each tick the NPC steps out of any overlap with a neighbour from its last scan, by half the
+        // overlap (the neighbour does the same on its own tick), never into a wall or off a ledge. Riders and mounts
+        // are left out (a rider sits inside its mount); players keep the game's own push.
         void KeepApart()
         {
             if (contacts.Count == 0 || (entity as EntityAgent)?.MountedOn != null) return;
@@ -193,11 +193,11 @@ namespace LotrNpcs
             }
         }
 
-        // 0.0.82: a fighting NPC turns toward the NPC it fights. 0.0.137 (owner: NPCs should "keep their front toward
-        // the nearest enemy, and allow them to walk backwards"): its claimed target, else the nearest enemy from its scan
-        // or whoever last hurt it, within BattleSpacing.FaceScan, also while it walks (this behavior runs after the AI's
-        // path follower, which turns it the way it walks); moving away from that enemy it steps back at a walk with the
-        // walkback animation. Not mounted (the mount turns it) and not while breaking off (Retreat: they turn and run).
+        // A fighting NPC keeps its front toward the enemy: its claimed target, else the nearest enemy from its scan
+        // or whoever last hurt it, within BattleSpacing.FaceScan, also while it walks (this behavior runs after the
+        // AI's path follower, which turns it the way it walks). Moving away from that enemy it steps back at a walk
+        // with the walkback animation instead of turning its back. Not mounted (the mount turns it) and not while
+        // breaking off (Retreat: they turn and run).
         void Face(float dt)
         {
             long now = entity.World.ElapsedMilliseconds;
@@ -259,9 +259,9 @@ namespace LotrNpcs
             contacts.Clear();
             nearestEnemy = null; nearestEnemyD2 = double.MaxValue; scanFighting = fighting;
             BattleSpacing spacing = factions.Spacing;
-            // 0.0.82: enemies, the one it fights included, may come as close as the duel minimum; only its own side
-            // keeps CombatSpacing (before, every NPC but its target did, which shoved fighters out of reach). 0.0.104:
-            // out of a fight its own side keeps BodySpacing (formations stand 1.8 apart, so they are left as they are).
+            // Enemies, the one it fights included, may come as close as the duel minimum; only its own side keeps
+            // CombatSpacing (keeping every NPC but its target away shoved fighters out of reach). Out of a fight its
+            // own side keeps BodySpacing (formations stand 1.8 apart, so they are left as they are).
             scanSpacing = fighting ? spacing.Spacing : Math.Min(spacing.Spacing, BattleSpacing.BodySpacing);
             enemySpacing = Math.Min(spacing.DuelMin, scanSpacing);
             scanTarget = spacing.TargetOf(entity.EntityId, now);
@@ -294,7 +294,7 @@ namespace LotrNpcs
             // Cheap distance check first: most neighbours of a 5-block look-ahead scan are neither close nor ahead.
             double d2 = dx * dx + dz * dz;
             if (d2 < BattleSpacing.ContactScan * BattleSpacing.ContactScan && contacts.Count < 8) contacts.Add(e);
-            // 0.0.137: the nearest enemy, for Face.
+            // The nearest enemy, for Face.
             if (scanFighting && d2 < nearestEnemyD2 && (target || !factions.SameSide(entity, e))) { nearestEnemy = e; nearestEnemyD2 = d2; }
             bool near = d2 < scanSpacing * scanSpacing;
             bool ahead = lookAhead && !target && d2 < BattleSpacing.LookAhead * BattleSpacing.LookAhead && dx * headX + dz * headZ < 0;
@@ -325,7 +325,7 @@ namespace LotrNpcs
         // A dead or unloaded NPC frees its place in the fight, and nobody keeps a place on it.
         public override void OnEntityDeath(DamageSource damageSourceForDeath)
         {
-            // Recruits that hit it in the last 10 seconds earn XP (0.0.76).
+            // Recruits that hit it in the last 10 seconds earn XP.
             if (factions != null) entity.Api.ModLoader.GetModSystem<PromotionSystem>()?.OnDeath(entity);
             factions?.Log.Death(entity, damageSourceForDeath?.GetCauseEntity(), entity.World.ElapsedMilliseconds);
             factions?.Spacing.Forget(entity.EntityId);

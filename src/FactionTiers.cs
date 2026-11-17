@@ -16,7 +16,7 @@ using Vintagestory.GameContent;
 namespace LotrNpcs
 {
     /// <summary>One balance tier: follow limit, roster, per-rank health and damage, prices, and (for upgrading
-    /// version 19 files) the 0.0.90 multipliers.</summary>
+    /// version 19 files) the old multipliers.</summary>
     public sealed class FactionTier
     {
         public string Name;
@@ -24,20 +24,15 @@ namespace LotrNpcs
         public Dictionary<string, float> Health, Damage;
         public float Health090, Damage090;
         public Dictionary<string, int> Hire, Promote;
-        // The promotion prices 0.0.90 to 0.0.92 shipped (hire price less a third, about), for the version 22 migration.
+        // The promotion prices shipped with config versions 19-21, for the version 22 migration.
         public Dictionary<string, int> Promote090;
     }
 
     /// <summary>
-    /// The balance tiers. 0.0.90 (owner, 2026-11-04; "think of balancing numbers yourself for all factions"): follow
-    /// limits, rosters and prices so that a full warband of any tier wins about as often as any other's (owner chose
-    /// "B": even per full warband); Uruks are the exception the owner asked for ("slightly more health and damage then
-    /// men"), at a cost 1.1 times the Men's (owner chose "a"). Prices are the Men's times 5/followers, so a full warband
-    /// costs the same (until 0.0.108, which fits prices for equal coin instead; see Tables107). 0.0.91: health and damage per rank, fitted with the simulator in tools/balance (fitspread.py,
-    /// ranks-0.0.91.json) so that at each rank a full band of each tier wins half its fights averaged over every other
-    /// tier's full band of that rank (Uruks about 0.55), with every hit varied by DamageSpread (0.2). The flavour holds:
-    /// orcs low health and a little less damage, elves hard hitting, dwarves tough. The Shire and factions an admin
-    /// adds use the Men's (the baseline).
+    /// The balance tiers (Men, Uruk, Levy, Orc, Goblin, Elf, Dwarf). Today every tier has the Men's numbers, 3
+    /// followers, a roster of 16 and the Men's prices, so factions are equal and battles are decided by numbers and
+    /// tactics. Tiers stay apart for gear and names, and their older tables are kept below because the config
+    /// migrations compare files against them. The Shire and factions an admin adds use the Men's.
     /// </summary>
     public static class FactionTiers
     {
@@ -61,9 +56,8 @@ namespace LotrNpcs
 
         /// <summary>The ranks a promotion leads to.</summary>
         public static readonly string[] PromoteRanks = { "warrior", "archer", "captain" };
-        // 0.0.93 (owner, 2026-11-05: "There should be cost (coins) alongside xp to promote a unit. do the cost of the
-        // actual unit minus 3-4 coins"; chose "Minus 4 captain, 3 others"): a promotion costs the hire price of the rank
-        // it leads to, less 3 coins (less 4 for a captain), never below 0. The XP needed is unchanged.
+        // A promotion costs the hire price of the rank it leads to, less 3 coins (less 4 for a captain), never below
+        // 0.
         public const int PromoteDiscount = 3, CaptainPromoteDiscount = 4;
 
         /// <summary>What promoting to a rank costs when that rank hires for hirePrice.</summary>
@@ -81,7 +75,8 @@ namespace LotrNpcs
             return promote;
         }
 
-        /// <summary>0.0.113: promoting to a branch (guard, shock) costs what promoting to warrior does, unless listed.</summary>
+        /// <summary>Promoting to a branch (guard, shock) costs what promoting to warrior does, unless
+        /// listed.</summary>
         public static Dictionary<string, int> WithBranchPrices(Dictionary<string, int> promote)
         {
             foreach (string branch in Promotion.Branches)
@@ -91,30 +86,26 @@ namespace LotrNpcs
             return promote;
         }
 
-        /// <summary>0.0.113: a tier's branch stats from its warrior's (Promotion.Branches): guard health x1.25 and damage
-        /// x0.8, shock the other way round, so health x damage stays the warrior's (tools/balance/branches.py: 0.48 to 0.53
-        /// against plain warriors, coin for coin, in every faction).</summary>
+        /// <summary>A tier's branch stats from its warrior's (Promotion.Branches): guard health x1.25 and damage
+        /// x0.8, shock the other way round, so health x damage stays the warrior's.</summary>
         static Dictionary<string, float> WithBranches(Dictionary<string, float> table, bool health)
         {
             foreach (string branch in Promotion.AllBranches) table[branch] = Branch(branch, table[Promotion.BaseRank(branch)], health);
             return table;
         }
 
-        /// <summary>A branch's health or damage from its warrior's (0.0.154: a recruit branch's from its recruit's).</summary>
+        /// <summary>A branch's health or damage from its warrior's (a recruit branch's from its recruit's).</summary>
         public static float Branch(string branch, float warrior, bool health)
         {
             double scale = Promotion.GuardLike(branch) == health ? 1.25 : 0.8;
             return health ? Round(warrior * scale) : (float)Math.Round(warrior * scale, 2);
         }
 
-        // 0.0.135 (owner, 2026-11-14: "Equal stats, everyone 3", for PvP of 10 v 10 players with their followers): every
-        // tier has the Men's per-rank numbers, 3 followers and a roster of 16; hire prices are the Men's too (the
-        // coordinator's call, so equal coin stays fair; easy to undo with Tables134 below). Tiers stay apart for their
-        // gear, names and the 0.0.90 history the old config steps compare against.
-        // 0.0.153 (owner, 2026-11-16, chose "Stronger captains overall" so a captain beats a rider that beats 2 warriors):
-        // captains 96 health and 10.5 damage (were 48 and 7), about 3 times the health x damage. Config version 33.
-        // 0.0.155 (owner: players in iron and steel must be able to kill them): back to 48 and 7; the strength stays in
-        // NPC fights only (Riders.CaptainNpcFight). Config version 34 moves a captain still at 96 or 10.5 back.
+        // Every tier has the Men's per-rank numbers, 3 followers and a roster of 16, and the Men's hire prices
+        // (Tables134 below holds the last unequal set). Captains are 48 health and 7 damage; in fights with other
+        // NPCs they hit x1.5 and take x0.5 (Riders.CaptainNpcFight), so players in iron and steel can still kill
+        // them. CaptainHealth153/CaptainDamage153 are config version 33's stronger captains, which version 34 moves
+        // back.
         public const float CaptainHealth152 = 48, CaptainDamage152 = 7, CaptainHealth153 = 96, CaptainDamage153 = 10.5f, CaptainHealth = 48, CaptainDamage = 7f;
         static Dictionary<string, float> MenHealth => R(22, 34, CaptainHealth, 35);
         static Dictionary<string, float> MenDamage => R(3.15f, 3.95f, CaptainDamage, 3.05f);
@@ -122,17 +113,16 @@ namespace LotrNpcs
         public static readonly FactionTier Men = T("men", EqualFollowers, EqualRoster, 1f, 1f, MenHealth, MenDamage, 5, 15, 40, 15, 10, 10, 30);
         public static readonly FactionTier Uruk = T("uruk", EqualFollowers, EqualRoster, 1.05f, 1.03f, MenHealth, MenDamage, 5, 15, 40, 15, 11, 11, 33);
         public static readonly FactionTier Levy = T("levy", EqualFollowers, EqualRoster, 0.85f, 0.85f, MenHealth, MenDamage, 5, 15, 40, 15, 8, 8, 25);
-        // 0.0.103 (owner, 2026-11-09: "Maybe the stats only need to be slightly different instead of vastly"; chose
-        // "Narrow orcs to ~0.78 of a Man"): health x damage per rank went from about 0.55 of the Men's to about 0.78,
-        // roughly even per coin (orcs hire for about 0.75 of a Man). Config version 25 moves unchanged 0.0.91 tables.
+        // The orc tables of config version 25 (about 0.78 of a Man's health x damage), for the migrations.
         public static readonly Dictionary<string, float> OrcHealth091 = R(15, 27, 31, 22), OrcDamage091 = R(2.5f, 2.8f, 5.95f, 2.45f);
         public static readonly FactionTier Orc = T("orc", EqualFollowers, EqualRoster, 0.66f, 0.85f, MenHealth, MenDamage, 5, 15, 40, 15, 7, 7, 21);
         public static readonly FactionTier Goblin = T("goblin", EqualFollowers, EqualRoster, 0.57f, 0.73f, MenHealth, MenDamage, 5, 15, 40, 15, 6, 6, 19);
         public static readonly FactionTier Elf = T("elf", EqualFollowers, EqualRoster, 1.14f, 1.35f, MenHealth, MenDamage, 5, 15, 40, 15, 13, 13, 38);
         public static readonly FactionTier Dwarf = T("dwarf", EqualFollowers, EqualRoster, 1.33f, 1.15f, MenHealth, MenDamage, 5, 15, 40, 15, 13, 13, 38);
 
-        /// <summary>0.0.130 to 0.0.134 as shipped, for config version 31: tables, hire prices, follow limit and roster
-        /// (at the old baseline of 5 followers) that are still exactly these move to the 0.0.135 ones.</summary>
+        /// <summary>The tables, hire prices, follow limit and roster shipped before the factions were made equal (at
+        /// the old baseline of 5 followers), for config version 31: values still exactly these move to the equal
+        /// ones.</summary>
         public static readonly Dictionary<string, (Dictionary<string, float> Health, Dictionary<string, float> Damage, int[] Hire, int Followers, int Roster)> Tables134 =
             new Dictionary<string, (Dictionary<string, float>, Dictionary<string, float>, int[], int, int)>
         {
@@ -146,10 +136,7 @@ namespace LotrNpcs
         };
         public const int OldDefaultMaxFollowers134 = 5;
 
-        // 0.0.107 (owner chose "Orcs to 6 followers + refit all"): orcs follow 6 (was 7), and every tier's per-rank
-        // health and damage refitted with tools/balance/fit105.py under the 0.0.105 rules (hit turns, the attacker cap of
-        // 4, the hit spread) so each full same-rank following averages about 0.5 against the others (Uruk-hai 0.55),
-        // pulled toward the 0.0.103 values. The 0.0.103 tables, for config version 27:
+        // The tables of config versions 25-26, for the version 27 migration:
         public static readonly Dictionary<string, (Dictionary<string, float> Health, Dictionary<string, float> Damage)> Tables103 = new Dictionary<string, (Dictionary<string, float>, Dictionary<string, float>)>
         {
             ["men"] = (R(22, 34, 48, 34), R(3.05f, 4f, 7.05f, 3f)),
@@ -162,12 +149,7 @@ namespace LotrNpcs
         };
         public const int OrcFollowers103 = 7;
 
-        // 0.0.108 (owner, 2026-11-09: "increase attack frequency up a tick or two. and balance combat for equal coin
-        // spendage"): melee swings 0.25 s faster, every tier refitted for that pace (tools/balance/fit105.py), and hire
-        // each rank's price fitted (tools/balance/fitmix.py) so equal coin spent on any two factions wins about half
-        // the time however it is spent (mixed buys with or without captains: 0.42 to 0.56 on budgets of 50 to 250;
-        // recruit-only buys still favour the big orc and goblin rosters). The 0.0.107 tables and hire prices, for config
-        // version 28:
+        // The tables and hire prices of config version 27, for the version 28 migration:
         public static readonly Dictionary<string, (Dictionary<string, float> Health, Dictionary<string, float> Damage)> Tables107 = new Dictionary<string, (Dictionary<string, float>, Dictionary<string, float>)>
         {
             ["men"] = (R(22, 34, 48, 35), R(3.1f, 4f, 7f, 3.05f)),
@@ -209,8 +191,8 @@ namespace LotrNpcs
         public static float ScaledHealth(float typeHealth, float multiplier) =>
             typeHealth <= 0 ? typeHealth : Math.Max(1, Round(typeHealth * (double)multiplier));
 
-        /// <summary>One hit's damage with the spread (0.0.91, owner: "add a +-20% spread on hits"): times a random
-        /// 1 - spread to 1 + spread. roll is 0 to 1.</summary>
+        /// <summary>One hit's damage with the spread: times a random 1 - spread to 1 + spread. roll is 0 to
+        /// 1.</summary>
         public static float Spread(float damage, double spread, double roll) =>
             spread <= 0 ? damage : (float)(damage * (1 + spread * (2 * roll - 1)));
     }

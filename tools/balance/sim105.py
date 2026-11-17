@@ -5,7 +5,7 @@ melee hits on one target at least 0.55-0.75 s apart, later swings wait their tur
 a hit (arrows that land inside it are lost; melee never does since turns are booked), at most CAP melee attackers per
 target (0.0.102: 4), free enemies first, 0.8-1.5 s walk after a kill. Left out: terrain, formations/lines geometry,
 knockback, armor (NPC damage tier 8-9 passes every rank armor), Combat Overhaul, player.
-Usage: python3 -I sim105.py <Factions.cs> [runs]"""
+Usage: python3 -I sim105.py <FactionTiers.cs> [runs]"""
 import heapq, random, re, sys, json
 from multiprocessing import Pool
 

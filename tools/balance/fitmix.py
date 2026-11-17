@@ -1,7 +1,7 @@
 """0.0.108: per-rank whole-coin hire prices so equal coin is even however it is spent. Objective: every tier's average
 win rate (over the six others) near 0.5 in each spending style of evalcoin.py (quarter/half/all-allowed on captains then
 recruit-warrior-archer mix, no captains, recruits only, warriors only), budgets 50-250 with roster and captain limits.
-Men fixed. Coordinate search on each tier's four prices. Usage: python3 fitmix.py <Factions.cs> RUNS SWEEPS"""
+Men fixed. Coordinate search on each tier's four prices. Usage: python3 fitmix.py <FactionTiers.cs> RUNS SWEEPS"""
 import sys, random, json
 import os; sys.argv = os.environ.setdefault("LOTRNPCS_BALANCE_ARGV", "\n".join(sys.argv)).split("\n")  # Windows pool workers re-run this with the argv edited below; keep the real one
 SRC, RUNS, SWEEPS = sys.argv[1], int(sys.argv[2]), int(sys.argv[3]); sys.argv = [sys.argv[0], SRC, str(RUNS)]

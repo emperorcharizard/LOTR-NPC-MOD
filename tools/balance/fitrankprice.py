@@ -1,6 +1,6 @@
 """0.0.108: per-rank hire prices for equal coin. For each rank, armies of only that rank bought with the same coins
 (no roster or captain limit) should win about half their fights averaged over the other six tiers. Men's prices fixed;
-whole-coin prices; coordinate search. Usage: python3 fitrankprice.py <Factions.cs> RUNS"""
+whole-coin prices; coordinate search. Usage: python3 fitrankprice.py <FactionTiers.cs> RUNS"""
 import sys, random, json
 import os; sys.argv = os.environ.setdefault("LOTRNPCS_BALANCE_ARGV", "\n".join(sys.argv)).split("\n")  # Windows pool workers re-run this with the argv edited below; keep the real one
 SRC, RUNS = sys.argv[1], int(sys.argv[2]); sys.argv = [sys.argv[0], SRC, "1"]

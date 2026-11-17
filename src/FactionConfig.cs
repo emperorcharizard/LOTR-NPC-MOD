@@ -17,7 +17,7 @@ namespace LotrNpcs
 {
     public enum FactionRelation { Neutral, Ally, Enemy }
 
-    /// <summary>0.0.112: one item in a body's loot (FactionConfig.WildBodyLoot, HiredBodyLoot).</summary>
+    /// <summary>One item in a body's loot (FactionConfig.WildBodyLoot, HiredBodyLoot).</summary>
     public class BodyLoot
     {
         public string Code;
@@ -34,32 +34,26 @@ namespace LotrNpcs
         public List<string> FriendlyRaces = new List<string>();
         // Vanilla /group names whose members are friends.
         public List<string> FriendlyGroups = new List<string>();
-        // What hiring one of its NPCs costs (user, 2026-11-02): HirePrices coins of HireCoin per rank. Null until
-        // FillDefaults, so a file's prices replace the defaults instead of adding to them; ranks a file leaves out get
-        // the default price.
+        // What hiring one of its NPCs costs: HirePrices coins of HireCoin per rank. Null until FillDefaults, so a
+        // file's prices replace the defaults instead of adding to them; ranks a file leaves out get the default
+        // price.
         public string HireCoin;
         public Dictionary<string, int> HirePrices;
-        // What promoting a recruit costs, in HireCoin, by the rank it is promoted to (0.0.76, user, 2026-11-04: "at 15
-        // xp, they have the option to rank up to warrior or archer for 10 coins, then another 40 xp for warrior to rank
-        // up to captain for 30 coins"). Filled like HirePrices.
+        // What promoting a recruit costs, in HireCoin, by the rank it is promoted to. Filled like HirePrices.
         public Dictionary<string, int> PromotePrices;
-        // 0.0.90 (owner, 2026-11-04: factions "unequally equal", "like orcs would have a lower hp pool with a little
-        // less damage but be cheaper to hire and be able to have more follow at once"; numbers and rules in
-        // prompts/0.0.90-faction-balance.md): how many of this faction's recruits can follow a player at once and how
-        // many a player can have. Each recruit uses 1/MaxFollowers of a player's following and 1/MaxRecruits of their
-        // roster, so factions mix (owner: "Follow shares"). Null until FillDefaults: the faction's tier (FactionTiers),
-        // scaled by the file's baseline MaxFollowers and MaxRecruits.
+        // How many of this faction's recruits can follow a player at once and how many a player can have. Each
+        // recruit uses 1/MaxFollowers of a player's following and 1/MaxRecruits of their roster, so factions can be
+        // mixed. Null until FillDefaults: the faction's tier (FactionTiers), scaled by the file's baseline
+        // MaxFollowers and MaxRecruits.
         public int? MaxFollowers, MaxRecruits;
-        // 0.0.92 (owner, 2026-11-05: players pick their faction from a menu after making a character, chose "A": all
-        // factions, with a switch): false leaves this faction out of the pick menu. Admins can still set anyone to it.
+        // false leaves this faction out of the join menu. Admins can still set anyone to it.
         public bool Joinable = true;
-        // 0.0.91 (owner, 2026-11-05, after a 5 against 7 warrior fight the Men won losing one: per-rank numbers, "B",
-        // "balance it for all factions on an average, not just men"; prompts/0.0.91-rank-balance-despawn.md): the
-        // health and damage of each rank (recruit, warrior, captain, archer) of this faction's NPCs, in place of
-        // 0.0.90's two multipliers. A rank without an entry (or a rankless NPC) keeps its type's. Null until
-        // FillDefaults: the tier's table.
+        // Health and damage per hit by rank (recruit, warrior, captain, archer, guard, shock) for this faction's
+        // NPCs. A rank without an entry (or a rankless NPC) keeps its type's own. Null until FillDefaults: the tier's
+        // table.
         public Dictionary<string, float> Health, Damage;
-        // 0.0.90's multipliers, read once from a version 19 file so an admin's change carries over; never written back.
+        // Old per-faction multipliers, read once from a version 19 file so an admin's change carries over; never
+        // written back.
         [JsonProperty("HealthMultiplier")]
         public float? OldHealthMultiplier;
         [JsonProperty("DamageMultiplier")]
@@ -75,10 +69,8 @@ namespace LotrNpcs
     }
 
     /// <summary>
-    /// How two factions treat each other: "ally", "enemy" or "neutral". Factions without an entry are enemies
-    /// (user, 2026-11-02: factions are only friendly when the config says so). ShareFriends (allies only): each
-    /// faction's friends are also safe from the other's NPCs. Without it a player is safe only from the factions
-    /// that list their race or group.
+    /// How two factions treat each other: "ally", "enemy" or "neutral". Factions without an entry are enemies.
+    /// ShareFriends (allies only): each faction's members are also safe from the other's NPCs and can hire them.
     /// </summary>
     public class FactionRelationDef
     {
@@ -194,8 +186,7 @@ namespace LotrNpcs
         public void FillDefaults()
         {
             Factions = Factions ?? DefaultFactions();
-            // 0.0.76 (user, 2026-11-04: "No factions should be allies by default"): only the example entry, which
-            // allies nobody.
+            // No factions are allies by default: only the example entry, which allies nobody.
             Relations = Relations ?? new List<FactionRelationDef> { ExampleRelation() };
             WildBodyLoot = WildBodyLoot ?? DefaultBodyLoot();
             HiredBodyLoot = HiredBodyLoot ?? DefaultBodyLoot();
@@ -206,9 +197,8 @@ namespace LotrNpcs
                 if (def == null) continue;
                 FactionTier tier = FactionTiers.Of(kv.Key);
                 def.HireCoin = string.IsNullOrWhiteSpace(def.HireCoin) ? DefaultHireCoin : def.HireCoin.Trim();
-                // Ranks the file leaves out cost the default: the faction's tier price (0.0.90; the Men's are the old
-                // 5/15/40/15). Rank names compare in lower case; if a file names one twice ("Captain" and "captain"),
-                // the first counts.
+                // Ranks the file leaves out cost the faction's tier price. Rank names compare in lower case; if a
+                // file names one twice ("Captain" and "captain"), the first counts.
                 Dictionary<string, int> prices = new Dictionary<string, int>();
                 foreach (KeyValuePair<string, int> price in def.HirePrices ?? new Dictionary<string, int>())
                 {
@@ -226,7 +216,7 @@ namespace LotrNpcs
                     string rank = price.Key?.Trim().ToLowerInvariant();
                     if (!string.IsNullOrEmpty(rank) && !promote.ContainsKey(rank)) promote[rank] = price.Value;
                 }
-                // Ranks the file leaves out cost the faction's own hire price for that rank less the discount (0.0.93).
+                // Ranks the file leaves out cost the faction's own hire price for that rank less the discount.
                 foreach (KeyValuePair<string, int> price in FactionTiers.PromoteFor(prices))
                 {
                     if (!promote.ContainsKey(price.Key)) promote[price.Key] = price.Value;
@@ -240,10 +230,10 @@ namespace LotrNpcs
         public const int MaxFollowersLimit = 32, MaxRecruitsLimit = 256;
         public const float MaxHealthValue = 10000, MaxDamageValue = 1000;
 
-        /// <summary>A faction's follow limit, roster (0.0.90) and per-rank health and damage (0.0.91). Missing values
-        /// (or all of them, with replace) come from its tier, the limits scaled by this file's baseline MaxFollowers and
-        /// MaxRecruits (the Men's), so an admin who changed those keeps their proportions. Ranks a table leaves out come
-        /// from the tier too; rank names compare in lower case.</summary>
+        /// <summary>A faction's follow limit, roster and per-rank health and damage. Missing values (or all of them,
+        /// with replace) come from its tier, the limits scaled by this file's baseline MaxFollowers and MaxRecruits,
+        /// so an admin who changed those keeps their proportions. Ranks a table leaves out come from the tier too;
+        /// rank names compare in lower case.</summary>
         void FillLimits(FactionDef def, FactionTier tier, bool replace)
         {
             int baseFollowers = Math.Max(1, MaxFollowers), baseRecruits = Math.Max(1, MaxRecruits);
@@ -263,7 +253,8 @@ namespace LotrNpcs
                 string rank = kv.Key?.Trim().ToLowerInvariant();
                 if (!string.IsNullOrEmpty(rank) && !table.ContainsKey(rank) && !float.IsNaN(kv.Value)) table[rank] = clean(kv.Value);
             }
-            // 0.0.113: a file from before the branches gets them from its own warrior's value, so an admin's change carries.
+            // A file from before the guard and shock ranks gets them from its own warrior's value, so an admin's
+            // change carries over.
             foreach (string branch in Promotion.AllBranches)
             {
                 if (!table.ContainsKey(branch) && table.TryGetValue(Promotion.BaseRank(branch), out float source)) table[branch] = clean(FactionTiers.Branch(branch, source, health));
@@ -283,29 +274,19 @@ namespace LotrNpcs
         public int FollowersOf(string faction) => Def(faction)?.MaxFollowers ?? Math.Max(1, MaxFollowers);
         /// <summary>How many of this faction's recruits a player may have.</summary>
         public int RosterOf(string faction) => Def(faction)?.MaxRecruits ?? Math.Max(1, MaxRecruits);
-        /// <summary>How many captains a player may lead of this faction alone (0.0.104): roster / RosterPerCaptain,
-        /// a fraction of .75 or more rounding up, at least 1; int.MaxValue with the limit off.</summary>
+        /// <summary>How many captains a player may have (MaxCaptains; int.MaxValue with the limit off).</summary>
         public int CaptainsOf(string faction) => MaxCaptains <= 0 ? int.MaxValue : MaxCaptains;
         public static int CaptainsFor(int roster, int perCaptain) =>
             perCaptain <= 0 ? int.MaxValue : Math.Max(1, (int)Math.Floor(roster / (double)perCaptain + 0.25 + 1e-9));
-        /// <summary>The health of this faction's NPCs of this rank (0.0.91), or null: the type's own (a faction the
-        /// config doesn't know, a rank without an entry, a rankless NPC).</summary>
+        /// <summary>The health of this faction's NPCs of this rank, or null: the type's own (a faction the config
+        /// doesn't know, a rank without an entry, a rankless NPC).</summary>
         public float? HealthFor(string faction, string rank) => StatFor(Def(faction), Def(faction)?.Health, rank, 0);
         /// <summary>The damage of one hit (before the spread) of this faction's NPCs of this rank, or null: the type's.</summary>
         public float? DamageFor(string faction, string rank) => StatFor(Def(faction), Def(faction)?.Damage, rank, 2);
 
-        /// <summary>0.0.130 (owner, 2026-11-14: riders "dont seem to be able to hold their own in a fight against a large
-        /// group of warriors"): a rider costs a captain's price but fought with a warrior's numbers, about 1/2.5 of its
-        /// coin's worth. Unless the config lists a rider entry, its health and damage are the warrior's times RiderScale.
-        /// 0.0.135: one scale for every faction, the Men's 2.24 from 0.0.130 (which used (captain price / warrior price)
-        /// ^ 0.82 and left orc riders at 2.03 and Dunlending riders at 2.41; docs/balance/matchups-2026-11-14.md).</summary>
-        /// 0.0.149 (owner, 2026-11-16: "isnt the warriors supposed to be 50/50 with the riders?"): 1.5. At 2.24 with the
-        /// 0.0.133 charge and the 0.0.142 blows, 3 riders beat 13 warriors (equal coin) 13-0 and 1 beat 4 4-0.
-        /// 0.0.150 (owner, 2026-11-16: "3 riders should beat 5-7 warriors"): 1.0, a warrior's numbers on a horse. At 1.5,
-        /// 3 riders beat 6 Dunlending warriors 6-0 and 8 at least 7-0 (no rider lost); a square-law fit of the 3 v 8 log
-        /// put the even point at about 12 warriors at 1.5 and about 8 at 1.0. The charge and the horse carry the rest.
-        /// 0.0.168 (in game 2026-11-17, 0.0.167: since 0.0.164 foot soldiers land ~87% on passing riders, and a rider at 1.0
-        /// lost 1 v 2 warriors 46 v 41 damage; owner card "Riders x1.25 stats"): 1.25.
+        /// <summary>A rider's health and damage, unless the config lists a rider entry, are its warrior's times this.
+        /// Riders cost a captain's price; at 1.25 a rider beats 2 warriors and loses to a captain (in-game tests;
+        /// history in CHANGELOG.md and docs/notes).</summary>
         public const double DefaultRiderScale = 1.25;
 
         public static float RiderScale(FactionDef def) => (float)DefaultRiderScale;
@@ -317,24 +298,19 @@ namespace LotrNpcs
             if (rank == "rider" && table.TryGetValue("warrior", out float w)) return (float)Math.Round(w * RiderScale(def), digits);
             return table.TryGetValue(Promotion.StatRank(rank), out v) ? v : (float?)null;
         }
-        /// <summary>The spread on every NPC hit (0.0.91), 0 to 0.9.</summary>
+        /// <summary>The spread on every NPC hit, 0 to 0.9.</summary>
         [JsonIgnore]
         public double Spread => double.IsNaN(DamageSpread) ? DefaultDamageSpread : GameMath.Clamp(DamageSpread, 0, 0.9);
         /// <summary>How much bigger this faction's wild groups are than the baseline's: its follow limit over the
-        /// baseline MaxFollowers (orcs 6/5 since 0.0.107).</summary>
+        /// baseline MaxFollowers (1 while every faction has 3).</summary>
         public double GroupScaleOf(string faction) => FollowersOf(faction) / (double)Math.Max(1, MaxFollowers);
 
-        // Hire prices (user, 2026-11-02): 5, 15 and 40 coins for every faction for now; the coin can differ per faction.
-        // 0.0.59 (user, 2026-11-03: "Set the hiring coin id mordor uses to be standard for all races"): the large silver
-        // planchet the user's Mordor entry uses. The old default, coinage:coin-silver-lg, doesn't exist in their world.
-        // 0.0.94 (owner, 2026-11-05: "in the config, change the coins to rusty gears for now", then "just do it for the
-        // next build"): the vanilla rusty gear. PlanchetHireCoin was the default from 0.0.59 to 0.0.93; switching back is
-        // this one line.
+        // The coin hiring and promotion are paid in: the game's rusty gear. PlanchetHireCoin (a Coinage large silver
+        // planchet) was the default before; older files paying in it move to the gear.
         public const string DefaultHireCoin = "game:gear-rusty";
         public const string PlanchetHireCoin = "coinage:planchet-silver-lg";
-        // 0.0.55: archers, a unit of their own without ranks (user), cost a warrior's price.
-        /// <summary>The promotion prices 0.0.76 to 0.0.89 shipped for every faction (the version 19 migration compares
-        /// with them). Today's defaults come from the hire prices (FactionTiers.PromoteFor).</summary>
+        /// <summary>The default body loot: a few rusty gears by rank, plus a piece of cloth (recruits) or leather
+        /// (the rest).</summary>
         public static Dictionary<string, List<BodyLoot>> DefaultBodyLoot()
         {
             BodyLoot Gears(int min, int max) => new BodyLoot { Code = "game:gear-rusty", Min = min, Max = max };
@@ -433,12 +409,11 @@ namespace LotrNpcs
         public bool Migrate()
         {
             if (Version >= CurrentVersion) return false;
-            // 0.0.112 (owner: both servers run 0.0.108 or later): files older than version 19 (0.0.90) are no longer
-            // converted step by step; they keep their own values and take the steps below.
-            // 0.0.91 (version 20, owner: per-rank numbers, "B"): a version 19 file's HealthMultiplier and DamageMultiplier
-            // become per-rank tables. Multipliers still as 0.0.90 shipped them take the fitted table; ones the admin
-            // changed become the unit's own values times theirs, so their change carries over. DamageSpread comes in
-            // with its default.
+            // Files older than version 19 are no longer converted step by step; they keep their own values and take
+            // the steps below.
+            // Version 20: a version 19 file's HealthMultiplier and DamageMultiplier become per-rank tables.
+            // Multipliers still as shipped take the fitted table; ones the admin changed become the unit's own values
+            // times theirs. DamageSpread comes in with its default.
             if (Version == 19)
             {
                 foreach (KeyValuePair<string, FactionDef> kv in Factions)
@@ -453,10 +428,9 @@ namespace LotrNpcs
                     FillLimits(kv.Value, tier, false);
                 }
             }
-            // 0.0.93 (version 22, owner: promotion costs "the actual unit minus 3-4 coins"): promotion prices still as
-            // 0.0.90 to 0.0.92 shipped them become the faction's hire prices less the discount (so hire prices an admin
-            // changed count); promotion prices the admin chose stay.
-            // 0.0.94 (version 23): factions still paying in the planchet move to the rusty gear; a coin the admin chose stays.
+            // Version 22: promotion prices still as shipped become the faction's hire prices less the discount (so
+            // hire prices an admin changed count); promotion prices the admin chose stay.
+            // Version 23: factions still paying in the planchet move to the rusty gear; a coin the admin chose stays.
             if (Version < 23 && Version > 0)
             {
                 foreach (FactionDef def in Factions.Values)
@@ -474,10 +448,9 @@ namespace LotrNpcs
                         kv.Value.PromotePrices = FactionTiers.WithBranchPrices(FactionTiers.PromoteFor(kv.Value.HirePrices));
                 }
             }
-            // 0.0.108 (version 28, owner: "balance combat for equal coin spendage"): tables still exactly as 0.0.107 shipped
-            // them take the refitted ones, hire prices still exactly the 0.0.107 tier prices take the new ones, and
-            // promotion prices still derived from the old hire prices follow; values the admin chose stay. (Runs before
-            // the version 27 step, which lands older unchanged tables on the new ones directly.)
+            // Version 28: tables, hire prices and derived promotion prices still exactly as version 27 shipped them
+            // take the refitted ones; values the admin chose stay. (Runs before the version 27 step, which lands
+            // older unchanged tables on the new ones directly.)
             if (Version < 28 && Version > 0)
             {
                 foreach (KeyValuePair<string, FactionDef> kv in Factions)
@@ -497,10 +470,9 @@ namespace LotrNpcs
                     }
                 }
             }
-            // 0.0.107 (version 27, owner chose "Orcs to 6 followers + refit all"): health and damage tables still exactly as
-            // 0.0.103 to 0.0.106 shipped them take the refitted ones, and an orc-tier follow limit still at the old 7
-            // (scaled by the file's MaxFollowers) becomes 6; values the admin chose stay. (The version 25 orc
-            // move below lands on the new tables too.)
+            // Version 27: health and damage tables still exactly as versions 25-26 shipped them take the refitted
+            // ones, and an orc-tier follow limit still at the old 7 (scaled by the file's MaxFollowers) becomes 6;
+            // values the admin chose stay. (The version 25 orc move below lands on the new tables too.)
             if (Version < 27 && Version > 0)
             {
                 foreach (KeyValuePair<string, FactionDef> kv in Factions)
@@ -517,20 +489,17 @@ namespace LotrNpcs
                         kv.Value.MaxFollowers = FactionTiers.Round(tier.Followers * (double)baseFollowers / DefaultMaxFollowers);
                 }
             }
-            // 0.0.104 (version 26, owner chose "Yes, and turn lines on by default"): lines go on once. RosterPerCaptain
-            // comes in with its default.
+            // Version 26: battle lines go on once. RosterPerCaptain comes in with its default.
             if (Version < 26 && Version > 0) BattleLines = true;
-            // 0.0.112 (version 29, owner: "keep the i-frames off for now"): NPC hits on NPCs skip the hurt window, once.
+            // Version 29: NPC hits on NPCs skip the hurt window, once.
             if (Version < 29 && Version > 0) NpcHitsIgnoreHurtWindow = true;
-            // 0.0.114 (version 30, owner: "remove connection with fa races"): Fourth Age Races' races leave every
-            // faction's friendly races, once.
+            // Version 30: Fourth Age Races' races leave every faction's friendly races, once.
             if (Version < 30 && Version > 0)
             {
                 foreach (FactionDef def in Factions.Values)
                     def?.FriendlyRaces?.RemoveAll(r => r != null && r.Trim().StartsWith("faraces:", StringComparison.OrdinalIgnoreCase));
             }
-            // 0.0.103 (version 25, owner chose "Narrow orcs to ~0.78 of a Man"): orc-tier factions (Mordor, Angmar,
-            // Gundabad, and any with the orc tables) whose health or damage table is still exactly 0.0.91's take the new
+            // Version 25: orc-tier factions whose health or damage table is still exactly version 20's take the new
             // one; a table the admin changed stays.
             if (Version < 25 && Version > 0)
             {
@@ -541,8 +510,8 @@ namespace LotrNpcs
                     if (SameTable(kv.Value.Damage, FactionTiers.OrcDamage091)) kv.Value.Damage = new Dictionary<string, float>(FactionTiers.Orc.Damage);
                 }
             }
-            // 0.0.155 (version 34, owner: "keep this within reason for players to be able to kill in equivalent armor and
-            // weapons"): a captain still at 0.0.153's 96 health or 10.5 damage goes back to 48 or 7.
+            // Version 34: a captain still at 96 health or 10.5 damage (version 33's) goes back to 48 or 7, so players
+            // in equal armor can kill captains.
             if (Version < 34 && Version > 0)
                 foreach (FactionDef def in Factions.Values)
                 {
@@ -550,8 +519,8 @@ namespace LotrNpcs
                     if (def.Health != null && def.Health.TryGetValue("captain", out float h) && Math.Abs(h - FactionTiers.CaptainHealth153) < 1e-4) def.Health["captain"] = FactionTiers.CaptainHealth;
                     if (def.Damage != null && def.Damage.TryGetValue("captain", out float d) && Math.Abs(d - FactionTiers.CaptainDamage153) < 1e-4) def.Damage["captain"] = FactionTiers.CaptainDamage;
                 }
-            // 0.0.153 (version 33, owner chose "Stronger captains overall"): a captain still at the shipped 48 health or 7
-            // damage takes 96 or 10.5. Values the admin chose stay.
+            // Version 33: a captain still at the shipped 48 health or 7 damage takes 96 or 10.5. Values the admin
+            // chose stay.
             if (Version < 33 && Version > 0)
                 foreach (FactionDef def in Factions.Values)
                 {
@@ -559,14 +528,13 @@ namespace LotrNpcs
                     if (def.Health != null && def.Health.TryGetValue("captain", out float h) && Math.Abs(h - FactionTiers.CaptainHealth152) < 1e-4) def.Health["captain"] = FactionTiers.CaptainHealth;
                     if (def.Damage != null && def.Damage.TryGetValue("captain", out float d) && Math.Abs(d - FactionTiers.CaptainDamage152) < 1e-4) def.Damage["captain"] = FactionTiers.CaptainDamage;
                 }
-            // 0.0.138 (version 32, owner: "there should still be the 1 captain"): the roster-based captain count becomes
-            // MaxCaptains: the default 8 gives 1, 0 (no limit) stays none, another value keeps what it gave a roster of 16.
+            // Version 32: the roster-based captain count becomes MaxCaptains: the default 8 gives 1, 0 (no limit)
+            // stays none, another value keeps what it gave a roster of 16.
             if (Version < 32 && Version > 0)
                 MaxCaptains = RosterPerCaptain == DefaultRosterPerCaptain ? DefaultMaxCaptains : RosterPerCaptain <= 0 ? 0 : CaptainsFor(MaxRecruits, RosterPerCaptain);
-            // 0.0.135 (version 31, owner: "Equal stats, everyone 3"): a baseline follow limit still at the old 5 becomes 3;
-            // each faction's follow limit, roster, health and damage tables and hire prices still exactly as 0.0.130 to
-            // 0.0.134 shipped them take the equal ones, and promotion prices still derived from the old hire prices follow.
-            // Values the admin chose stay.
+            // Version 31 (equal factions): a baseline follow limit still at the old 5 becomes 3; each faction's
+            // follow limit, roster, health and damage tables and hire prices still exactly as shipped before take the
+            // equal ones, and promotion prices derived from the old hire prices follow. Values the admin chose stay.
             if (Version < 31 && Version > 0)
             {
                 int oldBase = Math.Max(1, MaxFollowers);
@@ -593,7 +561,7 @@ namespace LotrNpcs
                     }
                 }
             }
-            // 0.0.102 (version 24, owner: "Implement it again, do 4 per though"): the unchanged no-limit 0 becomes 4.
+            // Version 24: the unchanged no-limit 0 for MaxAttackersPerTarget becomes 4.
             if (Version < 24 && Version > 0 && MaxAttackersPerTarget == BattleSpacing.Default085MaxAttackers) MaxAttackersPerTarget = BattleSpacing.DefaultMaxAttackers;
             foreach (FactionDef def in Factions.Values)
             {
@@ -605,8 +573,8 @@ namespace LotrNpcs
             return true;
         }
 
-        // Both leave out the 0.0.113 branches, which FillDefaults adds to every file before Migrate compares it with the
-        // tables and prices older versions shipped without them.
+        // Both leave out the guard and shock branches, which FillDefaults adds to every file before Migrate compares
+        // it with the tables and prices older versions shipped without them.
         static bool SameTable(Dictionary<string, float> a, Dictionary<string, float> b) =>
             a != null && b != null && NoBranches(a).Count() == NoBranches(b).Count() && NoBranches(b).All(kv => a.TryGetValue(kv.Key, out float v) && Math.Abs(v - kv.Value) < 1e-4);
 
@@ -621,12 +589,11 @@ namespace LotrNpcs
             return (ra == a && rb == b) || (ra == b && rb == a);
         }
 
-        // The factions (user, 2026-11-02): Men are Gondor, Rohan, Dale, Arnor, Haradrim, Dunland (wildmen), Black
-        // Numenoreans and Easterlings; hobbits are one faction whatever the sub-race; Longbeards and Firebeards are
-        // one dwarf faction, wicked dwarves another; Noldor, Sindar and Avari are one elf faction, tormented elves
-        // another; orc factions depend on region and players, so orc players join through groups. Gondor, Rohan,
-        // Dale and Arnor share one race (Men of the West), so they list none either. Every faction but the Shire
-        // attacks non-members on sight, and factions are only allies when the config says so.
+        // The shipped factions. Men: Gondor, Rohan, Dale, Arnor, Haradrim, Dunland, Black Numenoreans, Easterlings.
+        // Hobbits are one faction (the Shire), dwarves two (Longbeards and Firebeards; wicked dwarves), elves two
+        // (Noldor, Sindar and Avari; tormented elves), orcs five by region. The races listed only count with
+        // RaceAndGroupMembership on; Gondor, Rohan, Dale and Arnor share one race, so they list none. Every faction
+        // but the Shire attacks non-members on sight.
         public static Dictionary<string, FactionDef> DefaultFactions()
         {
             FactionDef F(string stance, params string[] races) =>
@@ -649,8 +616,6 @@ namespace LotrNpcs
                 ["mordor"] = F("aggressive"),
                 ["angmar"] = F("aggressive"),
                 ["mistymountains"] = F("aggressive"),
-                // 0.0.62, work in progress (user, 2026-11-03: "a gundabad faction for a work in progress"). Like every
-                // orc faction, players join by group or /recruits faction set.
                 ["gundabad"] = F("aggressive"),
                 ["isengard"] = F("aggressive"),
             };

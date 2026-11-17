@@ -150,9 +150,9 @@ namespace LotrNpcs
         }
 
         /// <summary>
-        /// Wild NPCs treat a recruit the way they treat its owner (hiring plan, 2026-11-02): on sight if they would
-        /// attack the owner on sight, and also when the recruit or its owner hurt them or their allies. A recruit
-        /// keeps its faction's looks, not its friends: its own faction fights it too if its owner is that faction's enemy.
+        /// Wild NPCs treat a recruit the way they treat its owner: on sight if they would attack the owner on sight,
+        /// and also when the recruit or its owner hurt them or their allies. A recruit keeps its faction's looks, not
+        /// its friends: its own faction fights it too if its owner is that faction's enemy.
         /// </summary>
         public bool WouldAttackRecruit(string faction, Entity recruit, string ownerUid)
         {
@@ -162,7 +162,7 @@ namespace LotrNpcs
             return IsAggressive(faction) && !SideOf(ownerUid).FriendOf.Contains(faction);
         }
 
-        /// <summary>Would this NPC fight that entity (0.0.82, counting a battle line's enemies)?</summary>
+        /// <summary>Would this NPC fight that entity (counting a battle line's enemies)?</summary>
         public bool IsEnemyOf(Entity npc, Entity e)
         {
             string owner = Recruit.OwnerUidOf(npc);
@@ -170,7 +170,7 @@ namespace LotrNpcs
             return FactionOf(npc) is string faction && WantsToAttack(faction, e);
         }
 
-        /// <summary>Same side for battle spacing (0.0.82): recruits of one leader, or wild NPCs of one faction or allied
+        /// <summary>Same side for battle spacing: recruits of one leader, or wild NPCs of one faction or allied
         /// factions. Same-side NPCs keep CombatSpacing apart, others only the duel minimum.</summary>
         public bool SameSide(Entity a, Entity b)
         {
@@ -183,35 +183,35 @@ namespace LotrNpcs
 
         /// <summary>
         /// Does a recruit pick this target? Never its owner or the owner's other recruits, and nothing while passive
-        /// or breaking off after a movement order. Otherwise it fights whoever hurt the owner or one of them, and
-        /// whatever is going for them; defensive recruits fight only those. Aggressive ones (the default) also attack
-        /// enemies on sight: faction NPCs that would attack the owner on sight, monsters, and (0.0.102) players of an
-        /// enemy side and their recruits (EnemyForces); other players and their recruits only when they started it. Raiding ones attack every player and creature that isn't
-        /// allied (RaidTarget). Guarding ones (Guard here, 0.0.44) pick nothing on sight outside their area, and inside
-        /// it they also attack intruders (IsIntruder).
+        /// or breaking off after a movement order or Retreat (a Charge still fights). Otherwise it fights whoever
+        /// hurt the owner or one of them, and whatever is going for them; defensive recruits fight only those.
+        /// Aggressive ones (the default) also attack enemies on sight: faction NPCs that would attack the owner on
+        /// sight, monsters, and players of an enemy side and their recruits (EnemyForces); other players and their
+        /// recruits only when they started it. Raiding ones attack every player and creature that isn't allied
+        /// (RaidTarget). Guards pick nothing on sight outside their area, and inside it they also attack intruders
+        /// (IsIntruder).
         /// </summary>
         public bool RecruitWantsToAttack(Entity recruit, string ownerUid, Entity target, bool charge = false)
         {
             if (target == null || !target.Alive || target.EntityId == recruit.EntityId || Recruit.IsTeam(target, ownerUid)) return false;
             string stance = Recruit.StanceOf(recruit);
-            // 0.0.136: an ordered charge fights like Aggressive (passive recruits still never fight).
+            // An ordered charge fights like Aggressive (passive recruits still never fight).
             charge = charge || (Hiring != null && Hiring.Charging(recruit));
             if (stance == Recruit.Passive || (!charge && Hiring != null && Hiring.Disengaging(recruit))) return false;
             if (charge && stance == Recruit.Defensive) stance = Recruit.Aggressive;
-            // 0.0.77 had followers in a formation (not loose) fight nothing more than 12 blocks from their leader; 0.0.84
-            // (owner, 2026-11-04: "remove the limit") drops that. The break-off past 12 blocks (UpdateFollowFight) stays.
+            // Followers fight wherever the target is; they break off past 12 blocks from their leader
+            // (UpdateFollowFight).
             if (Hiring != null && Hiring.HasTeamGrudge(ownerUid, target.EntityId)) return true;
             if (HiringSystem.IsTargetingTeam(target, ownerUid)) return true;
             if (stance == Recruit.Defensive) return false;
-            // 0.0.112: no fights started with players near the world spawn (fighting back is above).
+            // No fights started with players near the world spawn (fighting back is above).
             if (target is EntityPlayer && NearWorldSpawn(target)) return false;
             bool guarding = Recruit.OrderOf(recruit) == Recruit.Guard;
             if (guarding && !InGuardArea(recruit, target)) return false;
             if (stance == Recruit.Raid) return RaidTarget(recruit, ownerUid, target);
             if (guarding && IsIntruder(ownerUid, target)) return true;
-            // 0.0.102 (owner, 2026-11-09: two hired armies sent at each other on Aggressive "did not fight each other";
-            // chose "Enemy players and recruits"): players of an enemy side (survival mode) and their recruits are fought
-            // on sight. Until 0.0.101 Aggressive left every player and player's recruit alone unless provoked.
+            // Players of an enemy side (survival mode) and their recruits are fought on sight, so two hired armies of
+            // warring factions fight each other.
             if (target is EntityPlayer targetPlayer) return CanBeAttacked(targetPlayer) && EnemyForces(recruit, ownerUid, Attrs.Uid(targetPlayer), null);
             if (Recruit.OwnerUidOf(target) is string otherOwner) return EnemyForces(recruit, ownerUid, otherOwner, target);
             if (FactionOf(target) is string other) return WouldAttackRecruit(other, recruit, ownerUid);
@@ -219,11 +219,11 @@ namespace LotrNpcs
         }
 
         /// <summary>
-        /// Are two players' forces enemies (0.0.102)? Each side is its player's factions (race, groups or admin setting)
-        /// plus, for a recruit, the recruit's own faction, so two players' hired armies of enemy factions fight even when
-        /// the players themselves belong to no faction. Enemies when some pair of their factions is at war and no pair is
-        /// allied (the same faction counts as allied). Players on the same side (group, allied factions, whitelist) never
-        /// are, and a side with no faction is nobody's enemy.
+        /// Are two players' forces enemies? Each side is its player's factions plus, for a recruit, the recruit's own
+        /// faction, so two players' hired armies of enemy factions fight even when the players themselves belong to
+        /// no faction. Enemies when some pair of their factions is at war and no pair is allied (the same faction
+        /// counts as allied). Players on the same side (group, allied factions, whitelist) never are, and a side with
+        /// no faction is nobody's enemy.
         /// </summary>
         public bool EnemyForces(Entity recruit, string ownerUid, string otherUid, Entity otherRecruit)
         {
@@ -260,8 +260,8 @@ namespace LotrNpcs
         }
 
         /// <summary>
-        /// Guard here (design doc, 2026-10-30: "any non-friendly player inside the radius, even while the owner is
-        /// offline"): a player who isn't on the owner's side (Friendly) and can be attacked, or such a player's recruit.
+        /// An intruder for Guard here: a player who isn't on the owner's side (Friendly) and can be attacked, or such
+        /// a player's recruit. Applies even while the owner is offline.
         /// </summary>
         public bool IsIntruder(string ownerUid, Entity target)
         {
@@ -272,7 +272,7 @@ namespace LotrNpcs
         /// <summary>How far around their post guards patrol, from the config.</summary>
         public double GuardRadius => FactionConfig.ClampGuardRadius(Config.GuardRadius);
 
-        /// <summary>0.0.112: is this entity within SpawnSafeRadius blocks (across) of the world spawn?</summary>
+        /// <summary>Is this entity within SpawnSafeRadius blocks (across) of the world spawn?</summary>
         public bool NearWorldSpawn(Entity e)
         {
             EntityPos spawn = sapi?.World.DefaultSpawnPosition;
@@ -291,10 +291,10 @@ namespace LotrNpcs
         }
 
         /// <summary>
-        /// Raid (user, 2026-11-03: "attack all non allied players and creatures"). Allied: players on the owner's side
-        /// (Friendly), those players' recruits, NPCs of a faction allied to the owner's or the recruit's own, and
-        /// creatures owned by any of those players. Players in creative or spectator mode are left alone. Everything
-        /// else alive with a mind of its own is fair game: other players, neutral and enemy NPCs, traders, monsters, animals.
+        /// Raid stance: attack every non-allied player and creature. Allied: players on the owner's side (Friendly),
+        /// those players' recruits, NPCs of a faction allied to the owner's or the recruit's own, and creatures owned
+        /// by any of those players. Players in creative or spectator mode are left alone. Everything else alive with
+        /// a mind of its own is fair game: other players, neutral and enemy NPCs, traders, monsters, animals.
         /// </summary>
         public bool RaidTarget(Entity recruit, string ownerUid, Entity target)
         {
@@ -449,18 +449,17 @@ namespace LotrNpcs
                 .Select(b => a + " + " + b + (rel == FactionRelation.Ally && SharesFriends(a, b) ? " (share friends)" : ""))).ToList();
             List<string> allies = pairs(FactionRelation.Ally), neutral = pairs(FactionRelation.Neutral);
             return string.Join("\n", Config.Factions.Select(kv => kv.Key + ": " + kv.Value.Stance
-                // 0.0.92: membership is by the join menu; races and groups only show while they count.
+                // Membership is by the join menu; races and groups only show while they count.
                 + (kv.Value.Joinable ? "" : ", not in the join menu")
                 + (Config.RaceAndGroupMembership
                     ? ", friendly races " + (kv.Value.FriendlyRaces.Count == 0 ? "none" : string.Join(" ", kv.Value.FriendlyRaces))
                       + ", friendly groups " + (kv.Value.FriendlyGroups.Count == 0 ? "none" : string.Join(" ", kv.Value.FriendlyGroups))
                     : "")
-                // 0.0.90: the balance values, short.
+                // The balance values, short.
                 + ", follow " + Config.FollowersOf(kv.Key) + ", roster " + Config.RosterOf(kv.Key)
-                // 0.0.91: per rank, recruit/warrior/captain/archer.
+                // Per rank, recruit/warrior/captain/archer.
                 + ", health " + RankList(Config.Def(kv.Key)?.Health) + ", damage " + RankList(Config.Def(kv.Key)?.Damage)))
-                // 0.0.89 (owner: "remove the descriptions in chat of the faction unit types and their hiring coin"): no
-                // hire prices or coin here any more; they are in the config file.
+                // Hire prices and the coin are in the config file, not here.
                 + "\nAllies: " + (allies.Count == 0 ? "none" : string.Join(", ", allies))
                 + "\nNeutral: " + (neutral.Count == 0 ? "none" : string.Join(", ", neutral))
                 + "\nEvery other pair are enemies. Hits vary by " + Math.Round(Config.Spread * 100) + "% either way.";

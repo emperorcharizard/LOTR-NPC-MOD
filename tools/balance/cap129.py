@@ -1,7 +1,7 @@
 """2026-11-14 balance check (docs/notes/balance-2026-11-14.md), sim105 rules on the shipped FactionTiers."""
 import sys, os, random, runpy
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.argv = ["sim105.py", os.path.join(HERE, "..", "..", "src", "Factions.cs"), "1"]
+sys.argv = ["sim105.py", os.path.join(HERE, "..", "..", "src", "FactionTiers.cs"), "1"]
 g = runpy.run_path(os.path.join(HERE, "sim105.py"), run_name="sim")
 U,fight,T=g["U"],g["fight"],g["TIERS"]
 def run(na,ta,nb,tb,cap,n=300):

@@ -16,13 +16,8 @@ using Vintagestory.GameContent;
 namespace LotrNpcs
 {
     /// <summary>
-    /// What the mod reads from an entity type's JSON, worked out once per type (0.0.44). The AI asks about every
-    /// creature near every NPC about once a second, and reading the type's JSON each time cost string copies and LINQ.
-    /// Thread-safe: natural spawn checks run on the world generation thread.
-    /// </summary>
-    /// <summary>
     /// Attribute reads for the AI's hot path. TreeAttribute.GetString passes every value through string.Intern, a
-    /// lookup in a global table that took longer than the rest of a targeting check (0.0.44 benchmark), so these
+    /// lookup in a global table that took longer than the rest of a targeting check, so these
     /// read the attribute directly. The text is the same; only the string object may differ, and nothing here
     /// compares strings by reference except caches checking that a value wasn't replaced.
     /// </summary>
@@ -34,6 +29,11 @@ namespace LotrNpcs
         public static string Uid(EntityPlayer player) => String(player?.WatchedAttributes, "playerUID");
     }
 
+    /// <summary>
+    /// What the mod reads from an entity type's JSON, worked out once per type. The AI asks about every
+    /// creature near every NPC about once a second, and reading the type's JSON each time cost string copies and LINQ.
+    /// Thread-safe: natural spawn checks run on the world generation thread.
+    /// </summary>
     public sealed class NpcTypeInfo
     {
         /// <summary>The lotrnpcsFaction attribute in lower case, or null for creatures without a faction.</summary>
@@ -44,7 +44,7 @@ namespace LotrNpcs
         public bool HasTaskAi { get; private set; }
         /// <summary>The "maxhealth" of the type's health behavior, or 0.</summary>
         public float MaxHealth { get; private set; }
-        /// <summary>May a new NPC of this type spawn bare-headed (lotrnpcsHelmetOptional, 0.0.82)? True when the type
+        /// <summary>May a new NPC of this type spawn bare-headed (lotrnpcsHelmetOptional)? True when the type
         /// doesn't say, as before.</summary>
         public bool HelmetOptional { get; private set; } = true;
         // FactionSystem.IsMonster's answer under the monster list with this stamp (main thread only).

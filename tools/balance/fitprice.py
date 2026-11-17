@@ -3,7 +3,7 @@ win about half their fights. Stats: fit-RANK.json (the 0.0.108 per-rank refit). 
 (5/15/40/15) times a multiplier m, rounded; Men fixed. A buyer spends up to a quarter on captains (within the captain
 limit), then recruit, warrior, recruit, warrior, archer in turn while affordable, then recruits, up to the roster.
 Budgets 50 to 250 coins in steps of 10, averaged (one budget alone is lumpy: a unit more or less decides it). Hill climbing on m in steps of 0.02.
-Usage: python3 fitprice.py <Factions.cs> RUNS STEPS"""
+Usage: python3 fitprice.py <FactionTiers.cs> RUNS STEPS"""
 import sys, json, random
 import os; sys.argv = os.environ.setdefault("LOTRNPCS_BALANCE_ARGV", "\n".join(sys.argv)).split("\n")  # Windows pool workers re-run this with the argv edited below; keep the real one
 SRC, RUNS, STEPS = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])

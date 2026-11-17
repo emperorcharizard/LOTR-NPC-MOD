@@ -8,7 +8,7 @@ from multiprocessing import Pool
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ARGS, _argv = sys.argv[1:], sys.argv
-sys.argv = ["sim105.py", os.path.join(HERE, "..", "..", "src", "Factions.cs"), "1"]
+sys.argv = ["sim105.py", os.path.join(HERE, "..", "..", "src", "FactionTiers.cs"), "1"]
 G = runpy.run_path(os.path.join(HERE, "sim105.py"), run_name="sim")
 sys.argv = _argv  # Windows' multiprocessing children start from sys.argv again
 U, fight = G["U"], G["fight"]
