@@ -18,16 +18,16 @@ namespace LotrNpcs
 {
     public partial class HiringSystem
     {
-        // ---- 0.0.90: over the limits (owner chose "B" then "BB": dismiss, for the roster and for the following) ----
+        // ---- over the limits: recruits past the roster or following are dismissed ----
 
         /// <summary>
         /// Brings a player within their roster and follow shares after the limits were lowered (on joining, and after
         /// /recruits faction reload). First, while the roster is over, the most recently hired recruit whose faction
-        /// is known goes (loaded ones now, the others when they next load, as /recruits dismissall does); recruits from
-        /// before 0.0.90 whose faction isn't known yet are never dismissed. Then, while the following is over, shared
-        /// guards they borrowed go back to watch where they stand (they belong to someone else), and then the most
-        /// recently hired of their own followers are dismissed. find looks a loaded entity up by id; titleOf names one
-        /// for the chat line. Returns the titles of those dismissed now and how many go later. Public for tests.
+        /// is known goes (loaded ones now, the others when they next load, as /recruits dismissall does); recruits
+        /// whose faction isn't known yet are never dismissed. Then, while the following is over, shared guards they
+        /// borrowed go back to watch where they stand (they belong to someone else), and then the most recently hired
+        /// of their own followers are dismissed. find looks a loaded entity up by id; titleOf names one for the chat
+        /// line. Returns the titles of those dismissed now and how many go later. Public for tests.
         /// </summary>
         public (List<string> Gone, int Later, int Returned) EnforceLimits(string uid, System.Func<long, EntityAgent> find, System.Func<EntityAgent, string> titleOf)
         {
@@ -98,10 +98,10 @@ namespace LotrNpcs
         }
 
         /// <summary>
-        /// A recruit loaded (0.0.90). Its faction is remembered for its roster share. A recruit from before 0.0.90 whose
-        /// faction was only learned now may put its owner over the roster, which is then put right as on joining. A
-        /// follower that loads into a following that has filled up meanwhile (it was in an unloaded chunk) never
-        /// counts as over: it keeps watch where it stands instead, like a hire past the following.
+        /// A recruit loaded. Its faction is remembered for its roster share. A recruit whose faction was only learned
+        /// now may put its owner over the roster, which is then put right as on joining. A follower that loads into a
+        /// following that has filled up meanwhile (it was in an unloaded chunk) never counts as over: it keeps watch
+        /// where it stands instead, like a hire past the following.
         /// </summary>
         public void OnRecruitLoaded(EntityAgent npc)
         {
@@ -172,7 +172,7 @@ namespace LotrNpcs
             if (Owner(player.PlayerUID) is HiringOwner owner)
             {
                 Refresh(owner, player);
-                // 0.0.90: over limits an admin lowered (or a pre-0.0.90 army over the new ones) on joining.
+                // Over limits an admin lowered, on joining.
                 EnforceLimits(player);
             }
         }
@@ -198,9 +198,9 @@ namespace LotrNpcs
                     Entity recruit = sapi.World.GetEntityById(list[i]);
                     if (recruit == null) continue;   // not loaded: it stays on the list
                     if (!recruit.Alive || Recruit.OwnerUidOf(recruit) != kv.Key) { ForgetFollowFight(list[i]); list.RemoveAt(i); continue; }
-                    // Who may see its XP (0.0.76): the owner and the owner's /group.
+                    // Who may see its XP: the owner and the owner's /group.
                     Promotion.SyncOwnerGroups(recruit, kv.Value.Groups);
-                    // The roster's picture of it (0.0.113), every 30 seconds.
+                    // The roster's picture of it, every 30 seconds.
                     if (summarizeNow) (kv.Value.Summaries ??= new Dictionary<long, RecruitSummary>())[recruit.EntityId] = RecruitSummary.Of(recruit);
                     // A borrower who left the game gives the guard back: it keeps watch where it stands.
                     if (Recruit.BorrowerUidOf(recruit) != null && Recruit.OnlineLeader(recruit) == null)
@@ -213,7 +213,7 @@ namespace LotrNpcs
                     // Only followers come along; holders and guards stay at their posts.
                     EntityPlayer leader = Recruit.OnlineLeader(recruit);
                     bool follows = leader != null && Recruit.OrderOf(recruit) == Recruit.Follow && leader.Alive && recruit.Pos.Dimension == leader.Pos.Dimension;
-                    // 0.0.136: a charge ends after ChargeMs, or ChargeQuietMs after the last enemy near the recruit.
+                    // A charge ends after ChargeMs, or ChargeQuietMs after the last enemy near the recruit.
                     if (charging.TryGetValue(recruit.EntityId, out var ch))
                     {
                         long nowMs = Now;
@@ -223,9 +223,9 @@ namespace LotrNpcs
                         if (ChargeOver(nowMs, ch.Until, quiet)) EndCharge(recruit.EntityId);
                         else charging[recruit.EntityId] = (ch.Until, quiet);
                     }
-                    // Formation followers too far from the leader break off their fight (0.0.77).
+                    // Formation followers too far from the leader break off their fight.
                     if (UpdateFollowFight(recruit, follows ? leader : null) && recruit is EntityAgent agent) StopFights(agent);
-                    // A loose follower in a fight isn't pulled away from it (0.0.77); it comes when the fight is over.
+                    // A loose follower in a fight isn't pulled away from it; it comes when the fight is over.
                     bool looseFighting = Recruit.FormationOf(recruit) == Formation.Loose
                         && recruit.GetBehavior<EntityBehaviorFactionMember>()?.Fighting(sapi.World.ElapsedMilliseconds) == true;
                     if (follows && !looseFighting && recruit.Pos.SquareDistanceTo(leader.Pos) > TeleportDistance * TeleportDistance)

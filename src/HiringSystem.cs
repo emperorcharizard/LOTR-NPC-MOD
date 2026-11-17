@@ -17,11 +17,11 @@ using Vintagestory.GameContent;
 namespace LotrNpcs
 {
     /// <summary>
-    /// Hiring (user, 2026-11-02): right-clicking a faction NPC opens a talk menu like the traders'. Members of its
-    /// faction can hire it for the faction's HirePrices in HireCoin, up to MaxRecruits each. Recruits follow, hold
-    /// or guard (orders and stances: Orders.cs), fight whatever would attack their owner and whoever hurts the owner or
-    /// them, and wild NPCs treat them the way they treat the owner. Owners keep a whitelist of players their recruits
-    /// never attack on sight (/recruits whitelist). Server only; the menu itself is GuiDialogTalk on the client.
+    /// Hiring: right-clicking a faction NPC opens a talk menu like the traders'. Members of its faction can hire it
+    /// for the faction's HirePrices in HireCoin, up to MaxRecruits each. Recruits follow, hold or guard (orders and
+    /// stances: Orders.cs), fight whatever would attack their owner and whoever hurts the owner or them, and wild
+    /// NPCs treat them the way they treat the owner. Owners keep a whitelist of players their recruits never attack
+    /// on sight (/recruits whitelist). Server only; the menu itself is GuiDialogTalk on the client.
     /// </summary>
     public partial class HiringSystem : ModSystem
     {
@@ -35,12 +35,10 @@ namespace LotrNpcs
         public const double CommandRange = 96;
         // How long a movement order keeps recruits from starting fights, so they break off and go.
         public const int DisengageMs = 5000;
-        // 0.0.77 (owner, 2026-11-04: "12 blocks, but when that amount is exceeded, they leave combat to return to you";
-        // "Have it apply to all formations except loose, where on loose they dont try to return to me, and fight until
-        // the enemy is dead"). A follower in a formation other than loose fights only enemies within FollowFightRange
-        // of its leader. Farther than that from the leader, it breaks off and starts no fight (not even striking back)
-        // until it is back within RegroupWithin. Loose followers fight on wherever the fight goes and come back when it
-        // is over; the pull to the leader at TeleportDistance waits until then too.
+        // A follower in a formation other than loose fights only enemies within FollowFightRange of its leader.
+        // Farther than that from the leader, it breaks off and starts no fight (not even striking back) until it is
+        // back within RegroupWithin. Loose followers fight on wherever the fight goes and come back when it is over;
+        // the pull to the leader at TeleportDistance waits until then too.
         public const double FollowFightRange = 12, RegroupWithin = 4;
 
         ICoreServerAPI sapi;
@@ -53,11 +51,11 @@ namespace LotrNpcs
         // recruit entity id -> until when (ms) it starts no fights after a movement order. Kept in memory only: the
         // clock restarts with the server.
         readonly Dictionary<long, long> disengageUntil = new Dictionary<long, long>();
-        // 0.0.77: followers in a formation (not loose) -> their leader's entity, and those breaking off to regroup.
+        // Followers in a formation (not loose) -> their leader's entity, and those breaking off to regroup.
         readonly Dictionary<long, Entity> formationLeader = new Dictionary<long, Entity>();
         readonly HashSet<long> regrouping = new HashSet<long>();
-        // 0.0.136 (owner: "I also want to add retreat and charge commands"): recruit entity id -> charge (until when, and
-        // since when no enemy has been within ChargeQuietRange, 0 while one is). In memory only, like disengageUntil.
+        // Retreat and Charge: recruit entity id -> charge (until when, and since when no enemy has been within
+        // ChargeQuietRange, 0 while one is). In memory only, like disengageUntil.
         readonly Dictionary<long, (long Until, long QuietSince)> charging = new Dictionary<long, (long, long)>();
         // The same ids for the battle lines (BattleLineSystem.SideOf is static): charging recruits form no lines.
         static readonly HashSet<long> chargingIds = new HashSet<long>();
@@ -71,13 +69,12 @@ namespace LotrNpcs
         public long NowForTests;
         long Now => sapi?.World.ElapsedMilliseconds ?? NowForTests;
 
-        /// <summary>The baseline roster and follow limit (the Men's; the file's top-level values). Each faction has its
-        /// own since 0.0.90 (FactionConfig.RosterOf, FollowersOf).</summary>
+        /// <summary>The baseline roster and follow limit (the file's top-level values). Each faction can have its own
+        /// (FactionConfig.RosterOf, FollowersOf).</summary>
         public int MaxRecruits => Math.Max(1, Factions?.Config.MaxRecruits ?? FactionConfig.DefaultMaxRecruits);
         public int MaxFollowers => Math.Max(1, Factions?.Config.MaxFollowers ?? FactionConfig.DefaultMaxFollowers);
-        // ---- 0.0.90 follow and roster shares (owner: "Follow shares": each follower uses 1/(its faction's follow
-        // limit) of the following, and the same kind of share applies to the total roster; never more than 1, owner
-        // chose "a") ----
+        // ---- follow and roster shares: each follower uses 1/(its faction's follow limit) of the following, and
+        // likewise for the roster; the shares never add up to more than 1 ----
 
         /// <summary>Rounding room for sums of shares, so 7 sevenths still fit.</summary>
         public const double ShareSlack = 1e-6;
@@ -85,8 +82,9 @@ namespace LotrNpcs
         public double RosterShare(string faction) => 1.0 / Math.Max(1, Factions?.Config.RosterOf(faction) ?? FactionConfig.DefaultMaxRecruits);
         public static bool Fits(double used, double share) => used + share <= 1 + ShareSlack;
 
-        /// <summary>0.0.138: does a band fit? Members are (share, is a recruit). Up to extra recruits ride free in the
-        /// recruit-only places (the biggest shares first); every other member uses its share of the ranked places.</summary>
+        /// <summary>Does a band fit? Members are (share, is a recruit). Up to extra recruits ride free in the
+        /// recruit-only places (the biggest shares first); every other member uses its share of the ranked
+        /// places.</summary>
         public static bool BandFits(IEnumerable<(double Share, bool Recruit)> members, int extra) => Over(BandUsed(members, extra)) == false;
 
         /// <summary>The ranked places a band uses (see BandFits).</summary>
@@ -99,13 +97,13 @@ namespace LotrNpcs
         int RecruitExtra => Factions?.Config.RecruitExtra ?? FactionConfig.DefaultRecruitExtraFollowers;
         (double Share, bool Recruit) Member(Entity e) => (FollowShare(FactionSystem.FactionOf(e)), Promotion.BaseRank(RankOf(e)) == "recruit");
 
-        /// <summary>0.0.138: would candidate fit the player's following (its followers but except, plus candidate)?</summary>
+        /// <summary>Would candidate fit the player's following (its followers but except, plus candidate)?</summary>
         public bool FollowFits(string uid, Entity candidate, Entity except = null) =>
             BandFits(Followers(uid).Where(e => e != except && e != candidate).Append(candidate).Select(Member), RecruitExtra);
         public static bool Over(double used) => used > 1 + ShareSlack;
 
-        /// <summary>How much of the player's roster their recruits use. A recruit whose faction isn't known yet (hired
-        /// before 0.0.90 and not loaded since) counts at the baseline share.</summary>
+        /// <summary>How much of the player's roster their recruits use. A recruit whose faction isn't known yet (not
+        /// loaded since an old version) counts at the baseline share.</summary>
         public double RosterUsed(string uid)
         {
             if (!(Owner(uid) is HiringOwner owner)) return 0;
@@ -121,7 +119,7 @@ namespace LotrNpcs
             Followers(uid).Where(e => e != except).Sum(e => FollowShare(FactionSystem.FactionOf(e)));
 
         /// <summary>How many more of each faction fit the player's following: the given faction first, then those of
-        /// their followers, at most four (0.0.90 room line).</summary>
+        /// their followers, at most four (the talk menu's room line).</summary>
         public List<RoomEntry> Room(string uid, string faction)
         {
             List<EntityAgent> following = Followers(uid);
@@ -136,8 +134,8 @@ namespace LotrNpcs
             return shown.Take(4).Select(f => new RoomEntry { Faction = f, Count = Math.Max(0, (int)Math.Floor((1 - used + ShareSlack) / FollowShare(f))) }).ToList();
         }
 
-        /// <summary>How many more of each faction fit the player's roster (0.0.91): the given faction first, then those
-        /// of their recruits whose faction is known, at most four.</summary>
+        /// <summary>How many more of each faction fit the player's roster: the given faction first, then those of
+        /// their recruits whose faction is known, at most four.</summary>
         public List<RoomEntry> RosterRoom(string uid, string faction)
         {
             double used = RosterUsed(uid);
@@ -185,14 +183,14 @@ namespace LotrNpcs
             (owner.Summaries ??= new Dictionary<long, RecruitSummary>())[npc.EntityId] = RecruitSummary.Of(npc);
         }
 
-        /// <summary>A captain's share of the player's captain places (0.0.104): 1 / CaptainsOf(its faction).</summary>
+        /// <summary>A captain's share of the player's captain places: 1 / CaptainsOf(its faction).</summary>
         public double CaptainShare(string faction)
         {
             int n = Factions?.Config.CaptainsOf(faction) ?? FactionConfig.CaptainsFor(FactionConfig.DefaultMaxRecruits, FactionConfig.DefaultRosterPerCaptain);
             return n == int.MaxValue ? 0 : 1.0 / n;
         }
 
-        /// <summary>How much of the player's captain places their captains use (0.0.104).</summary>
+        /// <summary>How much of the player's captain places their captains use.</summary>
         public double CaptainsUsed(string uid)
         {
             if (!(Owner(uid) is HiringOwner owner) || owner.Captains == null) return 0;
@@ -202,7 +200,7 @@ namespace LotrNpcs
             return used;
         }
 
-        /// <summary>Room for one more captain of this faction (0.0.104)?</summary>
+        /// <summary>Room for one more captain of this faction?</summary>
         public bool CaptainFits(string uid, string faction) => CaptainShare(faction) == 0 || Fits(CaptainsUsed(uid), CaptainShare(faction));
 
         /// <summary>The player's loaded, living recruits that are told to follow them, wherever they are.</summary>
@@ -259,7 +257,7 @@ namespace LotrNpcs
 
             CommandArgumentParsers parsers = api.ChatCommands.Parsers;
             ModCommands.RootOf(api)
-                // 0.0.73 (user, 2026-11-04: "make an option in the chat to fire all your recruits").
+                // Sets every recruit free.
                 .BeginSubCommand("dismissall")
                     .WithAlias("fireall")
                     .RequiresPlayer()
@@ -270,7 +268,7 @@ namespace LotrNpcs
                 .BeginSubCommand("whitelist")
                     .RequiresPlayer()
                     .WithDescription("Players your recruits never attack on sight, even on Guard here or the raid stance. They still fight back if hurt. With nothing after it, opens the whitelist menu.")
-                    // 0.0.76 (user: the whitelist menu "would be good for this round"): /recruits whitelist alone opens it.
+                    // /recruits whitelist alone opens the whitelist menu.
                     .HandleWith(OpenWhitelistMenu)
                     .BeginSubCommand("add")
                         .WithDescription("Put a player on your whitelist")

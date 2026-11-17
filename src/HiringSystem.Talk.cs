@@ -81,7 +81,7 @@ namespace LotrNpcs
                 state.Coin = ownDef?.HireCoin ?? FactionConfig.DefaultHireCoin;
                 if (Promotions != null) state.Promote = Promotions.Offers(npc, ownDef);
                 state.Classes = OtherClasses(npc);
-                // 0.0.104: no captain offer while the player's captain places are full.
+                // No captain offer while the player's captain places are full.
                 if (state.Promote != null && state.Promote.ContainsKey("captain") && RankOf(npc) != "captain" && !CaptainFits(player.PlayerUID, faction))
                 {
                     state.Promote = new Dictionary<string, int>(state.Promote);
@@ -110,7 +110,7 @@ namespace LotrNpcs
                 state.Coin = def?.HireCoin ?? FactionConfig.DefaultHireCoin;
             }
             else state.Mode = "stranger";
-            // 0.0.90: the room line for the menus that can hire, follow or borrow.
+            // The room line for the menus that can hire, follow or borrow.
             if (state.Mode == "member" || state.Mode == "own" || state.Mode == "borrowed" || state.Mode == "shared")
             {
                 state.Room = Room(player.PlayerUID, faction);
@@ -139,7 +139,7 @@ namespace LotrNpcs
                 case "borrow":
                     {
                         if (state.Mode != "shared") return state;
-                        // 0.0.90: a borrowed guard takes its faction's share of the borrower's following.
+                        // A borrowed guard takes its faction's share of the borrower's following.
                         if (!FollowFits(player.PlayerUID, npc)) return StateFor(npc, player, "talk-followfull");
                         Recruit.Lend(npc, player.PlayerUID, player.PlayerName);
                         Recruit.SetOrder(npc, Recruit.Follow);
@@ -200,8 +200,8 @@ namespace LotrNpcs
             }
         }
 
-        /// <summary>0.0.154: the recruit classes (Promotion.RecruitClasses) this NPC could take besides its own, whose
-        /// entity types exist; empty for any other rank.</summary>
+        /// <summary>The recruit classes (Promotion.RecruitClasses) this NPC could take besides its own, whose entity
+        /// types exist; empty for any other rank.</summary>
         List<string> OtherClasses(Entity npc)
         {
             string rank = RankOf(npc);
@@ -209,8 +209,8 @@ namespace LotrNpcs
             return Promotion.RecruitClasses.Where(c => c != rank && sapi.World.GetEntityType(Promotion.CodeAtRank(npc.Code, c)) != null).ToList();
         }
 
-        /// <summary>0.0.154: the player's recruit becomes another recruit class (a new NPC, as a promotion makes),
-        /// keeping its XP, for free. True when done (the owner is told in chat).</summary>
+        /// <summary>The player's recruit becomes another recruit class (a new NPC, as a promotion makes), keeping its
+        /// XP, for free. True when done (the owner is told in chat).</summary>
         bool ChangeClass(EntityAgent npc, IServerPlayer player, string cls)
         {
             int xp = Promotion.Xp(npc);
@@ -225,9 +225,9 @@ namespace LotrNpcs
         }
 
         /// <summary>
-        /// Promotes the player's own recruit to rank if its XP is full, the rank is on offer and the player pays (the talk
-        /// menu, and since 0.0.113 the promotion screen, also from the roster, at any distance). Null when done (the
-        /// owner is told in chat), else the reply's lang key, with the price it asked for.
+        /// Promotes the player's own recruit to rank if its XP is full, the rank is on offer and the player pays
+        /// (from the talk menu, or the promotion screen at any distance). Null when done (the owner is told in chat),
+        /// else the reply's lang key, with the price it asked for.
         /// </summary>
         public string PromoteRecruit(EntityAgent npc, IServerPlayer player, string rank, out int price)
         {
@@ -244,9 +244,9 @@ namespace LotrNpcs
             sapi?.Logger.Notification("[lotrnpcs] " + player.PlayerName + " promoted their recruit to " + rank + " for " + price + " " + state.Coin + ".");
             return null;
         }
-        // ---- 0.0.113: the roster screen and the promotion screen (Roster.cs) ----
+        // ---- the roster screen and the promotion screen (Roster.cs) ----
 
-        /// <summary>Server: remembers how a recruit is now, for the roster while it isn't loaded (0.0.113).</summary>
+        /// <summary>Server: remembers how a recruit is now, for the roster while it isn't loaded.</summary>
         public void Summarize(Entity npc)
         {
             if (Recruit.OwnerUidOf(npc) is string uid && Owner(uid) is HiringOwner owner && owner.Recruits.Contains(npc.EntityId))
@@ -281,7 +281,7 @@ namespace LotrNpcs
             string room = (RoomText(Room(uid, null), L) + " " + RosterText(RosterRoom(uid, null), L)).Trim();
             if (room.Length > 0) state.Header.Add(room);
             if (owner.Captains != null && owner.Captains.Count > 0) state.Header.Add(L("roster-captains", new object[] { Percent(CaptainsUsed(uid)) }));
-            // 0.0.138: ranked places and recruit-only places in use.
+            // Ranked places and recruit-only places in use.
             List<EntityAgent> band = Followers(uid);
             int recruits = band.Count(e => Promotion.BaseRank(RankOf(e)) == "recruit"), extra = RecruitExtra, inExtra = Math.Min(recruits, extra);
             state.Header.Add(L("roster-band", new object[] { band.Count - inExtra, MaxFollowers, inExtra, extra }));
@@ -364,7 +364,7 @@ namespace LotrNpcs
 
         TalkState Hire(EntityAgent npc, IServerPlayer player, TalkState state)
         {
-            // 0.0.90: room on the roster for one more of this faction (shares, not a count).
+            // Room on the roster for one more of this faction (shares, not a count).
             string faction = FactionSystem.FactionOf(npc);
             if (!Fits(RosterUsed(player.PlayerUID), RosterShare(faction))) { state.Reply = "talk-full"; return state; }
             if (RankOf(npc) == "captain" && !CaptainFits(player.PlayerUID, faction)) { state.Reply = "talk-captains-full"; return state; }
@@ -373,7 +373,7 @@ namespace LotrNpcs
             // Past the follow share, a new recruit guards the spot where it was hired instead of following.
             bool guards = !FollowFits(player.PlayerUID, npc);
             Recruit.Bind(npc, player.PlayerUID, player.PlayerName);
-            // A name befitting its race (0.0.54), unless it already has one.
+            // A name befitting its race, unless it already has one.
             Looks.NameOnHire(npc, sapi.World.Rand);
             if (guards) Recruit.SetGuardAt(npc, PostAt(npc));
             // Recruits never despawn as zone NPCs do. The old origin comes back if they are dismissed.
@@ -389,7 +389,7 @@ namespace LotrNpcs
             if (player.Entity != null) RefreshFollowSlots(owner, player.Entity);
             sapi.Logger.Notification("[lotrnpcs] " + player.PlayerName + " hired " + npc.Code + " (" + npc.EntityId + ") for " + state.Price + " " + state.Coin
                 + ", now " + owner.Recruits.Count + " recruits, roster " + Percent(RosterUsed(player.PlayerUID)) + " used.");
-            // 0.0.91 (owner: players "should be notified how many recruits they have left in their capacity").
+            // Tell the player how much room is left on their roster.
             string Lg(string k, object[] a) => Lang.GetL(player.LanguageCode, "lotrnpcs:" + k, a);
             player.SendMessage(GlobalConstants.GeneralChatGroup, Lg("hired-room", new object[] { Recruit.TitleInSentence(npc, player.LanguageCode),
                 RoomText(Room(player.PlayerUID, faction), Lg), RosterText(RosterRoom(player.PlayerUID, faction), Lg) }).Trim(), EnumChatType.Notification);
@@ -431,7 +431,7 @@ namespace LotrNpcs
             owner.Summaries?.Remove(old.EntityId);
             Learn(owner, next);
             Promotion.SyncOwnerGroups(next, owner.Groups);
-            // 0.0.138 (owner: "once ranked up they cant follow"): past the ranked places it stays on the roster but guards.
+            // Past the ranked places a newly ranked recruit stays on the roster but guards.
             if (Recruit.OrderOf(next) == Recruit.Follow && !FollowFits(uid, next, old))
             {
                 Recruit.SetGuardAt(next, next.Pos.XYZ);
@@ -457,9 +457,8 @@ namespace LotrNpcs
         }
 
         /// <summary>
-        /// Dismisses every recruit of this owner (0.0.73): loaded ones at once, the rest when they next load
-        /// (PendingDismiss). find looks a loaded entity up by id. Returns how many went now and how many later.
-        /// Public for tests.
+        /// Dismisses every recruit of this owner: loaded ones at once, the rest when they next load (PendingDismiss).
+        /// find looks a loaded entity up by id. Returns how many went now and how many later. Public for tests.
         /// </summary>
         public (int Now, int Later) DismissAll(string uid, System.Func<long, EntityAgent> find)
         {

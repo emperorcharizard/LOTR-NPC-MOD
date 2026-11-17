@@ -17,14 +17,14 @@ using Vintagestory.GameContent;
 namespace LotrNpcs
 {
     /// <summary>
-    /// On every faction NPC, both sides: right-click opens the talk menu (user, 2026-11-02: "a menu similar to the
-    /// traders"), and for recruits it keeps them from wandering, stops friendly fire from their own side, and calls
-    /// the other recruits when one is hurt. It goes before "health" so friendly fire is cancelled before it lands.
+    /// On every faction NPC, both sides: right-click opens the talk menu, and for recruits it keeps them from
+    /// wandering, stops friendly fire from their own side, and calls the other recruits when one is hurt. It goes
+    /// before "health" so friendly fire is cancelled before it lands.
     /// </summary>
     public class EntityBehaviorHireable : EntityBehavior
     {
         public const int OpenPacket = 46301, ActionPacket = 46302, ReplyPacket = 46303, ClosePacket = 46304, TalkRequestPacket = 46305;
-        /// <summary>Client to server: a LooksRequest as JSON (0.0.54). Server to client: the refusal's lang key.</summary>
+        /// <summary>Client to server: a LooksRequest as JSON. Server to client: the refusal's lang key.</summary>
         public const int LooksPacket = 46306;
         public const double TalkRange = 5;
         HiringSystem hiring;
@@ -57,10 +57,8 @@ namespace LotrNpcs
             if (task is AiTaskWander || task is AiTaskZonePatrol) return Recruit.OwnerUidOf(entity) == null && entity.World.ElapsedMilliseconds > talkingUntilMs;
             // Recruits standing in a formation face its way instead of looking about.
             if (task is AiTaskLookAround) return !(Recruit.OwnerUidOf(entity) != null && Recruit.HasFacing(entity));
-            // 1.0.2 (owner, 2026-11-17: Retreat "pulls them away from an enemy, then they almost immediately re lock back
-            // onto the nearest enemy"): the target search already skipped enemies while breaking off, but the game's own
-            // strike-back at whoever just hit them didn't; now no fight task starts at all until the break-off ends (a
-            // Charge order still fights).
+            // While a recruit breaks off (Retreat, or a movement order), no fight task starts at all, not even the
+            // game's own strike-back at whoever just hit it; a Charge order still fights.
             if (task is AiTaskSeekEntity || task is AiTaskMeleeAttack || task is AiTaskFactionShoot)
             {
                 if (Recruit.OwnerUidOf(entity) == null) return true;
@@ -140,8 +138,9 @@ namespace LotrNpcs
             else if (gearBefore != Attrs.String(entity.WatchedAttributes, EntityBehaviorHeldWeapon.WeaponAttr) + "|" + Attrs.String(entity.WatchedAttributes, EntityBehaviorHeldWeapon.ShieldAttr)) Reclass(player);
         }
 
-        // 0.0.115: a warrior whose new weapon or shield makes another class (Looks.ClassFor) becomes that class, as a
-        // promotion makes a new NPC (PromotionSystem.Promote), keeping its XP. The looks dialog closes with the old NPC.
+        // A warrior whose new weapon or shield makes another class (Looks.ClassFor) becomes that class, as a
+        // promotion makes a new NPC (PromotionSystem.Promote), keeping its XP. The looks dialog closes with the old
+        // NPC.
         void Reclass(IServerPlayer player)
         {
             string target = Looks.LoadoutClass(entity);
@@ -174,7 +173,7 @@ namespace LotrNpcs
 
         public override void OnEntityReceiveDamage(DamageSource damageSource, ref float damage)
         {
-            // 0.0.137: a hit in the back (from the projectile, attacker or source spot behind this NPC) does more.
+            // A hit in the back (from the projectile, attacker or source spot behind this NPC) does more.
             if (damage > 0 && damageSource != null && damageSource.Type != EnumDamageType.Heal && entity.Api.Side == EnumAppSide.Server
                 && (entity as EntityAgent)?.MountedOn?.Entity != damageSource.SourceEntity)
             {
@@ -212,7 +211,7 @@ namespace LotrNpcs
         {
             if (hiring == null || Recruit.OwnerUidOf(entity) == null) return;
             EnumDespawnReason reason = despawn?.Reason ?? EnumDespawnReason.Unload;
-            // Unloaded recruits stay hired; death is handled in OnEntityDeath. The roster remembers where they were (0.0.113).
+            // Unloaded recruits stay hired; death is handled in OnEntityDeath. The roster remembers where they were.
             if (reason == EnumDespawnReason.Unload || reason == EnumDespawnReason.OutOfRange) hiring.Summarize(entity);
             if (reason == EnumDespawnReason.Unload || reason == EnumDespawnReason.Disconnect || reason == EnumDespawnReason.OutOfRange || reason == EnumDespawnReason.Death) return;
             hiring.OnRecruitGone(entity, false);
@@ -221,7 +220,7 @@ namespace LotrNpcs
         public override void GetInfoText(StringBuilder infotext)
         {
             if (!(Recruit.OwnerUidOf(entity) is string owner)) return;
-            // A named recruit still shows its people and rank (0.0.54).
+            // A named recruit still shows its people and rank.
             if (entity.WatchedAttributes.GetBool(Looks.NamedAttr)) infotext.AppendLine(Lang.Get(entity.Code.Domain + ":item-creature-" + entity.Code.Path));
             string borrowerName = Recruit.BorrowerUidOf(entity) != null ? entity.WatchedAttributes.GetString(Recruit.BorrowerNameAttr) : null;
             if ((entity.Api as ICoreClientAPI)?.World.Player?.PlayerUID != owner)
@@ -251,7 +250,7 @@ namespace LotrNpcs
         public override WorldInteraction[] GetInteractionHelp(IClientWorldAccessor world, EntitySelection es, IClientPlayer player, ref EnumHandling handled) =>
             ShowsOwnerHelp(entity, player?.PlayerUID) ? OwnerHelp : null;
 
-        // A dead recruit's body offers only the harvest, not talk and orders (seen in game, 0.0.117 checklist 112.3).
+        // A dead recruit's body offers only the harvest, not talk and orders.
         public static bool ShowsOwnerHelp(Entity e, string playerUid) =>
             playerUid != null && e.Alive && Recruit.OwnerUidOf(e) != null && Recruit.LeaderUidOf(e) == playerUid;
 

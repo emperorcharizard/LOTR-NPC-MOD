@@ -133,7 +133,7 @@ namespace LotrNpcs
 
             if (pickClass && state.Mode == "own")
             {
-                // 0.0.156: the class choices behind "Let me change your class" (owner, 2026-11-16).
+                // The class choices behind "Let me change your class".
                 foreach (string cls in state.Classes ?? new List<string>())
                 {
                     string text = Lang.Get("lotrnpcs:talk-opt-class", ClassTitle(cls));
@@ -159,10 +159,10 @@ namespace LotrNpcs
                 Choice("lotrnpcs:talk-opt-guard", () => Send(Recruit.Guard));
                 Choice("lotrnpcs:talk-opt-guard-shared", () => Send(Recruit.GuardShared));
                 Choice("lotrnpcs:talk-opt-looks", OpenLooks);
-                // 0.0.154: a recruit changes class for free. 0.0.156: one choice that opens the classes.
+                // A recruit changes class for free: one choice that opens the classes.
                 if (state.Classes != null && state.Classes.Count > 0)
                     Choice("lotrnpcs:talk-opt-class-menu", () => { pickClass = true; Npc(Format("lotrnpcs:talk-class-ask")); Options(); });
-                // Promotion (0.0.76), once the recruit's XP is full. 0.0.113: one choice that opens the promotion screen.
+                // Promotion, once the recruit's XP is full: one choice that opens the promotion screen.
                 if ((state.Promote != null && state.Promote.Count > 0) || state.CaptainsFull)
                     Choice("lotrnpcs:talk-opt-promote-menu", () => { capi.ModLoader.GetModSystem<RosterSystem>()?.Send(new RosterRequest { Action = "promote-menu", Id = npc.EntityId }); Options(); });
                 Add(Lang.Get("lotrnpcs:talk-opt-ask"), Ask);
@@ -243,9 +243,9 @@ namespace LotrNpcs
             return "...";
         }
 
-        // {0} price, {1} coin name, {2} the baseline roster, {3} owner, {4} recruits the player leads, {5} the baseline
-        // follow limit, {6} the room line (0.0.90 follow shares: "Room in your band: Mordor orcs 1, Men of Gondor 0."),
-        // {7} the roster line (0.0.91: "Room on your roster: Mordor orcs 12.").
+        // {0} price, {1} coin name, {2} the baseline roster, {3} owner, {4} recruits the player leads, {5} the
+        // baseline follow limit, {6} the room line ("Room in your band: Mordor orcs 1, Men of Gondor 0."), {7} the
+        // roster line ("Room on your roster: Mordor orcs 12.").
         string ClassTitle(string cls) =>
             Recruit.TitleKey(faction, cls, k => Lang.HasTranslation(k)) is string key ? Lang.Get(key).ToLowerInvariant() : cls;
 
@@ -254,7 +254,7 @@ namespace LotrNpcs
 
         static string ClientLang(string key, object[] args) => Lang.Get("lotrnpcs:" + key, args);
 
-        // 0.0.91: what still fits, in grey under the NPC's words, for a player who could hire it and after a hire.
+        // What still fits, in grey under the NPC's words, for a player who could hire it and after a hire.
         void Status()
         {
             string text = (HiringSystem.RoomText(state.Room, ClientLang) + " " + HiringSystem.RosterText(state.RosterRoom, ClientLang)).Trim();

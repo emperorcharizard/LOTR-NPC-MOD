@@ -20,7 +20,7 @@ namespace LotrNpcs
     {
         // ---- orders (hold R) ----
 
-        /// <summary>0.0.136: is this recruit charging on its owner's order?</summary>
+        /// <summary>Is this recruit charging on its owner's order?</summary>
         public bool Charging(Entity recruit) => recruit != null && charging.TryGetValue(recruit.EntityId, out var c) && c.Until > Now;
 
         /// <summary>Whether a charge is over: past its end, or ChargeQuietMs with no enemy near (quietSince 0: one is).</summary>
@@ -63,11 +63,11 @@ namespace LotrNpcs
         /// <summary>Is this recruit still breaking off after a movement order?</summary>
         public bool Disengaging(Entity recruit) => regrouping.Contains(recruit.EntityId) || (disengageUntil.TryGetValue(recruit.EntityId, out long until) && until > Now);
 
-        /// <summary>Is this follower breaking off a fight to get back to its leader (0.0.77)?</summary>
+        /// <summary>Is this follower breaking off a fight to get back to its leader?</summary>
         public bool Regrouping(Entity recruit) => regrouping.Contains(recruit.EntityId);
 
-        /// <summary>Is the target more than FollowFightRange from a formation follower's leader? 0.0.77 kept such
-        /// followers from picking it; 0.0.84 (owner: "remove the limit") no longer does, so nothing calls this now.</summary>
+        /// <summary>Is the target more than FollowFightRange from a formation follower's leader? Unused: followers
+        /// may pick targets anywhere and break off past the range instead.</summary>
         public bool BeyondFollowRange(Entity recruit, Entity target) =>
             target != null && formationLeader.TryGetValue(recruit.EntityId, out Entity leader) && leader != null
             && target.Pos.SquareDistanceTo(leader.Pos) > FollowFightRange * FollowFightRange;
@@ -81,7 +81,7 @@ namespace LotrNpcs
         {
             long id = recruit.EntityId;
             bool inFormation = leader != null && Recruit.OrderOf(recruit) == Recruit.Follow && Recruit.FormationOf(recruit) != Formation.Loose;
-            // 0.0.136: a charging recruit fights wherever the charge takes it.
+            // A charging recruit fights wherever the charge takes it.
             if (inFormation && Charging(recruit)) { formationLeader[id] = leader; regrouping.Remove(id); return false; }
             if (!inFormation)
             {
@@ -208,7 +208,7 @@ namespace LotrNpcs
             string L(string key, params object[] args) => Lang.GetL(player.LanguageCode, "lotrnpcs:" + key, args);
             EntityPlayer by = player.Entity;
             if (sapi == null || by == null || cmd == null) return L("cmd-none");
-            // The numbers come from the client (0.0.113): a NaN or infinity would end up in positions and facings.
+            // The numbers come from the client: a NaN or infinity would end up in positions and facings.
             if (!new[] { cmd.X, cmd.Y, cmd.Z, cmd.Fx, cmd.Fz }.All(double.IsFinite)) return L("cmd-none");
             List<EntityAgent> crew = Crew(by);
             if (crew.Count == 0) return L("cmd-none");
@@ -227,11 +227,11 @@ namespace LotrNpcs
             {
                 case Recruit.Follow:
                     {
-                        // As many follow as fit the follow shares (0.0.90; before, at most MaxFollowers). Those already
-                        // following stay with the owner; the others are tried nearest first, each joining if its share
-                        // fits (so a goblin may still join after an elf didn't), and the rest keep their orders.
+                        // As many follow as fit the follow shares. Those already following stay with the owner; the
+                        // others are tried nearest first, each joining if its share fits (so a goblin may still join
+                        // after an elf didn't), and the rest keep their orders.
                         List<EntityAgent> following = Followers(player.PlayerUID);
-                        // 0.0.138: ranked recruits take the ranked places first, then recruits fill the recruit-only ones.
+                        // Ranked recruits take the ranked places first, then recruits fill the recruit-only ones.
                         List<EntityAgent> joining = crew.Where(e => !following.Contains(e)).OrderBy(e => Promotion.BaseRank(RankOf(e)) == "recruit").ThenBy(e => e.Pos.SquareDistanceTo(by.Pos)).ToList();
                         List<EntityAgent> coming = following.Where(crew.Contains).ToList();
                         List<EntityAgent> band = new List<EntityAgent>(following);
@@ -293,9 +293,9 @@ namespace LotrNpcs
 
                 case "retreat":
                     {
-                        // 0.0.136: followers drop their fights, come back at a run (the follow task runs past 6 blocks, a
-                        // rider's mount gallops) and start no fights for RetreatSeconds; they still take hits. Then they
-                        // simply follow on, stance and formation unchanged.
+                        // Followers drop their fights, come back at a run (the follow task runs past 6 blocks, a
+                        // rider's mount gallops) and start no fights for RetreatSeconds; they still take hits. Then
+                        // they simply follow on, stance and formation unchanged.
                         List<EntityAgent> back = crew.Where(e => Recruit.OrderOf(e) == Recruit.Follow).ToList();
                         if (back.Count == 0) return L("cmd-nofollowers");
                         long ms = (long)(FactionConfig.ClampRetreatSeconds(Factions?.Config.RetreatSeconds ?? FactionConfig.DefaultRetreatSeconds) * 1000);
@@ -305,8 +305,9 @@ namespace LotrNpcs
 
                 case "charge":
                     {
-                        // 0.0.136: followers run at the enemy the owner looks at (or the nearest to where they look, or to
-                        // them), out of formation and battle lines, and fight from there until the charge ends (Charging).
+                        // Followers run at the enemy the owner looks at (or the nearest to where they look, or to
+                        // them), out of formation and battle lines, and fight from there until the charge ends
+                        // (Charging).
                         List<EntityAgent> chargers = crew.Where(e => Recruit.OrderOf(e) == Recruit.Follow && Recruit.StanceOf(e) != Recruit.Passive).ToList();
                         if (chargers.Count == 0) return L("cmd-nofollowers");
                         bool Wanted(Entity e) => Factions != null && chargers.Any(n => Factions.RecruitWantsToAttack(n, Recruit.OwnerUidOf(n), e, true));
@@ -399,9 +400,8 @@ namespace LotrNpcs
         }
 
         /// <summary>
-        /// Puts a player on the owner's whitelist or takes them off (the command and, since 0.0.76, the whitelist menu).
-        /// Returns the reply; ok is false when nothing changed because of a mistake (unknown player, yourself, not
-        /// listed).
+        /// Puts a player on the owner's whitelist or takes them off (the command and the whitelist menu). Returns the
+        /// reply; ok is false when nothing changed because of a mistake (unknown player, yourself, not listed).
         /// </summary>
         public string ChangeWhitelist(IServerPlayer player, string name, bool add, out bool ok)
         {
@@ -425,7 +425,7 @@ namespace LotrNpcs
             return L("whitelist-removed", known);
         }
 
-        /// <summary>The whitelist menu's contents for this player (0.0.76): who is listed, and who is online to add.</summary>
+        /// <summary>The whitelist menu's contents for this player: who is listed, and who is online to add.</summary>
         public WhitelistState WhitelistStateFor(IServerPlayer player, string notice = null)
         {
             Dictionary<string, string> list = Owner(player.PlayerUID)?.Whitelist ?? new Dictionary<string, string>();

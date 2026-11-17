@@ -18,9 +18,8 @@ namespace LotrNpcs
 {
     /// <summary>
     /// Recruits follow their owner, loosely or in the owner's formation, go to the spot they hold, or patrol the area
-    /// they guard. They walk, and run whenever they fall behind (user, 2026-11-03: "they move at a walking speed"),
-    /// switching on the way; patrols are walked, unless a guard is heading back from outside its area. Faction fights
-    /// come first: seek and melee have higher priority.
+    /// they guard. They walk, and run whenever they fall behind, switching on the way; patrols are walked, unless a
+    /// guard is heading back from outside its area. Faction fights come first: seek and melee have higher priority.
     /// </summary>
     public class AiTaskFollowOwner : AiTaskBase
     {
@@ -38,7 +37,7 @@ namespace LotrNpcs
         readonly HiringSystem hiring;
         Vec3d goalAtStart;
         bool stuck, running, patrolling, returning;
-        // Set while the guard fights, so it walks back to its post once the fight is over (0.0.76).
+        // Set while the guard fights, so it walks back to its post once the fight is over.
         bool foughtSincePost;
         // Back at the post after a chase: a spot within this many blocks of it.
         const double BackToPostWithin = 3;
@@ -108,12 +107,11 @@ namespace LotrNpcs
             if (Recruit.OwnerUidOf(entity) == null) return false;
             if (Recruit.OrderOf(entity) == Recruit.Guard && !Recruit.HasGuardSpot(entity)) return ShouldPatrol(now);
             patrolling = returning = false;
-            // 0.0.77 (owner, 2026-11-04: on aggressive, "they run to me after they make a hit, then re aggro back onto
-            // the closest enemy"): a follower in a fight stays in it between blows instead of running back to its
-            // leader. It comes back when the fight is over, or (in a formation other than loose) when it breaks off.
-            // 0.0.114 (owner, 0.0.113 test: followers run to the player in battle again): the 3 s fighting mark lapses
-            // in a battle line's pauses (waiting in its slot, a turn on the target), so a line member counts as fighting
-            // too; lines keep members MemberGraceMs after their last target.
+            // A follower in a fight stays in it between blows instead of running back to its leader (and then
+            // re-engaging). It comes back when the fight is over, or (in a formation other than loose) when it breaks
+            // off. The 3 s fighting mark lapses in a battle line's pauses (waiting in its slot, a turn on the
+            // target), so a line member counts as fighting too; lines keep members MemberGraceMs after their last
+            // target.
             if (Recruit.OrderOf(entity) == Recruit.Follow && hiring != null && Recruit.StanceOf(entity) != Recruit.Passive && !hiring.Disengaging(entity)
                 && (entity.GetBehavior<EntityBehaviorFactionMember>()?.Fighting(now) == true || hiring.Factions?.Lines.LineOf(entity.EntityId) != null)) return false;
             Vec3d goal = Goal();
@@ -141,8 +139,8 @@ namespace LotrNpcs
             if (!Recruit.TryGetPost(entity, out double px, out double py, out double pz)) return false;
             double radius = hiring?.GuardRadius ?? FactionConfig.DefaultGuardRadius;
             double dx = entity.Pos.X - px, dz = entity.Pos.Z - pz;
-            // 0.0.76 (user, 2026-11-04: "after a chase, the recruits should return to post"): a guard that chased
-            // something walks back to its post when the fight is over, instead of staying where it ended.
+            // A guard that chased something walks back to its post when the fight is over, instead of staying where
+            // it ended.
             if (entity.GetBehavior<EntityBehaviorFactionMember>()?.Fighting(now) == true) { foughtSincePost = true; return false; }
             if (foughtSincePost)
             {

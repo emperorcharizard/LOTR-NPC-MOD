@@ -34,29 +34,28 @@ namespace LotrNpcs
         public string BorrowerName;
         // Lang key (lotrnpcs domain, without it) of the NPC's answer to the player's last choice, or null.
         public string Reply;
-        // "own" only (0.0.76): the ranks the recruit can be promoted to now, with their price in Coin. Empty until its XP
-        // is full.
+        // "own" only: the ranks the recruit can be promoted to now, with their price in Coin. Empty until its XP is
+        // full.
         public Dictionary<string, int> Promote = new Dictionary<string, int>();
-        // 0.0.90 follow shares: how many more of each faction could still follow the player (this NPC's faction and
-        // those of their followers), shown as "Room in your band: ..." ({6} in the talk lines).
+        // Follow shares: how many more of each faction could still follow the player (this NPC's faction and those of
+        // their followers), shown as "Room in your band: ..." ({6} in the talk lines).
         public List<RoomEntry> Room = new List<RoomEntry>();
-        // 0.0.91 (owner, 2026-11-05: "since the number has changed, players should be notified how many recruits they
-        // have left in their capacity"): how many more of each faction fit the roster ({7}, "Room on your roster: ...").
+        // How many more of each faction fit the roster ({7}, "Room on your roster: ...").
         public List<RoomEntry> RosterRoom = new List<RoomEntry>();
-        // 0.0.104: the player's captain places are full, so no captain is offered.
+        // The player's captain places are full, so no captain is offered.
         public bool CaptainsFull;
-        // 0.0.154: "own" only (0.0.156), the recruit classes it can change to (free). Empty for other ranks.
+        // "own" only: the recruit classes it can change to (free). Empty for other ranks.
         public List<string> Classes = new List<string>();
     }
 
-    /// <summary>One faction in the room line (0.0.90): how many more of its recruits fit the following.</summary>
+    /// <summary>One faction in the room line: how many more of its recruits fit the following.</summary>
     public class RoomEntry
     {
         public string Faction;
         public int Count;
     }
 
-    /// <summary>0.0.113: a recruit as last seen loaded, saved with the world for the roster screen.</summary>
+    /// <summary>A recruit as last seen loaded, saved with the world for the roster screen.</summary>
     public class RecruitSummary
     {
         public string Code, Name, Rank, Faction, Order, Stance, Borrower;
@@ -83,15 +82,15 @@ namespace LotrNpcs
         public string Race;
         public List<string> Groups = new List<string>();
         public List<long> Recruits = new List<long>();
-        // Recruits dismissed with /recruits dismissall while their chunk wasn't loaded (0.0.73): each is set free when
-        // it next loads.
+        // Recruits dismissed with /recruits dismissall while their chunk wasn't loaded: each is set free when it next
+        // loads.
         public List<long> PendingDismiss = new List<long>();
-        // 0.0.90: each recruit's faction by entity id, so its roster share is known while it isn't loaded. Recruits
-        // hired before 0.0.90 are added when they next load; until then they count at the baseline share.
+        // Each recruit's faction by entity id, so its roster share is known while it isn't loaded. Recruits missing
+        // here are added when they next load; until then they count at the baseline share.
         public Dictionary<long, string> RecruitFactions = new Dictionary<long, string>();
-        // 0.0.104: which recruits are captains, for the captain limit while they aren't loaded.
+        // Which recruits are captains, for the captain limit while they aren't loaded.
         public HashSet<long> Captains = new HashSet<long>();
-        // 0.0.113 roster screen: what each recruit was like when last seen, for the ones that aren't loaded.
+        // For the roster screen: what each recruit was like when last seen, for the ones that aren't loaded.
         public Dictionary<long, RecruitSummary> Summaries = new Dictionary<long, RecruitSummary>();
         // Players the owner's recruits never attack on sight (design doc: a whitelist with add, remove and list,
         // now /recruits whitelist), by UID, with the name they had when added.
@@ -107,12 +106,10 @@ namespace LotrNpcs
         [JsonIgnore] public double FaceX, FaceZ = 1;
     }
 
-    /// <summary>Where a recruit keeps its owner and orders: WatchedAttributes, so clients see them too.</summary>
     /// <summary>
-    /// One chat command for the whole mod (0.0.89, owner, 2026-11-04: "for all the commands, streamline the name ... so
-    /// that when I do /help "x" it gives all the available commands for this mod"): /recruits, with dismissall,
-    /// whitelist and orders for players and faction and zone for admins (they were /recruits faction, /recruits zone and the client
-    /// command /recruits orders). Each mod system adds its own branch to the same root.
+    /// One chat command for the whole mod, /recruits, so /help recruits lists everything: join, dismissall,
+    /// whitelist, orders and roster for players, faction and zone for admins. Each mod system adds its own branch to
+    /// the same root.
     /// </summary>
     public static class ModCommands
     {
@@ -130,22 +127,21 @@ namespace LotrNpcs
         public static OnCommandDelegate AdminOnly(OnCommandDelegate handler) =>
             args => args.Caller.HasPrivilege(Privilege.controlserver) ? handler(args) : TextCommandResult.Error(AdminOnlyText);
 
-        /// <summary>An admin command for testing (owner, 2026-11-12: "turn off all debugging features before release, with
-        /// only a config option to turn them back on"): refused unless the faction config's DebugCommands is on, read at
+        /// <summary>An admin command for testing: refused unless the faction config's DebugCommands is on, read at
         /// each use so /recruits faction reload switches it.</summary>
         public static OnCommandDelegate DebugOnly(ICoreServerAPI api, OnCommandDelegate handler) =>
             AdminOnly(args => api.ModLoader.GetModSystem<FactionSystem>()?.Config?.DebugCommands == true ? handler(args) : TextCommandResult.Error(DebugOffText));
     }
 
+    /// <summary>Where a recruit keeps its owner and orders: WatchedAttributes, so clients see them too.</summary>
     public static class Recruit
     {
-        /// <summary>Archers (0.0.55) stand in the back rank of a formation.</summary>
+        /// <summary>Archers stand in the back rank of a formation.</summary>
         public static bool IsArcher(Entity npc) => NpcTypeInfo.Of(npc)?.Rank == "archer";
 
         /// <summary>
-        /// The lang key of the word put before a hired NPC's name (user, 2026-11-03: call hired NPCs by
-        /// their rank, then their name): title-[faction]-[rank] if the language has it (the
-        /// Shire's hobbits are farmers), else title-[rank]. Null for a rankless NPC.
+        /// The lang key of the word put before a hired NPC's name ("Warrior Gorbag"): title-[faction]-[rank] if the
+        /// language has it (the Shire's hobbits are farmers), else title-[rank]. Null for a rankless NPC.
         /// </summary>
         public static string TitleKey(string faction, string rank, System.Func<string, bool> has)
         {
@@ -178,18 +174,17 @@ namespace LotrNpcs
 
         public const string OwnerUidAttr = "lotrnpcsOwnerUid", OwnerNameAttr = "lotrnpcsOwnerName", OrderAttr = "lotrnpcsOrder";
         const string HoldX = "lotrnpcsHoldX", HoldY = "lotrnpcsHoldY", HoldZ = "lotrnpcsHoldZ";
-        // A guard's place in a formation around its post (0.0.50, user: formations from the R menu should apply to
-        // guards too). Without one, a guard patrols its area.
+        // A guard's place in a formation around its post (formations from the orders menu apply to guards too).
+        // Without one, a guard patrols its area.
         const string SpotX = "lotrnpcsSpotX", SpotY = "lotrnpcsSpotY", SpotZ = "lotrnpcsSpotZ";
-        // Which way a recruit standing in a formation faces (0.0.51, user's screenshots: formations came out ragged and
-        // guards in a column spun on the spot). Set only for formation spots; it also keeps them from looking around.
+        // Which way a recruit standing in a formation faces. Set only for formation spots; it also keeps them from
+        // looking around (or spinning on the spot).
         const string FaceYawAttr = "lotrnpcsFaceYaw";
-        // Follow me, Hold position (also where Move there sends them), and Guard here (0.0.44): patrol the area around
-        // a post and attack intruders. The held spot and the guard post share the hold coordinates.
+        // Follow me, Hold position (also where Move there sends them), and Guard here: patrol the area around a post
+        // and attack intruders. The held spot and the guard post share the hold coordinates.
         public const string Follow = "follow", Hold = "hold", Guard = "guard";
-        // Combat stances (user, 2026-11-03): passive never fights; defensive fights only what attacks the owner or
-        // their recruits; aggressive (the default, 0.0.37's behavior) attacks every enemy; raid attacks every player
-        // and creature that isn't allied.
+        // Combat stances: passive never fights; defensive fights only what attacks the owner or their recruits;
+        // aggressive (the default) attacks every enemy; raid attacks every player and creature that isn't allied.
         public const string StanceAttr = "lotrnpcsStance", Passive = "passive", Defensive = "defensive", Aggressive = "aggressive", Raid = "raid";
         public static readonly string[] Stances = { Passive, Defensive, Aggressive, Raid };
         // The formation of the last order, and a follower's place in it (right and forward of the owner, in blocks).
@@ -201,20 +196,19 @@ namespace LotrNpcs
 
         public static string OrderOf(Entity e) => Attrs.String(e.WatchedAttributes, OrderAttr) ?? Follow;
 
-        // Shared guards (user, 2026-11-03: guards "picked up by other members of the faction to follow them, without
-        // having to pay", as "a new option", by /group): the owner posts them with "Guard this area for our people";
-        // any player in one of the owner's groups may then borrow one for free. It follows the borrower (and counts
-        // toward their MaxFollowers) until they post it again or leave the game; then it guards where it stands and
-        // can be borrowed again. The owner keeps it: only they can dismiss it, and any order of theirs takes it back.
+        // Shared guards: the owner posts them with "Guard this area for our people"; any player in one of the owner's
+        // groups may then borrow one for free. It follows the borrower (and counts toward their MaxFollowers) until
+        // they post it again or leave the game; then it guards where it stands and can be borrowed again. The owner
+        // keeps it: only they can dismiss it, and any order of theirs takes it back.
         public const string GuardShared = "guard-shared";
         public const string SharedAttr = "lotrnpcsShared", BorrowerUidAttr = "lotrnpcsBorrowerUid", BorrowerNameAttr = "lotrnpcsBorrowerName";
         public static bool IsShared(Entity e) => e?.WatchedAttributes != null && e.WatchedAttributes.GetBool(SharedAttr);
 
         // The game's RemoveAttribute on watched attributes resends all of them, even for a key that is not there, and
-        // that makes every player's client rebuild the NPC's whole model (5-19 ms each). Formation refreshes on
-        // every hire, promotion and order removed absent slot keys from every follower (0.0.114, client log 2026-11-11).
-        // So the key is taken out of the tree's entries directly and only that key is sent: an update for a key that
-        // is gone carries no data, and the client deletes a key whose update has none (the game's PartialUpdate).
+        // that makes every player's client rebuild the NPC's whole model (5-19 ms each), which formation refreshes
+        // did for every follower on every order. So the key is taken out of the tree's entries directly and only that
+        // key is sent: an update for a key that is gone carries no data, and the client deletes a key whose update
+        // has none (the game's PartialUpdate).
         static readonly FieldInfo TreeEntries = typeof(TreeAttribute).GetField("attributes", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 
         static void Drop(Entity npc, string key) => DropWatched(npc.WatchedAttributes, key);
