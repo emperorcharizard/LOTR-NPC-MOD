@@ -1,5 +1,5 @@
 """lotrnpcs 0.0.105 combat balance simulator. Event-driven NPC-on-NPC fights with the current rules:
-per-rank health/damage tables (FactionTiers, parsed from src/Factions.cs), +-20% hit spread, melee every 2.6-3.0 s (0.0.108; was 2.85-3.25)
+per-rank health/damage tables (FactionTiers, parsed from src/FactionTiers.cs), +-20% hit spread, melee every 2.6-3.0 s (0.0.108; was 2.85-3.25)
 (90% land), arrows every 3.1-3.9 s (70% land, shooting from the start while melee closes in 3-5 s), hit turns (0.0.98:
 melee hits on one target at least 0.55-0.75 s apart, later swings wait their turn), vanilla 0.5 s invulnerability after
 a hit (arrows that land inside it are lost; melee never does since turns are booked), at most CAP melee attackers per

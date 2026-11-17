@@ -19,6 +19,6 @@ After the owner's 5 against 7 warrior test (Men won losing one), the balance mov
 
 - `fitspread.py RANK RUNS STEPS START.json`: hill climbing on single steps (health +-1, damage +-0.05) for one rank, every pair with a fixed seed, Men free but pulled to the base values, a small pull toward each faction's 0.0.90 flavour; then a check on fresh fights. Writes `spread-RANK.json`.
 - `fitjoint.py`: the same without the spread (how 0.0.91 found that per-rank numbers alone leave single pairs lopsided).
-- `ranks-0.0.91.json`: the shipped result (the tables in `FactionTiers`, src/Factions.cs), with each faction's average and every pair. Averages 0.45 to 0.57, every single pair 0.37 to 0.63.
+- `ranks-0.0.91.json`: the shipped result (the tables in `FactionTiers`, src/FactionTiers.cs), with each faction's average and every pair. Averages 0.45 to 0.57, every single pair 0.37 to 0.63.
 
 To refit from the shipped values: `for r in recruit warrior captain archer; do python3 fitspread.py $r 400 200 ranks-0.0.91.json; done` (about 10 minutes on 2 cores). `analyse.py` still uses the 0.0.90 multipliers.

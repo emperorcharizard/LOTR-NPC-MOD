@@ -38,7 +38,7 @@ ANIMS = [
     {"code": "jump", "animation": "newjump", "blendMode": "Average",
      "triggeredBy": {"onControls": ["Idle", "Jump"], "matchExact": True}},
     {"code": "hurt", "animation": "hurt", "blendMode": "Average"},
-    # 0.0.137: stepping back while facing an enemy (Factions.cs Face), weighted over the controls' walk.
+    # 0.0.137: stepping back while facing an enemy (FactionMember.cs Face), weighted over the controls' walk.
     {"code": "lotrnpcs-walkback", "animation": "walkback", "blendMode": "Average", "weight": 10, "animationSpeed": 1.1},
     {"code": "hit", "animation": "hit", "blendMode": "Add",
      "elementWeight": {"UpperArmR": 4, "LowerArmR": 4, "UpperArmL": 4, "LowerArmL": 4},
@@ -71,7 +71,7 @@ AI_TASKS = [
     {"code": "lotrnpcs:meleeattack", "entityCodes": ["player"], "priority": 3, "slot": 1, "damage": 3, "damageTier": 1,
      "mincooldown": 1700, "maxcooldown": 2100, "attackDurationMs": 900, "damagePlayerAtMs": DAMAGE_AT_MS,
      "animation": "hit", "animationSpeed": 1},
-    # Our seek task: vanilla seek, but targets are chosen by faction (Factions.cs): non-friendly players for
+    # Our seek task: vanilla seek, but targets are chosen by faction (FactionSeek.cs): non-friendly players for
     # aggressive factions, enemy factions' NPCs, monsters, and anyone who attacked the faction or its allies.
     # 0.0.94 (owner: "for units that are being damaged but cannot reach their attacker, have them flee and hide behind
     # cover"; recruits too): above seek, shooting and following (Hiding.cs).
@@ -950,7 +950,7 @@ ARCHER_STAND_OFF = 16
 RIDER_WANDER_LEASH = 12
 # 0.0.161 (in game 2026-11-17, 151.C3: riders hit the warriors in their path for 37-80 s before an archer came within
 # the 24-block seek): a rider looks for archers up to 36 blocks off. Anyone else it still takes only within 24
-# (Riders.NonArcherSeekRange, checked in Factions.cs ArcherFirst).
+# (Riders.NonArcherSeekRange, checked in FactionSeek.cs ArcherFirst).
 RIDER_ARCHER_SEEK_RANGE = 36
 
 
@@ -984,7 +984,7 @@ def entity(code, name, extra_attributes, skin_client, skin_server, health=25, ar
             "behaviors": [
                 {"code": "repulseagents"},
                 nametag(name),
-                # Right-click talk menu and recruit info (Hiring.cs).
+                # Right-click talk menu and recruit info (Hireable.cs).
                 {"code": "lotrnpcs:hireable"},
                 {"code": "controlledphysics"},
                 {"code": "interpolateposition"},
@@ -999,14 +999,14 @@ def entity(code, name, extra_attributes, skin_client, skin_server, health=25, ar
                 nametag(name),
                 {"code": "controlledphysics"},
             ] + ([{"code": "lotrnpcs:rankarmor", "tier": armor_tier}] if armor_tier else []) + [
-                # Talk menu, hiring and recruit upkeep (Hiring.cs). Before health, so it can cancel friendly fire.
+                # Talk menu, hiring and recruit upkeep (Hireable.cs). Before health, so it can cancel friendly fire.
                 {"code": "lotrnpcs:hireable"},
                 {"code": "health", "currenthealth": health, "maxhealth": health},
                 {"code": "taskai", "aiCreatureType": "Humanoid", "aitasks": ai_tasks},
                 # 0.0.88 (owner: NPCs "will fling themselves off the edge" of deep pits): right after the AI, so it can
                 # stop a step the AI just set (EdgeGuard.cs).
                 {"code": "lotrnpcs:edgeguard"},
-                # Fights back with its allies when hurt (Factions.cs). 0.0.137: after the AI, so its facing (Face) wins
+                # Fights back with its allies when hurt (FactionMember.cs). 0.0.137: after the AI, so its facing (Face) wins
                 # over the path follower's turn toward where it walks.
                 {"code": "lotrnpcs:factionmember"},
                 # 0.0.112 (owner, review Q10): a drifter-style body. The drops list stays empty: lotrnpcs:bodyloot fills it
@@ -1033,7 +1033,7 @@ WARRIOR_GEAR = ["game:armor-head-chain-iron", "game:armor-body-chain-iron", "gam
 # Melee was tuned in game under Combat Overhaul: slashing, about 0.75, 2 and 3.5 damage per torso hit through
 # iron LOTR faction armor (13 slashing resist), and 3, 4 and 7 on an unarmored player.
 # 0.0.43 (user, 2026-11-03: "reduce the health of all the npcs by 6"): 22, 34 and 48 (were 28, 40 and 54), and 19
-# for the two rankless leftovers (was 25). NPCs already in a world are brought down on load (Factions.cs).
+# for the two rankless leftovers (was 25). NPCs already in a world are brought down on load (FactionMember.cs).
 # Each entry is (health, rank armor tier, (melee damage, damage tier)); armor tier 0 leaves out lotrnpcs:rankarmor.
 RANK_STATS = {"recruit": (22, 0, (3, 8)), "warrior": (34, 0, (4, 9)), "captain": (48, 0, (7, 9)),  # 0.0.153 had 96 and 10.5; 0.0.155 keeps that only against NPCs (Riders.CaptainNpcFight)
              

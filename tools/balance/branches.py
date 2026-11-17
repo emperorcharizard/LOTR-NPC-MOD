@@ -6,7 +6,7 @@ worth their price, per faction, under sim105's fight rules.
 - marksman: the archer's next rank. Health = archer's; finds the arrow damage multiplier at which marksmen bought with
   the same coin as archers win half, both behind an equal-coin screen of the faction's warriors.
 Budgets 60 to 240 coins (no roster or captain limit), common random numbers, bisection.
-Usage: python tools/balance/branches.py src/Factions.cs RUNS"""
+Usage: python tools/balance/branches.py src/FactionTiers.cs RUNS"""
 import sys, random
 import os; sys.argv = os.environ.setdefault("LOTRNPCS_BALANCE_ARGV", "\n".join(sys.argv)).split("\n")  # Windows pool workers re-run this with the argv edited below; keep the real one
 SRC, RUNS = sys.argv[1], int(sys.argv[2]); sys.argv = [sys.argv[0], SRC, "1"]

@@ -6,7 +6,7 @@ RUNS = int(sys.argv[1]) if len(sys.argv) > 1 else 1000
 WHAT = sys.argv[2] if len(sys.argv) > 2 else "all"
 
 # tier: (max followers, roster, health x, damage x)
-# The 0.0.90 shipped values (FactionTiers in src/Factions.cs). Override on the command line: Orc=0.66,0.85
+# The 0.0.90 shipped values (FactionTiers in src/FactionTiers.cs). Override on the command line: Orc=0.66,0.85
 TIERS = {
     "Men":    (5, 16, 1.00, 1.00),
     "Uruk":   (5, 15, 1.05, 1.03),
