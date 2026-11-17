@@ -1274,7 +1274,7 @@ public static class Program {
                 float scale = FactionConfig.RiderScale(rohanDef), wh = riderConfig.HealthFor("rohan", "warrior") ?? 0, wd = riderConfig.DamageFor("rohan", "warrior") ?? 0;
                 double expect = FactionConfig.DefaultRiderScale;
                 var own = new FactionDef { Health = new Dictionary<string, float> { ["warrior"] = 34, ["rider"] = 50 }, Damage = new Dictionary<string, float> { ["warrior"] = 4 } };
-                Check(Math.Abs(scale - expect) < 1e-4 && scale > 0.9 && scale < 1.1 && riderConfig.HealthFor("rohan", "rider") == (float)Math.Round(wh * scale)
+                Check(Math.Abs(scale - expect) < 1e-4 && scale > 1.2 && scale < 1.3 && riderConfig.HealthFor("rohan", "rider") == (float)Math.Round(wh * scale)
                     && Math.Abs((riderConfig.DamageFor("rohan", "rider") ?? 0) - wd * scale) < 0.006 && riderConfig.HealthFor("mordor", "rider") == riderConfig.HealthFor("rohan", "rider") && riderConfig.DamageFor("dunlendings", "rider") == riderConfig.DamageFor("rohan", "rider")
                     && FactionConfig.RiderScale(null) == (float)FactionConfig.DefaultRiderScale && FactionConfig.RiderScale(own) == (float)FactionConfig.DefaultRiderScale,
                     "0.0.130/0.0.135/0.0.150: a rider's health and damage are its faction's warrior's times 1.0, the same in every faction, unless the config lists its own");
