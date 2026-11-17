@@ -189,6 +189,23 @@ namespace LotrNpcs
         /// any enemy but an archer while an archer is there to pick; with none, it takes the nearest as before.</summary>
         public static bool PassesOver(bool mounted, bool targetIsArcher) => mounted && !targetIsArcher;
 
+        /// <summary>0.0.161 (in game 2026-11-17, 151.C3: riders reached the archers only 37-80 s in): a rider's seek
+        /// (seekingRange 36 in gen) finds archers that far off, but passes over anyone else beyond the usual 24.</summary>
+        public const double NonArcherSeekRange = 24;
+
+        /// <summary>0.0.161 (same run: riders' blows fell out of reach 65 of 122 times, median 3.4 blocks against a 2.5
+        /// reach, mostly the horse carrying the rider on past its target): a mounted NPC doesn't swing when, at its mount's
+        /// and the target's present motion, the target will be out of reach when the blow falls. Motion of whatever the
+        /// entity rides, else its own.</summary>
+        public static (double X, double Z) MotionOf(Entity e)
+        {
+            Entity body = (e as EntityAgent)?.MountedOn?.Entity ?? e;
+            return (body.Pos.Motion.X, body.Pos.Motion.Z);
+        }
+
+        /// <summary>Half the width of a standing NPC's selection box (0.6), added to a rider's reach in GoneByBlow.</summary>
+        public const double FootHalfWidth = 0.3;
+
         /// <summary>0.0.151: the rider's focus moves to the archer its seek is riding for, unless it already finishes one.</summary>
         public static bool FocusOnHunted(bool huntedIsArcher, bool focusIsArcher) => huntedIsArcher && !focusIsArcher;
 

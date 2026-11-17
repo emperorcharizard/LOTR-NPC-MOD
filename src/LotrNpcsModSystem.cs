@@ -300,6 +300,20 @@ namespace LotrNpcs
                 targetEntity = null;
                 return false;
             }
+            // 0.0.161: a rider doesn't swing at a target that its horse, or the target, will have carried out of reach
+            // by the time the blow falls (Riders.MotionOf); it looks again shortly, as above.
+            if ((entity as EntityAgent)?.MountedOn != null && targetEntity != null)
+            {
+                (double tx, double tz) = Riders.MotionOf(targetEntity);
+                (double mx, double mz) = Riders.MotionOf(entity);
+                double halfWidth = (targetEntity as EntityAgent)?.MountedOn != null ? Riders.RiderHalfWidth : Riders.FootHalfWidth;
+                if (Riders.GoneByBlow(targetEntity.Pos.X - entity.Pos.X, targetEntity.Pos.Z - entity.Pos.Z, tx - mx, tz - mz, damagePlayerAtMs, minDist + halfWidth))
+                {
+                    lastCheckOrAttackMs = entity.World.ElapsedMilliseconds - attackDurationMs + TurnRetryMs * 2;
+                    targetEntity = null;
+                    return false;
+                }
+            }
             // 0.0.98 staggered swings (BattleSpacing.HitWaitMs): a hit that would land inside the target's hurt window
             // after another NPC's hit would be thrown away, so this NPC waits its turn. It looks again when the turn is
             // due (at least TurnRetryMs later), not every tick, so waiting costs no extra target searches.

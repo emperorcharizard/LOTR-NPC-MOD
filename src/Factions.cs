@@ -2149,6 +2149,8 @@ namespace LotrNpcs
         {
             if (!Riders.PassesOver((entity as EntityAgent)?.MountedOn != null, Recruit.IsArcher(e))) return true;
             double d = e.Pos.SquareDistanceTo(entity.Pos);
+            // 0.0.161: a rider's seek reaches 36 blocks for archers; anyone else only within the usual 24.
+            if (d > Riders.NonArcherSeekRange * Riders.NonArcherSeekRange) return false;
             if (nonArcherFallback == null || d < nonArcherFallbackDistSq) { nonArcherFallback = e; nonArcherFallbackDistSq = d; }
             return false;
         }

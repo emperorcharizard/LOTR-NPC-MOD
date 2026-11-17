@@ -805,3 +805,11 @@ Owner, 2026-11-16, after testing 154.1-154.2: "I think though it should just be,
 - [x] 156.8 (fixed by 0.0.160, see 160.1; 0.0.158, 2026-11-17: much better, the seven stars arc, crown and trunk read as the tree, but the trunk shows as two thin lines with black between; screenshot /mnt/project-files/lotrnpcs/0.0.158/kite-shield-ingame.jpg; owner to judge) The Arnor kite shield shows the white tree and seven gold stars cleanly (its down faces' UVs are flipped top to bottom at build time; if it's still scrambled, try rotate 180 instead).
 - [x] 160.1 (0.0.160; passed in game 2026-11-17 by computer use: solid single trunk, full crown, gold stars arc; screenshot /mnt/project-files/lotrnpcs/0.0.160/kite-shield-ingame-0.0.160.png) The Arnor kite shield shows the white tree as one solid trunk under a full crown with the seven gold stars above it (down faces now turned 180 degrees; 0.0.158's v-only flip drew the trunk as two lines; owner said 2026-11-17 "still messed up").
 - [ ] 159.1 Dunlending captains always show their Warlord helmet (none bareheaded).
+
+## 161. Riders reach archers sooner and stop swinging out of reach (0.0.161)
+
+In game 2026-11-17 (151.C3, log 193403): riders opened on the warriors in their path and reached the archers only 37-80 s in; 65 of their 122 blows fell out of reach (median 3.4 blocks v a 2.5 reach). Riders now seek archers up to 36 blocks off (others still within 24), and a rider holds a swing when its horse's or the target's motion will carry the target out of reach by the time the blow falls.
+
+- [ ] 161.1 Redo 151.C3 (3 Rohan riders 20 blocks from 5 Dunlending warriors with 3 archers 10 blocks behind them): the riders go for the archers from the start (first archer hit well before 37 s) and kill them first.
+- [ ] 161.2 Same run: far fewer rider blows "out of reach when the blow fell" (was 65 of 122), and riders still land charge hits.
+- [ ] 161.3 151.C1 still holds: 1 Rohan rider v 2 Dunlending warriors, the rider wins.
