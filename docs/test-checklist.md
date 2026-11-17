@@ -769,6 +769,7 @@ Each side spends about 60 coins at its live hire prices (`/recruits faction list
 - [ ] 151.C2 1 Rohan rider v 1 Dunlending captain: the captain wins.
   - 2026-11-16 on 0.0.150: FAILED, the rider was winning when stopped at 218 s (52 v 17 damage, captain landed 5 of 6 swings but swung only 6 times). By stats a captain (48/7) is weaker than 2 warriors (34/3.95 each), so no rider strength gives 'beats 2 warriors, loses to a captain'; owner decision asked.
 - [ ] 151.C3 3 Rohan riders v 5 Dunlending warriors + 3 archers behind them: the riders ride past the warriors to the archers and kill them first (0.0.151).
+  - 2026-11-17 on 0.0.160 (log 193403, 244 s): PARTLY. The 3 archers died first (100, 126, 140 s, all to riders) and no warrior died; a warrior killed one rider at 152 s. But every rider opened on the warriors in its path and reached an archer only 37-80 s in. Riders landed 57 of 122 swings (65 out of reach, median 3.4 blocks v reach 2.5; archers step back). Dunlending warriors spent ~860 NPC-seconds chasing riders ~9 blocks off they never caught.
 
 ## 153. Stronger captains (0.0.153)
 
@@ -776,7 +777,8 @@ Owner, 2026-11-16, chose "Stronger captains overall" (so a captain beats a rider
 
 - [x] 153.1 1 Rohan rider v 1 Dunlending captain: the captain wins.
   - 2026-11-16 on 0.0.153: captain dealt 32 (rider left on 2 of 34, then stood off), rider dealt 46 of the captain's 96, by 172 s (log 104729).
-- [ ] 153.2 1 Dunlending captain v 2 Dunlending warriors: the captain wins.
+- [x] 153.2 1 Dunlending captain v 2 Dunlending warriors: the captain wins.
+  - 2026-11-17 on 0.0.160 (v 2 Rohan warriors, same stats): captain killed both (41 s, 64 s) with 20.9 health left (log 193156).
 - [ ] 153.3 0.0.155 (owner: "keep this within reason for players to be able to kill in equivalent armor and weapons", "Aka for captains, iron and steel"): captains are back to 48 health and 7 damage against players; config version 34 moves 96/10.5 back. A player in iron or steel armor with an iron or steel weapon can kill a captain one on one. Against NPCs the captain still hits x1.5 and takes x0.5 (redo 153.1 and 153.2 on 0.0.155).
   - 2026-11-16 on 0.0.155, 1 rider v 1 captain: captain dealt 37 (rider 34 health) and took 19 of 48 by 153 s, captain wins (log 105929). Player side not tested yet.
 
