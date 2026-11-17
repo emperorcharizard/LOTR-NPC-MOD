@@ -850,4 +850,5 @@ In game 2026-11-17 (0.0.162 and 0.0.163, 1 rider v 2 warriors): ride-out after r
 ## 167. A rider's blow counts a pass through reach (0.0.167)
 
 - [ ] 167.1 1 Rohan rider v 2 Dunlending warriors: far fewer rider blows "out of reach when the blow fell" (0.0.166: 22 of 36), and the rider wins.
+  - 2026-11-17 on 0.0.167 (log 232003): out of reach down to 12 of 27 (44%, was 61%), but the rider died at ~203 s: 46 damage dealt, 41 taken, no kill; the warriors landed 20 of 23. Fight stayed beside the player. Riders now lose 1 v 2 since foot soldiers swing at passing riders (0.0.164); owner asked about rider strength.
 - [ ] 165.2 3 riders v 5 warriors + 3 archers: the riders still kill the archers first (161.1 numbers).
