@@ -292,128 +292,104 @@ namespace LotrNpcs
     /// </summary>
     public class FactionConfig
     {
-        // How to edit the file (user, 2026-11-02: "add #instructions to the config"). Rewritten on every load.
+        // Field order is the order of the keys in the file, so related settings sit together. The how-to text for
+        // each one is InstructionText below; the history of each setting is in docs/notes and CHANGELOG.md.
+
+        // Rewritten on every load from InstructionText.
         [JsonProperty("#Instructions")]
         public List<string> Instructions;
-        // Format of the file. 0 = written by 0.0.31, 1 = by 0.0.32, 2 = by 0.0.33, 3 = by 0.0.34, 4 = by 0.0.35 to
-        // 0.0.38, 5 = by 0.0.39 and 0.0.40, 6 = by 0.0.41 to 0.0.43, 7 = by 0.0.44 to 0.0.47, 8 = by 0.0.48 to 0.0.50, 9 = by 0.0.51 and 0.0.52, 10 = by 0.0.53, 11 = by 0.0.54, 12 = by 0.0.55 to 0.0.58, 13 = by 0.0.59 to 0.0.61, 14 = by 0.0.62 to 0.0.73, 15 = by 0.0.74 and 0.0.75, 16 = by 0.0.76 to 0.0.81, 17 = by 0.0.82 to 0.0.84, 18 = by 0.0.85 to 0.0.89, 19 = by 0.0.90, 20 = by 0.0.91, 21 = by 0.0.92, 22 = by 0.0.93, 23 = by 0.0.94 to 0.0.101, 24 = by 0.0.102, 25 = by 0.0.103, 26 = by 0.0.104 to 0.0.106, 27 = by 0.0.107, 28 = by 0.0.108 to 0.0.111, 29 = by 0.0.112;
-        // Migrate() updates older files once and then stores them.
+        // File format. Migrate() updates older files once and then stores them.
         public const int CurrentVersion = 34;
         public int Version;
+
+        // ---- Factions and relations ----
         public Dictionary<string, FactionDef> Factions;
         public List<FactionRelationDef> Relations;
+        // Players join by the menu; true also counts race (FriendlyRaces) and /group (FriendlyGroups).
+        public bool RaceAndGroupMembership = false;
         public List<string> MonsterCodes;
         public int GrudgeSeconds = 30;
         public int CallForHelpRange = 16;
-        // 0.0.124: how far a wild NPC that starts a fight calls idle NPCs of its faction (0.0.123 used CallForHelpRange,
-        // 16, and 11 of 38 orcs that had wandered off while the armies spawned still never joined).
+        // How far a wild NPC that starts a fight calls idle wild NPCs of its faction.
         public int JoinFightRange = 32;
-        // Most NPCs one player may have hired at once, and how many of them may follow at a time (user, 2026-11-03:
-        // hire more at a time, but only 5 may follow at once; hire cap 15, was 5 for both).
-        // 0.0.51 (user, 2026-11-03): the hire cap is 16.
-        public const int DefaultMaxRecruits = 16, DefaultMaxFollowers = FactionTiers.EqualFollowers; // 0.0.135: 3 (was 5)
+
+        // ---- Recruits ----
+        // Baseline roster and following, used by factions without their own.
+        public const int DefaultMaxRecruits = 16, DefaultMaxFollowers = FactionTiers.EqualFollowers;
         public int MaxRecruits = DefaultMaxRecruits;
         public int MaxFollowers = DefaultMaxFollowers;
-        // 0.0.104 (owner, 2026-11-09: "limit the ranks of units per cap. Like 1-2 captains only"; chose "1 captain per 8
-        // roster places"): one captain per RosterPerCaptain places of a faction's roster, rounded so that 13 places
-        // give 1, 16 give 2 and 22 give 3 (CaptainsOf). 0 turns the limit off.
-        public const int DefaultRosterPerCaptain = 8;
-        // 0.0.138 (owner, 2026-11-14: "there should still be the 1 captain"): the captain limit is MaxCaptains per player
-        // (0 = none). RosterPerCaptain is only read from older files (version 32 turns it into MaxCaptains) and no
-        // longer written.
-        public int RosterPerCaptain = DefaultRosterPerCaptain;
-        public bool ShouldSerializeRosterPerCaptain() => false;
         public const int DefaultMaxCaptains = 1;
         public int MaxCaptains = DefaultMaxCaptains;
-        // 0.0.138 (owner: "for recruits, maybe they can have an additional follower or two"): followers past the 3
-        // ranked places, for recruits only (0 to 10).
-        // Owner, 2026-11-14 (after 0.0.138 shipped with 2): "maybe just 1 recruit place".
+        // Extra following places for plain recruits only (0 to 10).
         public const int DefaultRecruitExtraFollowers = 1;
         public int RecruitExtraFollowers = DefaultRecruitExtraFollowers;
+        [JsonIgnore]
         public int RecruitExtra => GameMath.Clamp(RecruitExtraFollowers, 0, 10);
-        // Out-of-combat healing (user, 2026-11-03: "increase the regen of the npcs", then "just a bit faster"), as a
-        // multiple of vanilla's creature regeneration of 0.01 health a second: 30 heals a recruit (22 health since
-        // 0.0.43) in about 1.2 minutes and a captain (48) in about 2.7. In a fight, and for RegenDelaySeconds after the
-        // last hit, vanilla speed applies.
-        public const float DefaultHealthRegenSpeed = 30;
-        public float HealthRegenSpeed = DefaultHealthRegenSpeed;
-        public int RegenDelaySeconds = 10;
-        // Guard here (design doc, 2026-10-30: "16 blocks by default, set in the config"): how far around their post
-        // guarding recruits patrol and attack intruders. Kept between MinGuardRadius and MaxGuardRadius.
-        public const int DefaultGuardRadius = 16, MinGuardRadius = 4, MaxGuardRadius = 64;
-        public int GuardRadius = DefaultGuardRadius;
-
-        public static int ClampGuardRadius(int radius) => GameMath.Clamp(radius, MinGuardRadius, MaxGuardRadius);
-        // 0.0.112 (owner, 2026-11-09 review Q8: "no-guard radius around world spawn: guards never attack players on
-        // sight there, still fight back"): within this many blocks (across) of the world spawn no recruit starts a fight
-        // with a player. 0 turns it off.
-        public int SpawnSafeRadius = 64;
-        // 0.0.112 (owner, review Q10: a drifter-style body to harvest with a knife, rusty gears by rank and a little
-        // cloth or leather, no armor or weapons; hired NPCs too, configured apart, same defaults): by rank, what a
-        // wild NPC's body and a recruit's body hold. Rankless NPCs use the recruit list.
-        public Dictionary<string, List<BodyLoot>> WildBodyLoot;
-        public Dictionary<string, List<BodyLoot>> HiredBodyLoot;
-        // Battle spacing (0.0.53, user, 2026-11-03: "maybe put a minimum distance npcs have to one another when
-        // fighting"): most NPCs that go for one NPC at once (0 = no limit, 4 by default since 0.0.102; players are never limited), and how far
-        // apart fighting NPCs keep (BattleSpacing.MinSpacing to MaxSpacing blocks).
-        public int MaxAttackersPerTarget = BattleSpacing.DefaultMaxAttackers;
-        public double CombatSpacing = BattleSpacing.DefaultSpacing;
-        // Helmets (0.0.54, user, 2026-11-03: "randomize whether the npcs are wearing helmets or not"): the chance a new
-        // NPC wears its outfit's helmet, and whether captains always do (their helmets mark them out).
-        public double HelmetChance = 0.6;
-        // 0.0.82 (owner's loadout list decides per unit which may spawn bare-headed): false by default; version 17 turns
-        // an old true off once.
-        public bool CaptainsAlwaysHelmeted = false;
-        // 0.0.82 battle lines and duel band (owner's combat answers, 2026-11-04; Battle.cs, BattleLines.cs).
-        // 0.0.85 (owner, 2026-11-04: "the goal is to have the npcs fight first, then maintain formation second"): off
-        // by default, since a line keeps NPCs in their places until an enemy comes near. Version 18 turns an unchanged
-        // true off once. 0.0.104 (owner, 2026-11-09: lines "stay in that line until they outnumber the enemy where they
-        // start to surround them"; chose "Yes, and turn lines on by default"): on by default again; version 26 turns an
-        // old false on once.
-        public bool BattleLines = true;
-        // 0.0.122 (owner, 2026-11-13: smooth, low-lag combat, no long marching lines): wild NPCs don't form lines.
-        public bool WildBattleLines = false;
-        // 0.0.109 (owner chose "Yes, as a config switch"): NPC hits on anything but a player land even inside the
-        // target's 0.5 s hurt window, so crowds and arrows count in full; NPCs then don't wait for a hit turn on such a
-        // target. Players keep the window. Off by default (the 0.0.98 staggered swings).
-        // 0.0.112 (owner: "keep the i-frames off for now"): on by default; version 29 turns an old false on once.
-        public bool NpcHitsIgnoreHurtWindow = true;
-        // 0.0.135 (owner, 2026-11-14: "the average fight time should be increased, because it feels like all the units
-        // die within 30 seconds to a minute"): every hit this mod's NPCs land on anything but a player is this times its
-        // damage (melee, arrows, charge hits after their x2.5), so NPC fights last about twice as long; players take and
-        // deal what they did. A file without it gets 0.5.
-        public const float DefaultNpcVsNpcDamageMultiplier = 0.5f;
-        // 0.0.137 (owner: "npcs to receive 1.5x damage in the back"): hits on this mod's NPCs from their rear cone
-        // (BackArcDegrees wide, behind them) do BackHitMultiplier times the damage, on top of NpcVsNpcDamageMultiplier.
-        public const double DefaultBackHitMultiplier = 1.5, DefaultBackArcDegrees = 120;
-        public double BackHitMultiplier = DefaultBackHitMultiplier, BackArcDegrees = DefaultBackArcDegrees;
-        public double BackScale => double.IsNaN(BackHitMultiplier) ? DefaultBackHitMultiplier : GameMath.Clamp(BackHitMultiplier, 0, 10);
-        public double BackArc => double.IsNaN(BackArcDegrees) ? DefaultBackArcDegrees : GameMath.Clamp(BackArcDegrees, 0, 360);
-        // 0.0.136: how long followers told to Retreat start no fights (1 to 60 s).
+        // Old captain limit (one per this many roster places). Only read from files older than version 32, which
+        // turns it into MaxCaptains; never written.
+        public const int DefaultRosterPerCaptain = 8;
+        public int RosterPerCaptain = DefaultRosterPerCaptain;
+        public bool ShouldSerializeRosterPerCaptain() => false;
+        // Seconds followers told to Retreat start no fights (1 to 60).
         public const double DefaultRetreatSeconds = 10;
         public double RetreatSeconds = DefaultRetreatSeconds;
         public static double ClampRetreatSeconds(double s) => double.IsNaN(s) ? DefaultRetreatSeconds : GameMath.Clamp(s, 1, 60);
+        // How far around their post guards patrol and watch for intruders.
+        public const int DefaultGuardRadius = 16, MinGuardRadius = 4, MaxGuardRadius = 64;
+        public int GuardRadius = DefaultGuardRadius;
+        public static int ClampGuardRadius(int radius) => GameMath.Clamp(radius, MinGuardRadius, MaxGuardRadius);
+        // Within this many blocks of world spawn no recruit attacks a player on sight (0 = off).
+        public int SpawnSafeRadius = 64;
+
+        // ---- Healing and loot ----
+        // Out-of-combat healing as a multiple of vanilla creature regeneration (0.01 health a second): 30 heals a
+        // recruit in about 1.2 minutes. In a fight, and for RegenDelaySeconds after the last hit, vanilla speed applies.
+        public const float DefaultHealthRegenSpeed = 30;
+        public float HealthRegenSpeed = DefaultHealthRegenSpeed;
+        public int RegenDelaySeconds = 10;
+        // By rank, what a dead wild NPC's and a dead recruit's body hold. Rankless NPCs use the recruit list.
+        public Dictionary<string, List<BodyLoot>> WildBodyLoot;
+        public Dictionary<string, List<BodyLoot>> HiredBodyLoot;
+
+        // ---- Battles ----
+        // Every NPC hit on anything but a player is this times its damage, so NPC fights last longer (0 to 10).
+        public const float DefaultNpcVsNpcDamageMultiplier = 0.5f;
         public float NpcVsNpcDamageMultiplier = DefaultNpcVsNpcDamageMultiplier;
         /// <summary>The multiplier for a hit on target: NpcVsNpcDamageMultiplier (0 to 10) on non-players, 1 on players.</summary>
         public float HitScaleFor(Entity target) => target is EntityPlayer ? 1f : (float.IsNaN(NpcVsNpcDamageMultiplier) ? DefaultNpcVsNpcDamageMultiplier : GameMath.Clamp(NpcVsNpcDamageMultiplier, 0, 10));
-        // 0.0.115 (owner: debugging features off before release, a config option turns them back on): the testing
-        // commands (ModCommands.DebugOnly). A file without it gets false.
-        public bool DebugCommands = false;
-        public double DuelDistanceMin = BattleSpacing.DefaultDuelMin;
-        public double DuelDistanceMax = BattleSpacing.DefaultDuelMax;
-        public double LineHoldRange = 6;
-        // Shields (0.0.55, user, 2026-11-03: "Take this shield model for the mordor orcs ... its a toggle-able
-        // accessory"): the chance a new NPC that may carry a shield gets one. Never with a two-handed weapon.
-        public double ShieldChance = 0.5;
-        // 0.0.91 (owner, 2026-11-05: "add a +-20% spread on hits"): every NPC hit (melee and arrows, wild NPCs and
-        // recruits) deals its damage times a random 1 - DamageSpread to 1 + DamageSpread, so fights between same-rank
-        // bands aren't settled by whole numbers of hits. 0 turns it off.
+        // Hits from an NPC's rear cone (BackArcDegrees wide) do BackHitMultiplier times the damage.
+        public const double DefaultBackHitMultiplier = 1.5, DefaultBackArcDegrees = 120;
+        public double BackHitMultiplier = DefaultBackHitMultiplier, BackArcDegrees = DefaultBackArcDegrees;
+        [JsonIgnore]
+        public double BackScale => double.IsNaN(BackHitMultiplier) ? DefaultBackHitMultiplier : GameMath.Clamp(BackHitMultiplier, 0, 10);
+        [JsonIgnore]
+        public double BackArc => double.IsNaN(BackArcDegrees) ? DefaultBackArcDegrees : GameMath.Clamp(BackArcDegrees, 0, 360);
+        // Each NPC hit deals its damage times a random 1 - DamageSpread to 1 + DamageSpread (0 = off).
         public const double DefaultDamageSpread = 0.2;
         public double DamageSpread = DefaultDamageSpread;
-        // 0.0.92 (owner, 2026-11-05: "instead of applying the race allegiance, have them select right after making a
-        // character"; groups: "A", they stop counting): a player's faction is the one they picked from the join menu
-        // or an admin set. true brings back the old membership by race (FriendlyRaces) and /group (FriendlyGroups).
-        public bool RaceAndGroupMembership = false;
+        // NPC hits on anything but a player land even inside the target's 0.5 s hurt window. Players keep the window.
+        public bool NpcHitsIgnoreHurtWindow = true;
+        // Most NPCs on one NPC at once (0 = no limit; players are never limited) and how far apart fighters keep.
+        public int MaxAttackersPerTarget = BattleSpacing.DefaultMaxAttackers;
+        public double CombatSpacing = BattleSpacing.DefaultSpacing;
+        public double DuelDistanceMin = BattleSpacing.DefaultDuelMin;
+        public double DuelDistanceMax = BattleSpacing.DefaultDuelMax;
+        // Battle lines for recruits in formation, and for wild NPCs too when WildBattleLines is on.
+        public bool BattleLines = true;
+        public bool WildBattleLines = false;
+        // Defensive recruits hold their line until an enemy is this close.
+        public double LineHoldRange = 6;
+
+        // ---- Looks ----
+        // Chance a new NPC that may go bare-headed wears its helmet; whether captains always do.
+        public double HelmetChance = 0.6;
+        public bool CaptainsAlwaysHelmeted = false;
+        // Chance a new NPC that may carry a shield gets one (never with a two-handed weapon).
+        public double ShieldChance = 0.5;
+
+        // ---- Admin ----
+        // Turns on the testing commands (ModCommands.DebugOnly).
+        public bool DebugCommands = false;
 
         public void FillDefaults()
         {
@@ -542,6 +518,7 @@ namespace LotrNpcs
             return table.TryGetValue(Promotion.StatRank(rank), out v) ? v : (float?)null;
         }
         /// <summary>The spread on every NPC hit (0.0.91), 0 to 0.9.</summary>
+        [JsonIgnore]
         public double Spread => double.IsNaN(DamageSpread) ? DefaultDamageSpread : GameMath.Clamp(DamageSpread, 0, 0.9);
         /// <summary>How much bigger this faction's wild groups are than the baseline's: its follow limit over the
         /// baseline MaxFollowers (orcs 6/5 since 0.0.107).</summary>
@@ -591,38 +568,48 @@ namespace LotrNpcs
 
         public static readonly List<string> InstructionText = new List<string>
         {
-            "LOTR NPCs: who the NPC factions treat as friends and enemies. After editing, run /recruits faction reload (no restart needed). This #Instructions list is rewritten on every start, so don't edit it.",
-            "Factions: one entry per NPC faction, by its id (the names /recruits faction and /recruits zone use).",
-            "Stance: \"aggressive\" attacks every player who isn't a member on sight. \"defensive\" only fights players who hurt it or its allies.",
-            "Members (since 0.0.92): a player is a member of the faction they picked from the join menu, which opens after they make their character (and on every join until they pick; /recruits join opens it again). The pick is permanent: only an admin changes it, with /recruits faction set, or /recruits faction clear to let them pick again. Joinable (in each faction): false leaves it out of the menu.",
-            "RaceAndGroupMembership: false (the default since 0.0.92) means race and /group don't make anyone a member. true brings back the old rule: a player is also a member when their race is in FriendlyRaces (Player Model Lib codes such as lrc:harfoot; /recruits faction check shows a player's) or they are in one of its FriendlyGroups, unless an admin or the menu set their faction (which replaces the race; groups still count).",
-            "HireCoin and HirePrices: what hiring one of the faction's NPCs costs, as a number of coins per rank (recruit, warrior, captain) and for archers (archer). HireCoin is the item code of the coin, game:gear-rusty (the game's rusty gear) by default since 0.0.94 (it was coinage:planchet-silver-lg, a large silver planchet). Rankless NPCs cost a recruit's price, and a price of 0 makes hiring free. The shipped prices (since 0.0.108) are fitted so the same coins spent on any two factions buy forces that win about as often as each other.",
-            "PromotePrices: what promoting a recruit costs in HireCoin, by the rank it becomes (warrior, guard, shock, archer, captain). By default it is the faction's hire price for that rank less 3 coins, or less 4 for a captain (Men: 12 to warrior or archer, 36 to captain); a rank left out gets that default (guard and shock, which can't be hired: the warrior's promotion price). A hired recruit or warrior earns 1 XP for each NPC of this mod that dies within 10 seconds of its hit: at 15 XP a recruit can become a warrior, guard, shock trooper or archer, at 40 XP a warrior, guard or shock trooper can become a captain or a rider (a rider costs the captain's price unless rider is listed). The owner promotes it in its talk menu. 0 makes it free.",
-            "Hiring: right-click an NPC to talk. Members of its faction, and members of an allied faction whose alliance has ShareFriends, can hire it, paying from their hotbar and backpack.",
-            "MaxFollowers and MaxRecruits (in each faction): how many of the faction's recruits can follow a player at once, and how many a player can have. Each recruit uses a share: 1/MaxFollowers of the following and 1/MaxRecruits of the roster, and a player's shares must add up to no more than 1, so factions can be mixed (3 Gondor men and 2 Mordor orcs use 3/5 + 2/7 of the following). Past the following, a new recruit guards where it was hired and the rest hold or guard. A player over the limits when they join (after an admin lowers them) loses the most recently hired recruits until they fit. The MaxFollowers and MaxRecruits at the top of the file are the baseline (3 and 16 since 0.0.135, every faction alike) and count for a faction without its own.",
-            "Health and Damage (in each faction, by rank: recruit, warrior, captain, archer, and since 0.0.113 the promotion-only guard and shock, which a file without them gets as the warrior's health x1.25 and damage x0.8 (guard) or health x0.8 and damage x1.25 (shock)): the health and the damage of one hit of the faction's NPCs of that rank, in place of their unit's own (health is a whole number; an archer's damage is its arrow's, and its shove). Since 0.0.135 every faction ships the same numbers (health 22, 34, 48 and 35, damage 3.15, 3.95, 7 and 3.05 for recruit, warrior, captain and archer; since 0.0.155 a captain's hits on NPCs do x1.5 and NPC hits on it x0.5, so it fights other NPCs as 0.0.153's 96 and 10.5 did while players face 48 and 7), with the same 3 followers, roster of 16 and prices, so fights between factions are decided by numbers and tactics. A rider without its own entry has its warrior's health and damage times 1.25 (1.0 in 0.0.150 to 0.0.167, 1.5 in 0.0.149, 2.24 before). Damage tiers don't change. Wild groups grow with MaxFollowers over the baseline (1 for every faction now; see the spawning file).",
-            "BackHitMultiplier (1.5 by default, since 0.0.137; 0 to 10) and BackArcDegrees (120; 0 to 360): a hit on one of this mod's NPCs that comes from behind it, within a cone BackArcDegrees wide centred on its back, does BackHitMultiplier times the damage (on top of NpcVsNpcDamageMultiplier). Fighting NPCs keep turned toward the nearest enemy within 6 blocks and step backwards (at a walk) instead of turning their back.",
-            "RetreatSeconds (10 by default, since 0.0.136; 1 to 60): after the Retreat order (combat page of the orders menu) your followers drop their fights, run back to you and start no fights for this many seconds; then they follow on as before. The Charge order sends them at the enemy you look at (within 48 blocks), out of formation, fighting like Aggressive, until no enemy is within 16 blocks of them for 5 seconds or 30 seconds have passed.",
-            "NpcVsNpcDamageMultiplier (0.5 by default, since 0.0.135; 0 to 10): every hit this mod's NPCs land on anything that isn't a player is this times its damage (melee, arrows, and charge hits after their x2.5), so fights between NPCs last longer. Hits on players, and players' hits, don't change.",
-            "DamageSpread: every NPC hit, melee and arrows, deals its damage times a random 1 - DamageSpread to 1 + DamageSpread (0.2 = 80% to 120%), so fights aren't decided by whole numbers of hits. 0 turns it off; at most 0.9.",
-            "WildBodyLoot and HiredBodyLoot (by rank: recruit, warrior, captain, archer): what a dead wild NPC's body and a dead recruit's body hold for a player with a knife, as a list of { Code, Min, Max } (item code, and a random count from Min to Max). By default rusty gears (recruit 0-1, warrior and archer 1-2, captain 3-5) and up to one piece of cloth (recruits) or leather (the rest); armor and weapons are never dropped. Rankless NPCs use the recruit list; an empty list leaves an empty body. Bodies rot away after 3 in-game hours.",
-            "SpawnSafeRadius (64 by default, 0 = off): within this many blocks of the world spawn, recruits (guards, aggressive and raiding ones alike) never attack a player on sight. They still fight back against a player who attacks them, their owner or their group.",
-            "GuardRadius: how many blocks around their post recruits told to Guard here patrol (4 to 64). On the aggressive and raid stances they attack any player there who isn't their owner, the owner's group mate, a member of a faction allied to the owner's, or on the owner's whitelist (/recruits whitelist add <player>), even while the owner is offline.",
-            "Relations: how two factions treat each other. Relation is \"ally\", \"enemy\" or \"neutral\", and two factions without an entry are enemies. No factions are allies by default. Allies never fight and come to help each other; neutral factions leave each other's NPCs alone.",
-            "ShareFriends (allies only): true makes each faction's members safe from the other's NPCs too, and lets them hire the other's NPCs. Otherwise a player is safe only from their own factions and hires only from them.",
-            "MonsterCodes: creatures every faction attacks on sight (* is a wildcard). GrudgeSeconds: how long NPCs fight someone who hurt them or an ally. CallForHelpRange: how many blocks away allies come to help. JoinFightRange (32 by default, since 0.0.124): how far a wild NPC that starts a fight calls idle wild NPCs of its faction to join it; they call in turn, so a spread-out army joins. 0 turns it off.",
-            "MaxCaptains (1 by default, since 0.0.138; it replaces RosterPerCaptain): how many captains a player may have, whatever their faction. Hiring or promoting past it is refused; captains a player already has stay. 0 means no limit. Riders don't count.",
-            "RecruitExtraFollowers (1 by default, since 0.0.138; 0 to 10): places in a player's following for recruits only, past the MaxFollowers places every rank shares. So a band is up to 3 followers of any rank and 1 more recruit. A following recruit that is promoted while the ranked places are full stays on the roster but guards where it stands until a place frees.",
-            "MaxAttackersPerTarget: how many NPCs may fight one NPC at a time. 4 by default; 0 means no limit. With a limit, the rest look for another enemy, wait one step behind in a battle line, or, outside a line, join a full enemy anyway when there is no other within reach. Either way an NPC takes an enemy nobody is fighting before one already being fought. Players are never limited, and an NPC always strikes back at whoever hits it.",
-            "CombatSpacing: how far apart, in blocks, fighting NPCs of the same side keep from each other, and the gap between neighbours in a battle line (0.8 to 4, 1.5 by default). Enemies only keep DuelDistanceMin apart. As many attackers as fit round an enemy this far apart (5 by default) fight it; the others take another enemy with room first, or else wait in a second ring one CombatSpacing farther out and step in when a place opens.",
-            "DuelDistanceMin and DuelDistanceMax: how far from the center of the NPC it fights an attacker stands (1.0 to 1.6 blocks by default): it closes in when farther, steps back when closer, and stands and fights in between. Players are approached the vanilla way.",
-            "BattleLines (true by default): groups of NPCs line up when they meet another faction's NPCs, waiting in their places until an enemy comes near: wild NPCs, and recruits following in any formation but Loose. The front rank has one place per enemy; when the lines meet each front NPC fights the enemy facing it from its place in the line. NPCs past that (the side outnumbers the enemy) lengthen the line at both ends and, when the lines meet, wrap round the enemy's flanks, up to MaxAttackersPerTarget on one enemy. Wild NPCs and aggressive or raid recruits march to meet the enemy; defensive recruits hold their line until an enemy is within LineHoldRange blocks. Loose followers, guards, archers, and fights with players or monsters don't make lines. false lets NPCs fight as they find enemies.",
-            "WildBattleLines (false by default since 0.0.122): wild NPCs form battle lines too. Off, they walk straight in, each taking the nearest enemy with room (MaxAttackersPerTarget) and waiting just outside when it is full: smoother and lighter on the server. Recruits following in a formation form lines either way (BattleLines).",
-            "NpcHitsIgnoreHurtWindow (true by default since 0.0.112): true lets NPC hits on NPCs and creatures land even within half a second of another hit (the game's hurt window, which otherwise throws such hits away), so every attacker and every arrow counts, and NPCs stop waiting for a turn to hit such a target. Players always keep the hurt window.",
-            "HelmetChance: the chance (0 to 1) that a newly spawned NPC that may go bare-headed wears its outfit's helmet. Which units may go bare-headed is set by the mod for each unit (all orcs and Uruk-hai, and the units of other factions marked so); the others always spawn with theirs. A helmet it doesn't wear is kept, and its owner can put it on or take any helmet off from the recruit's menu. Helmets are only for looks: NPC protection comes from rank. CaptainsAlwaysHelmeted: true makes every captain always wear theirs (false by default since 0.0.82).",
-            "ShieldChance: the chance (0 to 1) that a newly spawned NPC that can carry a shield gets one. Shields are only for looks, are never carried with a two-handed weapon, and the owner can take one off or put it on from the recruit's menu.",
-            "HealthRegenSpeed: how fast NPCs heal out of combat, as a multiple of vanilla's creature healing (1 = vanilla, 0.01 health a second; 30 = 0.3 a second). RegenDelaySeconds: how long after its last hit an NPC starts healing at that speed.",
-            "DebugCommands (false by default): true turns on the admin commands for testing: /recruits battlelog, xp, bench and zone spawnnow. /recruits faction reload applies a change without a restart.",
+            "LOTR NPCs faction settings. After editing, run /recruits faction reload (no restart needed). This list is rewritten on every start, so don't edit it. The full guide is docs/config-guide.md in the mod's GitHub repo.",
+            "--- Each faction (under Factions, by id) ---",
+            "Stance: \"aggressive\" attacks every non-member player on sight; \"defensive\" only fights players who hurt it or its allies.",
+            "Members: a player belongs to the faction they pick in the join menu (opens on first join; /recruits join reopens it until they pick). The pick is permanent; admins change it with /recruits faction set or clear. Joinable: false hides the faction from the menu.",
+            "HireCoin and HirePrices: the coin item (default game:gear-rusty, the rusty gear) and how many it costs to hire each rank (recruit, warrior, captain, archer). 0 = free.",
+            "PromotePrices: coins to promote a recruit to each rank. Default: the hire price less 3 coins, or less 4 for a captain (12 to warrior, guard, shock or archer; 36 to captain or rider).",
+            "MaxFollowers and MaxRecruits: how many of this faction's recruits may follow a player at once (default 3) and how many they may own (default 16). Each recruit uses 1/MaxFollowers of the following and 1/MaxRecruits of the roster, so a player can mix factions as long as the shares add up to 1. The values at the top of the file are used by factions without their own.",
+            "Health and Damage (by rank): health and damage per hit for recruit, warrior, captain, archer, guard and shock. Every faction ships the same numbers: health 22/34/48/35, damage 3.15/3.95/7/3.05 (recruit/warrior/captain/archer). Riders use warrior numbers x1.25. Captains hit other NPCs x1.5 and take x0.5 from them.",
+            "FriendlyRaces and FriendlyGroups: only used when RaceAndGroupMembership is true.",
+            "--- Between factions ---",
+            "Relations: \"ally\", \"enemy\" or \"neutral\" for a pair of factions (A, B). Pairs without an entry are enemies. No factions are allies by default. Allies never fight and help each other; neutral factions leave each other alone.",
+            "ShareFriends (allies only): true lets each faction's members hire the other's NPCs and keeps them safe from those NPCs.",
+            "Hiring: right-click an NPC to talk. Members of its faction (and of allies with ShareFriends) can hire it, paying from hotbar and backpack.",
+            "RaceAndGroupMembership (default false): true also makes a player a member by race (FriendlyRaces, e.g. lrc:harfoot) or /group (FriendlyGroups), unless the menu or an admin already set their faction.",
+            "MonsterCodes: creatures every faction attacks on sight (* = wildcard).",
+            "GrudgeSeconds: how long NPCs keep fighting someone who hurt them or an ally.",
+            "CallForHelpRange: how many blocks away allies come to help.",
+            "JoinFightRange (32 by default): how far a wild NPC that starts a fight calls idle wild NPCs of its faction to join. 0 = off.",
+            "--- Recruits ---",
+            "MaxCaptains (default 1): captains a player may have, of any faction. 0 = no limit. Riders don't count.",
+            "RecruitExtraFollowers (default 1, 0 to 10): extra following places for plain recruits only, on top of MaxFollowers.",
+            "RetreatSeconds (default 10, 1 to 60): after the Retreat order, followers run back and start no fights for this long. The Charge order sends them at the enemy you look at for up to 30 seconds.",
+            "GuardRadius (default 16, 4 to 64): how far recruits ordered to Guard here patrol. Aggressive and raiding guards attack any player there who isn't the owner, their group, an ally or on the owner's whitelist (/recruits whitelist add <player>).",
+            "SpawnSafeRadius (default 64, 0 = off): within this many blocks of world spawn, recruits never attack a player on sight (they still fight back).",
+            "--- Healing and loot ---",
+            "HealthRegenSpeed: out-of-combat healing as a multiple of vanilla's (1 = 0.01 health a second; default 30). RegenDelaySeconds: wait after the last hit before healing.",
+            "WildBodyLoot and HiredBodyLoot (by rank): what a dead NPC's body holds for a player with a knife, as { Code, Min, Max } lists. Default: a few rusty gears plus cloth or leather. Armor and weapons never drop.",
+            "--- Battles ---",
+            "NpcVsNpcDamageMultiplier (default 0.5, 0 to 10): scales every NPC hit on anything that isn't a player, so NPC fights last longer.",
+            "BackHitMultiplier (default 1.5, 0 to 10) and BackArcDegrees (default 120): hits from behind, within this cone, do this much more damage.",
+            "DamageSpread (default 0.2, at most 0.9): each NPC hit deals a random 80% to 120% of its damage at 0.2. 0 = off.",
+            "NpcHitsIgnoreHurtWindow (default true): NPC hits on NPCs and creatures land even right after another hit. Players always keep the game's half-second hurt window.",
+            "MaxAttackersPerTarget (default 4, 0 = no limit): how many NPCs may fight one NPC at once; the rest find another enemy or wait. Players are never limited.",
+            "CombatSpacing (default 1.5, 0.8 to 4): blocks between fighting NPCs of the same side, and between neighbours in a battle line.",
+            "DuelDistanceMin and DuelDistanceMax (default 1.0 and 1.6): the distance an NPC keeps from the enemy it fights.",
+            "BattleLines (default true): groups (wild NPCs, and followers in any formation but Loose) line up when they meet an enemy group. Defensive recruits hold the line until an enemy is within LineHoldRange blocks.",
+            "WildBattleLines (default false): wild NPCs form battle lines too; off, they walk straight in.",
+            "--- Looks ---",
+            "HelmetChance (default 0.6): chance that a new NPC that may go bare-headed (orcs, Uruk-hai and some others) wears its helmet. CaptainsAlwaysHelmeted: true makes captains always wear theirs. Helmets are only for looks.",
+            "ShieldChance (default 0.5): chance that a new NPC that can carry a shield gets one (never with a two-handed weapon). Shields are only for looks.",
+            "--- Admin ---",
+            "DebugCommands (default false): true turns on the testing commands /recruits battlelog, xp, bench and zone spawnnow.",
             "Version: the file format. Don't change it; the mod updates older files once.",
         };
 

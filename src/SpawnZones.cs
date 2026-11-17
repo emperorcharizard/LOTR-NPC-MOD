@@ -99,19 +99,19 @@ namespace LotrNpcs
 
         public static readonly List<string> InstructionText = new List<string>
         {
-            "LOTR NPCs: natural spawning inside the zones admins mark with /recruits zone. Restart the server after editing. This #Instructions list is rewritten on every start, so don't edit it; your values are kept.",
-            "MinutesBetweenGroupsMin, MinutesBetweenGroupsMax and GroupChance: for each player standing in a zone, every so many minutes (a random time between the two) a group spawns with chance GroupChance (0 to 1; 0.5 = half the time, 1 = every time).",
-            "GroupSizeAvg, GroupSizeVar and GroupSizeMax: how many NPCs a group has (average, plus or minus the variation, never more than the maximum), for a faction with the baseline MaxFollowers in the faction file (3). A faction with its own MaxFollowers scales its groups by it over the baseline; every faction ships with 3 since 0.0.135, so all groups are alike.",
-            "WarriorShare: the chance for each member after the first (always a recruit) to be a warrior instead of a recruit. The Shire has no warriors or captains, so its groups are all hobbit farmers.",
-            "ArcherShare: the chance for each member after the first to be an archer, in factions that have archers (every faction but the Shire since 0.0.69). Archers are a unit of their own, without ranks; the rest of the group follows WarriorShare.",
-            "RivalGroupChance, RivalDistanceMin and RivalDistanceMax: where zones give the same ground to two factions at war (one zone listing both, or overlapping zones), the chance that a group spawning there brings a group of the enemy faction RivalDistanceMin to RivalDistanceMax blocks away, so they fight. 0 turns it off. The rival group still respects MaxNearby, MinDistanceToPlayer and the zones.",
-            "RiderChance (0.06 by default, since 0.0.117): the chance that one warrior of a wild group comes mounted, in factions that have riders and whose mount's mod is installed (Feverstone Wilds for horses and dire wolves, Teapot's Giant Boar for dwarves; elves ride the game's own tamed deer as a caribou, added by this mod's patch).",
-            "CaptainGroupChance: the chance that a group is a captain with CaptainEscortMin to CaptainEscortMax recruits, warriors and archers. CaptainEscortMax scales with the faction's MaxFollowers like the group size.",
-            "MinDistanceToPlayer and MaxDistanceToPlayer: how many blocks from the player a group appears. It always appears inside a zone that lists its faction.",
-            "MaxNearby and NearbyRange: no group spawns while MaxNearby zone NPCs (24 by default since 0.0.94; was 8) are within NearbyRange blocks of the player. NPCs count by their faction's share of the baseline MaxFollowers (1 each while every faction has 3).",
-            "MaxBlockLight: no group spawns where torches and other lamps make the light brighter than this (0 to 32). Daylight doesn't count.",
-            "DespawnAfterMinutesAway and DespawnDistance: zone NPCs that stay farther than DespawnDistance blocks from every player for that many minutes disappear, so new groups keep coming. NPCs from creative spawn items never despawn.",
-            "MaxLifetimeMinutes and LifetimeDespawnDistance: a zone NPC alive longer than MaxLifetimeMinutes (20) disappears as soon as it isn't fighting and no player is within LifetimeDespawnDistance blocks (64), so areas don't fill up while players stay nearby. 0 turns it off. Hired recruits and NPCs from creative spawn items never despawn.",
+            "LOTR NPCs natural spawning, inside the zones admins mark with /recruits zone. Restart the server after editing. This list is rewritten on every start, so don't edit it; your values are kept.",
+            "MinutesBetweenGroupsMin and MinutesBetweenGroupsMax (default 3 and 5): for each player in a zone, a new group is tried after a random time in this range. GroupChance (default 0.5): the chance that try spawns a group.",
+            "GroupSizeAvg, GroupSizeVar and GroupSizeMax (default 3, 2 and 5): group size, average plus or minus the variation, at most the maximum. A faction with its own MaxFollowers scales this; every faction ships with 3, so all groups are alike.",
+            "WarriorShare (default 0.35): chance each member after the first (always a recruit) is a warrior. The Shire has only hobbit farmers.",
+            "ArcherShare (default 0.2): chance each member after the first is an archer, in factions with archers (all but the Shire).",
+            "CaptainGroupChance (default 0.12): chance a group is a captain with CaptainEscortMin to CaptainEscortMax (default 1 to 3) escorts.",
+            "RiderChance (default 0.06): chance one warrior of a wild group is mounted, when its mount's mod is installed (Feverstone Wilds for horses and dire wolves, Teapot's Giant Boar for dwarves; elves ride caribou, built in).",
+            "RivalGroupChance (default 0.5), RivalDistanceMin and RivalDistanceMax (default 16 and 32): where zones give the same ground to two warring factions, the chance a group brings an enemy group this many blocks away, so they fight. 0 = off.",
+            "MinDistanceToPlayer and MaxDistanceToPlayer (default 40 and 80): how far from the player a group appears, always inside a zone that lists its faction.",
+            "MaxNearby (default 24) and NearbyRange (default 128): no group spawns while this many zone NPCs are within this many blocks of the player (1 each while every faction has 3 followers).",
+            "MaxBlockLight (default 7, 0 to 32): no group spawns where lamps make the light brighter than this. Daylight doesn't count.",
+            "DespawnAfterMinutesAway and DespawnDistance (default 5 and 128): zone NPCs farther than this from every player for this long disappear.",
+            "MaxLifetimeMinutes and LifetimeDespawnDistance (default 20 and 64): a zone NPC older than this disappears once it isn't fighting and no player is within this many blocks. 0 = off. Hired recruits and creative-spawned NPCs never despawn.",
         };
     }
 

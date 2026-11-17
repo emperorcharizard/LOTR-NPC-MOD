@@ -2495,7 +2495,7 @@ public static class Program {
             // Texts.
             Check(new[] { "join-title", "join-explain", "join-followers", "join-follower", "join-total", "join-legend", "join-bloc-free", "join-bloc-shadow", "join-bloc-other", "join-stance-aggressive", "join-stance-defensive", "join-confirm", "join-yes", "join-back", "join-later", "join-none", "join-done", "join-reminder", "join-already", "join-closed", "join-unknown" }.All(k => lang[k] != null)
                 && ((string)lang["join-reminder"]).Contains("/recruits join") && ((string)lang["join-confirm"]).Contains("permanent")
-                && FactionConfig.InstructionText.Any(l => l.StartsWith("Members (since 0.0.92)") && l.Contains("/recruits join")) && FactionConfig.InstructionText.Any(l => l.StartsWith("RaceAndGroupMembership"))
+                && FactionConfig.InstructionText.Any(l => l.StartsWith("Members:") && l.Contains("/recruits join")) && FactionConfig.InstructionText.Any(l => l.StartsWith("RaceAndGroupMembership"))
                 && ModCommands.RootHelp.Contains("join"),
                 "lang for the join menu (the reminder names /recruits join, the confirmation says it's permanent); #Instructions and /help recruits explain it");
             Check(!fs92.DescribeFactions().Contains("friendly races") && fs92.DescribeFactions().Contains("wickeddwarves: aggressive, not in the join menu"),
