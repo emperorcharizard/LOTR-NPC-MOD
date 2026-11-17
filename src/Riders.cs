@@ -120,8 +120,8 @@ namespace LotrNpcs
         public const long BoxedMs = 1500, BoxedHoldMs = 3000;
         /// <summary>A blow landed at a gallop: damage times this, and the target is pushed along the mount's heading
         /// (ChargeKnockback blocks a tick of motion, about 1.5 blocks on the ground; NPCs only, a player's motion is
-        /// its own client's).</summary>
-        public const float ChargeDamageMultiplier = 2f;
+        /// its own client's). 0.0.163 (owner card 2026-11-17, after 1 rider lost to 2 warriors on 0.0.162): x2.5 (was x2).</summary>
+        public const float ChargeDamageMultiplier = 2.5f;
         public const double ChargeKnockback = 0.45;
 
         /// <summary>The next phase. foeDistance: to the focus (centers, horizontally); rodeOut: blocks since the

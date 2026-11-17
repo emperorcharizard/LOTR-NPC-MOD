@@ -817,3 +817,10 @@ In game 2026-11-17 (151.C3, log 193403): riders opened on the warriors in their 
   - 2026-11-17 on 0.0.162 (log 194948): first 90 s 52 swings, 26 out of reach (same as 0.0.160), but aimed at archers (39 of 52); whole run 46 of 81 landed (0.0.160: 57 of 122). Most misses are archers stepping back (rider slow, 3.3-4.3 blocks), not gallop overshoot. Left open.
 - [ ] 161.3 151.C1 still holds: 1 Rohan rider v 2 Dunlending warriors, the rider wins.
   - 2026-11-17 on 0.0.162 (log 195542): FAILED, the warriors won at ~390 s (rider dealt 42, took 46; warriors landed 23 of 25). The fight drifted ~48 blocks north with the rider's ride-outs and Synergy froze it until I teleported over (the 133.3 drift). Riders lost strength in 0.0.156 (MountedExtraReach 1 -> 0.5) and 0.0.146 (foot blows at riders riding through land).
+
+## 163. Stronger charge (0.0.163)
+
+Owner, 2026-11-17 (card, after 161.3 failed): "Charge hits x2.5 (from x2)". Only a rider's blow landed at a gallop changes; standing swings stay x1.
+
+- [ ] 163.1 1 Rohan rider v 2 Dunlending warriors (stand at the fight so Synergy doesn't freeze it): the rider wins.
+- [ ] 163.2 1 Rohan rider v 1 Dunlending captain: the captain still wins.
