@@ -878,3 +878,10 @@ Owner, 2026-11-17 (card): "Riders x1.25 stats". A rider without its own entry ha
   - 2026-11-17 (log 232915): rider won 2-0 at ~305 s, 95 damage dealt v 39 taken, 24 of 40 blows landed, 9 charge hits; fight stayed beside the player.
 - [x] 168.2 1 Rohan rider v 1 Dunlending captain: the captain still wins.
   - 2026-11-17 (log 233435): captain won at ~237 s, 65 v 48 damage (13 of 18 landed); closer than on 0.0.165 (28 v 7).
+
+## 169. Same blow timing for every swing (1.0.1)
+
+Install `lotrnpcs_1.0.1.zip`; restart fully. Owner 2026-11-17: "When a spear user gets hit mid swing, their attack misses entirely"; "all animations should have the same attack landing timing".
+
+- [ ] 169.1 A spear soldier hit mid swing still lands its blow (400 ms after the swing starts, like every other weapon).
+- [ ] 169.2 9 Gondor v 9 Mordor warriors with `/recruits battlelog on`: the summary's "ended before their blow" count (noblow rows, with the weapon) is small and about the same on both sides; Gondor and Mordor about even over several fights.

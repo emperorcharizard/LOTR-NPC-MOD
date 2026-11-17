@@ -384,9 +384,16 @@ namespace LotrNpcs
             if (!swingStarted && (entity as EntityAgent)?.MountedOn == null && !atRider)
             {
                 long now = entity.World.ElapsedMilliseconds;
-                if (animMeta != null && entity.AnimManager?.IsAnimationActive(animMeta.Animation) == true) { swingStarted = true; swingStartedMs = now; }
+                // 1.0.1 (owner, 2026-11-17: "When a spear user gets hit mid swing, their attack misses entirely"; "all
+                // animations should have the same attack landing timing"): the swing also counts as started once the NPC
+                // faces its target (the moment the game starts the animation), whatever the animation manager says.
+                if ((animMeta != null && entity.AnimManager?.IsAnimationActive(animMeta.Animation) == true) || FacesTarget()) { swingStarted = true; swingStartedMs = now; }
                 else if (now - startedMs <= MaxTurnWaitMs) lastCheckOrAttackMs = now;
             }
+            // 1.0.1: a foot soldier's blow falls DamageAtMs after its swing started, for every weapon, even if a hit has
+            // turned it or cut its animation since (the game's own blow also needs it to face its target at that moment).
+            if (!struck && swingStarted && (entity as EntityAgent)?.MountedOn == null && !atRider
+                && Riders.BlowDue(swingStartedMs, damagePlayerAtMs, entity.World.ElapsedMilliseconds)) attackTarget();
             // 0.0.142 (in game 2026-11-15: 58 of 66 rider swings ran their full 900 ms without a blow): the game's own
             // blow needs the attacker to face its target, and a seated rider faces where its mount goes. A mounted
             // rider's blow falls on time here instead; attackTarget checks reach and logs a miss as out of reach.
@@ -411,9 +418,24 @@ namespace LotrNpcs
             return go;
         }
 
+        /// <summary>1.0.1: whether the NPC faces its target closely enough for the game to start its swing.</summary>
+        bool FacesTarget()
+        {
+            if (targetEntity == null) return false;
+            float desired = (float)Math.Atan2(targetEntity.Pos.X - entity.Pos.X, targetEntity.Pos.Z - entity.Pos.Z);
+            return Math.Abs(GameMath.AngleRadDistance(entity.Pos.Yaw, desired)) < attackAngleRangeDeg * GameMath.DEG2RAD;
+        }
+
         public override void FinishExecute(bool cancelled)
         {
             if (cancelled && !struck) RiderLog("cancelled before the blow");
+            // 1.0.1 battle log: a swing that ended without its blow (cancelled, or never started) gets a noblow row.
+            if (!struck && targetEntity != null && factions?.Log.On == true)
+            {
+                long now = entity.World.ElapsedMilliseconds;
+                factions.Log.Attack(entity, targetEntity, false, 0, BattleLog.Result.NoBlow, false, now, string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                    "weapon={0} cancelled={1} {2}", Weapon?.Current?.Item ?? "none", cancelled ? 1 : 0, MissDetail()));
+            }
             Riders.SwingDone(entity);
             base.FinishExecute(cancelled);
             Weapon?.Raise();
