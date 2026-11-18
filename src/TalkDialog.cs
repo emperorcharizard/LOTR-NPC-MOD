@@ -27,7 +27,7 @@ namespace LotrNpcs
         TalkState state;
         GuiElementRichtext textElem;
         ElementBounds clipBounds;
-        bool confirmDismiss, pickClass, closing;
+        bool confirmDismiss, closing;
         int lastQuestion;
 
         public override string ToggleKeyCombinationCode => null;
@@ -54,7 +54,6 @@ namespace LotrNpcs
         {
             state = next;
             confirmDismiss = false;
-            pickClass = false;
             if (state.Reply != null)
             {
                 string key = Has("lotrnpcs:" + state.Reply + "-" + faction) ? "lotrnpcs:" + state.Reply + "-" + faction : "lotrnpcs:" + state.Reply;
@@ -131,18 +130,7 @@ namespace LotrNpcs
             }
             void Choice(string key, Action onClick) { string text = Format(key); Add(text, () => { Player(text); onClick(); }); }
 
-            if (pickClass && state.Mode == "own")
-            {
-                // The class choices behind "Let me change your class".
-                foreach (string cls in state.Classes ?? new List<string>())
-                {
-                    string text = Lang.Get("lotrnpcs:talk-opt-class", ClassTitle(cls));
-                    string pick = cls;
-                    Add(text, () => { Player(text); pickClass = false; Send("class:" + pick); });
-                }
-                Choice("lotrnpcs:talk-opt-class-no", () => { pickClass = false; Npc(Line("own")); Options(); });
-            }
-            else if (confirmDismiss)
+            if (confirmDismiss)
             {
                 Choice("lotrnpcs:talk-opt-dismiss-yes", () => Send("dismiss"));
                 Choice("lotrnpcs:talk-opt-dismiss-no", () => { confirmDismiss = false; Npc(Line("stay")); Options(); });
@@ -159,9 +147,6 @@ namespace LotrNpcs
                 Choice("lotrnpcs:talk-opt-guard", () => Send(Recruit.Guard));
                 Choice("lotrnpcs:talk-opt-guard-shared", () => Send(Recruit.GuardShared));
                 Choice("lotrnpcs:talk-opt-looks", OpenLooks);
-                // A recruit changes class for free: one choice that opens the classes.
-                if (state.Classes != null && state.Classes.Count > 0)
-                    Choice("lotrnpcs:talk-opt-class-menu", () => { pickClass = true; Npc(Format("lotrnpcs:talk-class-ask")); Options(); });
                 // Promotion, once the recruit's XP is full: one choice that opens the promotion screen.
                 if ((state.Promote != null && state.Promote.Count > 0) || state.CaptainsFull)
                     Choice("lotrnpcs:talk-opt-promote-menu", () => { capi.ModLoader.GetModSystem<RosterSystem>()?.Send(new RosterRequest { Action = "promote-menu", Id = npc.EntityId }); Options(); });
@@ -246,9 +231,6 @@ namespace LotrNpcs
         // {0} price, {1} coin name, {2} the baseline roster, {3} owner, {4} recruits the player leads, {5} the
         // baseline follow limit, {6} the room line ("Room in your band: Mordor orcs 1, Men of Gondor 0."), {7} the
         // roster line ("Room on your roster: Mordor orcs 12.").
-        string ClassTitle(string cls) =>
-            Recruit.TitleKey(faction, cls, k => Lang.HasTranslation(k)) is string key ? Lang.Get(key).ToLowerInvariant() : cls;
-
         string Format(string key) => Lang.Get(key, state.Price, CoinName(), state.Cap, state.OwnerName ?? "", state.Hired, state.FollowCap,
             HiringSystem.RoomText(state.Room, ClientLang), HiringSystem.RosterText(state.RosterRoom, ClientLang));
 

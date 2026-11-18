@@ -80,7 +80,6 @@ namespace LotrNpcs
                 Factions.Config.Factions.TryGetValue(faction, out FactionDef ownDef);
                 state.Coin = ownDef?.HireCoin ?? FactionConfig.DefaultHireCoin;
                 if (Promotions != null) state.Promote = Promotions.Offers(npc, ownDef);
-                state.Classes = OtherClasses(npc);
                 // No captain offer while the player's captain places are full.
                 if (state.Promote != null && state.Promote.ContainsKey("captain") && RankOf(npc) != "captain" && !CaptainFits(player.PlayerUID, faction))
                 {
@@ -130,12 +129,6 @@ namespace LotrNpcs
             {
                 case "hire":
                     return state.Mode == "member" ? Hire(npc, player, state) : state;
-                case string trainAs when trainAs.StartsWith("class:"):
-                    {
-                        string cls = trainAs.Substring("class:".Length);
-                        if (state.Mode != "own" || !state.Classes.Contains(cls)) return state;
-                        return ChangeClass(npc, player, cls) ? null : state;
-                    }
                 case "borrow":
                     {
                         if (state.Mode != "shared") return state;
@@ -198,30 +191,6 @@ namespace LotrNpcs
                 default:
                     return state;
             }
-        }
-
-        /// <summary>The recruit classes (Promotion.RecruitClasses) this NPC could take besides its own, whose entity
-        /// types exist; empty for any other rank.</summary>
-        List<string> OtherClasses(Entity npc)
-        {
-            string rank = RankOf(npc);
-            if (Promotion.BaseRank(rank) != "recruit" || sapi == null) return new List<string>();
-            return Promotion.RecruitClasses.Where(c => c != rank && sapi.World.GetEntityType(Promotion.CodeAtRank(npc.Code, c)) != null).ToList();
-        }
-
-        /// <summary>The player's recruit becomes another recruit class (a new NPC, as a promotion makes), keeping its
-        /// XP, for free. True when done (the owner is told in chat).</summary>
-        bool ChangeClass(EntityAgent npc, IServerPlayer player, string cls)
-        {
-            int xp = Promotion.Xp(npc);
-            string before = Recruit.TitleInSentence(npc, player.LanguageCode);
-            EntityAgent next = Promotions?.Promote(npc, cls);
-            if (next == null) return false;
-            next.WatchedAttributes.SetInt(Promotion.XpAttr, xp);
-            next.WatchedAttributes.MarkPathDirty(Promotion.XpAttr);
-            player.SendMessage(GlobalConstants.GeneralChatGroup, Lang.GetL(player.LanguageCode, "lotrnpcs:promote-done", before, Recruit.TitleInSentence(next, player.LanguageCode)), EnumChatType.Notification);
-            sapi?.Logger.Notification("[lotrnpcs] " + player.PlayerName + " made their recruit a " + cls + ".");
-            return true;
         }
 
         /// <summary>

@@ -77,6 +77,10 @@ namespace LotrNpcs
             if (entity.Api.Side != EnumAppSide.Server) return;
             AiTaskManager tasks = entity.GetBehavior<EntityBehaviorTaskAI>()?.TaskManager;
             if (tasks != null) tasks.OnShouldExecuteTask += AllowTask;
+            // Guard and shock classes and the tormented elves were taken out: NPCs of them still in a world turn into
+            // their plain rank, or go, shortly after loading.
+            if (Promotion.IsRetired(NpcTypeInfo.Of(entity)?.Rank) || FactionConfig.IsRetiredFaction(FactionSystem.FactionOf(entity)))
+                entity.World.RegisterCallback(_ => entity.Api.ModLoader.GetModSystem<PromotionSystem>()?.Retire(entity as EntityAgent), 1000);
         }
 
         // No wandering off or looking about in a fight: between swings, or waiting in a battle line, the look-around

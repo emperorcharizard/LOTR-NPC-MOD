@@ -130,28 +130,9 @@ namespace LotrNpcs
             LooksRequest req;
             try { req = JsonConvert.DeserializeObject<LooksRequest>(Encoding.UTF8.GetString(data)); }
             catch (Exception) { return; }
-            // Cancel resends the old loadout: only a real change of weapon or shield may change the class.
-            string gearBefore = Attrs.String(entity.WatchedAttributes, EntityBehaviorHeldWeapon.WeaponAttr) + "|" + Attrs.String(entity.WatchedAttributes, EntityBehaviorHeldWeapon.ShieldAttr);
             string refused = Looks.Apply(entity, player.PlayerUID, req, Looks.PartsOf(entity.Api, Attrs.String(entity.WatchedAttributes, "skinModel")), Looks.WeaponChoices(entity), Looks.Head(entity), Looks.ShieldOf(entity), Looks.HelmetChoices(entity));
             talkingUntilMs = entity.World.ElapsedMilliseconds + 30000;
             if (refused != null) ((ICoreServerAPI)entity.Api).Network.SendEntityPacket(player, entity.EntityId, LooksPacket, Encoding.UTF8.GetBytes(refused));
-            else if (gearBefore != Attrs.String(entity.WatchedAttributes, EntityBehaviorHeldWeapon.WeaponAttr) + "|" + Attrs.String(entity.WatchedAttributes, EntityBehaviorHeldWeapon.ShieldAttr)) Reclass(player);
-        }
-
-        // A warrior whose new weapon or shield makes another class (Looks.ClassFor) becomes that class, as a
-        // promotion makes a new NPC (PromotionSystem.Promote), keeping its XP. The looks dialog closes with the old
-        // NPC.
-        void Reclass(IServerPlayer player)
-        {
-            string target = Looks.LoadoutClass(entity);
-            if (target == null || target == NpcTypeInfo.Of(entity)?.Rank || !(entity is EntityAgent npc)) return;
-            int xp = Promotion.Xp(entity);
-            string before = Recruit.TitleInSentence(entity, player.LanguageCode);
-            EntityAgent next = hiring?.Promotions?.Promote(npc, target);
-            if (next == null) return;
-            next.WatchedAttributes.SetInt(Promotion.XpAttr, xp);
-            next.WatchedAttributes.MarkPathDirty(Promotion.XpAttr);
-            player.SendMessage(GlobalConstants.GeneralChatGroup, Lang.GetL(player.LanguageCode, "lotrnpcs:promote-done", before, Recruit.TitleInSentence(next, player.LanguageCode)), EnumChatType.Notification);
         }
 
         public override void OnReceivedServerPacket(int packetid, byte[] data, ref EnumHandling handled)

@@ -34,28 +34,17 @@ namespace LotrNpcs
         public static int Need(string rank) => BaseRank(rank) == "recruit" ? 15 : BaseRank(rank) == "warrior" ? 40 : 0;
 
         /// <summary>
-        /// Promotion-only sidegrades of the warrior. Guard: health x1.25, damage x0.8, always a shield. Shock: health
-        /// x0.8, damage x1.25, a two-handed weapon. Both count as warriors everywhere else (prices they lack, body
-        /// loot, order lists) and lead to captain. Design: docs/design-roster-promotion.md.
+        /// Ranks that are no longer used: the guard and shock classes of warriors and recruits. Their entity types
+        /// stay (hidden) only so NPCs of them in a world load and turn into their plain rank (PromotionSystem.Retire),
+        /// and config entries for them are dropped.
         /// </summary>
-        public static readonly string[] Branches = { "guard", "shock" };
-        /// <summary>
-        /// The recruit's classes, guard recruit (health x1.25, damage x0.8, always a shield) and shock recruit (the
-        /// other way round, a two-handed weapon). Picked in the hire menu at the recruit's price and changed for free
-        /// in the talk menu; they count as recruits everywhere else.
-        /// </summary>
-        public static readonly string[] RecruitBranches = { "recruitguard", "recruitshock" };
-        /// <summary>A recruit's classes, in menu order.</summary>
-        public static readonly string[] RecruitClasses = { "recruit", "recruitguard", "recruitshock" };
-        /// <summary>Every branch, of warriors and of recruits.</summary>
-        public static readonly string[] AllBranches = { "guard", "shock", "recruitguard", "recruitshock" };
-        /// <summary>The rank a branch stands in for (warrior or recruit), else the rank itself.</summary>
-        public static string BaseRank(string rank) => Array.IndexOf(Branches, rank) >= 0 ? "warrior" : Array.IndexOf(RecruitBranches, rank) >= 0 ? "recruit" : rank;
-        /// <summary>A guard-like branch (more health, less damage).</summary>
-        public static bool GuardLike(string branch) => branch == "guard" || branch == "recruitguard";
+        public static readonly string[] Retired = { "guard", "shock", "recruitguard", "recruitshock" };
+        /// <summary>The plain rank a retired class turns into (warrior or recruit), else the rank itself.</summary>
+        public static string BaseRank(string rank) => rank == "guard" || rank == "shock" ? "warrior" : rank == "recruitguard" || rank == "recruitshock" ? "recruit" : rank;
+        public static bool IsRetired(string rank) => rank != null && Array.IndexOf(Retired, rank) >= 0;
 
         /// <summary>The ranks a rank can be promoted to, in menu order.</summary>
-        public static string[] Targets(string rank) => BaseRank(rank) == "recruit" ? new[] { "warrior", "guard", "shock", "archer" } : BaseRank(rank) == "warrior" ? new[] { "captain", "rider" } : Array.Empty<string>();
+        public static string[] Targets(string rank) => rank == "recruit" ? new[] { "warrior", "archer" } : rank == "warrior" ? new[] { "captain", "rider" } : Array.Empty<string>();
 
         /// <summary>The rank whose health, damage and body loot a rank takes when the config lists none of its own
         /// (riders fight as warriors; the mount is what they gain), else BaseRank.</summary>
@@ -236,6 +225,27 @@ namespace LotrNpcs
         /// rank's, with a helmet on if the old one wore one and off if not. The owner's recruit list keeps its place.
         /// Returns the new NPC, or null.
         /// </summary>
+        /// <summary>An NPC of a retired class (Promotion.Retired) becomes its plain rank, keeping its owner, looks and
+        /// XP; one of a retired faction (FactionConfig.RetiredFactions) is removed, which frees its place on its
+        /// owner's roster.</summary>
+        public void Retire(EntityAgent npc)
+        {
+            if (sapi == null || npc == null || !npc.Alive) return;
+            if (FactionConfig.IsRetiredFaction(FactionSystem.FactionOf(npc)))
+            {
+                sapi.Logger.Notification("[lotrnpcs] " + npc.Code + " (" + npc.EntityId + ") belongs to a faction that no longer exists and was removed.");
+                sapi.World.DespawnEntity(npc, new EntityDespawnData { Reason = EnumDespawnReason.Removed });
+                return;
+            }
+            string rank = NpcTypeInfo.Of(npc)?.Rank;
+            if (!Promotion.IsRetired(rank)) return;
+            int xp = Promotion.Xp(npc);
+            EntityAgent next = Promote(npc, Promotion.BaseRank(rank));
+            if (next == null) return;
+            next.WatchedAttributes.SetInt(Promotion.XpAttr, Math.Min(xp, Promotion.Need(Promotion.BaseRank(rank))));
+            next.WatchedAttributes.MarkPathDirty(Promotion.XpAttr);
+        }
+
         public EntityAgent Promote(EntityAgent npc, string rank)
         {
             if (sapi == null || npc == null || !npc.Alive) return null;

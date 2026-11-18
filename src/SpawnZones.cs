@@ -126,7 +126,7 @@ namespace LotrNpcs
     {
         // Every faction with ranked NPCs. The Shire has only recruits, its hobbit farmers.
         public static readonly string[] Factions = { "mordor", "angmar", "mistymountains", "gundabad", "isengard", "gondor", "rohan", "dale", "arnor", "haradrim",
-            "dunlendings", "blacknumenoreans", "easterlings", "dwarves", "wickeddwarves", "elves", "tormentedelves", "shire" };
+            "dunlendings", "blacknumenoreans", "easterlings", "dwarves", "wickeddwarves", "woodelves", "shire" };
         const string SaveKey = "lotrnpcs:spawnzones";
         const string ConfigFile = "lotrnpcs-spawning.json";
         public const string OriginAttr = "lotrnpcsOrigin";
@@ -616,7 +616,8 @@ namespace LotrNpcs
             List<string> factions = new List<string>();
             foreach (string word in ((string)args[2]).Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries))
             {
-                string faction = word.ToLowerInvariant();
+                // The old name of a renamed faction (1.0.4: elves, now woodelves) still works.
+                string faction = FactionConfig.CurrentId(word);
                 if (!Factions.Contains(faction)) return TextCommandResult.Error("Unknown faction '" + word + "'. Factions: " + string.Join(", ", Factions));
                 if (!factions.Contains(faction)) factions.Add(faction);
             }
@@ -669,6 +670,7 @@ namespace LotrNpcs
             SpawnZone zone = zones.FirstOrDefault(z => z.Id == id);
             if (zone == null) return TextCommandResult.Error("There is no zone " + id + ". See /recruits zone list.");
 
+            faction = FactionConfig.CurrentId(faction);
             List<string> factions = new List<string>(zone.Factions);
             if (add && !factions.Contains(faction)) factions.Add(faction);
             if (!add) factions.Remove(faction);
@@ -756,8 +758,8 @@ namespace LotrNpcs
                 List<string> factions = new List<string>();
                 foreach (string f in zone.Factions ?? new List<string>())
                 {
-                    string faction = f?.Trim().ToLowerInvariant();
-                    if (!string.IsNullOrEmpty(faction) && !factions.Contains(faction)) factions.Add(faction);
+                    string faction = FactionConfig.CurrentId(f);
+                    if (!string.IsNullOrEmpty(faction) && !FactionConfig.IsRetiredFaction(faction) && !factions.Contains(faction)) factions.Add(faction);
                 }
                 clean.Add(new SpawnZone
                 {

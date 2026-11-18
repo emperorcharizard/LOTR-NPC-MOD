@@ -59,16 +59,16 @@ namespace LotrNpcs
         // (servers without it, or another character mod); the client still waits for any creation dialog to close.
         public const double WaitForCharacterSeconds = 15;
         // The order factions are listed in (as the creative tab: free peoples, then the shadow, then the rest).
-        public static readonly string[] Order = { "shire", "gondor", "rohan", "arnor", "dale", "dwarves", "elves", "mordor", "angmar",
-            "mistymountains", "gundabad", "isengard", "haradrim", "easterlings", "dunlendings", "blacknumenoreans", "wickeddwarves", "tormentedelves" };
+        public static readonly string[] Order = { "shire", "gondor", "rohan", "arnor", "dale", "dwarves", "woodelves", "mordor", "angmar",
+            "mistymountains", "gundabad", "isengard", "haradrim", "easterlings", "dunlendings", "blacknumenoreans", "wickeddwarves" };
 
         // The menu's sections, the lore blocs of the design doc: Free Peoples, Shadow (with Gundabad and the wicked
-        // dwarves) and Others (the Dunlendings, the tormented elves and any faction an admin adds). Only the layout
+        // dwarves) and Others (the Dunlendings and any faction an admin adds). Only the layout
         // uses this: it allies nobody.
         public static readonly string[] Blocs = { "free", "shadow", "other" };
         static readonly Dictionary<string, string> BlocByFaction = new Dictionary<string, string>
         {
-            ["shire"] = "free", ["gondor"] = "free", ["rohan"] = "free", ["arnor"] = "free", ["dale"] = "free", ["dwarves"] = "free", ["elves"] = "free",
+            ["shire"] = "free", ["gondor"] = "free", ["rohan"] = "free", ["arnor"] = "free", ["dale"] = "free", ["dwarves"] = "free", ["woodelves"] = "free",
             ["mordor"] = "shadow", ["angmar"] = "shadow", ["mistymountains"] = "shadow", ["gundabad"] = "shadow", ["isengard"] = "shadow",
             ["haradrim"] = "shadow", ["easterlings"] = "shadow", ["blacknumenoreans"] = "shadow", ["wickeddwarves"] = "shadow",
         };

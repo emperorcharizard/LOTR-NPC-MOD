@@ -219,8 +219,8 @@ namespace LotrNpcs
                 if (def.Stance != "aggressive" && def.Stance != "defensive") Warn("faction " + id + " has the unknown stance \"" + def.Stance + "\", so it fights only when attacked.");
                 def.FriendlyRaces = Clean(def.FriendlyRaces);
                 def.FriendlyGroups = Clean(def.FriendlyGroups);
-                if (def.Enemies != null) def.Enemies = Clean(def.Enemies);
-                if (def.Allies != null) def.Allies = Clean(def.Allies);
+                if (def.Enemies != null) def.Enemies = Clean(def.Enemies.Select(FactionConfig.CurrentId).Where(f => !FactionConfig.IsRetiredFaction(f)).ToList());
+                if (def.Allies != null) def.Allies = Clean(def.Allies.Select(FactionConfig.CurrentId).Where(f => !FactionConfig.IsRetiredFaction(f)).ToList());
                 factions[id] = def;
             }
             config.Factions = factions;

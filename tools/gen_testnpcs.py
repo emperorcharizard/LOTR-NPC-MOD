@@ -557,13 +557,6 @@ SHIELD_OF = {"rohan": ["game:shield-woodmetal"], "dale": ["game:shield-woodmetal
              # (infantry, heavy infantry, warlord): the light shield for recruits, the heavy one for warriors and
              # captains. A dict by rank instead of a list.
              "haradrim": {"recruit": ["hdlightshield"], "warrior": ["hdheavyshield"], "captain": ["hdheavyshield"]}}
-# 0.0.113 (owner: "Guards should just be shielded units, and shock troops should be the two handed units"; chose game
-# stand-ins): a guard of a faction without a shield carries one of these, a shock trooper of a faction without a
-# two-handed weapon the game's ruined bardiche. Their other ranks stay as they were. Replaced as the models come.
-GUARD_SHIELD_STANDIN = {"uruk": ["game:shield-woodmetal"], "angmarorc": ["game:shield-crude"],
-                        "gundabadorc": ["game:shield-crude"], "tormentedelf": ["game:shield-woodmetal"],
-                        "wickeddwarf": ["dwtowershield", "dwshield"]}
-SHOCK_STANDIN = "ruinedbardiche"
 # The archers' bow (0.0.55): our own simple model (tools/weapons/orc_bow.json, dark wood, leather grip, iron nocks),
 # since no bow model was supplied; the owner can send one to replace it. Held in the right hand as vanilla holds bows,
 # grip at (0, 0, 8). 0.0.59 (user, 2026-11-03: "update the animations of the bow to be at rest until it is drawn to
@@ -771,9 +764,7 @@ def weapon_list(weapons=WEAPONS, weights=None):
 
 def held_weapon(faction, rank):
     """The lotrnpcs:heldweapon behavior for an NPC: archers keep their bow; other Mordor orcs pick a weapon and may
-    carry the shield. 0.0.113 branches pick from the warrior's list: guards its one-handed weapons and always the
-    shield (GUARD_SHIELD_STANDIN when the faction has none), shock troops its two-handed weapons (the ruined bardiche
-    when it has none), never with a shield."""
+    carry the shield. The retired guard and shock types (1.0.4) carry what their plain rank does."""
     if rank == "archer":
         bow, poses = BOW_OF.get(faction, DEFAULT_BOW)
         return {"code": "lotrnpcs:heldweapon", "fixed": True,
@@ -783,21 +774,12 @@ def held_weapon(faction, rank):
     listed = {name: ALL_WEAPONS[name] for name in prefs} if prefs else WEAPONS_OF.get(faction, {})
     shields = SHIELD_OF.get(faction, [])
     shields = shields.get(base, []) if isinstance(shields, dict) else shields
-    # 0.0.154: guard and shock recruits pick from the recruit's list the same way.
-    if rank in ("guard", "recruitguard"):
-        listed = {n: w for n, w in listed.items() if not w.get("twoHanded")} or listed
-        shields = shields or GUARD_SHIELD_STANDIN.get(faction, [])
-    elif rank in ("shock", "recruitshock"):
-        listed = {n: w for n, w in listed.items() if w.get("twoHanded")} or {SHOCK_STANDIN: ALL_WEAPONS[SHOCK_STANDIN]}
-        shields = []
     if rank == "rider" and any(w.get("attack") == "spearhit" for w in listed.values()):
         # 0.0.125 (owner, 2026-11-13: riders "prefer spears"): each spear weighs PREFER times what it would on foot.
         prefs = {n: (prefs or {}).get(n, 1) * (PREFER if w.get("attack") == "spearhit" else 1) for n, w in listed.items()}
     behavior = {"code": "lotrnpcs:heldweapon", "weapons": weapon_list(listed, prefs)}
     if shields:
         behavior["shields"] = [s if ":" in s else f"lotrnpcs:orcweapon-{s}" for s in shields]
-        if rank in ("guard", "recruitguard"):
-            behavior["alwaysShield"] = True
     return behavior
 
 
@@ -1039,15 +1021,14 @@ RANK_STATS = {"recruit": (22, 0, (3, 8)), "warrior": (34, 0, (4, 9)), "captain":
              
               # 0.0.55 archers (a unit, not a rank): a warrior's health, a recruit's shove when cornered.
               "archer": (34, 0, (3, 8)),
-              # 0.0.113 promotion-only warrior branches (Promotion.Branches): guard health x1.25 and damage x0.8, shock
-              # the other way round. The faction config's tables replace these (FactionTiers.WithBranches).
+              # Retired in 1.0.4 (owner, after an outside review: "Remove both"): the 0.0.113 guard and shock classes.
+              # Their types stay, hidden, so a world's ones load and become plain warriors or recruits.
               "guard": (43, 0, (3.2, 9)), "shock": (27, 0, (5, 9)),
               # 0.0.117 riders (promoted from the warrior line next to captain): a warrior's numbers; the mount is the gain.
               "rider": (34, 0, (4, 9)),
-              # 0.0.154 (owner, 2026-11-16: "Do the same for recruit"): the recruit's classes, picked when hiring.
               "recruitguard": (28, 0, (2.4, 8)), "recruitshock": (18, 0, (3.75, 8))}
-# Ranks that wear, carry and offer what another rank does (0.0.113: the warrior branches; 0.0.117 riders, for gear only:
-# in the code a rider is its own rank, Promotion.StatRank).
+# Ranks that wear, carry and offer what another rank does (riders, for gear only: in the code a rider is its own rank,
+# Promotion.StatRank; the retired guard and shock types).
 BASE_RANK = {"guard": "warrior", "shock": "warrior", "rider": "warrior", "recruitguard": "recruit", "recruitshock": "recruit"}
 BRANCH_NAMES = {"guard": "guard", "shock": "shock trooper", "recruitguard": "guard recruit", "recruitshock": "shock recruit"}
 RANKLESS_STATS = (19, 0, (3, 1))
@@ -1481,7 +1462,7 @@ TEST_NPCS = [
     *ranks("easterling", "Easterling", "lotrnpcs:easterling", SKINS + "human/easterling/humanskin10"),
     *ranks("dwarf", "Dwarf", "lotrnpcs:dwarf", SKINS + "dwarf/dwarfskin1"),
     *ranks("wickeddwarf", "Wicked dwarf", "lotrnpcs:wickeddwarf", SKINS + "dwarf/dwarfskin3"),
-    *ranks("elf", "Elf", "lotrnpcs:elf", SKINS + "elf/elfskin1"),
+    *ranks("elf", "Wood elf", "lotrnpcs:elf", SKINS + "elf/elfskin1"),
     *ranks("tormentedelf", "Tormented elf", "lotrnpcs:tormentedelf", SKINS + "elf/elfskin11"),
 ]
 
@@ -1521,7 +1502,7 @@ TEST_NPCS += [(code.removesuffix("-recruit") + "-" + branch, name.removesuffix("
 FACTION_OF = {"mordororc": "mordor", "angmarorc": "angmar", "goblin": "mistymountains", "uruk": "isengard", "gundabadorc": "gundabad",
               "gondor": "gondor", "rohan": "rohan", "dale": "dale", "arnor": "arnor", "haradrim": "haradrim",
               "dunlending": "dunlendings", "blacknumenorean": "blacknumenoreans", "easterling": "easterlings",
-              "dwarf": "dwarves", "wickeddwarf": "wickeddwarves", "hobbit": "shire", "elf": "elves",
+              "dwarf": "dwarves", "wickeddwarf": "wickeddwarves", "hobbit": "shire", "elf": "woodelves",
               "tormentedelf": "tormentedelves"}
 # NPCs whose code doesn't end in their rank. Hobbits have one rank, farmers, which counts as the Shire's recruit rank
 # (user, 2026-11-02: "make them recruit equivalent"), so they get recruit stats and Shire zones spawn them.
@@ -1530,6 +1511,12 @@ RANK_OF = {"test-hobbit": "recruit"}
 # hobbit"). Their entity types stay, so NPCs already in a world keep loading. Hobbits came back in 0.0.42 (user: "put
 # hobbits in the spawn menu anyway").
 HIDDEN = {"test-goblin", "test-uruk"}
+# Taken out (owner, 2026-11-18): the guard and shock classes and the tormented elves. Their types stay, hidden, so NPCs
+# of them in a world load and turn into their plain rank or go (PromotionSystem.Retire); nothing spawns them.
+RETIRED_RANKS = {"guard", "shock", "recruitguard", "recruitshock"}
+RETIRED_FACTIONS = {"tormentedelves"}
+HIDDEN |= {code for code, *_ in TEST_NPCS if code.rsplit("-", 1)[-1] in RETIRED_RANKS
+           or FACTION_OF.get(code.removeprefix("test-").split("-")[0]) in RETIRED_FACTIONS}
 
 
 # Names on hire (0.0.54, user, 2026-11-03: "when hired have their name be randomized anyway to names befitting the
@@ -1617,7 +1604,6 @@ for code, name, model, skin_texture, gear in TEST_NPCS:
     client_gear = [{"code": "seraphinventory"}, {"code": "lotrnpcs:helmethidehair", "hideBeardUnder": BEARD_HIDING_HELMETS, "hideEarsUnder": EAR_HIDING_HELMETS}] if gear else []
     faction, _, rank = code.removeprefix("test-").partition("-")
     rank = RANK_OF.get(code, rank)
-    # 0.0.113: guards and shock troops wear the warrior's armor and offer its helmets.
     base = BASE_RANK.get(rank, rank)
     sets = FACTION_SETS.get(faction, {}).get(base, [])
     # 0.0.78: sets worn only when no set above is complete (the owner's armor mod isn't installed).
@@ -1670,10 +1656,10 @@ for code, name, model, skin_texture, gear in TEST_NPCS:
 write_weapons()
 
 # The creative tab's order (0.0.71): free peoples, then the Shadow, each faction's units together, recruit to archer.
-CREATIVE_FACTIONS = ["shire", "gondor", "rohan", "arnor", "dale", "dwarves", "elves",
+CREATIVE_FACTIONS = ["shire", "gondor", "rohan", "arnor", "dale", "dwarves", "woodelves",
                      "mordor", "angmar", "mistymountains", "gundabad", "isengard", "haradrim", "easterlings", "dunlendings",
                      "blacknumenoreans", "wickeddwarves", "tormentedelves"]
-CREATIVE_RANKS = ["recruit", "recruitguard", "recruitshock", "warrior", "guard", "shock", "captain", "rider", "archer"]
+CREATIVE_RANKS = ["recruit", "warrior", "captain", "rider", "archer"]
 def _creative_key(code):
     race, _, rank = code.removeprefix("test-").partition("-")
     return CREATIVE_FACTIONS.index(FACTION_OF[race]), CREATIVE_RANKS.index(RANK_OF.get(code, rank))
@@ -1724,10 +1710,6 @@ def prefix_and_creature(name):
 TALK = {
     "talk-opt-hire": "I'd like to hire you. ({0} × {1})",
     "talk-opt-hire-free": "I'd like to hire you.",
-    "talk-opt-class-menu": "Let me change your class.",
-    "talk-opt-class": "Train as a {0}.",
-    "talk-opt-class-no": "Never mind, stay as you are.",
-    "talk-class-ask": "What should I train as?",
     "talk-opt-ask": "I have a question.",
     "talk-opt-follow": "Follow me.",
     "talk-opt-hold": "Hold your position here.",
@@ -2072,7 +2054,7 @@ FACTION_TALK = {
               [("Where's the best inn around here?", "Depends what you're after: good beer, good gossip or a quiet corner. Every village claims the first."),
                ("Have you seen anything strange lately?", "More big folk on the roads than usual. And riders in dark cloaks asking questions, so they say."),
                ("What do hobbits do all day?", "Garden, eat, visit, eat again. It's a very busy life, thank you.")]),
-    "elves": (["Well met, friend. The stars are bright tonight.", "You walk among the elves. Be welcome."],
+    "woodelves": (["Well met, friend. The stars are bright tonight.", "You walk among the elves. Be welcome."],
               "I will go with you a while. Our roads lie together, for now.",
               [("How old are you?", "Older than the oaks in this wood, and younger than the hills. Why do mortals always ask that?"),
                ("Will you sail west one day?", "One day. Not yet. There is still beauty here worth guarding."),
@@ -2129,7 +2111,7 @@ FOLK = {
     "gondor": "Men of Gondor", "rohan": "Riders of Rohan", "dale": "Men of Dale", "arnor": "Dunedain of Arnor",
     "haradrim": "Haradrim", "easterlings": "Easterlings", "blacknumenoreans": "Black Numenoreans", "dunlendings": "Dunlendings",
     "isengard": "Uruk-hai", "mordor": "Mordor orcs", "angmar": "Angmar orcs", "gundabad": "Gundabad orcs",
-    "mistymountains": "Goblins of the Misty Mountains", "elves": "Elves", "tormentedelves": "Tormented elves",
+    "mistymountains": "Goblins of the Misty Mountains", "woodelves": "Wood elves", "tormentedelves": "Tormented elves",
     "dwarves": "Dwarves", "wickeddwarves": "Wicked dwarves", "shire": "Hobbits",
 }
 assert set(FOLK) == set(FACTION_OF.values()), "a folk name for every faction"
@@ -2162,7 +2144,7 @@ with open(os.path.join(out, "modinfo.json"), "w") as f:
         "type": "code",
         "modid": "lotrnpcs",
         "name": "LOTR NPCs",
-        "version": "1.0.3",
+        "version": "1.0.4",
         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Race models from "
                        "LOTR Races and Classes by Dango Dango Dango, Shakgriig and Buggoi, used with their permission.",

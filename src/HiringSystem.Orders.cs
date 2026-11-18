@@ -469,9 +469,10 @@ namespace LotrNpcs
                     owner.Groups ??= new List<string>();
                     owner.Whitelist ??= new Dictionary<string, string>();
                     owner.PendingDismiss ??= new List<long>();
-                    owner.RecruitFactions ??= new Dictionary<long, string>();
+                    owner.RecruitFactions = (owner.RecruitFactions ?? new Dictionary<long, string>()).ToDictionary(kv => kv.Key, kv => FactionConfig.CurrentId(kv.Value));
                     owner.Captains ??= new HashSet<long>();
                     owner.Summaries ??= new Dictionary<long, RecruitSummary>();
+                    foreach (RecruitSummary sum in owner.Summaries.Values.Where(s => s != null)) sum.Faction = FactionConfig.CurrentId(sum.Faction);
                 }
                 sapi.Logger.Notification("[lotrnpcs] Loaded " + owners.Values.Sum(o => o.Recruits.Count) + " recruits of " + owners.Count + " players.");
             }

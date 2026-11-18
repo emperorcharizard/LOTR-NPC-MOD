@@ -44,8 +44,6 @@ namespace LotrNpcs
         public List<RoomEntry> RosterRoom = new List<RoomEntry>();
         // The player's captain places are full, so no captain is offered.
         public bool CaptainsFull;
-        // "own" only: the recruit classes it can change to (free). Empty for other ranks.
-        public List<string> Classes = new List<string>();
     }
 
     /// <summary>One faction in the room line: how many more of its recruits fit the following.</summary>

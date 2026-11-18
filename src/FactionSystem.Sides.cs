@@ -103,7 +103,8 @@ namespace LotrNpcs
             try
             {
                 assigned = JsonConvert.DeserializeObject<Dictionary<string, AssignedPlayer>>(Encoding.UTF8.GetString(bytes)) ?? new Dictionary<string, AssignedPlayer>();
-                foreach (string uid in assigned.Where(kv => kv.Value?.Faction == null).Select(kv => kv.Key).ToList()) assigned.Remove(uid);
+                foreach (AssignedPlayer p in assigned.Values.Where(p => p != null)) p.Faction = FactionConfig.CurrentId(p.Faction);
+                foreach (string uid in assigned.Where(kv => kv.Value?.Faction == null || FactionConfig.IsRetiredFaction(kv.Value.Faction)).Select(kv => kv.Key).ToList()) assigned.Remove(uid);
                 sides.Clear();
                 recordSides.Clear();
                 sapi.Logger.Notification("[lotrnpcs] Loaded " + assigned.Count + " admin-set player factions.");
@@ -440,7 +441,7 @@ namespace LotrNpcs
         }
 
         static string RankList(Dictionary<string, float> table) =>
-            table == null ? "as the units" : string.Join("/", FactionTiers.Ranks.Concat(Promotion.Branches).Select(r => table.TryGetValue(r, out float v) ? v.ToString("0.##", CultureInfo.InvariantCulture) : "-"));
+            table == null ? "as the units" : string.Join("/", FactionTiers.Ranks.Select(r => table.TryGetValue(r, out float v) ? v.ToString("0.##", CultureInfo.InvariantCulture) : "-"));
 
         public string DescribeFactions()
         {

@@ -48,8 +48,8 @@ namespace LotrNpcs
             Dictionary<string, int> hire = new Dictionary<string, int> { ["recruit"] = recruit, ["warrior"] = warrior, ["captain"] = captain, ["archer"] = archer };
             return new FactionTier
             {
-                Name = name, Followers = followers, Roster = roster, Health090 = health090, Damage090 = damage090, Health = WithBranches(health, true), Damage = WithBranches(damage, false),
-                Hire = hire, Promote = WithBranchPrices(PromoteFor(hire)),
+                Name = name, Followers = followers, Roster = roster, Health090 = health090, Damage090 = damage090, Health = health, Damage = damage,
+                Hire = hire, Promote = PromoteFor(hire),
                 Promote090 = new Dictionary<string, int> { ["warrior"] = promoteWarrior, ["archer"] = promoteArcher, ["captain"] = promoteCaptain },
             };
         }
@@ -73,32 +73,6 @@ namespace LotrNpcs
                 if (hire != null && hire.TryGetValue(rank, out int price)) promote[rank] = PromotePrice(rank, price);
             }
             return promote;
-        }
-
-        /// <summary>Promoting to a branch (guard, shock) costs what promoting to warrior does, unless
-        /// listed.</summary>
-        public static Dictionary<string, int> WithBranchPrices(Dictionary<string, int> promote)
-        {
-            foreach (string branch in Promotion.Branches)
-            {
-                if (!promote.ContainsKey(branch) && promote.TryGetValue("warrior", out int price)) promote[branch] = price;
-            }
-            return promote;
-        }
-
-        /// <summary>A tier's branch stats from its warrior's (Promotion.Branches): guard health x1.25 and damage
-        /// x0.8, shock the other way round, so health x damage stays the warrior's.</summary>
-        static Dictionary<string, float> WithBranches(Dictionary<string, float> table, bool health)
-        {
-            foreach (string branch in Promotion.AllBranches) table[branch] = Branch(branch, table[Promotion.BaseRank(branch)], health);
-            return table;
-        }
-
-        /// <summary>A branch's health or damage from its warrior's (a recruit branch's from its recruit's).</summary>
-        public static float Branch(string branch, float warrior, bool health)
-        {
-            double scale = Promotion.GuardLike(branch) == health ? 1.25 : 0.8;
-            return health ? Round(warrior * scale) : (float)Math.Round(warrior * scale, 2);
         }
 
         // Every tier has the Men's per-rank numbers, 3 followers and a roster of 16, and the Men's hire prices
@@ -176,7 +150,7 @@ namespace LotrNpcs
             ["dunlendings"] = Levy,
             ["mordor"] = Orc, ["angmar"] = Orc, ["gundabad"] = Orc,
             ["mistymountains"] = Goblin,
-            ["elves"] = Elf, ["tormentedelves"] = Elf,
+            ["woodelves"] = Elf,
             ["dwarves"] = Dwarf, ["wickeddwarves"] = Dwarf,
         };
 

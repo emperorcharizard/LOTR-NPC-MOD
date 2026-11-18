@@ -111,7 +111,7 @@ namespace LotrNpcs
         [JsonProperty("#Instructions")]
         public List<string> Instructions;
         // File format. Migrate() updates older files once and then stores them.
-        public const int CurrentVersion = 35;
+        public const int CurrentVersion = 36;
         public int Version;
 
         // ---- Factions and relations ----
@@ -229,7 +229,7 @@ namespace LotrNpcs
                 foreach (KeyValuePair<string, int> price in def.HirePrices ?? new Dictionary<string, int>())
                 {
                     string rank = price.Key?.Trim().ToLowerInvariant();
-                    if (!string.IsNullOrEmpty(rank) && !prices.ContainsKey(rank)) prices[rank] = price.Value;
+                    if (!string.IsNullOrEmpty(rank) && !Promotion.IsRetired(rank) && !prices.ContainsKey(rank)) prices[rank] = price.Value;
                 }
                 foreach (KeyValuePair<string, int> price in tier.Hire)
                 {
@@ -240,14 +240,14 @@ namespace LotrNpcs
                 foreach (KeyValuePair<string, int> price in def.PromotePrices ?? new Dictionary<string, int>())
                 {
                     string rank = price.Key?.Trim().ToLowerInvariant();
-                    if (!string.IsNullOrEmpty(rank) && !promote.ContainsKey(rank)) promote[rank] = price.Value;
+                    if (!string.IsNullOrEmpty(rank) && !Promotion.IsRetired(rank) && !promote.ContainsKey(rank)) promote[rank] = price.Value;
                 }
                 // Ranks the file leaves out cost the faction's own hire price for that rank less the discount.
                 foreach (KeyValuePair<string, int> price in FactionTiers.PromoteFor(prices))
                 {
                     if (!promote.ContainsKey(price.Key)) promote[price.Key] = price.Value;
                 }
-                def.PromotePrices = FactionTiers.WithBranchPrices(promote);
+                def.PromotePrices = promote;
                 FillLimits(def, tier, false);
             }
         }
@@ -277,13 +277,7 @@ namespace LotrNpcs
             foreach (KeyValuePair<string, float> kv in given ?? new Dictionary<string, float>())
             {
                 string rank = kv.Key?.Trim().ToLowerInvariant();
-                if (!string.IsNullOrEmpty(rank) && !table.ContainsKey(rank) && !float.IsNaN(kv.Value)) table[rank] = clean(kv.Value);
-            }
-            // A file from before the guard and shock ranks gets them from its own warrior's value, so an admin's
-            // change carries over.
-            foreach (string branch in Promotion.AllBranches)
-            {
-                if (!table.ContainsKey(branch) && table.TryGetValue(Promotion.BaseRank(branch), out float source)) table[branch] = clean(FactionTiers.Branch(branch, source, health));
+                if (!string.IsNullOrEmpty(rank) && !Promotion.IsRetired(rank) && !table.ContainsKey(rank) && !float.IsNaN(kv.Value)) table[rank] = clean(kv.Value);
             }
             foreach (KeyValuePair<string, float> kv in tier)
             {
@@ -381,7 +375,7 @@ namespace LotrNpcs
             "FriendlyRaces and FriendlyGroups: only used when RaceAndGroupMembership is true.",
             "--- Between factions ---",
             "Enemies and Allies (in each faction): the factions it fights and the ones it fights beside. A faction in neither line is neutral: they leave each other alone. To change a pair, move the name from one line to the other; one faction's line is enough, and the mod copies the change to the other faction on /recruits faction reload. Allies win: if either lists the other as an ally they are allies. To make allies enemies again, move the name back in both factions.",
-            "Default sides: the Free Peoples (gondor, rohan, dale, arnor, dwarves, shire, elves) are allies; the Shadow (mordor, angmar, mistymountains, gundabad, isengard, haradrim, easterlings, blacknumenoreans, wickeddwarves) are allies; the two are enemies. Dunlendings and tormentedelves are enemies of everyone.",
+            "Default sides: the Free Peoples (gondor, rohan, dale, arnor, dwarves, shire, woodelves) are allies; the Shadow (mordor, angmar, mistymountains, gundabad, isengard, haradrim, easterlings, blacknumenoreans, wickeddwarves) are allies; the two are enemies. The dunlendings are enemies of everyone.",
             "Allies never fight each other and come to help each other. A player is safe from NPCs of their own faction and its allies, but hires only from their own faction.",
             "Relations (optional): entries for one pair, {\"A\": \"gondor\", \"B\": \"dale\", \"Relation\": \"ally\", \"ShareFriends\": true}, which win over the lines.",
             "ShareFriends (allies only, in a Relations entry): true lets each faction's members hire the other's NPCs and keeps them safe from those NPCs.",
@@ -418,9 +412,23 @@ namespace LotrNpcs
             "Version: the file format. Don't change it; the mod updates older files once.",
         };
 
+        /// <summary>Factions that were taken out (the tormented elves). Their NPCs still in a world are removed when
+        /// they load, and a file's entry for them is dropped.</summary>
+        public static readonly string[] RetiredFactions = { "tormentedelves" };
+        public static bool IsRetiredFaction(string faction) => faction != null && Array.IndexOf(RetiredFactions, faction) >= 0;
+        /// <summary>Faction ids that were renamed: the elves became the Wood Elves, since other elf factions may
+        /// come with their own armor.</summary>
+        public static readonly Dictionary<string, string> RenamedFactions = new Dictionary<string, string> { ["elves"] = "woodelves" };
+        /// <summary>The current id for a faction id read from a file or save (lower case, renames applied).</summary>
+        public static string CurrentId(string faction)
+        {
+            string id = faction?.Trim().ToLowerInvariant();
+            return id != null && RenamedFactions.TryGetValue(id, out string now) ? now : id;
+        }
+
         // The shipped sides: each alliance's members are allies, the two alliances enemies, and a faction in neither
-        // (Dunlendings, tormented elves, any faction an admin adds) is an enemy of everyone.
-        public static readonly string[] FreePeoples = { "gondor", "rohan", "dale", "arnor", "dwarves", "shire", "elves" };
+        // (the Dunlendings, any faction an admin adds) is an enemy of everyone.
+        public static readonly string[] FreePeoples = { "gondor", "rohan", "dale", "arnor", "dwarves", "shire", "woodelves" };
         public static readonly string[] Shadow = { "mordor", "angmar", "mistymountains", "gundabad", "isengard", "haradrim", "easterlings", "blacknumenoreans", "wickeddwarves" };
 
         /// <summary>A faction's shipped Enemies and Allies lines among these factions.</summary>
@@ -442,6 +450,33 @@ namespace LotrNpcs
             if (config.Instructions == null || !config.Instructions.SequenceEqual(InstructionText)) store = true;
             config.Instructions = new List<string>(InstructionText);
             return config;
+        }
+
+        /// <summary>Renamed factions take their new key (unless the file already has it) and retired ones go, in the
+        /// faction list, the Enemies and Allies lines and the Relations entries.</summary>
+        void RenameAndRetire()
+        {
+            if (Factions != null)
+            {
+                Dictionary<string, FactionDef> renamed = new Dictionary<string, FactionDef>();
+                foreach (KeyValuePair<string, FactionDef> kv in Factions)
+                {
+                    string id = CurrentId(kv.Key);
+                    if (id == null || IsRetiredFaction(id) || renamed.ContainsKey(id)) continue;
+                    renamed[id] = kv.Value;
+                }
+                foreach (FactionDef def in renamed.Values.Where(d => d != null))
+                {
+                    if (def.Enemies != null) def.Enemies = def.Enemies.Select(CurrentId).Where(f => f != null && !IsRetiredFaction(f)).Distinct().ToList();
+                    if (def.Allies != null) def.Allies = def.Allies.Select(CurrentId).Where(f => f != null && !IsRetiredFaction(f)).Distinct().ToList();
+                }
+                Factions = renamed;
+            }
+            if (Relations != null)
+            {
+                foreach (FactionRelationDef r in Relations.Where(r => r != null)) { r.A = CurrentId(r.A); r.B = CurrentId(r.B); }
+                Relations = Relations.Where(r => r != null && !IsRetiredFaction(r.A) && !IsRetiredFaction(r.B)).ToList();
+            }
         }
 
         /// <summary>Updates a file from an older version. True if anything was done.</summary>
@@ -484,7 +519,7 @@ namespace LotrNpcs
                     if (kv.Value == null) continue;
                     FactionTier tier = FactionTiers.Of(kv.Key);
                     if (SamePrices(kv.Value.PromotePrices, tier.Promote090) || SamePrices(kv.Value.PromotePrices, tier.Promote))
-                        kv.Value.PromotePrices = FactionTiers.WithBranchPrices(FactionTiers.PromoteFor(kv.Value.HirePrices));
+                        kv.Value.PromotePrices = (FactionTiers.PromoteFor(kv.Value.HirePrices));
                 }
             }
             // Version 28: tables, hire prices and derived promotion prices still exactly as version 27 shipped them
@@ -505,7 +540,7 @@ namespace LotrNpcs
                     {
                         bool derived = SamePrices(kv.Value.PromotePrices, FactionTiers.PromoteFor(oldHire));
                         kv.Value.HirePrices = new Dictionary<string, int>(tier.Hire);
-                        if (derived) kv.Value.PromotePrices = FactionTiers.WithBranchPrices(FactionTiers.PromoteFor(kv.Value.HirePrices));
+                        if (derived) kv.Value.PromotePrices = (FactionTiers.PromoteFor(kv.Value.HirePrices));
                     }
                 }
             }
@@ -549,6 +584,9 @@ namespace LotrNpcs
                     if (SameTable(kv.Value.Damage, FactionTiers.OrcDamage091)) kv.Value.Damage = new Dictionary<string, float>(FactionTiers.Orc.Damage);
                 }
             }
+            // Version 36: the elves are the Wood Elves (key "woodelves"), and the tormented elves and the guard and
+            // shock classes are gone (their table entries are dropped as the file is read).
+            if (Version < 36 && Version > 0) RenameAndRetire();
             // Version 35: sides move into each faction's Enemies and Allies lines (filled with the shipped sides by
             // FillDefaults); old pair entries go, except alliances that share friends, which the lines can't say.
             if (Version < 35 && Version > 0 && Relations != null)
@@ -600,7 +638,7 @@ namespace LotrNpcs
                     {
                         bool derived = SamePrices(def.PromotePrices, FactionTiers.PromoteFor(oldHire));
                         def.HirePrices = new Dictionary<string, int>(tier.Hire);
-                        if (derived) def.PromotePrices = FactionTiers.WithBranchPrices(FactionTiers.PromoteFor(def.HirePrices));
+                        if (derived) def.PromotePrices = (FactionTiers.PromoteFor(def.HirePrices));
                     }
                 }
             }
@@ -624,7 +662,7 @@ namespace LotrNpcs
         static bool SamePrices(Dictionary<string, int> a, Dictionary<string, int> b) =>
             a != null && b != null && NoBranches(a).Count() == NoBranches(b).Count() && NoBranches(a).All(kv => b.TryGetValue(kv.Key, out int v) && v == kv.Value);
 
-        static IEnumerable<KeyValuePair<string, T>> NoBranches<T>(Dictionary<string, T> d) => d.Where(kv => Array.IndexOf(Promotion.AllBranches, kv.Key) < 0);
+        static IEnumerable<KeyValuePair<string, T>> NoBranches<T>(Dictionary<string, T> d) => d.Where(kv => !Promotion.IsRetired(kv.Key));
 
         public static bool SamePair(FactionRelationDef r, string a, string b)
         {
@@ -633,8 +671,8 @@ namespace LotrNpcs
         }
 
         // The shipped factions. Men: Gondor, Rohan, Dale, Arnor, Haradrim, Dunland, Black Numenoreans, Easterlings.
-        // Hobbits are one faction (the Shire), dwarves two (Longbeards and Firebeards; wicked dwarves), elves two
-        // (Noldor, Sindar and Avari; tormented elves), orcs five by region. The races listed only count with
+        // Hobbits are one faction (the Shire), dwarves two (Longbeards and Firebeards; wicked dwarves), the elves are
+        // the Wood Elves (more elf factions can come with their own armor), orcs five by region. The races listed only count with
         // RaceAndGroupMembership on; Gondor, Rohan, Dale and Arnor share one race, so they list none. Every faction
         // but the Shire attacks non-members on sight.
         public static Dictionary<string, FactionDef> DefaultFactions()
@@ -654,8 +692,7 @@ namespace LotrNpcs
                 ["dwarves"] = F("aggressive", "lrc:longbeard", "lrc:firebeardsandbroadbeams"),
                 ["wickeddwarves"] = F("aggressive", "lrc:wickeddwarf"),
                 ["shire"] = F("defensive", "lrc:harfoot", "lrc:stoor", "lrc:fallohide"),
-                ["elves"] = F("aggressive", "lrc:noldor", "lrc:sindar", "lrc:avari"),
-                ["tormentedelves"] = F("aggressive", "lrc:tormentedelf"),
+                ["woodelves"] = F("aggressive", "lrc:sindar", "lrc:avari"),
                 ["mordor"] = F("aggressive"),
                 ["angmar"] = F("aggressive"),
                 ["mistymountains"] = F("aggressive"),

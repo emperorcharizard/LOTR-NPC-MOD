@@ -34,17 +34,17 @@ public static class Program {
         }
         EntityProperties T(string code) => types.First(t => t.Code.Path == code);
         Check(withSpawn == 0, "no vanilla spawn rules in the JSON any more");
-        bool Branch(EntityProperties t) => Array.IndexOf(Promotion.AllBranches, t.Attributes["lotrnpcsRank"].AsString()) >= 0;
+        bool Branch(EntityProperties t) => Promotion.IsRetired(t.Attributes["lotrnpcsRank"].AsString());
         bool Rider(EntityProperties t) => t.Attributes["lotrnpcsRank"].AsString() == "rider";
         Check(types.Count(t => t.Attributes?["lotrnpcsFaction"].Exists == true && t.Attributes["lotrnpcsRank"].Exists && !Branch(t) && !Rider(t)) == 69
             && types.Count(t => t.Attributes?["lotrnpcsFaction"].Exists == true && t.Attributes["lotrnpcsRank"].Exists && Branch(t)) == 68
             && types.Count(t => t.Attributes?["lotrnpcsFaction"].Exists == true && Rider(t)) == 17,
             "69 zone NPC types (17 factions x 3 ranks with Gundabad, the Shire's hobbit recruits, and archers for every faction but the Shire), plus 0.0.113's guards and shock troops (and 0.0.154's guard and shock recruits) for the 17 armed factions and 0.0.117's riders for the 11 mounted ones (0.0.156: every armed faction, 17)");
-        var rankedFactions = types.Where(t => t.Attributes?["lotrnpcsRank"].Exists == true).Select(t => t.Attributes["lotrnpcsFaction"].AsString()).Distinct().OrderBy(f => f).ToList();
+        var rankedFactions = types.Where(t => t.Attributes?["lotrnpcsRank"].Exists == true && !FactionConfig.IsRetiredFaction(t.Attributes["lotrnpcsFaction"].AsString())).Select(t => t.Attributes["lotrnpcsFaction"].AsString()).Distinct().OrderBy(f => f).ToList();
         Check(rankedFactions.SequenceEqual(SpawnZoneSystem.Factions.OrderBy(f => f)) && SpawnZoneSystem.Factions.All(f => (f == "shire" ? new[] { "recruit" } : new[] { "recruit", "warrior", "captain", "archer" }).All(r => types.Any(t => t.Attributes?["lotrnpcsFaction"].AsString() == f && t.Attributes["lotrnpcsRank"].AsString() == r))), "every faction /lotrzone accepts has a recruit, warrior and captain (the Shire only recruits), and no other faction has ranks");
         Check(T("test-hobbit").Attributes["lotrnpcsFaction"].AsString() == "shire" && T("test-hobbit").Attributes["lotrnpcsRank"].AsString() == "recruit", "hobbits are the Shire's recruits");
         var defaults = FactionConfig.DefaultFactions();
-        Check(SpawnZoneSystem.Factions.All(defaults.ContainsKey) && types.All(t => t.Attributes?["lotrnpcsFaction"].Exists != true || defaults.ContainsKey(t.Attributes["lotrnpcsFaction"].AsString())), "zone factions and NPC factions are all in the default faction config");
+        Check(SpawnZoneSystem.Factions.All(defaults.ContainsKey) && types.All(t => t.Attributes?["lotrnpcsFaction"].Exists != true || defaults.ContainsKey(t.Attributes["lotrnpcsFaction"].AsString()) || FactionConfig.IsRetiredFaction(t.Attributes["lotrnpcsFaction"].AsString())), "zone factions and NPC factions are all in the default faction config (but the retired tormented elves, 1.0.4)");
         Check(T("test-goblin-captain").Attributes["lotrnpcsFaction"].AsString() == "mistymountains" && T("test-goblin-captain").Attributes["lotrnpcsRank"].AsString() == "captain", "attributes read back");
 
         // --- fake server ---
@@ -262,7 +262,7 @@ public static class Program {
         typeof(SpawnZoneSystem).GetField("atWar", F).SetValue(sys, defaultWars);
         cfg.RivalGroupChance = 0; int off = 0; for (int i = 0; i < 100; i++) { spawnNow.Invoke(sys, new object[] { me }); if (Zone().Select(e => e.Properties.Attributes["lotrnpcsFaction"].AsString()).Distinct().Count() > 1) off++; KillAll(); }
         Check(off == 0, "RivalGroupChance 0 turns it off"); cfg.RivalGroupChance = 0.5;
-        Check(Add("-3000 -3000 -2800 -2800 elves tormentedelves gondor").Status == EnumCommandStatus.Success, "a zone for the new factions (elves, tormented elves, gondor)");
+        Check(Add("-3000 -3000 -2800 -2800 elves gondor").Status == EnumCommandStatus.Success, "a zone for the elves (the old name of the wood elves, 1.0.4) and gondor");
         Check(Add("-3000 -3000 -2800 -2800 rivendell").Status == EnumCommandStatus.Error, "unknown factions can't get a zone");
         Check(Add("5800 5800 6200 6200 shire").Status == EnumCommandStatus.Success, "a Shire zone");
         var shirePlayer = MakePlayer("Shire", 6000, 6000); int hobbits = 0; bool onlyHobbits = true;
@@ -270,7 +270,7 @@ public static class Program {
         Check(hobbits > 300 && onlyHobbits, "Shire zones spawn groups of hobbits only, no warriors or captains (" + hobbits + " in 300 groups)");
         var west = MakePlayer("West", -2900, -2900); var seenWest = new HashSet<string>();
         for (int i = 0; i < 200; i++) { spawnNow.Invoke(sys, new object[] { west }); foreach (var e in Zone()) seenWest.Add(e.Properties.Code.Path.Replace("-recruit", "").Replace("-warrior", "").Replace("-captain", "").Replace("-archer", "")); KillAll(); }
-        Check(seenWest.SetEquals(new[] { "test-elf", "test-tormentedelf", "test-gondor" }), "new factions spawn in their zone (" + string.Join(",", seenWest) + ")");
+        Check(seenWest.SetEquals(new[] { "test-elf", "test-gondor" }), "both spawn in their zone (" + string.Join(",", seenWest) + ")");
         var outside = MakePlayer("Outside", 5000, 5000);
         Check(spawnNow.Invoke(sys, new object[] { outside }).ToString() == "NoPlace", "player far from every zone: no group");
         var edge = MakePlayer("Edge", -200, 0);  // 50 blocks west of zone 1's edge: spawns only on the zone side
@@ -339,21 +339,21 @@ public static class Program {
             int MaxSize(string f) => Many(f, false).Max(g => g.Count);
             (int, int) Escort(string f) { var gs = Many(f, true); return (gs.Min(g => g.Count) - 1, gs.Max(g => g.Count) - 1); }
             var menG = Many("gondor", false); var orcG = Many("mordor", false);
-            Console.WriteLine($"   > largest groups: men {MaxSize("gondor")}, levy {MaxSize("dunlendings")}, orcs {MaxSize("mordor")}, goblins {MaxSize("mistymountains")}, elves {MaxSize("elves")}, dwarves {MaxSize("dwarves")}; average men {menG.Average(g => g.Count):F2}, orcs {orcG.Average(g => g.Count):F2}");
-            Check(new[] { "gondor", "isengard", "dunlendings", "mordor", "mistymountains", "elves", "dwarves", "shire" }.All(f => MaxSize(f) == 5),
+            Console.WriteLine($"   > largest groups: men {MaxSize("gondor")}, levy {MaxSize("dunlendings")}, orcs {MaxSize("mordor")}, goblins {MaxSize("mistymountains")}, elves {MaxSize("woodelves")}, dwarves {MaxSize("dwarves")}; average men {menG.Average(g => g.Count):F2}, orcs {orcG.Average(g => g.Count):F2}");
+            Check(new[] { "gondor", "isengard", "dunlendings", "mordor", "mistymountains", "woodelves", "dwarves", "shire" }.All(f => MaxSize(f) == 5),
                 "wild groups are up to 5 for every faction (0.0.135: everyone follows 3, so every group scale is 1)");
             Check(Math.Abs(orcG.Average(g => g.Count) - menG.Average(g => g.Count)) < 0.15 && menG.All(g => g[0] == "recruit") && orcG.All(g => g[0] == "recruit")
-                && menG.Concat(Many("gondor", true)).All(g => g.All(r => Array.IndexOf(Promotion.Branches, r) < 0)),
+                && menG.Concat(Many("gondor", true)).All(g => g.All(r => !Promotion.IsRetired(r))),
                 "orc groups are as big as men's on average (0.0.135), and every group still starts with a recruit; no wild guards or shock troops (0.0.113, players only)");
-            Check(new[] { "gondor", "mordor", "mistymountains", "elves" }.All(f => Escort(f) == (1, 3)),
+            Check(new[] { "gondor", "mordor", "mistymountains", "woodelves" }.All(f => Escort(f) == (1, 3)),
                 "a captain's escort is 1 to 3 for every faction (0.0.135)");
-            Check(new[] { "mordor", "mistymountains", "elves", "nobody" }.All(f => Math.Abs(fc.GroupScaleOf(f) - 1) < 1e-9),
+            Check(new[] { "mordor", "mistymountains", "woodelves", "nobody" }.All(f => Math.Abs(fc.GroupScaleOf(f) - 1) < 1e-9),
                 "in MaxNearby every NPC counts as one (0.0.135: every faction follows 3, the baseline)");
             // 0.0.135: every faction weighs one.
             typeof(SpawnZoneSystem).GetField("groupScale", F).SetValue(sys, (System.Func<string, double>)(f => fc.GroupScaleOf(f)));
             var weight = typeof(SpawnZoneSystem).GetMethod("Weight", F);
             double W(string f) => (double)weight.Invoke(sys, new object[] { f });
-            Check(Math.Abs(W("mistymountains") - 1) < 1e-9 && Math.Abs(W("elves") - 1) < 1e-9 && Math.Abs(W("gondor") - 1) < 1e-9,
+            Check(Math.Abs(W("mistymountains") - 1) < 1e-9 && Math.Abs(W("woodelves") - 1) < 1e-9 && Math.Abs(W("gondor") - 1) < 1e-9,
                 "every faction's NPCs weigh one in MaxNearby (0.0.135)");
             Check(SpawnConfig.InstructionText.Any(l => l.StartsWith("GroupSizeAvg") && l.Contains("all groups are alike")) && SpawnConfig.InstructionText.Any(l => l.StartsWith("MaxNearby") && l.Contains("1 each")),
                 "#Instructions explain the scaled groups and the weighted MaxNearby");
