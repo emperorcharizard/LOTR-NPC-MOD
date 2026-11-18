@@ -557,6 +557,19 @@ namespace LotrNpcs
     /// </summary>
     public class EntityBehaviorPresetSkinModel : EntityBehavior
     {
+        /// <summary>
+        /// Our own Player Model Lib models (1.0.4): only the orc bodies, which add looks LOTR Races and Classes doesn't
+        /// have (goblin faces, orc ears, more hair, the smaller Mordor orc). Every other race uses LRC's own model.
+        /// </summary>
+        public static readonly string[] OwnModels = { "lotrnpcs:goblin", "lotrnpcs:mordororc", "lotrnpcs:uruk" };
+
+        /// <summary>A model of ours from 1.0.3 or before (lotrnpcs:gondor, a per-faction copy of an LRC model) that is
+        /// gone; an NPC saved with one takes its type's model.</summary>
+        public static bool IsRetiredModel(string code) =>
+            code != null && code.StartsWith("lotrnpcs:", StringComparison.Ordinal) && Array.IndexOf(OwnModels, code) < 0;
+
+        Dictionary<string, string[]> limits;
+
         public EntityBehaviorPresetSkinModel(Entity entity) : base(entity)
         {
         }
@@ -564,12 +577,32 @@ namespace LotrNpcs
         public override void Initialize(EntityProperties properties, JsonObject attributes)
         {
             base.Initialize(properties, attributes);
+            limits = Looks.SkinLimits(properties.Attributes);
 
+            // Before Player Model Lib's own behavior (listed after this one), which reads the model.
             string model = attributes["skinModel"].AsString(null);
-            if (model == null || entity.WatchedAttributes.HasAttribute("skinModel")) return;
+            string stored = Attrs.String(entity.WatchedAttributes, "skinModel");
+            if (model == null || (stored != null && !IsRetiredModel(stored))) return;
 
             entity.WatchedAttributes.SetString("skinModel", model);
             entity.WatchedAttributes.MarkPathDirty("skinModel");
+        }
+
+        public override void AfterInitialized(bool onFirstSpawn)
+        {
+            base.AfterInitialized(onFirstSpawn);
+            if (entity.Api?.Side != EnumAppSide.Server || limits.Count == 0) return;
+            // Player Model Lib has picked the looks by now; if it waits for its models, look again shortly.
+            if (!Limit()) entity.World.RegisterCallback(_ => Limit(), 500);
+        }
+
+        // False when Player Model Lib hasn't picked any looks yet.
+        bool Limit()
+        {
+            if (!entity.Alive && entity.State == EnumEntityState.Despawned) return true;
+            if (entity.WatchedAttributes.GetTreeAttribute("skinConfig")?.GetTreeAttribute("appliedParts") == null) return false;
+            if (Looks.KeepInLimits(entity, limits, entity.World.Rand)) entity.WatchedAttributes.MarkPathDirty("skinConfig");
+            return true;
         }
 
         public override string PropertyName() => "lotrnpcs:presetskinmodel";

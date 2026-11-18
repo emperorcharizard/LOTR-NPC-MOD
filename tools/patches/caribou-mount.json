@@ -19,7 +19,6 @@
 
     "value": {
       "*-caribou-*": {"base": "entity/animal/mammal/hooved/deer/caribou/adult"},
-
       "*-male-adult": {
         "base": "entity/animal/mammal/hooved/deer/elk/female",
         "overlays": [{"base": "entity/animal/mammal/hooved/deer/elk/malefringe"}]

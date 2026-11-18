@@ -40,7 +40,7 @@ namespace LotrNpcs
         {
             this.npc = npc;
             this.onFinished = onFinished;
-            parts = Looks.PartsOf(capi, npc.WatchedAttributes.GetString("skinModel"));
+            parts = Looks.PartsFor(npc);
             partOrder = Looks.FaceParts.Where(parts.ContainsKey).ToArray();
             weapons = Looks.WeaponChoices(npc);
             original = new LooksRequest { Parts = new Dictionary<string, string>() };

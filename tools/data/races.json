@@ -1,0 +1,256 @@
+{
+  "goblin": {
+    "model": "lotrnpcs:goblin",
+    "parts": {
+      "baseskin": ["orcskin5", "orcskin6", "orcskin7"],
+      "face": ["orcskin5", "orcskin6", "orcskin7"],
+      "eyecolor": ["bitter-lemon", "citrine"],
+      "underwear": ["breeches"],
+      "haircolor": ["slategray", "eerieblack"],
+      "brows": ["slategray", "eerieblack"]
+    }
+  },
+
+  "mordororc": {
+    "model": "lotrnpcs:mordororc",
+    "parts": {
+      "baseskin": ["orcskin2", "orcskin3", "orcskin8"],
+      "face": ["orcskin2", "orcskin3", "orcskin8"],
+      "eyecolor": ["topaz", "ruby", "citrine"],
+      "underwear": ["breeches"],
+      "haircolor": ["eerieblack", "slategray"],
+      "brows": ["eerieblack", "slategray"]
+    }
+  },
+
+  "gundabadorc": {
+    "model": "lotrnpcs:mordororc",
+    "parts": {
+      "baseskin": ["orcskin2", "orcskin1", "orcskin7"],
+      "face": ["orcskin2", "orcskin1", "orcskin7"],
+      "eyecolor": ["topaz", "ruby", "citrine"],
+      "underwear": ["breeches"],
+      "haircolor": ["eerieblack", "slategray"],
+      "brows": ["eerieblack", "slategray"]
+    }
+  },
+
+  "uruk": {
+    "model": "lotrnpcs:uruk",
+    "parts": {
+      "baseskin": ["orcskin4", "orcskin9"],
+      "face": ["orcskin4", "orcskin9"],
+      "eyecolor": ["ruby", "topaz"],
+      "underwear": ["breeches"],
+      "hairbase": ["dreadlocks", "longflowing", "longwithstrands", "messy"],
+      "hairextra": ["none", "tieddreads", "unkempt"],
+      "haircolor": ["eerieblack"],
+      "brows": ["eerieblack"],
+      "facialexpression": ["angry", "determined", "fierce", "serious"]
+    }
+  },
+
+  "gondor": {
+    "model": "lrc:freepeople",
+    "parts": {
+      "underwear": ["breeches"],
+
+      "hairbase": [
+        "balding", "combed", "classic", "layered", "mediumlength-bangs", "short", "short-parted",
+        "short-trimmed", "longwithstrands"
+      ],
+
+      "haircolor": ["eerieblack", "liver", "indigodye"],
+      "brows": ["eerieblack", "liver", "indigodye"]
+    }
+  },
+
+  "rohan": {
+    "model": "lrc:freepeople",
+    "parts": {
+      "underwear": ["breeches"],
+      "hairbase": ["longflowing", "longwithstrands", "layered", "classic", "messy", "combed"],
+      "haircolor": ["wheat", "ecru", "sanddune", "harvestgold", "russet"],
+      "brows": ["wheat", "ecru", "sanddune", "harvestgold", "russet"]
+    }
+  },
+
+  "dunlending": {
+    "model": "lrc:wildmen",
+    "parts": {
+      "underwear": ["breeches"],
+
+      "hairbase": [
+        "messy", "messy2", "longflowing", "longwithstrands", "dreadlocks", "balding", "layered"
+      ],
+
+      "haircolor": ["russet", "rosewood", "cordovan", "liver", "eerieblack", "oldburgundy"],
+      "brows": ["russet", "rosewood", "cordovan", "liver", "eerieblack", "oldburgundy"]
+    }
+  },
+
+  "easterling": {
+    "model": "lrc:easterling",
+    "parts": {
+      "underwear": ["breeches"],
+
+      "hairbase": [
+        "bald", "balding", "short", "short-trimmed", "combed", "classic", "longwithstrands",
+        "layered"
+      ],
+
+      "haircolor": ["eerieblack", "indigodye", "liver", "oldburgundy"],
+      "brows": ["eerieblack", "indigodye", "liver", "oldburgundy"]
+    }
+  },
+
+  "dwarf": {
+    "model": "lrc:longbeard",
+    "parts": {
+      "underwear": ["breeches"],
+
+      "hairbase": [
+        "bald", "balding", "messy", "longflowing", "longwithstrands", "layered", "classic", "short"
+      ],
+
+      "haircolor": [
+        "eerieblack", "liver", "cordovan", "rosewood", "russet", "oldburgundy", "slategray",
+        "silverchalice"
+      ],
+
+      "brows": [
+        "eerieblack", "liver", "cordovan", "rosewood", "russet", "oldburgundy", "slategray",
+        "silverchalice"
+      ],
+
+      "beard": [
+        "dwarf1", "dwarf2", "dwarf3", "dwarf4", "dwarf5", "brd-box20-full", "brd-braid10-double",
+        "brd-braid15-triple", "brd-full10-shaggy"
+      ]
+    }
+  },
+
+  "hobbit": {
+    "model": "lrc:harfoot",
+    "parts": {
+      "baseskin": [
+        "hobbitskin1", "hobbitskin2", "hobbitskin3", "hobbitskin4", "hobbitskin5", "hobbitskin6",
+        "hobbitskin8"
+      ],
+
+      "face": [
+        "hobbitskin1", "hobbitskin2", "hobbitskin3", "hobbitskin4", "hobbitskin5", "hobbitskin6",
+        "hobbitskin8"
+      ],
+
+      "underwear": ["breeches"],
+
+      "hairbase": [
+        "afro", "messy", "messy2", "short", "layered", "classic", "combed", "mediumlength-bangs"
+      ],
+
+      "haircolor": ["liver", "cordovan", "rosewood", "russet", "wheat", "eerieblack"],
+      "brows": ["liver", "cordovan", "rosewood", "russet", "wheat", "eerieblack"]
+    }
+  },
+
+  "dale": {
+    "model": "lrc:freepeople",
+    "parts": {
+      "underwear": ["breeches"],
+
+      "hairbase": [
+        "balding", "combed", "classic", "layered", "longflowing", "longwithstrands",
+        "mediumlength-bangs", "messy", "short", "short-parted", "short-trimmed"
+      ],
+
+      "haircolor": ["cordovan", "rosewood", "russet", "liver", "sanddune"],
+      "brows": ["cordovan", "rosewood", "russet", "liver", "sanddune"]
+    }
+  },
+
+  "arnor": {
+    "model": "lrc:freepeople",
+    "parts": {
+      "underwear": ["breeches"],
+
+      "hairbase": [
+        "combed", "classic", "layered", "longflowing", "longwithstrands", "messy", "short-trimmed"
+      ],
+
+      "haircolor": ["eerieblack", "liver", "slategray", "cordovan"],
+      "brows": ["eerieblack", "liver", "slategray", "cordovan"]
+    }
+  },
+
+  "haradrim": {
+    "model": "lrc:haradrim",
+    "parts": {
+      "underwear": ["breeches"],
+
+      "hairbase": [
+        "balding", "combed", "classic", "layered", "longflowing", "longwithstrands",
+        "mediumlength-bangs", "messy", "short", "short-parted", "short-trimmed", "bald",
+        "dreadlocks"
+      ],
+
+      "haircolor": ["eerieblack", "liver", "oldburgundy", "indigodye"],
+      "brows": ["eerieblack", "liver", "oldburgundy", "indigodye"]
+    }
+  },
+
+  "blacknumenorean": {
+    "model": "lrc:bnumenorean",
+    "parts": {
+      "underwear": ["breeches"],
+
+      "hairbase": [
+        "balding", "combed", "classic", "layered", "longflowing", "longwithstrands",
+        "mediumlength-bangs", "messy", "short", "short-parted", "short-trimmed", "bald"
+      ],
+
+      "haircolor": ["eerieblack", "slategray", "indigodye", "silverchalice"],
+      "brows": ["eerieblack", "slategray", "indigodye", "silverchalice"]
+    }
+  },
+
+  "wickeddwarf": {
+    "model": "lrc:wickeddwarf",
+    "parts": {
+      "underwear": ["breeches"],
+
+      "hairbase": [
+        "bald", "balding", "messy", "longflowing", "longwithstrands", "layered", "classic", "short"
+      ],
+
+      "haircolor": ["lightgray", "silverchalice", "slategray", "eerieblack"],
+      "brows": ["lightgray", "silverchalice", "slategray", "eerieblack"],
+
+      "beard": [
+        "dwarf1", "dwarf2", "dwarf3", "dwarf4", "dwarf5", "brd-box20-full", "brd-braid10-double",
+        "brd-braid15-triple", "brd-full10-shaggy"
+      ]
+    }
+  },
+
+  "elf": {
+    "model": "lrc:sindar",
+    "parts": {
+      "underwear": ["breeches"],
+      "haircolor": [
+        "silverchalice", "wheat", "ecru", "harvestgold", "eerieblack", "liver", "cordovan"
+      ],
+
+      "brows": ["silverchalice", "wheat", "ecru", "harvestgold", "eerieblack", "liver", "cordovan"]
+    }
+  },
+
+  "tormentedelf": {
+    "model": "lrc:tormentedelf",
+    "parts": {
+      "underwear": ["breeches"],
+      "haircolor": ["eerieblack", "slategray", "darkpurple", "liver"],
+      "brows": ["eerieblack", "slategray", "darkpurple", "liver"]
+    }
+  }
+}

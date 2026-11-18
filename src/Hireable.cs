@@ -130,7 +130,7 @@ namespace LotrNpcs
             LooksRequest req;
             try { req = JsonConvert.DeserializeObject<LooksRequest>(Encoding.UTF8.GetString(data)); }
             catch (Exception) { return; }
-            string refused = Looks.Apply(entity, player.PlayerUID, req, Looks.PartsOf(entity.Api, Attrs.String(entity.WatchedAttributes, "skinModel")), Looks.WeaponChoices(entity), Looks.Head(entity), Looks.ShieldOf(entity), Looks.HelmetChoices(entity));
+            string refused = Looks.Apply(entity, player.PlayerUID, req, Looks.PartsFor(entity), Looks.WeaponChoices(entity), Looks.Head(entity), Looks.ShieldOf(entity), Looks.HelmetChoices(entity));
             talkingUntilMs = entity.World.ElapsedMilliseconds + 30000;
             if (refused != null) ((ICoreServerAPI)entity.Api).Network.SendEntityPacket(player, entity.EntityId, LooksPacket, Encoding.UTF8.GetBytes(refused));
         }

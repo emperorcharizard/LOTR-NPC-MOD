@@ -146,8 +146,7 @@ namespace LotrNpcs
         {
             Dictionary<AssetLocation, JObject> models = ObjectCacheUtil.GetOrCreate(capi, ModelCacheKey, () => new Dictionary<AssetLocation, JObject>());
             if (models.TryGetValue(modelCode, out JObject model)) return model;
-            IAsset asset = capi.Assets.TryGet(new AssetLocation(modelCode.Domain, "config/customplayermodels/" + modelCode.Path + ".json"));
-            model = asset == null ? null : JObject.Parse(asset.ToText())[modelCode.Path] as JObject;
+            model = ModelConfigs.Find(capi, modelCode.ToString());
             models[modelCode] = model;
             return model;
         }

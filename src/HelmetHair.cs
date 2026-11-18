@@ -126,8 +126,7 @@ namespace LotrNpcs
             string modelKey = "model:" + modelLoc;
             if (!cache.TryGetValue(modelKey, out object modelObj))
             {
-                IAsset asset = capi.Assets.TryGet(new AssetLocation(modelLoc.Domain, "config/customplayermodels/" + modelLoc.Path + ".json"));
-                modelObj = asset == null ? null : JObject.Parse(asset.ToText())[modelLoc.Path] as JObject;
+                modelObj = ModelConfigs.Find(capi, modelLoc.ToString());
                 cache[modelKey] = modelObj;
             }
             JObject model = modelObj as JObject;

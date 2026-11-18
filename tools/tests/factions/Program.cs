@@ -1,5 +1,5 @@
 using System; using System.Collections.Generic; using System.IO; using System.Linq; using System.Reflection;
-using Newtonsoft.Json.Linq; using Vintagestory.API.Common; using Vintagestory.API.Common.Entities; using Vintagestory.API.Datastructures;
+using Newtonsoft.Json.Linq; using Newtonsoft.Json; using Vintagestory.API.Common; using Vintagestory.API.Common.Entities; using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools; using Vintagestory.API.Util; using Vintagestory.ServerMods.NoObf; using LotrNpcs;
 
 public class TestAgent : EntityAgent { public void SetProps(EntityProperties p) { Properties = p; } }
@@ -518,6 +518,25 @@ public static class Program {
         Check(lang.Properties().Where(p => p.Name.StartsWith("item-creature-") || p.Name.StartsWith("entity-") || p.Name.StartsWith("prefixandcreature-")).All(p => !((string)p.Value).Contains("Test")), "names no longer say Test");
         var items = JObject.Parse(File.ReadAllText(Path.Combine(argv[0], "..", "itemtypes", "creature.json")));
         var entityFiles = Directory.GetFiles(argv[0], "*.json").Select(f => JObject.Parse(File.ReadAllText(f))).ToDictionary(j => (string)j["code"]);
+        // 1.0.4: LOTR Races and Classes is required; its files are where the build unpacked it (build/lrc).
+        string lrcDir = Path.GetFullPath(Path.Combine(argv[0], "..", "..", "..", "..", "lrc", "assets", "lrc"));
+        JObject ModelDef(string code)
+        {
+            string key = code.Split(':')[1];
+            if (code.StartsWith("lotrnpcs:")) return ModelConfigs.ModelIn(File.ReadAllText(Path.Combine(argv[0], "..", "config", "customplayermodels", key + ".json")), key);
+            return Directory.GetFiles(Path.Combine(lrcDir, "config", "customplayermodels"), "*.json").Select(f => ModelConfigs.ModelIn(File.ReadAllText(f), key)).First(m => m != null);
+        }
+        // An LRC body as the game loads it: with our animations patched in (patches/lrc-body-animations.json).
+        JObject Body(string name)
+        {
+            var shape = JObject.Parse(File.ReadAllText(Path.Combine(lrcDir, "shapes", "entity", "humanoid", name + ".json")), new JsonLoadSettings { CommentHandling = CommentHandling.Ignore });
+            foreach (var op in JArray.Parse(File.ReadAllText(Path.Combine(argv[0], "..", "patches", "lrc-body-animations.json"))).Where(o => (string)o["file"] == "lrc:shapes/entity/humanoid/" + name + ".json"))
+                ((JArray)shape["animations"]).Add(op["value"]);
+            return shape;
+        }
+        string ModelOf(string type) => (string)entityFiles[type]["server"]["behaviors"].First(b => (string)b["code"] == "lotrnpcs:presetskinmodel")["skinModel"];
+        // What an NPC of this type may look like: its model's parts, cut to the type's limits (as the looks menu offers).
+        Dictionary<string, string[]> TypeParts(string type) => Looks.Limit(Looks.ParseParts(ModelDef(ModelOf(type))), Looks.SkinLimits(new JsonObject(entityFiles[type]["attributes"])));
         JToken GearSets(JObject jo) => jo["server"]["behaviors"].FirstOrDefault(b => (string)b["code"] == "lotrnpcs:startinggear")?["sets"];
         // 0.0.78: sets worn only when none of "sets" is complete.
         JToken FallbackSets(JObject jo) => jo["server"]["behaviors"].FirstOrDefault(b => (string)b["code"] == "lotrnpcs:startinggear")?["fallbackSets"];
@@ -545,13 +564,39 @@ public static class Program {
                 return sets.Count() == want.Length && want.Select((w, i) => sets[i].Select(c => (string)c).SequenceEqual(w)).All(b => b) && fallback.All(c => !c.Contains("armor-head-")) && fallback.Any()
                     && (r == "recruit" ? g["attributes"]["lotrnpcsHelmets"] == null : g["attributes"]["lotrnpcsHelmets"].Select(c => (string)c).SequenceEqual(helms))
                     && (string)g["attributes"]["lotrnpcsFaction"] == "gundabad" && (string)g["attributes"]["lotrnpcsRank"] == r
-                    && (string)g["client"]["behaviors"].First(b => (string)b["code"] == "lotrnpcs:presetskinmodel")["skinModel"] == "lotrnpcs:gundabadorc";
+                    && (string)g["client"]["behaviors"].First(b => (string)b["code"] == "lotrnpcs:presetskinmodel")["skinModel"] == "lotrnpcs:mordororc";
             }) && lang.Properties().All(p => !((string)p.Value).Contains("(WIP)")) && SpawnZoneSystem.Factions.Contains("gundabad"),
-            "Gundabad orcs: their own race model (0.0.63), bone armor for recruits, the norc Gundabad set for warriors (0.0.76) with the tusked helmet too, captains the warlord set with three helmets (0.0.95; no bone armor since 0.0.96), no helmet without the mod, no \"(WIP)\" (0.0.76), and zones accept them");
-        var gParts = Looks.ParseParts(File.ReadAllText(Path.Combine(argv[0], "..", "config", "customplayermodels", "gundabadorc.json")), "gundabadorc");
-        var mParts = Looks.ParseParts(File.ReadAllText(Path.Combine(argv[0], "..", "config", "customplayermodels", "mordororc.json")), "mordororc");
-        Check(gParts["baseskin"].SequenceEqual(new[] { "orcskin2", "orcskin1", "orcskin7" }) && gParts["face"].SequenceEqual(gParts["baseskin"])
-            && gParts.Keys.Where(k => k != "baseskin" && k != "face").All(k => mParts.ContainsKey(k) && gParts[k].SequenceEqual(mParts[k])),
+            "Gundabad orcs: the Mordor orc model with their own skins (0.0.63; their own model until 1.0.4), bone armor for recruits, the norc Gundabad set for warriors (0.0.76) with the tusked helmet too, captains the warlord set with three helmets (0.0.95; no bone armor since 0.0.96), no helmet without the mod, no \"(WIP)\" (0.0.76), and zones accept them");
+        // 1.0.4 (outside review, owner: "Make it a dependency"): LOTR Races and Classes is required and its models are
+        // used as they are, one per race; each faction's looks are limits on its types (tools/data/races.json).
+        {
+            var info = JObject.Parse(File.ReadAllText(Path.Combine(argv[0], "..", "..", "..", "modinfo.json")));
+            var ownModels = Directory.GetFiles(Path.Combine(argv[0], "..", "config", "customplayermodels"), "*.json").Select(Path.GetFileNameWithoutExtension).OrderBy(n => n).ToArray();
+            var gondor = TypeParts("test-gondor-warrior"); var rohan = TypeParts("test-rohan-warrior");
+            Check((string)info["dependencies"]["lrc"] != null && ownModels.SequenceEqual(new[] { "goblin", "mordororc", "uruk" })
+                && EntityBehaviorPresetSkinModel.OwnModels.OrderBy(m => m).SequenceEqual(ownModels.Select(m => "lotrnpcs:" + m))
+                && ModelOf("test-gondor-warrior") == "lrc:freepeople" && ModelOf("test-rohan-captain") == "lrc:freepeople" && ModelOf("test-dwarf-warrior") == "lrc:longbeard" && ModelOf("test-elf-archer") == "lrc:sindar"
+                && !Directory.Exists(Path.Combine(argv[0], "..", "textures", "entity", "humanoid", "skinparts")) && !File.Exists(Path.Combine(argv[0], "..", "shapes", "entity", "humanoid", "seraph-faceless.json"))
+                && gondor["haircolor"].All(c => new[] { "eerieblack", "liver", "indigodye" }.Contains(c)) && rohan["haircolor"].Contains("wheat") && !gondor["haircolor"].Contains("wheat")
+                && !gondor.ContainsKey("underwear") && TypeParts("test-dwarf-warrior")["beard"].Contains("dwarf1") && !TypeParts("test-dwarf-warrior")["beard"].Contains("none"),
+                "1.0.4: LRC is a dependency and nothing of it is copied; Gondor and Rohan share LRC's Men of the West, told apart by their hair limits; only the three orc bodies are ours; dwarves always have a beard");
+            Check(EntityBehaviorPresetSkinModel.IsRetiredModel("lotrnpcs:gondor") && EntityBehaviorPresetSkinModel.IsRetiredModel("lotrnpcs:gundabadorc") && !EntityBehaviorPresetSkinModel.IsRetiredModel("lotrnpcs:mordororc")
+                && !EntityBehaviorPresetSkinModel.IsRetiredModel("lrc:freepeople") && !EntityBehaviorPresetSkinModel.IsRetiredModel(null),
+                "1.0.4: an NPC saved with one of the old per-faction models takes its type's model when it loads");
+            var looks = Npc("test-rohan-warrior");
+            var applied = new TreeAttribute(); applied.SetString("haircolor", "eerieblack"); applied.SetString("brows", "steelblue"); applied.SetString("hairbase", "afro"); applied.SetString("eyecolor", "azure");
+            var skinTree = new TreeAttribute(); skinTree["appliedParts"] = applied; looks.WatchedAttributes["skinConfig"] = skinTree;
+            var limits = Looks.SkinLimits(new JsonObject(entityFiles["test-rohan-warrior"]["attributes"]));
+            bool changed = Looks.KeepInLimits(looks, limits, new Random(3));
+            string hairNow = Looks.CurrentPart(looks, "haircolor");
+            Check(changed && limits["haircolor"].Contains(hairNow) && Looks.CurrentPart(looks, "brows") == hairNow && limits["hairbase"].Contains(Looks.CurrentPart(looks, "hairbase")) && Looks.CurrentPart(looks, "eyecolor") == "azure"
+                && Looks.CurrentPart(looks, "underwear") == "breeches" && !Looks.KeepInLimits(looks, limits, new Random(4)),
+                "1.0.4: looks outside a faction's limits (as Player Model Lib picks them from the whole race) are picked again inside them, brows matching the hair; parts without limits stay");
+        }
+        var gParts = TypeParts("test-gundabadorc-warrior");
+        var mParts = TypeParts("test-mordororc-warrior");
+        Check(gParts["baseskin"].SequenceEqual(new[] { "orcskin1", "orcskin2", "orcskin7" }) && gParts["face"].SequenceEqual(gParts["baseskin"])
+            && mParts["baseskin"].SequenceEqual(new[] { "orcskin2", "orcskin3", "orcskin8" }) && gParts.Keys.Where(k => k != "baseskin" && k != "face").All(k => mParts.ContainsKey(k) && gParts[k].SequenceEqual(mParts[k])),
             "0.0.63: Gundabad orcs are the Mordor orc with the three lightest orc skins (" + string.Join(", ", gParts["baseskin"]) + ")");
         var follow = entityFiles["test-gondor-warrior"]["server"]["behaviors"].First(b => (string)b["code"] == "taskai")["aitasks"].First(t => (string)t["code"] == "lotrnpcs:followowner");
         Check((double)follow["walkSpeed"] > 0.025 && (double)follow["runSpeed"] >= 0.05, "followers walk a little faster than a walking player and run at least as fast as a sprinting one");
@@ -913,7 +958,7 @@ public static class Program {
             "every ranked NPC carries a weapon (0.0.76: the falx where its faction has no model yet), the Shire's hobbits and the rankless ones none, and every archer its bow");
         armed.RemoveAll(c => !c.StartsWith("test-mordororc-") || c.EndsWith("-archer") || c.EndsWith("-guard") || c.EndsWith("-shock") || c.EndsWith("-recruitguard") || c.EndsWith("-recruitshock"));
         Check(armed.All(c => JToken.DeepEquals(HeldWeapon(entityFiles[c], "server"), HeldWeapon(entityFiles[c], "client")) && HeldWeapon(entityFiles[c], "server")["weapons"].Count() == 6), "...with the same six weapons listed on both sides");
-        var bodyShape = JObject.Parse(File.ReadAllText(Path.Combine(assets, "shapes", "entity", "humanoid", "seraph-faceless.json")));
+        var bodyShape = Body("seraph-faceless");
         var bodyAnims = new HashSet<string>(bodyShape["animations"].Select(a => (string)a["code"]));
         Check(Riders.HoldsForFight(3, false) && Riders.HoldsForFight(20, true) && !Riders.HoldsForFight(5, false) && Riders.HoldFightDistance > Riders.CloseInDistance
             && Riders.CloseInSpeed(3) == Riders.WalkSpeed && Riders.CloseInSpeed(2) == 0,
@@ -1064,13 +1109,12 @@ public static class Program {
         JToken HandRot(string n) => JObject.Parse(File.ReadAllText(Path.Combine(assets, "itemtypes", "orcweapon-" + n + ".json")))["tpHandTransform"]["rotation"];
         Check((float)HandRot("scimitar")["x"] == 180 && (float)HandRot("scimitar")["z"] == 20 && (float)HandRot("knife")["x"] == 0 && (float)HandRot("knife")["z"] == 0,
             "0.0.66: the scimitar and knife are rolled over in the hand (owner: both were upside down), the scimitar keeping its downward slant");
-        string[] OrcHair(string race) => ((JObject)JObject.Parse(File.ReadAllText(Path.Combine(assets, "config", "customplayermodels", race + ".json"))).Properties().First().Value)["SkinnableParts"]
-            .First(p => (string)p["code"] == "hairbase")["variants"].Select(v => (string)v["code"]).ToArray();
+        string[] OrcHair(string race) => TypeParts("test-" + race + "-warrior")["hairbase"];
         Check(new[] { "goblin", "mordororc", "gundabadorc", "uruk" }.All(r => OrcHair(r).Contains("dreadlocks") && OrcHair(r).Contains("messy") && !OrcHair(r).Contains("longbalding"))
             && !File.Exists(Path.Combine(assets, "shapes", "skinparts", "hair-base", "orclongbalding.json")),
             "0.0.67: every orc body offers the game's dreadlocks and messy hair, and the long balding hair is gone (owner did not like it)");
         Check((string)entityAnims["lotrnpcs-poleaxe-attack"]["animation"] == "poleaxechop" && bodyAnims.Contains("poleaxechop") && !bodyAnims.Contains("lotrnpcs-poleaxe-attack"),
-            "0.0.68: the poleaxe swings our own two-handed chop, built into the bundled body (owner: it used the spear thrust)");
+            "0.0.68: the poleaxe swings our own two-handed chop, patched into LRC's body (owner: it used the spear thrust)");
         Check(weaponEntries.Count(w => w["holdAnimation"] != null) == 1 && (string)weaponEntries.First(w => w["holdAnimation"] != null)["item"] == "lotrnpcs:orcweapon-poleaxe", "only the poleaxe has a guard pose between attacks");
         bool speedsOk = weaponEntries.All(w => { var m = entityAnims[(string)w["attackAnimation"]]; return (string)m["blendMode"] == "Average" && (float)m["elementWeight"]["UpperArmR"] > (float)m["elementWeight"]["UpperFootR"] * 10; });
         Check(speedsOk, "swings take over the arms and torso but leave the legs to walking and running");
@@ -1489,9 +1533,9 @@ public static class Program {
                 "0.0.56: what an NPC's owner and others read names it by rank and name, not \"recruit\"");
             // 0.0.56 (user: "FA has the tusks. lotr chars does not."): Mordor orcs wear LRC's own tuskless orc faces.
             string orcModel = File.ReadAllText(Path.Combine(argv[0], "..", "config", "customplayermodels", "mordororc.json"));
-            var orcFaces = System.Text.RegularExpressions.Regex.Matches(orcModel, "\"lotrnpcs:seraphfaces/([a-z-]+)\"").Select(m => m.Groups[1].Value).ToList();
+            var orcFaces = System.Text.RegularExpressions.Regex.Matches(orcModel, "\"lrc:seraphfaces/([a-z-]+)\"").Select(m => m.Groups[1].Value).ToList();
             Check(!orcModel.Contains("face/orc/") && orcFaces.Count == 4 && orcFaces.Contains("angry") && orcFaces.Contains("determined")
-                && orcFaces.All(f => File.Exists(Path.Combine(assets, "shapes", "seraphfaces", f + ".json")) && !File.ReadAllText(Path.Combine(assets, "shapes", "seraphfaces", f + ".json")).Contains("orkteeth")),
+                && orcFaces.All(f => File.Exists(Path.Combine(lrcDir, "shapes", "seraphfaces", f + ".json")) && !File.ReadAllText(Path.Combine(lrcDir, "shapes", "seraphfaces", f + ".json")).Contains("orkteeth")),
                 "0.0.56: Mordor orc faces are LRC's tuskless ones (" + string.Join(", ", orcFaces) + "), and orcs from before keep their expression code");
             Check(lang["item-orcweapon-shield"] != null && lang["looks-shield"] != null && lang["looks-shieldtwohanded"] != null && lang["item-orcweapon-bow"] != null, "the shield, the bow and the new looks messages have their text");
 
@@ -1929,13 +1973,13 @@ public static class Program {
                 && (string)animsOf["lotrnpcs-dwspear-hold"]["animation"] == "spearidle" && (string)animsOf["lotrnpcs-elfspear-attack"]["animation"] == "spearhit",
                 "the poleaxe and battleaxe hold poleaxehold between chops; spears thrust and hold spearidle; the falx slashes");
             Check(new[] { "seraph-faceless", "dwarf-faceless", "elf-faceless" }.All(b => {
-                    var shape = JObject.Parse(File.ReadAllText(Path.Combine(assets, "shapes", "entity", "humanoid", b + ".json")));
+                    var shape = Body(b);
                     var codes = shape["animations"].Select(a => (string)a["code"]).ToList();
                     return codes.Contains("poleaxehold") && codes.Contains("poleaxechop") && codes.Contains("spearidle") && codes.Contains("greatswordhold"); }),
                 "the human, dwarf and elf bodies all have the poleaxe's hold and chop (0.0.76) and the greatsword guard (0.0.96)");
             // 0.0.96 (owner: "Fix the way the poleaxes are held"; chose the shoulder carry): poleaxehold moves only the
             // right arm and the item, and the poleaxe, battleaxe and warhammer hold only those, so the left arm walks.
-            var carry = JObject.Parse(File.ReadAllText(Path.Combine(assets, "shapes", "entity", "humanoid", "dwarf-faceless.json")))["animations"].Single(a => (string)a["code"] == "poleaxehold");
+            var carry = Body("dwarf-faceless")["animations"].Single(a => (string)a["code"] == "poleaxehold");
             var carryEls = carry["keyframes"].SelectMany(k => ((JObject)k["elements"]).Properties().Select(p => p.Name)).Distinct().OrderBy(n => n).ToArray();
             Check(carryEls.SequenceEqual(new[] { "ItemAnchor", "LowerArmR", "UpperArmR" })
                 && new[] { "poleaxe", "dwbattleaxe", "dwwarhammer" }.All(w => ((JObject)animsOf["lotrnpcs-" + w + "-hold"]["elementWeight"]).Properties().Select(p => p.Name).OrderBy(n => n).SequenceEqual(new[] { "ItemAnchor", "LowerArmR", "UpperArmR" })),
@@ -1943,15 +1987,15 @@ public static class Program {
             // 0.0.77: the server builds an NPC's animations from its type's base shape (the owner's 0.0.76 server log:
             // "attempted to play an animation code which its shape does not have: poleaxehold"), so every NPC type uses
             // our own body, and every animation its type names must be in that body.
-            var ourBody = JObject.Parse(File.ReadAllText(Path.Combine(assets, "shapes", "entity", "humanoid", "seraph-faceless.json")));
+            var ourBody = Body("seraph-faceless");
             var ourBodyAnims = new HashSet<string>(ourBody["animations"].Select(a => (string)a["code"]));
             var npcFiles = entityFiles.Where(kv => kv.Key.StartsWith("test-")).ToList();
             var missing = npcFiles.SelectMany(kv => (kv.Value["client"]?["animations"] ?? new JArray()).Select(a => (string)a["animation"]).Where(a => a != null && !ourBodyAnims.Contains(a)).Select(a => kv.Key + ":" + a)).Distinct().ToList();
-            Check(npcFiles.Count > 70 && npcFiles.All(kv => (string)kv.Value["client"]["shape"]["base"] == "lotrnpcs:entity/humanoid/seraph-faceless") && missing.Count == 0,
-                "every NPC type's base shape is our body, which has every animation the type plays (0.0.77)" + (missing.Count > 0 ? ": missing " + string.Join(", ", missing.Take(5)) : ""));
+            Check(npcFiles.Count > 70 && npcFiles.All(kv => (string)kv.Value["client"]["shape"]["base"] == "lrc:entity/humanoid/seraph-faceless") && missing.Count == 0,
+                "every NPC type's base shape is LRC's body with our animations patched in (1.0.4; our copy since 0.0.77), which has every animation the type plays" + (missing.Count > 0 ? ": missing " + string.Join(", ", missing.Take(5)) : ""));
         // 0.0.80 (owner: "when the helmet is on, hide the hair options underneath").
         {
-            var harModel = JObject.Parse(File.ReadAllText(Path.Combine(assets, "config", "customplayermodels", "haradrim.json")))["haradrim"] as JObject;
+            var harModel = ModelDef("lrc:haradrim");
             Check(EntityBehaviorHelmetHidesHair.HairShapePath(harModel, "hairbase", "short1") == "game:entity/humanoid/seraphskinparts/hair-base/short1"
                 && EntityBehaviorHelmetHidesHair.HairShapePath(harModel, "hairextra", "braids") == "game:entity/humanoid/seraphskinparts/hair-extra/braids"
                 && EntityBehaviorHelmetHidesHair.HairShapePath(harModel, "hairbase", "none") == null && EntityBehaviorHelmetHidesHair.HairShapePath(harModel, "nosuchpart", "x") == null,
@@ -1983,12 +2027,12 @@ public static class Program {
                 "every Haradrim helmet hides the beard on the types that wear it, and no other helmet does" + (badHar.Concat(badOther).Any() ? ": " + string.Join(", ", badHar.Concat(badOther).Take(4)) : ""));
             // 0.0.96 (owner: "with the new gundabad helmet, the ears stick out from the sides"): the owner's Gundabad
             // Helmet also hides the ears; ear variants name their own shape.
-            var gbModel = JObject.Parse(File.ReadAllText(Path.Combine(assets, "config", "customplayermodels", "gundabadorc.json")))["gundabadorc"] as JObject;
+            var gbModel = ModelDef("lotrnpcs:mordororc");
             var gbHelmet = new AssetLocation("gundabad:armor-head-tierfourplate-gundabadhelmetone-gundabadhelmetone-none");
             List<AssetLocation> EarPatterns(JToken npc) => npc["client"]["behaviors"].FirstOrDefault(b => (string)b["code"] == "lotrnpcs:helmethidehair")?["hideEarsUnder"]?.Select(t => new AssetLocation((string)t)).ToList() ?? new List<AssetLocation>();
             var gbCaptain = entityFiles["test-gundabadorc-captain"];
             var earOther = entityFiles.Where(kv => GearSets(kv.Value) != null).SelectMany(kv => Helmets(kv.Value).Where(h => h != gbHelmet.ToString() && EntityBehaviorHelmetHidesHair.HidesBeard(new AssetLocation(h), EarPatterns(kv.Value))).Select(h => kv.Key + ":" + h)).ToList();
-            Check(EntityBehaviorHelmetHidesHair.HairShapePath(gbModel, "ears", "plumpears") == "lotrnpcs:entity/humanoid/ears/orc_earsplump"
+            Check(EntityBehaviorHelmetHidesHair.HairShapePath(gbModel, "ears", "plumpears") == "lrc:entity/humanoid/ears/orc_earsplump"
                 && EntityBehaviorHelmetHidesHair.HairShapePath(gbModel, "hairbase", "messy") == "game:entity/humanoid/seraphskinparts/hair-base/messy"
                 && EntityBehaviorHelmetHidesHair.PartsUnder(gbHelmet, Patterns(gbCaptain), EarPatterns(gbCaptain)).SequenceEqual(new[] { "hairbase", "hairextra", "ears" })
                 && EntityBehaviorHelmetHidesHair.PartsUnder(new AssetLocation("norc:armor-head-tierfiveplate-norchelmetheavier-norchelmetheavier-none"), Patterns(gbCaptain), EarPatterns(gbCaptain)).SequenceEqual(new[] { "hairbase", "hairextra" })

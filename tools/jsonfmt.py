@@ -4,8 +4,8 @@ be patched by hand; owner: "Break up wordy sections with blank space").
 - A list or object that fits on one line (at most WIDTH characters there) stays on one line; a longer list of plain
   values (names, item codes) puts as many on each line as fit.
 - Anything longer is split, one entry per line, indented by two spaces.
-- Inside a split object, a member whose value spans several lines gets a blank line before and after it, so long
-  blocks (an entity's client and server parts, a faction in the config) stand apart.
+- Inside a split object, a member whose value spans several lines gets a blank line after it, and before it too when
+  the object has four members or more, so long blocks (an entity's client and server parts, a faction) stand apart.
 
 Usage: from jsonfmt import dumps; dumps(data) returns the text, ending in a newline.
 """
@@ -46,7 +46,7 @@ def _format(value, indent, key_len):
     text = ""
     for i, part in enumerate(parts):
         if i:
-            big = "\n" in part or "\n" in parts[i - 1]
+            big = "\n" in parts[i - 1] or ("\n" in part and len(parts) >= 4)
             text += ",\n\n" if big else ",\n"
         text += pad + part
     return "{\n" + text + "\n" + " " * indent + "}"

@@ -1,4 +1,4 @@
-"""One-command build of the lotrnpcs test zip (0.0.112): DLL, generated assets, bundled LRC races, both offline test
+"""One-command build of the lotrnpcs test zip (0.0.112): DLL, generated assets, the orc models made from LRC, both offline test
 suites, then releases/lotrnpcs_<version>-test.zip. Runs on Windows and Linux (GitHub Actions).
 
     python tools/build.py              build, test, zip
@@ -41,47 +41,23 @@ def run(args, cwd=ROOT):
         sys.exit(f"failed ({result.returncode}): {args[0]}")
 
 
-SKINS = os.path.join("textures", "entity", "humanoid", "skinparts")
-
-
-def dedupe_skins(assets):
-    """0.0.134 (owner, 2026-11-14: "debloat the size of the modfile"): LRC ships the same skin picture under several
-    races (dwarfskin1 = elfskin4 = hobbitskin8 = humanskin4, ...). Each picture is kept once, under the first of its
-    paths in sorted order, and every JSON reference to the other paths points there instead (about 350 KB)."""
-    import hashlib
-    root = os.path.join(assets, SKINS)
-    byhash = {}
-    for folder, _, files in os.walk(root):
-        for name in files:
-            if name.endswith(".png"):
-                path = os.path.join(folder, name)
-                byhash.setdefault(hashlib.sha256(open(path, "rb").read()).hexdigest(), []).append(path)
-    code = lambda path: "lotrnpcs:" + os.path.relpath(path, os.path.join(assets, "textures"))[:-4].replace(os.sep, "/")
-    moved = {}
-    for paths in byhash.values():
-        keep, *drop = sorted(paths, key=code)
-        for path in drop:
-            moved[code(path) + '"'] = code(keep) + '"'
-            os.remove(path)
-    for folder, _, files in os.walk(assets):
-        for name in files:
-            if name.endswith(".json"):
-                path = os.path.join(folder, name)
-                text = open(path, encoding="utf-8-sig").read()
-                new = text
-                for old, keep in moved.items():
-                    new = new.replace('"' + old, '"' + keep)
-                if new != text:
-                    open(path, "w", encoding="utf-8").write(new)
-    # Every skin a JSON file names must still exist.
+def check_lrc_refs(assets):
+    """1.0.4: LOTR Races and Classes is a required mod, so its shapes and textures are named, not copied. Every lrc:
+    shape or texture our files name must be in LRC."""
     import re
+    lrc = os.path.join(LRC, "assets", "lrc")
+    count = 0
     for folder, _, files in os.walk(assets):
         for name in files:
             if name.endswith(".json"):
-                for ref in re.findall(r'"lotrnpcs:(entity/humanoid/skinparts/[^"]+)"', open(os.path.join(folder, name), encoding="utf-8-sig").read()):
-                    if not os.path.isfile(os.path.join(assets, "textures", ref + ".png")):
-                        sys.exit(f"missing skin {ref} in {name}")
-    print(f"skins: {len(moved)} duplicate pictures dropped")
+                for ref in set(re.findall(r'"lrc:([a-z0-9_/.-]+)"', open(os.path.join(folder, name), encoding="utf-8-sig").read())):
+                    path = ref.removeprefix("shapes/").removesuffix(".json")
+                    if "{code}" in ref or "/" not in ref:
+                        continue
+                    count += 1
+                    if not any(os.path.isfile(os.path.join(lrc, kind, path + ext)) for kind, ext in (("shapes", ".json"), ("textures", ".png"))):
+                        sys.exit(f"{name} names lrc:{ref}, which isn't in LRC")
+    print(f"lrc: {count} references checked")
 
 
 def packed(path):
@@ -107,9 +83,9 @@ def main():
     if not os.path.isdir(os.path.join(LRC, "assets", "lrc")):
         with zipfile.ZipFile(LRC_ZIP) as z:
             z.extractall(LRC)
-    # bundle_lrc writes our own body shapes (with the poleaxe and greatsword animations).
-    run([sys.executable, os.path.join(ROOT, "tools", "bundle_lrc.py"), os.path.join(LRC, "assets", "lrc"), os.path.join(GEN, "assets", "lotrnpcs")])
-    dedupe_skins(os.path.join(GEN, "assets", "lotrnpcs"))
+    # The orc models and the patch adding our weapon animations to LRC's bodies; checks tools/data/races.json.
+    run([sys.executable, os.path.join(ROOT, "tools", "lrc_models.py"), os.path.join(LRC, "assets", "lrc"), os.path.join(GEN, "assets", "lotrnpcs")])
+    check_lrc_refs(os.path.join(GEN, "assets", "lotrnpcs"))
     entities = os.path.join(GEN, "assets", "lotrnpcs", "entities")
 
     fac = os.path.join(ROOT, "tools", "tests", "factions")

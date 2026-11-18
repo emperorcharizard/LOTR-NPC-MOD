@@ -1,6 +1,7 @@
 """Generates the test NPC mod assets into the folder given as argv[1].
 
-Run bundle_lrc.py into the same folder for the race models these NPCs use.
+Run lrc_models.py into the same folder for the orc models and the patch with our animations on LOTR Races and
+Classes' bodies (a required mod since 1.0.4).
 """
 import copy
 import json
@@ -95,12 +96,12 @@ AI_TASKS = [
 
 # Vanilla body as the base shape: Player Model Lib swaps in the race model at render time.
 FA_BODY = "game:entity/humanoid/seraph-faceless"
-# 0.0.77: NPCs use our own copy of that body (bundled by bundle_lrc.py: the game's body plus our shape animations
-# poleaxechop and poleaxehold). The server builds an NPC's animations from its type's base shape, never from the Player
-# Model Lib race model, so with the game's body it refused both ("attempted to play an animation code which its shape
-# does not have", owner's 0.0.76 server-debug.log) and the poleaxe and battleaxe hung at the side, one-handed.
-# Same elements as the game's body; only the animation list differs.
-NPC_BODY = "lotrnpcs:entity/humanoid/seraph-faceless"
+# 0.0.77: NPCs use LOTR Races and Classes' body with our shape animations poleaxechop and poleaxehold added (a patch
+# written by lrc_models.py since 1.0.4; a copy of the body until then). The server builds an NPC's animations from its
+# type's base shape, never from the Player Model Lib race model, so with the game's body it refused both ("attempted
+# to play an animation code which its shape does not have", owner's 0.0.76 server-debug.log) and the poleaxe and
+# battleaxe hung at the side, one-handed.
+NPC_BODY = "lrc:entity/humanoid/seraph-faceless"
 FA_BASE_TEXTURE = "game:entity/humanoid/seraph-naked-hairless"
 
 
@@ -127,7 +128,7 @@ WEAPON_TEXTURES_OK = {"game:block/metal/ingot/iron", "game:block/metal/tarnished
 # dagger is faced correctly").
 # attack: the vanilla body animation swung with it, and impact the frame where the blow lands, so the animation speed
 # can put that frame at DAMAGE_AT_MS. The poleaxe's poleaxechop (0.0.68) is our own two-handed chop, added to the body by
-# bundle_lrc.py from tools/anims (it used vanilla's spear thrust until then). hold: an animation held between attacks (the poleaxe, about 2.3 blocks long in
+# lrc_models.py (bundle_lrc.py before 1.0.4) from tools/anims (it used vanilla's spear thrust until then). hold: an animation held between attacks (the poleaxe, about 2.3 blocks long in
 # hand, is held slanted across the body in both clasped hands with vanilla's holdbothhands; 0.0.45's
 # holdbothhandslarge spread the hands so the left one missed the shaft, user 2026-11-03 screenshot). Checked offline against vanilla's falx with the body's own skeleton.
 WEAPON_SCALE = 0.6
@@ -139,7 +140,7 @@ WEAPON_SCALE = 0.6
 # handle wrap (checked offline with the body, previews/weapons-0.0.65.png). Was: scimitar (2.0, 0.75), axe
 # (1.9, 0.75), hammer (1.1, 0.75), poleaxe (4.0, 0.75) on the 0.0.45 models.
 # 0.0.76 (user, 2026-11-04: "have the right arm higher on the poleaxe while holding it"): between swings the poleaxe is
-# held with poleaxehold (tools/anims, injected by bundle_lrc), the game's holdbothhands with the right arm re-solved so
+# held with poleaxehold (tools/anims, patched into LRC's bodies by lrc_models.py), the game's holdbothhands with the right arm re-solved so
 # the right hand sits 0.25 blocks further up the shaft, same shaft line and angle (solved offline, error 0.03 px). The
 # grip moves the same distance up the shaft (0.25 blocks / 0.6 scale = 6.67 px from 2.6), so the poleaxe itself stays
 # where it was and the left hand, unchanged, now holds it below the right. In the chop the poleaxe slides 0.25 blocks
@@ -1005,9 +1006,10 @@ def entity(code, name, extra_attributes, skin_client, skin_server, health=25, ar
     }
 
 
-# Player Model Lib draws a race model. Model codes are "domain:key"; ours are bundled by bundle_lrc.py.
-# Each entry: entity code, display name, model code, skin texture for the creative item icon, starting gear.
-SKINS = "lotrnpcs:entity/humanoid/skinparts/"
+# Player Model Lib draws a race model. Each entry: entity code, display name, race ("lotrnpcs:<race>", a key of
+# tools/data/races.json, which names the model and the looks the race may have), skin texture for the creative item
+# icon, starting gear.
+SKINS = "lrc:entity/humanoid/skinparts/"
 ORC_SKIN = SKINS + "orc/orcskin8"
 # Rank outfits are vanilla armor items, worn through the vanilla gear inventory. Looks only for now:
 # armor on NPCs doesn't reduce damage in vanilla, and it isn't dropped on death.
@@ -1448,7 +1450,7 @@ TEST_NPCS = [
     ("test-uruk-guard", "Isengard Uruk-hai guard", "lotrnpcs:uruk", SKINS + "orc/orcskin9", WARRIOR_GEAR),
     ("test-uruk-shock", "Isengard Uruk-hai shock trooper", "lotrnpcs:uruk", SKINS + "orc/orcskin9", WARRIOR_GEAR),
     # Gundabad (0.0.62, work in progress): the Mordor orc body at 0.9 size (user's choice), the bone armor, no helmets.
-    # 0.0.63: their own race model, lotrnpcs:gundabadorc (bundle_lrc.py), the Mordor orc with lighter skins.
+    # 0.0.63: the Mordor orc with lighter skins (their own model until 1.0.4; now lotrnpcs:mordororc with Gundabad's skins in tools/data/races.json).
     *[(f"test-gundabadorc-{rank}", f"Gundabad orc {BRANCH_NAMES.get(rank, rank)}", "lotrnpcs:gundabadorc", SKINS + "orc/orcskin1", GUNDABAD_FALLBACK[BASE_RANK.get(rank, rank)])
       for rank in ("recruit", "warrior", "captain", "archer", "guard", "shock")],
     ("test-hobbit", "Hobbit", "lotrnpcs:hobbit", SKINS + "hobbit/hobbitskin1", HOBBIT_GEAR),
@@ -1596,8 +1598,14 @@ PORTRAIT_FACE = {f: "angry" for f in EVIL} | {"shire": "kind"}
 # faceless (user, 2026-11-03). Dwarves get a full beard.
 PORTRAIT_PARTS = {"dwarf": {"beard": "brd-box20-full"}, "wickeddwarf": {"beard": "brd-box20-full"}}
 PORTRAITS = {}
+# 1.0.4: each race's Player Model Lib model and the looks it may have (lotrnpcsSkinParts, kept by
+# lotrnpcs:presetskinmodel; the looks menu offers only these).
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "races.json"), encoding="utf-8") as f:
+    RACES = json.load(f)
 
-for code, name, model, skin_texture, gear in TEST_NPCS:
+for code, name, race_code, skin_texture, gear in TEST_NPCS:
+    race = RACES[race_code.split(":", 1)[1]]
+    model = race["model"]
     preset = {"code": "lotrnpcs:presetskinmodel", "skinModel": model}
     skin = [preset, {"code": "PlayerModelLib:ExtraSkinnable"}]
     # The gear inventory goes after Player Model Lib, which swaps in the race model that the gear is added onto.
@@ -1616,7 +1624,7 @@ for code, name, model, skin_texture, gear in TEST_NPCS:
     # Gear textures go before Player Model Lib, whose texture lookup only knows the race model's own textures.
     gear_textures = [{"code": "lotrnpcs:geartextures"}] if gear else []
     health, armor_tier, melee = RANK_STATS.get(rank, RANKLESS_STATS)
-    attributes = {"lotrnpcsFaction": FACTION_OF[faction]}
+    attributes = {"lotrnpcsFaction": FACTION_OF[faction], "lotrnpcsSkinParts": race["parts"]}
     if code in HIDDEN:
         attributes["inCreativeInventory"] = False
     if rank in RANK_STATS:
@@ -1645,7 +1653,8 @@ for code, name, model, skin_texture, gear in TEST_NPCS:
         # 0.0.82: whether it may spawn bare-headed (HELMET_ALWAYS); read by Looks.RollHelmet.
         attributes["lotrnpcsHelmetOptional"] = helmet_optional(faction, base)
     PORTRAITS[code] = {"model": model, "skin": skin_texture,
-                       "parts": {"facialexpression": PORTRAIT_FACE.get(FACTION_OF[faction], "determined")} | PORTRAIT_PARTS.get(faction, {}),
+                       "parts": {p: v[0] for p, v in race["parts"].items() if p in ("haircolor", "brows", "eyecolor", "face")}
+                                | {"facialexpression": PORTRAIT_FACE.get(FACTION_OF[faction], "determined")} | PORTRAIT_PARTS.get(faction, {}),
                        "sets": sets + fallback_sets, "items": gear}
     weapons = [held_weapon(faction, rank)] if rank == "archer" or ((faction in WEAPONS_OF or faction in SHIELD_OF or faction in WEAPON_PREFS) and base in ("recruit", "warrior", "captain")) else []
     write(f"entities/{code}.json", entity(
@@ -2148,11 +2157,11 @@ with open(os.path.join(out, "modinfo.json"), "w") as f:
         "name": "LOTR NPCs",
         "version": "1.0.4",
         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
-                       "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Race models from "
-                       "LOTR Races and Classes by Dango Dango Dango, Shakgriig and Buggoi, used with their permission.",
+                       "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Needs LOTR Races "
+                       "and Classes (by Dango Dango Dango, Shakgriig and Buggoi) for the race models.",
         "authors": ["Emperorcharizar"],
         "contributors": ["Dango Dango Dango", "Shakgriig", "Buggoi"],
-        "dependencies": {"playermodellib": "1.23.8"},
+        "dependencies": {"playermodellib": "1.23.8", "lrc": "0.4.1"},
         "side": "Universal",
         "requiredOnClient": True,
         "requiredOnServer": True,

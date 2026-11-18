@@ -225,29 +225,80 @@ namespace LotrNpcs
             lock (partsCache)
             {
                 if (partsCache.TryGetValue(model, out Dictionary<string, string[]> cached)) return cached;
-                Dictionary<string, string[]> parts = Empty;
-                try
-                {
-                    AssetLocation code = new AssetLocation(model);
-                    IAsset asset = api.Assets.TryGet(new AssetLocation(code.Domain, "config/customplayermodels/" + code.Path + ".json"));
-                    if (asset != null) parts = ParseParts(asset.ToText(), code.Path);
-                }
-                catch (Exception e)
-                {
-                    api.Logger.Warning("[lotrnpcs] Can't read the skin parts of {0}: {1}", model, e.Message);
-                }
-                return partsCache[model] = parts;
+                return partsCache[model] = ParseParts(ModelConfigs.Find(api, model));
             }
+        }
+
+        /// <summary>
+        /// 1.0.4: what this NPC's owner may pick: its model's parts, limited to its type's own picks
+        /// (lotrnpcsSkinParts, such as dark hair for Gondor on LOTR Races and Classes' shared Men of the West model).
+        /// A part the type limits to one variant isn't offered.
+        /// </summary>
+        public static Dictionary<string, string[]> PartsFor(Entity npc)
+        {
+            Dictionary<string, string[]> all = PartsOf(npc.Api, Attrs.String(npc.WatchedAttributes, "skinModel"));
+            return Limit(all, SkinLimits(npc.Properties?.Attributes));
+        }
+
+        /// <summary>A type's part limits (attributes.lotrnpcsSkinParts): part code -> the variants it may have.</summary>
+        public static Dictionary<string, string[]> SkinLimits(JsonObject typeAttributes)
+        {
+            var limits = new Dictionary<string, string[]>();
+            JsonObject parts = typeAttributes?["lotrnpcsSkinParts"];
+            if (parts == null || !parts.Exists || !(parts.Token is JObject obj)) return limits;
+            foreach (JProperty p in obj.Properties())
+            {
+                string[] codes = (p.Value as JArray)?.Select(v => (string)v).Where(v => v != null).ToArray();
+                if (codes != null && codes.Length > 0) limits[p.Name] = codes;
+            }
+            return limits;
+        }
+
+        /// <summary>The parts with each limited one cut down to its allowed variants, in the model's order. Public for tests.</summary>
+        public static Dictionary<string, string[]> Limit(Dictionary<string, string[]> parts, Dictionary<string, string[]> limits)
+        {
+            if (limits.Count == 0) return parts;
+            var result = new Dictionary<string, string[]>();
+            foreach (KeyValuePair<string, string[]> part in parts)
+            {
+                string[] variants = limits.TryGetValue(part.Key, out string[] allowed) ? part.Value.Where(v => Array.IndexOf(allowed, v) >= 0).ToArray() : part.Value;
+                if (variants.Length > 1) result[part.Key] = variants;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Server, 1.0.4: keeps an NPC's looks inside its type's limits. Player Model Lib picks every part at random from
+        /// the whole race model when the NPC first spawns; a part outside the limits (or left over from an older model)
+        /// gets one of the allowed variants. Brows take the hair colour and the face the body's skin when they may, as
+        /// a person's would. True when something changed.
+        /// </summary>
+        public static bool KeepInLimits(Entity npc, Dictionary<string, string[]> limits, Random rand)
+        {
+            bool changed = false;
+            foreach (KeyValuePair<string, string[]> limit in limits)
+            {
+                string current = CurrentPart(npc, limit.Key);
+                string match = limit.Key == "brows" ? CurrentPart(npc, "haircolor") : limit.Key == "face" ? CurrentPart(npc, "baseskin") : null;
+                // Brows and face follow their partner only when they were picked here, so an owner's own pick in the
+                // looks menu stays.
+                if (current != null && Array.IndexOf(limit.Value, current) >= 0) continue;
+                string pick = match != null && Array.IndexOf(limit.Value, match) >= 0 ? match : limit.Value[rand.Next(limit.Value.Length)];
+                SetPart(npc, limit.Key, pick);
+                changed = true;
+            }
+            return changed;
         }
 
         static readonly Dictionary<string, string[]> Empty = new Dictionary<string, string[]>();
         static readonly Dictionary<string, Dictionary<string, string[]>> partsCache = new Dictionary<string, Dictionary<string, string[]>>();
 
         /// <summary>The face parts in one customplayermodels file (keyed by model name).</summary>
-        public static Dictionary<string, string[]> ParseParts(string json, string modelKey)
+        public static Dictionary<string, string[]> ParseParts(string json, string modelKey) => ParseParts(ModelConfigs.ModelIn(json, modelKey));
+
+        /// <summary>The face parts of one model definition.</summary>
+        public static Dictionary<string, string[]> ParseParts(JObject model)
         {
-            JObject root = JObject.Parse(json, new JsonLoadSettings { CommentHandling = CommentHandling.Ignore });
-            JToken model = root.Properties().FirstOrDefault(p => string.Equals(p.Name, modelKey, StringComparison.OrdinalIgnoreCase))?.Value;
             JArray list = (model?["SkinnableParts"] ?? model?["skinnableParts"]) as JArray;
             Dictionary<string, string[]> parts = new Dictionary<string, string[]>();
             if (list == null) return parts;
