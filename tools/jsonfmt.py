@@ -7,9 +7,11 @@ be patched by hand; owner: "Break up wordy sections with blank space").
 - Inside a split object, a member whose value spans several lines gets a blank line after it, and before it too when
   the object has four members or more, so long blocks (an entity's client and server parts, a faction) stand apart.
 
-Usage: from jsonfmt import dumps; dumps(data) returns the text, ending in a newline.
+Usage: from jsonfmt import dumps, loads; dumps(data) returns the text, ending in a newline; loads(text) reads a
+file that has // comments, as tools/data files may.
 """
 import json
+import re
 
 WIDTH = 100
 
@@ -37,7 +39,7 @@ def _format(value, indent, key_len):
         return "[\n" + ",\n".join(pad + l for l in lines) + "\n" + " " * indent + "]"
     if isinstance(value, list):
         items = [_format(v, inner, 0) for v in value]
-        sep = ",\n\n" if any("\n" in i for i in items) and all(isinstance(v, dict) for v in value) else ",\n"
+        sep = ",\n\n" if any("\n" in i for i in items) and all(isinstance(v, (dict, list)) for v in value) else ",\n"
         return "[\n" + sep.join(pad + i for i in items) + "\n" + " " * indent + "]"
     parts = []
     for k, v in value.items():
@@ -50,6 +52,13 @@ def _format(value, indent, key_len):
             text += ",\n\n" if big else ",\n"
         text += pad + part
     return "{\n" + text + "\n" + " " * indent + "}"
+
+
+def loads(text):
+    """Reads JSON as the game does, with // comments (on their own line or after a value) and trailing commas."""
+    text = re.sub(r'(?m)^\s*//.*$|(?<=[,{\[])\s*//.*$', "", text)
+    text = re.sub(r",(\s*[}\]])", r"\1", text)
+    return json.loads(text)
 
 
 def dumps(value):

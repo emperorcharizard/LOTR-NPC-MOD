@@ -1,0 +1,1028 @@
+{
+  // What each race's NPCs wear, by rank. Every list under a rank is one whole outfit; an NPC gets one of them at
+  // random when it spawns, from the outfits whose items all exist (so an outfit from a mod that isn't installed is
+  // skipped). If none is complete, it wears the plain vanilla rank outfit instead (see armorWithoutMods for the
+  // Haradrim's own). An item code may end in "@slot" (such as "@face" or "@neck") to wear it in that gear slot.
+  // Archers wear their recruits' outfits unless the race lists "archer". Riders wear their warriors'.
+  // Races are the NPC type codes (test-<race>-<rank>): elf = the Wood Elves. After editing, run python tools/build.py.
+  // The looks menu offers every helmet in a unit's outfits (and, for Men, Elves and Dwarves, the lower ranks' too).
+
+  "armor": {
+    // Gondor (Gondor mod): Man-at-Arms (any colour; Man-at-Arms or Levy helmet) for recruits, Infantry (with or
+    // without cloak) for warriors, Fountain Guard with cloak and Infantry leggings for captains, Rangers for archers.
+    "gondor": {
+      "recruit": [
+        [
+          "gond:armor-head-tierthreechain-gondorhelmetarms-gondorhelmetarms-none",
+          "gond:armor-body-tierthreechain-gondorarmorarms-gondorarmorarmsblue-none",
+          "gond:armor-legs-tierthreechain-gondorleggingsmedium-gondorleggingsmediumblue-none"
+        ],
+
+        [
+          "gond:armor-head-tierthreechain-gondorhelmetarms-gondorhelmetarms-chain",
+          "gond:armor-body-tierthreechain-gondorarmorarms-gondorarmorarmsblue-none",
+          "gond:armor-legs-tierthreechain-gondorleggingsmedium-gondorleggingsmediumblue-none"
+        ],
+
+        [
+          "gond:armor-head-tierfourplate-gondorlevyhelmet-gondorlevyhelmet-none",
+          "gond:armor-body-tierthreechain-gondorarmorarms-gondorarmorarmsblue-none",
+          "gond:armor-legs-tierthreechain-gondorleggingsmedium-gondorleggingsmediumblue-none"
+        ],
+
+        [
+          "gond:armor-head-tierthreechain-gondorhelmetarms-gondorhelmetarms-none",
+          "gond:armor-body-tierthreechain-gondorarmorarms-gondorarmorarmsblack-none",
+          "gond:armor-legs-tierthreechain-gondorleggingsmedium-gondorleggingsmediumblack-none"
+        ],
+
+        [
+          "gond:armor-head-tierthreechain-gondorhelmetarms-gondorhelmetarms-chain",
+          "gond:armor-body-tierthreechain-gondorarmorarms-gondorarmorarmsblack-none",
+          "gond:armor-legs-tierthreechain-gondorleggingsmedium-gondorleggingsmediumblack-none"
+        ],
+
+        [
+          "gond:armor-head-tierfourplate-gondorlevyhelmet-gondorlevyhelmet-none",
+          "gond:armor-body-tierthreechain-gondorarmorarms-gondorarmorarmsblack-none",
+          "gond:armor-legs-tierthreechain-gondorleggingsmedium-gondorleggingsmediumblack-none"
+        ],
+
+        [
+          "gond:armor-head-tierthreechain-gondorhelmetarms-gondorhelmetarms-none",
+          "gond:armor-body-tierthreechain-gondorarmorarms-gondorarmorarmsgreen-none",
+          "gond:armor-legs-tierthreechain-gondorleggingsmedium-gondorleggingsmediumgreen-none"
+        ],
+
+        [
+          "gond:armor-head-tierthreechain-gondorhelmetarms-gondorhelmetarms-chain",
+          "gond:armor-body-tierthreechain-gondorarmorarms-gondorarmorarmsgreen-none",
+          "gond:armor-legs-tierthreechain-gondorleggingsmedium-gondorleggingsmediumgreen-none"
+        ],
+
+        [
+          "gond:armor-head-tierfourplate-gondorlevyhelmet-gondorlevyhelmet-none",
+          "gond:armor-body-tierthreechain-gondorarmorarms-gondorarmorarmsgreen-none",
+          "gond:armor-legs-tierthreechain-gondorleggingsmedium-gondorleggingsmediumgreen-none"
+        ],
+
+        [
+          "gond:armor-head-tierthreechain-gondorhelmetarms-gondorhelmetarms-none",
+          "gond:armor-body-tierthreechain-gondorarmorarms-gondorarmorarmsyellow-none",
+          "gond:armor-legs-tierthreechain-gondorleggingsmedium-gondorleggingsmediumyellow-none"
+        ],
+
+        [
+          "gond:armor-head-tierthreechain-gondorhelmetarms-gondorhelmetarms-chain",
+          "gond:armor-body-tierthreechain-gondorarmorarms-gondorarmorarmsyellow-none",
+          "gond:armor-legs-tierthreechain-gondorleggingsmedium-gondorleggingsmediumyellow-none"
+        ],
+
+        [
+          "gond:armor-head-tierfourplate-gondorlevyhelmet-gondorlevyhelmet-none",
+          "gond:armor-body-tierthreechain-gondorarmorarms-gondorarmorarmsyellow-none",
+          "gond:armor-legs-tierthreechain-gondorleggingsmedium-gondorleggingsmediumyellow-none"
+        ],
+
+        [
+          "gond:armor-head-tierthreechain-gondorhelmetarms-gondorhelmetarms-none",
+          "gond:armor-body-tierthreechain-gondorarmorarmsblacktwo-gondorarmorarmsblacktwo-none",
+          "gond:armor-legs-tierthreechain-gondorleggingsmedium-gondorleggingsmediumblack-none"
+        ],
+
+        [
+          "gond:armor-head-tierthreechain-gondorhelmetarms-gondorhelmetarms-chain",
+          "gond:armor-body-tierthreechain-gondorarmorarmsblacktwo-gondorarmorarmsblacktwo-none",
+          "gond:armor-legs-tierthreechain-gondorleggingsmedium-gondorleggingsmediumblack-none"
+        ],
+
+        [
+          "gond:armor-head-tierfourplate-gondorlevyhelmet-gondorlevyhelmet-none",
+          "gond:armor-body-tierthreechain-gondorarmorarmsblacktwo-gondorarmorarmsblacktwo-none",
+          "gond:armor-legs-tierthreechain-gondorleggingsmedium-gondorleggingsmediumblack-none"
+        ]
+      ],
+
+      "warrior": [
+        [
+          "gond:armor-head-tierfourplate-gondorhelmetinfantry-gondorhelmetinfantry-none",
+          "gond:armor-body-tierfourplate-gondorarmorheavy-gondorarmorheavy-none",
+          "gond:armor-legs-tierfourplate-gondorleggingsheavy-gondorleggingsheavy-none"
+        ],
+
+        [
+          "gond:armor-head-tierfourplate-gondorhelmetinfantry-gondorhelmetinfantry-none",
+          "gond:armor-body-tierfourplate-gondorarmorheavy-gondorarmorheavy-cloaked",
+          "gond:armor-legs-tierfourplate-gondorleggingsheavy-gondorleggingsheavy-none"
+        ]
+      ],
+
+      "captain": [
+        [
+          "gond:armor-head-tierfiveplate-gondorhelmetinfantry-gondorhelmetfountain-none",
+          "gond:armor-body-tierfiveplate-gondorarmorfountain-gondorarmorfountain-cloaked",
+          "gond:armor-legs-tierfourplate-gondorleggingsheavy-gondorleggingsheavy-none"
+        ]
+      ],
+
+      "archer": [
+        [
+          "gond:armor-head-tiertwogambeson-gondorrangerhelmet-gondorrangerhelmet-gondorrangermask",
+          "gond:armor-body-tiertwogambeson-gondorrangerarmor-gondorrangerarmor-none",
+          "gond:armor-legs-tiertwogambeson-gondorrangerleggings-gondorrangerleggings-none"
+        ]
+      ]
+    },
+
+    // Rohan (Rohan mod): Man-at-Arms for recruits, Eorling for warriors (green or red), Huscarl for captains.
+    "rohan": {
+      "recruit": [
+        [
+          "roha:armor-head-tierthreechain-rohanhelmetmedium-rohanhelmetmedium-none",
+          "roha:armor-body-tierthreechain-rohanarmormedium-rohanarmormediumgreen-none",
+          "roha:armor-legs-tierthreechain-rohanleggingsmedium-rohanleggingsmediumgreen-none"
+        ],
+
+        [
+          "roha:armor-head-tierthreechain-rohanhelmetmedium-rohanhelmetmedium-none",
+          "roha:armor-body-tierthreechain-rohanarmormedium-rohanarmormediumred-none",
+          "roha:armor-legs-tierthreechain-rohanleggingsmedium-rohanleggingsmediumred-none"
+        ]
+      ],
+
+      "warrior": [
+        [
+          "roha:armor-head-tierfourscale-rohanhelmetheavy-rohanhelmetheavy-none",
+          "roha:armor-body-tierfourscale-rohanarmorheavy-rohanarmorheavygreen-none",
+          "roha:armor-legs-tierfourscale-rohanleggingsheavy-rohanleggingsheavygreen-none"
+        ],
+
+        [
+          "roha:armor-head-tierfourscale-rohanhelmetheavy-rohanhelmetheavy-none",
+          "roha:armor-body-tierfourscale-rohanarmorheavy-rohanarmorheavyred-none",
+          "roha:armor-legs-tierfourscale-rohanleggingsheavy-rohanleggingsheavyred-none"
+        ]
+      ],
+
+      "captain": [
+        [
+          "roha:armor-head-tierfivescale-rohanhelmetheavier-rohanhelmetheavier-none",
+          "roha:armor-body-tierfivescale-rohanarmorheavier-rohanarmorheavier-none",
+          "roha:armor-legs-tierfivescale-rohanleggingsheavier-rohanleggingsheavier-none"
+        ]
+      ]
+    },
+
+    // Dale (Dale and Dorwinion mod): Lake Guard, Dale Soldier, Dale Captain.
+    "dale": {
+      "recruit": [
+        [
+          "dale:armor-head-tierthreechain-dalehelmetmedium-dalehelmetmedium-none",
+          "dale:armor-body-tierthreechain-dalearmormedium-dalearmormedium-none",
+          "dale:armor-legs-tierthreechain-daleleggingsmedium-daleleggingsmedium-none"
+        ]
+      ],
+
+      "warrior": [
+        [
+          "dale:armor-head-tierfourscale-dalehelmetheavy-dalehelmetheavy-none",
+          "dale:armor-body-tierfourscale-dalearmorheavy-dalearmorheavy-none",
+          "dale:armor-legs-tierfourscale-daleleggingsheavy-daleleggingsheavy-none"
+        ]
+      ],
+
+      "captain": [
+        [
+          "dale:armor-head-tierfivescale-dalehelmetheavier-dalehelmetheavier-none",
+          "dale:armor-body-tierfivescale-dalearmorheavier-dalearmorheavier-none",
+          "dale:armor-legs-tierfivescale-daleleggingsheavier-daleleggingsheavier-none"
+        ]
+      ]
+    },
+
+    // Arnor (Arnor mod): Arnorian Infantry (the Levy), Soldier (may wear the Infantry helmet), Lord.
+    "arnor": {
+      "recruit": [
+        [
+          "arnor:armor-head-tierthreechain-arnorhelmetmedium-arnorhelmetmedium-none",
+          "arnor:armor-body-tierthreechain-arnorarmormedium-arnorarmormedium-none",
+          "arnor:armor-legs-tierthreechain-arnorleggingsmedium-arnorleggingsmedium-none"
+        ]
+      ],
+
+      "warrior": [
+        [
+          "arnor:armor-head-tierfourplate-arnorhelmetheavy-arnorhelmetheavy-none",
+          "arnor:armor-body-tierfourplate-arnorarmorheavy-arnorarmorheavy-none",
+          "arnor:armor-legs-tierfourplate-arnorleggingsheavy-arnorleggingsheavy-none"
+        ],
+
+        [
+          "arnor:armor-head-tierthreechain-arnorhelmetmedium-arnorhelmetmedium-none",
+          "arnor:armor-body-tierfourplate-arnorarmorheavy-arnorarmorheavy-none",
+          "arnor:armor-legs-tierfourplate-arnorleggingsheavy-arnorleggingsheavy-none"
+        ]
+      ],
+
+      "captain": [
+        [
+          "arnor:armor-head-tierfiveplate-arnorhelmetheavier-arnorhelmetheavier-none",
+          "arnor:armor-body-tierfiveplate-arnorarmorheavier-arnorarmorheavier-none",
+          "arnor:armor-legs-tierfiveplate-arnorleggingsheavier-arnorleggingsheavier-none"
+        ]
+      ]
+    },
+
+    // Dwarves (Dwarves mod): Militia (brown), Warrior, Lord.
+    "dwarf": {
+      "recruit": [
+        [
+          "dwarf:armor-head-tierthreechain-dwarfhelmetmedium-dwarfhelmetmedium-none",
+          "dwarf:armor-body-tierthreechain-dwarfarmormedium-dwarfarmormediumbrown-none",
+          "dwarf:armor-legs-tierthreechain-dwarfleggingsmedium-dwarfleggingsmedium-none"
+        ]
+      ],
+
+      "warrior": [
+        [
+          "dwarf:armor-head-tierfourplate-dwarfhelmetheavy-dwarfhelmetheavy-none",
+          "dwarf:armor-body-tierfourplate-dwarfarmorheavy-dwarfarmorheavy-none",
+          "dwarf:armor-legs-tierfourplate-dwarfleggingsheavy-dwarfleggingsheavy-none"
+        ]
+      ],
+
+      "captain": [
+        [
+          "dwarf:armor-head-tierfiveplate-dwarfhelmetheavier-dwarfhelmetheavier-none",
+          "dwarf:armor-body-tierfiveplate-dwarfarmorheavier-dwarfarmorheavier-none",
+          "dwarf:armor-legs-tierfiveplate-dwarfleggingsheavier-dwarfleggingsheavier-none"
+        ]
+      ]
+    },
+
+    // Wood elves (Woodland Realm mod): Woodland Sentinel, Wood-elf Warrior, Mirkwood Gate Warden.
+    "elf": {
+      "recruit": [
+        [
+          "wlel:armor-head-tierthreescale-woodlandhelmetmedium-woodlandhelmetmedium-none",
+          "wlel:armor-body-tierthreescale-woodlandarmormedium-woodlandarmormedium-none",
+          "wlel:armor-legs-tierthreescale-woodlandleggingsmedium-woodlandleggingsmedium-none"
+        ]
+      ],
+
+      "warrior": [
+        [
+          "wlel:armor-head-tierfourscale-woodlandhelmetheavy-woodlandhelmetheavy-none",
+          "wlel:armor-body-tierfourscale-woodlandarmorheavy-woodlandarmorheavy-none",
+          "wlel:armor-legs-tierfourscale-woodlandleggingsheavy-woodlandleggingsheavy-none"
+        ]
+      ],
+
+      "captain": [
+        [
+          "wlel:armor-head-tierfivescale-woodlandhelmetheavier-woodlandhelmetheavier-none",
+          "wlel:armor-body-tierfivescale-woodlandarmorheavier-woodlandarmorheavier-none",
+          "wlel:armor-legs-tierfivescale-woodlandleggingsheavier-woodlandleggingsheavier-none"
+        ]
+      ]
+    },
+
+    // Hobbits: plain vanilla clothes like the game's traders, no helmets (a hat now and then, see "hats").
+    "hobbit": {
+      "recruit": [
+        [
+          "game:clothes-upperbody-peasent-shirt", "game:clothes-lowerbody-braiesbrown",
+          "game:clothes-waist-peasant-strap"
+        ],
+
+        [
+          "game:clothes-upperbody-homespun-shirt", "game:clothes-lowerbody-homespun-pants",
+          "game:clothes-upperbodyover-quilteddoublet"
+        ],
+
+        [
+          "game:clothes-upperbody-commoner-shirt", "game:clothes-lowerbody-commoner-trousers",
+          "game:clothes-waist-sturdy-leather-belt"
+        ],
+
+        [
+          "game:clothes-upperbody-pastoral-shirt", "game:clothes-lowerbody-pastoral-pants",
+          "game:clothes-shoulder-apronbrown"
+        ],
+
+        [
+          "game:clothes-upperbody-merchant-shirt", "game:clothes-lowerbody-merchant-pants",
+          "game:clothes-waist-merchant-belt"
+        ],
+
+        [
+          "game:clothes-upperbody-farmhand", "game:clothes-lowerbody-farmhand",
+          "game:clothes-waist-farmhand"
+        ],
+
+        [
+          "game:clothes-upperbody-ruralfarmer", "game:clothes-lowerbody-braiesplain",
+          "game:clothes-waist-ruralfarmer"
+        ],
+
+        [
+          "game:clothes-upperbody-linen-tunic", "game:clothes-lowerbody-workmans-gown",
+          "game:clothes-shoulder-woolen-scarf"
+        ],
+
+        [
+          "game:clothes-upperbody-woolen-shirt", "game:clothes-lowerbody-shepherd-pants",
+          "game:clothes-upperbodyover-commoner-coat"
+        ],
+
+        [
+          "game:clothes-upperbody-tailor-blouse", "game:clothes-lowerbody-tailor-trousers",
+          "game:clothes-upperbodyover-tailor-jacket"
+        ],
+
+        [
+          "game:clothes-upperbody-messenger-shirt", "game:clothes-lowerbody-messenger-trousers",
+          "game:clothes-waist-messenger-belt"
+        ],
+
+        [
+          "game:clothes-upperbody-marketeer", "game:clothes-lowerbody-marketeer",
+          "game:clothes-waist-marketeer"
+        ]
+      ]
+    },
+
+    // Mordor orcs (Mordor mod): Orc Raider or Orc Warrior for recruits (Mordor or Angmar helmet), Orc Warrior
+    // (black or red) for warriors, red Orc Warrior with the red-masked Servant of the Eye helmet for captains.
+    "mordororc": {
+      "recruit": [
+        [
+          "mord:armor-head-tierthreechain-servanthelmetorcmedium-servanthelmetorcmedium-none",
+          "mord:armor-body-tierthreechain-servantarmororcmedium-servantarmororcmediumblack-none",
+          "mord:armor-legs-tierthreechain-servantleggingsorcmedium-servantleggingsorcmedium-none"
+        ],
+
+        [
+          "angmar:armor-head-tierthreescale-angmarhelmetmedium-angmarhelmetmedium-none",
+          "mord:armor-body-tierthreechain-servantarmororcmedium-servantarmororcmediumblack-none",
+          "mord:armor-legs-tierthreechain-servantleggingsorcmedium-servantleggingsorcmedium-none"
+        ],
+
+        [
+          "mord:armor-head-tierthreechain-servanthelmetorcmedium-servanthelmetorcmedium-none",
+          "mord:armor-body-tierthreechain-servantarmororcmedium-servantarmororcmediumbrown-none",
+          "mord:armor-legs-tierthreechain-servantleggingsorcmedium-servantleggingsorcmedium-none"
+        ],
+
+        [
+          "angmar:armor-head-tierthreescale-angmarhelmetmedium-angmarhelmetmedium-none",
+          "mord:armor-body-tierthreechain-servantarmororcmedium-servantarmororcmediumbrown-none",
+          "mord:armor-legs-tierthreechain-servantleggingsorcmedium-servantleggingsorcmedium-none"
+        ],
+
+        [
+          "mord:armor-head-tierfourplate-servanthelmetorcheavy-servanthelmetorcheavy-none",
+          "mord:armor-body-tierfourplate-servantarmororcheavy-servantarmororcheavyblack-none",
+          "mord:armor-legs-tierfourplate-servantleggingsorcheavy-servantleggingsorcheavyblack-none"
+        ],
+
+        [
+          "angmar:armor-head-tierthreescale-angmarhelmetmedium-angmarhelmetmedium-none",
+          "mord:armor-body-tierfourplate-servantarmororcheavy-servantarmororcheavyblack-none",
+          "mord:armor-legs-tierfourplate-servantleggingsorcheavy-servantleggingsorcheavyblack-none"
+        ],
+
+        [
+          "mord:armor-head-tierfourplate-servanthelmetorcheavy-servanthelmetorcheavy-none",
+          "mord:armor-body-tierfourplate-servantarmororcheavy-servantarmororcheavyred-none",
+          "mord:armor-legs-tierfourplate-servantleggingsorcheavy-servantleggingsorcheavyred-none"
+        ],
+
+        [
+          "angmar:armor-head-tierthreescale-angmarhelmetmedium-angmarhelmetmedium-none",
+          "mord:armor-body-tierfourplate-servantarmororcheavy-servantarmororcheavyred-none",
+          "mord:armor-legs-tierfourplate-servantleggingsorcheavy-servantleggingsorcheavyred-none"
+        ]
+      ],
+
+      "warrior": [
+        [
+          "mord:armor-head-tierfourplate-servanthelmetorcheavy-servanthelmetorcheavy-none",
+          "mord:armor-body-tierfourplate-servantarmororcheavy-servantarmororcheavyblack-none",
+          "mord:armor-legs-tierfourplate-servantleggingsorcheavy-servantleggingsorcheavyblack-none"
+        ],
+
+        [
+          "mord:armor-head-tierfourplate-servanthelmetorcheavy-servanthelmetorcheavy-none",
+          "mord:armor-body-tierfourplate-servantarmororcheavy-servantarmororcheavyred-none",
+          "mord:armor-legs-tierfourplate-servantleggingsorcheavy-servantleggingsorcheavyred-none"
+        ]
+      ],
+
+      "captain": [
+        [
+          "mord:armor-head-tierfourplate-servanthelmethumanheavy-servanthelmethumanheavy-maskred",
+          "mord:armor-body-tierfourplate-servantarmororcheavy-servantarmororcheavyred-none",
+          "mord:armor-legs-tierfourplate-servantleggingsorcheavy-servantleggingsorcheavyred-none"
+        ]
+      ]
+    },
+
+    // Angmar orcs (Angmar mod): Raider (Angmar, Mordor or Gundabad tusked helmet), Soldier (either helmet),
+    // Wight Guard (either helmet) for captains.
+    "angmarorc": {
+      "recruit": [
+        [
+          "angmar:armor-head-tierthreescale-angmarhelmetmedium-angmarhelmetmedium-none",
+          "angmar:armor-body-tierthreechain-angmararmormedium-angmararmormedium-none",
+          "angmar:armor-legs-tierthreechain-angmarleggingsmedium-angmarleggingsmedium-none"
+        ],
+
+        [
+          "mord:armor-head-tierthreechain-servanthelmetorcmedium-servanthelmetorcmedium-none",
+          "angmar:armor-body-tierthreechain-angmararmormedium-angmararmormedium-none",
+          "angmar:armor-legs-tierthreechain-angmarleggingsmedium-angmarleggingsmedium-none"
+        ],
+
+        [
+          "mord:armor-head-tierfourplate-servanthelmetorcheavy-servanthelmetorcheavy-none",
+          "angmar:armor-body-tierthreechain-angmararmormedium-angmararmormedium-none",
+          "angmar:armor-legs-tierthreechain-angmarleggingsmedium-angmarleggingsmedium-none"
+        ],
+
+        [
+          "norc:armor-head-tierfourplate-norchelmetheavytwo-norchelmetheavytwo-none",
+          "angmar:armor-body-tierthreechain-angmararmormedium-angmararmormedium-none",
+          "angmar:armor-legs-tierthreechain-angmarleggingsmedium-angmarleggingsmedium-none"
+        ]
+      ],
+
+      "warrior": [
+        [
+          "angmar:armor-head-tierfourplate-angmarhelmetheavy-angmarhelmetheavy-none",
+          "angmar:armor-body-tierfourplate-angmararmorheavy-angmararmorheavy-none",
+          "angmar:armor-legs-tierfourplate-angmarleggingsheavy-angmarleggingsheavy-none"
+        ],
+
+        [
+          "angmar:armor-head-tierfourplate-angmarhelmetheavy2-angmarhelmetheavy2-none",
+          "angmar:armor-body-tierfourplate-angmararmorheavy-angmararmorheavy-none",
+          "angmar:armor-legs-tierfourplate-angmarleggingsheavy-angmarleggingsheavy-none"
+        ]
+      ],
+
+      "captain": [
+        [
+          "angmar:armor-head-tierfiveplate-angmarhelmetheavier-angmarhelmetheavier-none",
+          "angmar:armor-body-tierfiveplate-angmararmorheavier-angmararmorheavier-none",
+          "angmar:armor-legs-tierfiveplate-angmarleggingsheavier-angmarleggingsheavier-none"
+        ],
+
+        [
+          "angmar:armor-head-tierfiveplate-angmarhelmetheavier2-angmarhelmetheavier2-none",
+          "angmar:armor-body-tierfiveplate-angmararmorheavier-angmararmorheavier-none",
+          "angmar:armor-legs-tierfiveplate-angmarleggingsheavier-angmarleggingsheavier-none"
+        ]
+      ]
+    },
+
+    // Misty Mountains orcs (Northern Orcs mod): Moria Orc for recruits, Gundabad Orc for warriors, Gundabad Warlord
+    // for captains, each with the helmets the owner listed.
+    "goblin": {
+      "recruit": [
+        [
+          "norc:armor-head-tierthreechain-norchelmetmedium-norchelmetmedium-none",
+          "norc:armor-body-tierthreechain-norcarmormedium-norcarmormedium-none",
+          "norc:armor-legs-tierthreechain-norcleggingsmedium-norcleggingsmedium-none"
+        ],
+
+        [
+          "norc:armor-head-tierfourplate-norchelmetheavy-norchelmetheavy-none",
+          "norc:armor-body-tierthreechain-norcarmormedium-norcarmormedium-none",
+          "norc:armor-legs-tierthreechain-norcleggingsmedium-norcleggingsmedium-none"
+        ],
+
+        [
+          "mord:armor-head-tierthreechain-servanthelmetorcmedium-servanthelmetorcmedium-none",
+          "norc:armor-body-tierthreechain-norcarmormedium-norcarmormedium-none",
+          "norc:armor-legs-tierthreechain-norcleggingsmedium-norcleggingsmedium-none"
+        ]
+      ],
+
+      "warrior": [
+        [
+          "norc:armor-head-tierfourplate-norchelmetheavy-norchelmetheavy-none",
+          "norc:armor-body-tierfourplate-norcarmorheavy-norcarmorheavy-none",
+          "norc:armor-legs-tierfourplate-norcleggingsheavy-norcleggingsheavy-none"
+        ],
+
+        [
+          "mord:armor-head-tierfourplate-servanthelmetorcheavy-servanthelmetorcheavy-none",
+          "norc:armor-body-tierfourplate-norcarmorheavy-norcarmorheavy-none",
+          "norc:armor-legs-tierfourplate-norcleggingsheavy-norcleggingsheavy-none"
+        ],
+
+        [
+          "norc:armor-head-tierthreechain-norchelmetmedium-norchelmetmedium-none",
+          "norc:armor-body-tierfourplate-norcarmorheavy-norcarmorheavy-none",
+          "norc:armor-legs-tierfourplate-norcleggingsheavy-norcleggingsheavy-none"
+        ]
+      ],
+
+      "captain": [
+        [
+          "norc:armor-head-tierfiveplate-norchelmetheavier-norchelmetheavier-none",
+          "norc:armor-body-tierfiveplate-norcarmorheavier-norcarmorheavier-none",
+          "norc:armor-legs-tierfiveplate-norcleggingsheavier-norcleggingsheavier-none"
+        ],
+
+        [
+          "norc:armor-head-tierfourplate-norchelmetheavy-norchelmetheavy-none",
+          "norc:armor-body-tierfiveplate-norcarmorheavier-norcarmorheavier-none",
+          "norc:armor-legs-tierfiveplate-norcleggingsheavier-norcleggingsheavier-none"
+        ]
+      ]
+    },
+
+    // Gundabad orcs: the owner's Gundabad Bone Armor for recruits, the Northern Orcs Gundabad set for warriors
+    // (also the tusked helmet), the Gundabad Warlord set with three helmets for captains.
+    "gundabadorc": {
+      "recruit": [
+        [
+          "gundabad:armor-body-tierthreebrig-gundabadbonearmor-gundabadbonearmor-none",
+          "gundabad:armor-legs-tierthreebrig-gundabadboneleggings-gundabadboneleggings-none"
+        ]
+      ],
+
+      "warrior": [
+        [
+          "norc:armor-head-tierfourplate-norchelmetheavy-norchelmetheavy-none",
+          "norc:armor-body-tierfourplate-norcarmorheavy-norcarmorheavy-none",
+          "norc:armor-legs-tierfourplate-norcleggingsheavy-norcleggingsheavy-none"
+        ],
+
+        [
+          "norc:armor-head-tierfourplate-norchelmetheavytwo-norchelmetheavytwo-none",
+          "norc:armor-body-tierfourplate-norcarmorheavy-norcarmorheavy-none",
+          "norc:armor-legs-tierfourplate-norcleggingsheavy-norcleggingsheavy-none"
+        ]
+      ],
+
+      "captain": [
+        [
+          "norc:armor-head-tierfiveplate-norchelmetheavier-norchelmetheavier-none",
+          "norc:armor-body-tierfiveplate-norcarmorheavier-norcarmorheavier-none",
+          "norc:armor-legs-tierfiveplate-norcleggingsheavier-norcleggingsheavier-none"
+        ],
+
+        [
+          "norc:armor-head-tierfourplate-norchelmetheavytwo-norchelmetheavytwo-none",
+          "norc:armor-body-tierfiveplate-norcarmorheavier-norcarmorheavier-none",
+          "norc:armor-legs-tierfiveplate-norcleggingsheavier-norcleggingsheavier-none"
+        ],
+
+        [
+          "gundabad:armor-head-tierfourplate-gundabadhelmetone-gundabadhelmetone-none",
+          "norc:armor-body-tierfiveplate-norcarmorheavier-norcarmorheavier-none",
+          "norc:armor-legs-tierfiveplate-norcleggingsheavier-norcleggingsheavier-none"
+        ]
+      ]
+    },
+
+    // Isengard Uruk-hai (Isengard mod): Scout for recruits, Infantry (any Uruk helmet but scout or general; clean or
+    // painted) for warriors, the same with the General helmet for captains.
+    "uruk": {
+      "recruit": [
+        [
+          "iseng:armor-head-tierthreechain-urukhaihelmetscout-urukhaihelmetscout-clean",
+          "iseng:armor-body-tierthreechain-urukhaiarmormedium-urukhaiarmormedium-clean",
+          "iseng:armor-legs-tierthreechain-urukhaileggingsmedium-urukhaileggingsmedium-clean"
+        ]
+      ],
+
+      "warrior": [
+        [
+          "iseng:armor-head-tierfourplate-urukhaihelmetinfantry-urukhaihelmetinfantry-clean",
+          "iseng:armor-body-tierfourplate-urukhaiarmorheavy-urukhaiarmorheavy-clean",
+          "iseng:armor-legs-tierfourplate-urukhaileggingsheavy-urukhaileggingsheavy-clean"
+        ],
+
+        [
+          "iseng:armor-head-tierfourplate-urukhaihelmetinfantry-urukhaihelmetinfantry-painted",
+          "iseng:armor-body-tierfourplate-urukhaiarmorheavy-urukhaiarmorheavy-painted",
+          "iseng:armor-legs-tierfourplate-urukhaileggingsheavy-urukhaileggingsheavy-clean"
+        ],
+
+        [
+          "iseng:armor-head-tierfourplate-urukhaihelmetberserker-urukhaihelmetberserker-clean",
+          "iseng:armor-body-tierfourplate-urukhaiarmorheavy-urukhaiarmorheavy-clean",
+          "iseng:armor-legs-tierfourplate-urukhaileggingsheavy-urukhaileggingsheavy-clean"
+        ],
+
+        [
+          "iseng:armor-head-tierfourplate-urukhaihelmetberserker-urukhaihelmetberserker-painted",
+          "iseng:armor-body-tierfourplate-urukhaiarmorheavy-urukhaiarmorheavy-painted",
+          "iseng:armor-legs-tierfourplate-urukhaileggingsheavy-urukhaileggingsheavy-clean"
+        ],
+
+        [
+          "iseng:armor-head-tierfourplate-urukhaihelmetarcher-urukhaihelmetarcher-clean",
+          "iseng:armor-body-tierfourplate-urukhaiarmorheavy-urukhaiarmorheavy-clean",
+          "iseng:armor-legs-tierfourplate-urukhaileggingsheavy-urukhaileggingsheavy-clean"
+        ],
+
+        [
+          "iseng:armor-head-tierfourplate-urukhaihelmetarcher-urukhaihelmetarcher-painted",
+          "iseng:armor-body-tierfourplate-urukhaiarmorheavy-urukhaiarmorheavy-painted",
+          "iseng:armor-legs-tierfourplate-urukhaileggingsheavy-urukhaileggingsheavy-clean"
+        ]
+      ],
+
+      "captain": [
+        [
+          "iseng:armor-head-tierfourplate-urukhaihelmetgeneral-urukhaihelmetgeneral-clean",
+          "iseng:armor-body-tierfourplate-urukhaiarmorheavy-urukhaiarmorheavy-clean",
+          "iseng:armor-legs-tierfourplate-urukhaileggingsheavy-urukhaileggingsheavy-clean"
+        ],
+
+        [
+          "iseng:armor-head-tierfourplate-urukhaihelmetgeneral-urukhaihelmetgeneral-painted",
+          "iseng:armor-body-tierfourplate-urukhaiarmorheavy-urukhaiarmorheavy-painted",
+          "iseng:armor-legs-tierfourplate-urukhaileggingsheavy-urukhaileggingsheavy-clean"
+        ]
+      ]
+    },
+
+    // Haradrim: the owner's Haradrim armor mod (infantry, heavy infantry, warlord). Without that mod they wear the
+    // outfits under "armorWithoutMods".
+    "haradrim": {
+      "recruit": [
+        [
+          "haradrimarmor:armor-head-tierthreechain-haradriminfantryhelmet-haradriminfantryhelmet-none",
+          "haradrimarmor:armor-body-tierthreechain-haradriminfantryarmor-haradriminfantryarmor-none",
+          "haradrimarmor:armor-legs-tierthreechain-haradriminfantryleggings-haradriminfantryleggings-none"
+        ]
+      ],
+
+      "warrior": [
+        [
+          "haradrimarmor:armor-head-tierfourplate-haradrimheavyhelmet-haradrimheavyhelmet-none",
+          "haradrimarmor:armor-body-tierfourplate-haradrimheavyarmor-haradrimheavyarmor-none",
+          "haradrimarmor:armor-legs-tierfourplate-haradrimheavyleggings-haradrimheavyleggings-none"
+        ]
+      ],
+
+      "captain": [
+        [
+          "haradrimarmor:armor-head-tierfiveplate-haradrimwarlordhelmet-haradrimwarlordhelmet-none",
+          "haradrimarmor:armor-body-tierfiveplate-haradrimwarlordarmor-haradrimwarlordarmor-none",
+          "haradrimarmor:armor-legs-tierfiveplate-haradrimwarlordleggings-haradrimwarlordleggings-none"
+        ]
+      ]
+    },
+
+    // Easterlings (vanilla armor): tin bronze brigandine, tin bronze plate, and for captains plate with the Woodland
+    // Sentinel helmet over an iron chain coif worn in the face slot ("@face").
+    "easterling": {
+      "recruit": [
+        [
+          "game:armor-head-brigandine-tinbronze", "game:armor-body-brigandine-tinbronze",
+          "game:armor-legs-brigandine-tinbronze"
+        ]
+      ],
+
+      "warrior": [
+        [
+          "game:armor-head-plate-tinbronze", "game:armor-body-plate-tinbronze",
+          "game:armor-legs-plate-tinbronze"
+        ]
+      ],
+
+      "captain": [
+        [
+          "wlel:armor-head-tierthreescale-woodlandhelmetmedium-woodlandhelmetmedium-none",
+          "game:armor-head-chain-iron@face", "game:armor-body-plate-tinbronze",
+          "game:armor-legs-plate-tinbronze"
+        ]
+      ]
+    },
+
+    // Dunlendings (Isengard mod): Raider, Warrior (may wear the Raider helmet), Warlord (the first helmet only: the
+    // second draws nothing).
+    "dunlending": {
+      "recruit": [
+        [
+          "iseng:armor-head-tierthreechain-dunlendinghelmetmedium-dunlendinghelmetmedium-clean",
+          "iseng:armor-body-tierthreechain-dunlendingarmormedium-dunlendingarmormedium-clean",
+          "iseng:armor-legs-tierthreechain-dunlendingleggingsmedium-dunlendingleggingsmedium-clean"
+        ]
+      ],
+
+      "warrior": [
+        [
+          "iseng:armor-head-tierfourchain-dunlendinghelmetheavy-dunlendinghelmetheavy-clean",
+          "iseng:armor-body-tierfourchain-dunlendingarmorheavy-dunlendingarmorheavy-clean",
+          "iseng:armor-legs-tierfourchain-dunlendingleggingsheavy-dunlendingleggingsheavy-clean"
+        ],
+
+        [
+          "iseng:armor-head-tierthreechain-dunlendinghelmetmedium-dunlendinghelmetmedium-clean",
+          "iseng:armor-body-tierfourchain-dunlendingarmorheavy-dunlendingarmorheavy-clean",
+          "iseng:armor-legs-tierfourchain-dunlendingleggingsheavy-dunlendingleggingsheavy-clean"
+        ]
+      ],
+
+      "captain": [
+        [
+          "iseng:armor-head-tierfiveplate-dunlendinghelmetheavier-dunlendinghelmetheavier-clean",
+          "iseng:armor-body-tierfiveplate-dunlendingarmorheavier-dunlendingarmorheavier-clean",
+          "iseng:armor-legs-tierfiveplate-dunlendingleggingsheavier-dunlendingleggingsheavier-clean"
+        ]
+      ]
+    },
+
+    // Black Numenoreans (Mordor mod's human armor): Black Numenorean (brown or black), black Servant of the Eye
+    // (bare or black mask), red Servant of the Eye with the red mask for captains.
+    "blacknumenorean": {
+      "recruit": [
+        [
+          "mord:armor-head-tierthreescale-servanthelmethumanmedium-servanthelmethumanmedium-none",
+          "mord:armor-body-tierthreescale-servantarmorhumanmedium-servantarmorhumanmediumbrown-none",
+          "mord:armor-legs-tierthreescale-servantleggingshumanmedium-servantleggingshumanmedium-none"
+        ],
+
+        [
+          "mord:armor-head-tierthreescale-servanthelmethumanmedium-servanthelmethumanmedium-none",
+          "mord:armor-body-tierthreescale-servantarmorhumanmedium-servantarmorhumanmediumblack-none",
+          "mord:armor-legs-tierthreescale-servantleggingshumanmedium-servantleggingshumanmedium-none"
+        ]
+      ],
+
+      "warrior": [
+        [
+          "mord:armor-head-tierfourplate-servanthelmethumanheavy-servanthelmethumanheavy-none",
+          "mord:armor-body-tierfourplate-servantarmorhumanheavy-servantarmorhumanheavyblack-none",
+          "mord:armor-legs-tierfourplate-servantleggingshumanheavy-servantleggingshumanheavy-none"
+        ],
+
+        [
+          "mord:armor-head-tierfourplate-servanthelmethumanheavy-servanthelmethumanheavy-maskblack",
+          "mord:armor-body-tierfourplate-servantarmorhumanheavy-servantarmorhumanheavyblack-none",
+          "mord:armor-legs-tierfourplate-servantleggingshumanheavy-servantleggingshumanheavy-none"
+        ]
+      ],
+
+      "captain": [
+        [
+          "mord:armor-head-tierfourplate-servanthelmethumanheavy-servanthelmethumanheavy-maskred",
+          "mord:armor-body-tierfourplate-servantarmorhumanheavy-servantarmorhumanheavyred-none",
+          "mord:armor-legs-tierfourplate-servantleggingshumanheavy-servantleggingshumanheavy-none"
+        ]
+      ]
+    },
+
+    // Wicked dwarves (Dwarves mod): Footman, Warrior, Lord.
+    "wickeddwarf": {
+      "recruit": [
+        [
+          "dwarf:armor-head-tierthreechain-evildwarfhelmetmedium-evildwarfhelmetmedium-none",
+          "dwarf:armor-body-tierthreechain-evildwarfarmormedium-evildwarfarmormedium-none",
+          "dwarf:armor-legs-tierthreechain-evildwarfleggingsmedium-evildwarfleggingsmedium-none"
+        ]
+      ],
+
+      "warrior": [
+        [
+          "dwarf:armor-head-tierfourplate-evildwarfhelmetheavy-evildwarfhelmetheavy-none",
+          "dwarf:armor-body-tierfourplate-evildwarfarmorheavy-evildwarfarmorheavy-none",
+          "dwarf:armor-legs-tierfourplate-evildwarfleggingsheavy-evildwarfleggingsheavy-none"
+        ]
+      ],
+
+      "captain": [
+        [
+          "dwarf:armor-head-tierfiveplate-evildwarfhelmetheavier-evildwarfhelmetheavier-none",
+          "dwarf:armor-body-tierfiveplate-evildwarfarmorheavier-evildwarfarmorheavier-none",
+          "dwarf:armor-legs-tierfiveplate-evildwarfleggingsheavier-evildwarfleggingsheavier-none"
+        ]
+      ]
+    },
+
+    // Tormented elves: retired in 1.0.4 (their NPCs are removed when they load); kept so those still load.
+    "tormentedelf": {
+      "recruit": [
+        [
+          "angmar:armor-body-tiertwogambeson-angmararmorranger-angmararmorranger-none",
+          "angmar:armor-legs-tiertwogambeson-angmarleggingsranger-angmarleggingsranger-none"
+        ]
+      ],
+
+      "warrior": [
+        [
+          "angmar:armor-body-tiertwogambeson-angmararmorranger-angmararmorranger-none",
+          "angmar:armor-legs-tiertwogambeson-angmarleggingsranger-angmarleggingsranger-none"
+        ]
+      ],
+
+      "captain": [
+        [
+          "angmar:armor-body-tiertwogambeson-angmararmorranger-angmararmorranger-none",
+          "angmar:armor-legs-tiertwogambeson-angmarleggingsranger-angmarleggingsranger-none",
+          "game:clothes-head-rottenking"
+        ]
+      ]
+    }
+  },
+
+  // Outfits worn only when none of the race's "armor" outfits is complete, every rank alike: the Haradrim's
+  // vanilla clothes (Nadiyan boots, pants and cape, a tailored gambeson, the noble robe, a belt, the fur wrap in the
+  // neck slot and the miner mask), used when the Haradrim armor mod isn't installed.
+  "armorWithoutMods": {
+    "haradrim": [
+      [
+        "game:clothes-nadiya-foot-guard", "game:clothes-nadiya-lowerbody-guard",
+        "game:clothes-nadiya-shoulder-hunter", "game:armor-body-tailored-red-linen",
+        "game:armor-legs-tailored-red-linen", "game:clothes-upperbodyover-forgotten",
+        "game:clothes-waist-sturdy-leather-belt", "game:clothes-shoulder-furwrap@neck",
+        "game:clothes-face-miner"
+      ],
+
+      [
+        "game:clothes-nadiya-foot-guard", "game:clothes-nadiya-lowerbody-guard",
+        "game:clothes-nadiya-shoulder-peasant1", "game:armor-body-tailored-red-linen",
+        "game:armor-legs-tailored-red-linen", "game:clothes-upperbodyover-forgotten",
+        "game:clothes-waist-sturdy-leather-belt", "game:clothes-shoulder-furwrap@neck",
+        "game:clothes-face-miner"
+      ],
+
+      [
+        "game:clothes-nadiya-foot-guard", "game:clothes-nadiya-lowerbody-guard",
+        "game:clothes-nadiya-shoulder-peasant2", "game:armor-body-tailored-red-linen",
+        "game:armor-legs-tailored-red-linen", "game:clothes-upperbodyover-forgotten",
+        "game:clothes-waist-sturdy-leather-belt", "game:clothes-shoulder-furwrap@neck",
+        "game:clothes-face-miner"
+      ],
+
+      [
+        "game:clothes-nadiya-foot-guard", "game:clothes-nadiya-lowerbody-guard",
+        "game:clothes-nadiya-shoulder-peasant3", "game:armor-body-tailored-red-linen",
+        "game:armor-legs-tailored-red-linen", "game:clothes-upperbodyover-forgotten",
+        "game:clothes-waist-sturdy-leather-belt", "game:clothes-shoulder-furwrap@neck",
+        "game:clothes-face-miner"
+      ],
+
+      [
+        "game:clothes-nadiya-foot-guard", "game:clothes-nadiya-lowerbody-guard",
+        "game:clothes-nadiya-shoulder-shepherd", "game:armor-body-tailored-red-linen",
+        "game:armor-legs-tailored-red-linen", "game:clothes-upperbodyover-forgotten",
+        "game:clothes-waist-sturdy-leather-belt", "game:clothes-shoulder-furwrap@neck",
+        "game:clothes-face-miner"
+      ],
+
+      [
+        "game:clothes-nadiya-foot-guard", "game:clothes-nadiya-lowerbody-hunter",
+        "game:clothes-nadiya-shoulder-hunter", "game:armor-body-tailored-red-linen",
+        "game:armor-legs-tailored-red-linen", "game:clothes-upperbodyover-forgotten",
+        "game:clothes-waist-sturdy-leather-belt", "game:clothes-shoulder-furwrap@neck",
+        "game:clothes-face-miner"
+      ],
+
+      [
+        "game:clothes-nadiya-foot-guard", "game:clothes-nadiya-lowerbody-hunter",
+        "game:clothes-nadiya-shoulder-peasant1", "game:armor-body-tailored-red-linen",
+        "game:armor-legs-tailored-red-linen", "game:clothes-upperbodyover-forgotten",
+        "game:clothes-waist-sturdy-leather-belt", "game:clothes-shoulder-furwrap@neck",
+        "game:clothes-face-miner"
+      ],
+
+      [
+        "game:clothes-nadiya-foot-guard", "game:clothes-nadiya-lowerbody-hunter",
+        "game:clothes-nadiya-shoulder-peasant2", "game:armor-body-tailored-red-linen",
+        "game:armor-legs-tailored-red-linen", "game:clothes-upperbodyover-forgotten",
+        "game:clothes-waist-sturdy-leather-belt", "game:clothes-shoulder-furwrap@neck",
+        "game:clothes-face-miner"
+      ],
+
+      [
+        "game:clothes-nadiya-foot-guard", "game:clothes-nadiya-lowerbody-hunter",
+        "game:clothes-nadiya-shoulder-peasant3", "game:armor-body-tailored-red-linen",
+        "game:armor-legs-tailored-red-linen", "game:clothes-upperbodyover-forgotten",
+        "game:clothes-waist-sturdy-leather-belt", "game:clothes-shoulder-furwrap@neck",
+        "game:clothes-face-miner"
+      ],
+
+      [
+        "game:clothes-nadiya-foot-guard", "game:clothes-nadiya-lowerbody-hunter",
+        "game:clothes-nadiya-shoulder-shepherd", "game:armor-body-tailored-red-linen",
+        "game:armor-legs-tailored-red-linen", "game:clothes-upperbodyover-forgotten",
+        "game:clothes-waist-sturdy-leather-belt", "game:clothes-shoulder-furwrap@neck",
+        "game:clothes-face-miner"
+      ],
+
+      [
+        "game:clothes-nadiya-foot-guard", "game:clothes-nadiya-lowerbody-guard",
+        "game:clothes-nadiya-shoulder-hunter", "game:armor-body-tailored-black-linen",
+        "game:armor-legs-tailored-black-linen", "game:clothes-upperbodyover-forgotten",
+        "game:clothes-waist-sturdy-leather-belt", "game:clothes-shoulder-furwrap@neck",
+        "game:clothes-face-miner"
+      ],
+
+      [
+        "game:clothes-nadiya-foot-guard", "game:clothes-nadiya-lowerbody-guard",
+        "game:clothes-nadiya-shoulder-peasant1", "game:armor-body-tailored-black-linen",
+        "game:armor-legs-tailored-black-linen", "game:clothes-upperbodyover-forgotten",
+        "game:clothes-waist-sturdy-leather-belt", "game:clothes-shoulder-furwrap@neck",
+        "game:clothes-face-miner"
+      ],
+
+      [
+        "game:clothes-nadiya-foot-guard", "game:clothes-nadiya-lowerbody-guard",
+        "game:clothes-nadiya-shoulder-peasant2", "game:armor-body-tailored-black-linen",
+        "game:armor-legs-tailored-black-linen", "game:clothes-upperbodyover-forgotten",
+        "game:clothes-waist-sturdy-leather-belt", "game:clothes-shoulder-furwrap@neck",
+        "game:clothes-face-miner"
+      ],
+
+      [
+        "game:clothes-nadiya-foot-guard", "game:clothes-nadiya-lowerbody-guard",
+        "game:clothes-nadiya-shoulder-peasant3", "game:armor-body-tailored-black-linen",
+        "game:armor-legs-tailored-black-linen", "game:clothes-upperbodyover-forgotten",
+        "game:clothes-waist-sturdy-leather-belt", "game:clothes-shoulder-furwrap@neck",
+        "game:clothes-face-miner"
+      ],
+
+      [
+        "game:clothes-nadiya-foot-guard", "game:clothes-nadiya-lowerbody-guard",
+        "game:clothes-nadiya-shoulder-shepherd", "game:armor-body-tailored-black-linen",
+        "game:armor-legs-tailored-black-linen", "game:clothes-upperbodyover-forgotten",
+        "game:clothes-waist-sturdy-leather-belt", "game:clothes-shoulder-furwrap@neck",
+        "game:clothes-face-miner"
+      ],
+
+      [
+        "game:clothes-nadiya-foot-guard", "game:clothes-nadiya-lowerbody-hunter",
+        "game:clothes-nadiya-shoulder-hunter", "game:armor-body-tailored-black-linen",
+        "game:armor-legs-tailored-black-linen", "game:clothes-upperbodyover-forgotten",
+        "game:clothes-waist-sturdy-leather-belt", "game:clothes-shoulder-furwrap@neck",
+        "game:clothes-face-miner"
+      ],
+
+      [
+        "game:clothes-nadiya-foot-guard", "game:clothes-nadiya-lowerbody-hunter",
+        "game:clothes-nadiya-shoulder-peasant1", "game:armor-body-tailored-black-linen",
+        "game:armor-legs-tailored-black-linen", "game:clothes-upperbodyover-forgotten",
+        "game:clothes-waist-sturdy-leather-belt", "game:clothes-shoulder-furwrap@neck",
+        "game:clothes-face-miner"
+      ],
+
+      [
+        "game:clothes-nadiya-foot-guard", "game:clothes-nadiya-lowerbody-hunter",
+        "game:clothes-nadiya-shoulder-peasant2", "game:armor-body-tailored-black-linen",
+        "game:armor-legs-tailored-black-linen", "game:clothes-upperbodyover-forgotten",
+        "game:clothes-waist-sturdy-leather-belt", "game:clothes-shoulder-furwrap@neck",
+        "game:clothes-face-miner"
+      ],
+
+      [
+        "game:clothes-nadiya-foot-guard", "game:clothes-nadiya-lowerbody-hunter",
+        "game:clothes-nadiya-shoulder-peasant3", "game:armor-body-tailored-black-linen",
+        "game:armor-legs-tailored-black-linen", "game:clothes-upperbodyover-forgotten",
+        "game:clothes-waist-sturdy-leather-belt", "game:clothes-shoulder-furwrap@neck",
+        "game:clothes-face-miner"
+      ],
+
+      [
+        "game:clothes-nadiya-foot-guard", "game:clothes-nadiya-lowerbody-hunter",
+        "game:clothes-nadiya-shoulder-shepherd", "game:armor-body-tailored-black-linen",
+        "game:armor-legs-tailored-black-linen", "game:clothes-upperbodyover-forgotten",
+        "game:clothes-waist-sturdy-leather-belt", "game:clothes-shoulder-furwrap@neck",
+        "game:clothes-face-miner"
+      ]
+    ]
+  },
+
+  // Units that always spawn with a helmet. Every other unit sometimes spawns bare-headed (HelmetChance in the
+  // server config); orcs always may. The looks menu can still take any helmet off.
+  "alwaysHelmeted": {
+    "gondor": ["archer", "captain", "recruit", "warrior"],
+    "rohan": ["archer", "recruit"],
+    "dunlending": ["captain"],
+    "elf": ["archer", "captain", "recruit", "warrior"],
+    "dwarf": ["captain"],
+    "wickeddwarf": ["captain"],
+    "dale": ["archer", "recruit", "warrior"],
+    "arnor": ["archer", "recruit"],
+    "blacknumenorean": ["archer", "captain", "recruit", "warrior"]
+  },
+
+  // A hat now and then, by race: the chance, and the hats to pick from.
+  "hats": {
+    "hobbit": {
+      "chance": 0.125,
+      "items": [
+        "game:clothes-head-straw-hat", "game:clothes-head-roll-hat", "game:clothes-head-broadbrim",
+        "game:clothes-head-thrumcap", "game:clothes-head-capotain", "game:clothes-head-merchant-hat"
+      ]
+    }
+  }
+}

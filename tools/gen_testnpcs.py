@@ -11,7 +11,7 @@ import shutil
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from jsonfmt import dumps  # noqa: E402  (readable, patchable JSON with blank lines between big sections)
+from jsonfmt import dumps, loads  # noqa: E402  (readable, patchable JSON with blank lines between big sections)
 
 out = sys.argv[1]
 A = os.path.join(out, "assets", "lotrnpcs")
@@ -1042,375 +1042,39 @@ CAPTAIN_GEAR = ["game:armor-head-antique-blackguard-damaged", "game:armor-body-a
 GUNDABAD_FALLBACK = {rank: [c for c in gear if "armor-head-" not in c]
                      for rank, gear in (("recruit", RECRUIT_GEAR), ("warrior", WARRIOR_GEAR), ("captain", CAPTAIN_GEAR),
                                         ("archer", RECRUIT_GEAR))}
-# Faction armor (user): each orc faction wears its own "To Rule Them All" armor mod. lotrnpcs:startinggear picks
-# one whole set at random and falls back to the vanilla outfit above when the armor mod isn't installed.
-def mord(part, tier, construct, material, last="none"):
-    return f"mord:armor-{part}-{tier}-{construct}-{material}-{last}"
-def angmar(part, tier, construct):
-    return f"angmar:armor-{part}-{tier}-{construct}-{construct}-none"
-MORD_RAIDER_HEAD = mord("head", "tierthreechain", "servanthelmetorcmedium", "servanthelmetorcmedium")
-MORD_RAIDER_LEGS = mord("legs", "tierthreechain", "servantleggingsorcmedium", "servantleggingsorcmedium")
-MORD_WARRIOR_HEAD = mord("head", "tierfourplate", "servanthelmetorcheavy", "servanthelmetorcheavy")
-# Captain helmet (user): Servant of the Eye Helmet (Red Mask), worn with the red Orc Warrior armor.
-MORD_CAPTAIN_HEAD = mord("head", "tierfourplate", "servanthelmethumanheavy", "servanthelmethumanheavy", "maskred")
-def mord_warrior(colour, head=MORD_WARRIOR_HEAD):
-    return [head, mord("body", "tierfourplate", "servantarmororcheavy", "servantarmororcheavy" + colour),
-            mord("legs", "tierfourplate", "servantleggingsorcheavy", "servantleggingsorcheavy" + colour)]
-def norc(part, tier, construct):
-    return f"norc:armor-{part}-{tier}-{construct}-{construct}-none"
-def uruk(part, tier, construct, finish):
-    return f"iseng:armor-{part}-{tier}-{construct}-{construct}-{finish}"
-GUNDABAD_BODY = norc("body", "tierfourplate", "norcarmorheavy")
-GUNDABAD_LEGS = norc("legs", "tierfourplate", "norcleggingsheavy")
-URUK_INFANTRY_LEGS = uruk("legs", "tierfourplate", "urukhaileggingsheavy", "clean")
-ANGMAR_SOLDIER_BODY = angmar("body", "tierfourplate", "angmararmorheavy")
-ANGMAR_SOLDIER_LEGS = angmar("legs", "tierfourplate", "angmarleggingsheavy")
-# 0.0.82 loadouts (owner's list, 2026-11-04, prompts/0.0.82-loadouts-combat.md): "All orcs and uruks can be unhelmed
-# unless otherwise noted. If there is a color variant, make sure the whole set is the same color." Each set below is
-# one whole outfit; a set per helmet a unit may wear.
-ANGMAR_RAIDER_HEAD = angmar("head", "tierthreescale", "angmarhelmetmedium")
-GUNDABAD_HEAD = norc("head", "tierfourplate", "norchelmetheavy")
-GUNDABAD_TUSKED_HEAD = norc("head", "tierfourplate", "norchelmetheavytwo")
-def mord_raider(colour, head=MORD_RAIDER_HEAD):
-    return [head, mord("body", "tierthreechain", "servantarmororcmedium", "servantarmororcmedium" + colour), MORD_RAIDER_LEGS]
-FACTION_SETS = {
-    # Mordor (user, 2026-11-02): Orc Raider (black or brown) for recruits, Orc Warrior for warriors, Orc Warrior red
-    # with the red-masked Servant of the Eye helmet for captains. 0.0.82 (owner's list): "Mordor Orc: Raider or warrior
-    # set. Helmet can also be angmar orc helmet." "Black Uruk: Mordor orc warrior set only." (black or red, legs to
-    # match). Captains unchanged.
-    "mordororc": {
-        "recruit": [mord_raider(c, head) for c in ("black", "brown") for head in (MORD_RAIDER_HEAD, ANGMAR_RAIDER_HEAD)]
-                   + [mord_warrior(c, head) for c in ("black", "red") for head in (MORD_WARRIOR_HEAD, ANGMAR_RAIDER_HEAD)],
-        "warrior": [mord_warrior("black"), mord_warrior("red")],
-        "captain": [mord_warrior("red", MORD_CAPTAIN_HEAD)],
-    },
-    # Angmar: Raider for recruits, Soldier for warriors, Wight Guard (either helmet) for captains (user). 0.0.82
-    # (owner's list): "Angmar Orc: Full set, can wear both mordor orc helmets, gundabad tusked helmet, or angmar orc
-    # helmet." "Angmar Soldier: Full set only, either helmet." Every rank stays an orc (owner: "Factions should not mix
-    # races").
-    "angmarorc": {
-        "recruit": [[head, angmar("body", "tierthreechain", "angmararmormedium"), angmar("legs", "tierthreechain", "angmarleggingsmedium")]
-                    for head in (ANGMAR_RAIDER_HEAD, MORD_RAIDER_HEAD, MORD_WARRIOR_HEAD, GUNDABAD_TUSKED_HEAD)],
-        "warrior": [[angmar("head", "tierfourplate", helmet), ANGMAR_SOLDIER_BODY, ANGMAR_SOLDIER_LEGS]
-                    for helmet in ("angmarhelmetheavy", "angmarhelmetheavy2")],
-        "captain": [[angmar("head", "tierfiveplate", helmet), angmar("body", "tierfiveplate", "angmararmorheavier"),
-                     angmar("legs", "tierfiveplate", "angmarleggingsheavier")]
-                    for helmet in ("angmarhelmetheavier", "angmarhelmetheavier2")],
-    },
-    # Misty Mountains (norc mod): Moria Orc for recruits, Gundabad Orc for warriors, Gundabad Warlord for captains (user).
-    # 0.0.82 (owner's list, "Northern Orcs", and "give the new option listed"): "Moria orc: Full moria set, can wear
-    # gundabad warrior helmet, orc snaga helmet" (snaga = the Mordor Orc Raider helmet, my guess: no item has that
-    # name); "Gundabad orc: Full gundabad plate, can wear either gundabad orc warrior helmet or black uruk helmet"
-    # (= Mordor's Orc Warrior helmet; this replaces 0.0.77's Moria helmet); "Gundabad warlord: Full gundabad warlod
-    # plate. Can also have Gundabad orc warrior helmet."
-    "goblin": {
-        "recruit": [[head, norc("body", "tierthreechain", "norcarmormedium"), norc("legs", "tierthreechain", "norcleggingsmedium")]
-                    for head in (norc("head", "tierthreechain", "norchelmetmedium"), GUNDABAD_HEAD, MORD_RAIDER_HEAD)],
-        # 0.0.115 (owner, 2026-11-12: "the misty mountains orc warriors should also get the moria orc helmet option").
-        "warrior": [[head, GUNDABAD_BODY, GUNDABAD_LEGS] for head in (GUNDABAD_HEAD, MORD_WARRIOR_HEAD, norc("head", "tierthreechain", "norchelmetmedium"))],
-        "captain": [[head, norc("body", "tierfiveplate", "norcarmorheavier"), norc("legs", "tierfiveplate", "norcleggingsheavier")]
-                    for head in (norc("head", "tierfiveplate", "norchelmetheavier"), GUNDABAD_HEAD)],
-    },
-    # Isengard (iseng mod): Uruk-hai Scout for recruits, Infantry (clean or painted) for warriors,
-    # painted Infantry with the General helmet for captains.
-    "uruk": {
-        "recruit": [[uruk("head", "tierthreechain", "urukhaihelmetscout", "clean"),
-                     uruk("body", "tierthreechain", "urukhaiarmormedium", "clean"),
-                     uruk("legs", "tierthreechain", "urukhaileggingsmedium", "clean")]],
-        # 0.0.82 (owner's list): "Uruk-hai Warrior: Uruk warrior only. Any Uruk helmet except for scout or general."
-        # (infantry, berserker, archer; clean or painted like the body; the legs exist only clean). "Uruk-hai Captain:
-        # Same as warrior but only General helmets."
-        "warrior": [[uruk("head", "tierfourplate", helmet, f), uruk("body", "tierfourplate", "urukhaiarmorheavy", f), URUK_INFANTRY_LEGS]
-                    for helmet in ("urukhaihelmetinfantry", "urukhaihelmetberserker", "urukhaihelmetarcher") for f in ("clean", "painted")],
-        "captain": [[uruk("head", "tierfourplate", "urukhaihelmetgeneral", f), uruk("body", "tierfourplate", "urukhaiarmorheavy", f), URUK_INFANTRY_LEGS]
-                    for f in ("clean", "painted")],
-    },
-}
-
-# Gundabad (0.0.62, work in progress; user, 2026-11-03: "I added a mod called gundabadarmor_0.1.0. call on it for a
-# gundabad faction for a work in progress"): the owner's Gundabad Bone Armor mod (mod id gundabad) has one set, a
-# chestplate with gauntlets and leggings with boots, and no helmet. Every rank wears it, bare-headed (user: "No
-# helmets"). Without the mod they wear the vanilla rank outfit, minus its helmets (GUNDABAD_FALLBACK).
-GUNDABAD_BONE = ["gundabad:armor-body-tierthreebrig-gundabadbonearmor-gundabadbonearmor-none",
-                 "gundabad:armor-legs-tierthreebrig-gundabadboneleggings-gundabadboneleggings-none"]
-FACTION_SETS["gundabadorc"] = {rank: [GUNDABAD_BONE] for rank in ("recruit", "warrior", "captain")}
-# 0.0.76 (user: "remove wip from gundabad. and give the warrior the gundabad helmet / armor from the angmar misty
-# mountains mod"): warriors wear the norc mod's Gundabad Orc set, as Misty Mountains warriors do. Recruits and
-# captains keep the bone armor.
-FACTION_SETS["gundabadorc"]["warrior"] = [[norc("head", "tierfourplate", "norchelmetheavy"), GUNDABAD_BODY, GUNDABAD_LEGS]]
-# 0.0.95 (owner, 2026-11-06: "make the gundabad tusked orc helmet an option for the gundabad orcs. and give the gundabad
-# captain the norc warlord options" ... "give the gundabad captain this helmet option" (Gundabad_Helmet_Variant_1);
-# "make the tusked helmet, warrior +. have the misty mountains captain keep the gundabad helmet, and the gundabad
-# captain, get this variant"): warriors also wear the tusked helmet; captains wear the Gundabad Warlord body and legs
-# with the warlord helmet, the tusked helmet or the owner's helmet (gundabad-bone-armor 0.3.0,
-# tools/gundabad_helmet_mod.py), or the bone armor as before. Recruits stay bare-headed in bone armor.
-GUNDABAD_HELMET_ONE = "gundabad:armor-head-tierfourplate-gundabadhelmetone-gundabadhelmetone-none"
-GUNDABAD_WARLORD = [norc("body", "tierfiveplate", "norcarmorheavier"), norc("legs", "tierfiveplate", "norcleggingsheavier")]
-FACTION_SETS["gundabadorc"]["warrior"] = [[head, GUNDABAD_BODY, GUNDABAD_LEGS] for head in (GUNDABAD_HEAD, GUNDABAD_TUSKED_HEAD)]
-FACTION_SETS["gundabadorc"]["captain"] = ([[head] + GUNDABAD_WARLORD for head in
-                                          (norc("head", "tierfiveplate", "norchelmetheavier"), GUNDABAD_TUSKED_HEAD, GUNDABAD_HELMET_ONE)])
-# 0.0.96 (owner, 2026-11-07: "the gundabad captain should not spawn in the bone armor like it does"): the bone armor
-# set is gone from captains. Captains already spawned keep what they wear (gear is handed out at spawn).
-
-# Shared orc helmets (0.0.55, user, 2026-11-03: "for all the orc factions except isengard, their helmets should be
-# interchangable, for the raider helmet, soldier helmets, and warrior helmets. the moria and gundabad orc helmets
-# should remain independent for their faction. as well as commander helmets remaining independent"). Mordor, Angmar
-# and Misty Mountains recruits and warriors also get each shared helmet with their own body and legs, as extra whole
-# sets after their own (portraits show the first). A set whose helmet mod isn't installed is skipped at spawn.
-ANGMAR_SOLDIER_HEAD = angmar("head", "tierfourplate", "angmarhelmetheavy")
-SHARED_ORC_HELMETS = {"recruit": [MORD_RAIDER_HEAD, ANGMAR_RAIDER_HEAD], "warrior": [MORD_WARRIOR_HEAD, ANGMAR_SOLDIER_HEAD]}
-SHARED_HELMET_FACTIONS = ("mordororc", "angmarorc", "goblin")
-
-
-def is_head(code):
-    return code.split(":", 1)[-1].startswith("armor-head-")
-
-
-def share_orc_helmets():
-    for faction in SHARED_HELMET_FACTIONS:
-        for rank, helmets in SHARED_ORC_HELMETS.items():
-            sets = FACTION_SETS[faction][rank]
-            extra = []
-            for own in list(sets):
-                rest = [c for c in own if not is_head(c)]
-                for helmet in helmets:
-                    candidate = [helmet] + rest
-                    if candidate not in sets and candidate not in extra:
-                        extra.append(candidate)
-            sets.extend(extra)
-
-
-# 0.0.82: the owner's loadout list names every helmet each orc unit may wear, so the shared helmets are no longer added
-# (share_orc_helmets is kept for reference, not called).
-
-# 0.0.35 (user, 2026-11-02): the other factions wear their own "To Rule Them All" sets where a mod has one, with
-# the medium set for recruits, the heavy set for warriors and the heaviest for captains. Haradrim, Easterlings and
-# Tormented Elves have no armor mod of their own, so 0.0.38 (user, 2026-11-03: "the most appropriate armor sets in
-# regard to similarity to their intention") borrowed the closest evil-aligned sets, mixed with vanilla pieces in
-# 0.0.39; since 0.0.41 they wear the outfits the user picked, at the end of FACTION_SETS.
-def trta(domain, part, tier, construct, material=None, last="none"):
-    return f"{domain}:armor-{part}-{tier}-{construct}-{material or construct}-{last}"
-def trta_set(domain, tier, head, body, legs, last="none"):
-    """A whole set whose items repeat their construct as the material."""
-    return [trta(domain, "head", tier, head, last=last), trta(domain, "body", tier, body, last=last),
-            trta(domain, "legs", tier, legs, last=last)]
-def gond(part, tier, construct, material=None, last="none"):
-    return trta("gond", part, tier, construct, material, last)
-GONDOR_INFANTRY_LEGS = gond("legs", "tierfourplate", "gondorleggingsheavy")
-def roha(part, tier, construct, material=None):
-    return trta("roha", part, tier, construct, material)
-def bnum(part, tier, construct, material=None, last="none"):
-    return trta("mord", part, tier, construct, material, last)
-def van(part, kind):
-    """A vanilla armor piece, such as van("body", "lamellar-copper")."""
-    return f"game:armor-{part}-{kind}"
-ANGMAR_RANGER = [trta("angmar", "body", "tiertwogambeson", "angmararmorranger"),
-                 trta("angmar", "legs", "tiertwogambeson", "angmarleggingsranger")]
-# Helmets that also hide beards and mustaches (0.0.81, owner: "beards cannot be worn with these helmets either", the
-# Haradrim helmets: veils and a mask over the face). Wildcards, read by lotrnpcs:helmethidehair.
-BEARD_HIDING_HELMETS = ["haradrimarmor:armor-head-*"]
-# 0.0.96 (owner, 2026-11-07: "with the new gundabad helmet, the ears stick out from the sides"): helmets that also hide
-# the ears skin part (orc ears), so they don't poke out of the helmet's sides. Only the owner's Gundabad Helmet.
-EAR_HIDING_HELMETS = [GUNDABAD_HELMET_ONE]
-
-# The haradrimarmor mod's items (tools/haradrim_armor_mod.py: armor-<part>-<tier>-haradrim<set><piece>-...-none).
-HARADRIM_ARMOR = {rank: [f"haradrimarmor:armor-{part}-{tier}-haradrim{rank}{piece}-haradrim{rank}{piece}-none"
-                         for part, piece in (("head", "helmet"), ("body", "armor"), ("legs", "leggings"))]
-                  for rank, tier in (("infantry", "tierthreechain"), ("heavy", "tierfourplate"), ("warlord", "tierfiveplate"))}
-NADIYAN_CAPES = ["hunter", "peasant1", "peasant2", "peasant3", "shepherd"]
-HARADRIM_OUTFITS = [["game:clothes-nadiya-foot-guard", f"game:clothes-nadiya-lowerbody-{pants}", f"game:clothes-nadiya-shoulder-{cape}",
-                     van("body", f"tailored-{colour}-linen"), van("legs", f"tailored-{colour}-linen"),
-                     "game:clothes-upperbodyover-forgotten", "game:clothes-waist-sturdy-leather-belt",
-                     "game:clothes-shoulder-furwrap@neck", "game:clothes-face-miner"]
-                    for colour in ("red", "black") for pants in ("guard", "hunter") for cape in NADIYAN_CAPES]
-FACTION_SETS.update({
-    # Gondor: Man-at-Arms (black, or the White Tree, with or without the coif) for recruits, Infantry (with or
-    # without the cloak) for warriors, Fountain Guard with Infantry leggings for captains (the mod has no Fountain
-    # Guard leggings).
-    # 0.0.82 (owner's list): "Gondorian Man-At-Arms: Either MAA set. MAA or Levy helmet." Every Man-at-Arms colour with
-    # its own legs (the White Tree breastplate has no legs of its own: black). "Gondorian Infantry: Full plate only."
-    # "Gondorian Fountain Guard: Fountain Guard with cloak only ... Legs should be infantry." Rangers: the archers.
-    "gondor": {
-        "recruit": [[helmet, gond("body", "tierthreechain", *body), gond("legs", "tierthreechain", "gondorleggingsmedium", "gondorleggingsmedium" + legs)]
-                    for body, legs in ((("gondorarmorarms", "gondorarmorarms" + c), c) for c in ("blue", "black", "green", "yellow"))
-                    for helmet in (gond("head", "tierthreechain", "gondorhelmetarms"), gond("head", "tierthreechain", "gondorhelmetarms", last="chain"),
-                                   gond("head", "tierfourplate", "gondorlevyhelmet"))]
-                   + [[helmet, gond("body", "tierthreechain", "gondorarmorarmsblacktwo"), gond("legs", "tierthreechain", "gondorleggingsmedium", "gondorleggingsmediumblack")]
-                      for helmet in (gond("head", "tierthreechain", "gondorhelmetarms"), gond("head", "tierthreechain", "gondorhelmetarms", last="chain"),
-                                     gond("head", "tierfourplate", "gondorlevyhelmet"))],
-        "warrior": [[gond("head", "tierfourplate", "gondorhelmetinfantry"),
-                     gond("body", "tierfourplate", "gondorarmorheavy", last=cloak), GONDOR_INFANTRY_LEGS]
-                    for cloak in ("none", "cloaked")],
-        "captain": [[gond("head", "tierfiveplate", "gondorhelmetinfantry", "gondorhelmetfountain"),
-                     gond("body", "tierfiveplate", "gondorarmorfountain", last="cloaked"), GONDOR_INFANTRY_LEGS]],
-    },
-    # Rohan: Man-at-Arms for recruits, Eorling for warriors (green or red, matching legs), Huscarl for captains.
-    # 0.0.82 (owner's list): "Rohirric Warrior: Warrior set only" (the Man-at-Arms set: the mod has none called warrior;
-    # my reading), "Eorling: Eorling set only", "Huscarl: Huscarl only". Unchanged.
-    "rohan": {
-        "recruit": [[roha("head", "tierthreechain", "rohanhelmetmedium"),
-                     roha("body", "tierthreechain", "rohanarmormedium", "rohanarmormedium" + c),
-                     roha("legs", "tierthreechain", "rohanleggingsmedium", "rohanleggingsmedium" + c)] for c in ("green", "red")],
-        "warrior": [[roha("head", "tierfourscale", "rohanhelmetheavy"),
-                     roha("body", "tierfourscale", "rohanarmorheavy", "rohanarmorheavy" + c),
-                     roha("legs", "tierfourscale", "rohanleggingsheavy", "rohanleggingsheavy" + c)] for c in ("green", "red")],
-        "captain": [trta_set("roha", "tierfivescale", "rohanhelmetheavier", "rohanarmorheavier", "rohanleggingsheavier")],
-    },
-    # Dale (Dale and Dorwinion mod): Lake Guard, Dale Soldier, Dale Captain.
-    "dale": {
-        "recruit": [trta_set("dale", "tierthreechain", "dalehelmetmedium", "dalearmormedium", "daleleggingsmedium")],
-        "warrior": [trta_set("dale", "tierfourscale", "dalehelmetheavy", "dalearmorheavy", "daleleggingsheavy")],
-        "captain": [trta_set("dale", "tierfivescale", "dalehelmetheavier", "dalearmorheavier", "daleleggingsheavier")],
-    },
-    # Arnor: Arnorian Infantry, Soldier, Lord. 0.0.82 (owner's list: "Levy: Full levy set, always helmed"; "Arnor
-    # warrior: Full set, can be unhelmed and wear levy helmet"; owner: "use the infantry helm"): the Levy is the
-    # Arnorian Infantry set, and warriors may wear its helmet.
-    "arnor": {
-        "recruit": [trta_set("arnor", "tierthreechain", "arnorhelmetmedium", "arnorarmormedium", "arnorleggingsmedium")],
-        "warrior": [trta_set("arnor", "tierfourplate", "arnorhelmetheavy", "arnorarmorheavy", "arnorleggingsheavy"),
-                    [trta("arnor", "head", "tierthreechain", "arnorhelmetmedium"), trta("arnor", "body", "tierfourplate", "arnorarmorheavy"),
-                     trta("arnor", "legs", "tierfourplate", "arnorleggingsheavy")]],
-        "captain": [trta_set("arnor", "tierfiveplate", "arnorhelmetheavier", "arnorarmorheavier", "arnorleggingsheavier")],
-    },
-    # Dunland (Isengard mod): Dunlending Raider, Warrior, Warlord (either helmet).
-    "dunlending": {
-        "recruit": [trta_set("iseng", "tierthreechain", "dunlendinghelmetmedium", "dunlendingarmormedium",
-                             "dunlendingleggingsmedium", "clean")],
-        # 0.0.82 (owner's list): "Dunlending Warrior: Warrior only for armor, can wear raider helmet and unhelmed."
-        "warrior": [trta_set("iseng", "tierfourchain", "dunlendinghelmetheavy", "dunlendingarmorheavy",
-                             "dunlendingleggingsheavy", "clean"),
-                    [trta("iseng", "head", "tierthreechain", "dunlendinghelmetmedium", last="clean"),
-                     trta("iseng", "body", "tierfourchain", "dunlendingarmorheavy", last="clean"),
-                     trta("iseng", "legs", "tierfourchain", "dunlendingleggingsheavy", last="clean")]],
-        # 0.0.159: only the first Warlord helmet; the Isengard mod's dunlendinghelmetheavier2 draws nothing (its shape's
-        # step-parent is empty), so captains rolling it looked bareheaded.
-        "captain": [trta_set("iseng", "tierfiveplate", "dunlendinghelmetheavier", "dunlendingarmorheavier", "dunlendingleggingsheavier", "clean")],
-    },
-    # Black Numenoreans (Mordor mod's human armor): Black Numenorean (brown or black) for recruits, black Servant of
-    # the Eye (bare or black mask) for warriors, Black Numenorean Lord (with or without the cloak) for captains.
-    # 0.0.82 (owner's list, read as this faction's units since factions don't mix races): "Black Numenorean: BN set
-    # only, not Lord." "Servant of the Eye: Servant only." Recruits the Black Numenorean set (brown or black), warriors
-    # the black Servant of the Eye (bare or black mask), captains the red one with the red mask (my split, so the ranks
-    # still look different). No Lord set.
-    "blacknumenorean": {
-        "recruit": [[bnum("head", "tierthreescale", "servanthelmethumanmedium"),
-                     bnum("body", "tierthreescale", "servantarmorhumanmedium", "servantarmorhumanmedium" + c),
-                     bnum("legs", "tierthreescale", "servantleggingshumanmedium")] for c in ("brown", "black")],
-        "warrior": [[bnum("head", "tierfourplate", "servanthelmethumanheavy", last=mask),
-                     bnum("body", "tierfourplate", "servantarmorhumanheavy", "servantarmorhumanheavyblack"),
-                     bnum("legs", "tierfourplate", "servantleggingshumanheavy")] for mask in ("none", "maskblack")],
-        "captain": [[bnum("head", "tierfourplate", "servanthelmethumanheavy", last="maskred"),
-                     bnum("body", "tierfourplate", "servantarmorhumanheavy", "servantarmorhumanheavyred"),
-                     bnum("legs", "tierfourplate", "servantleggingshumanheavy")]],
-    },
-    # Dwarves (Dwarves mod): Militia (brown), Warrior, Lord.
-    "dwarf": {
-        "recruit": [[trta("dwarf", "head", "tierthreechain", "dwarfhelmetmedium"),
-                     trta("dwarf", "body", "tierthreechain", "dwarfarmormedium", "dwarfarmormediumbrown"),
-                     trta("dwarf", "legs", "tierthreechain", "dwarfleggingsmedium")]],
-        "warrior": [trta_set("dwarf", "tierfourplate", "dwarfhelmetheavy", "dwarfarmorheavy", "dwarfleggingsheavy")],
-        "captain": [trta_set("dwarf", "tierfiveplate", "dwarfhelmetheavier", "dwarfarmorheavier", "dwarfleggingsheavier")],
-    },
-    # Wicked dwarves (Dwarves mod): Footman, Warrior, Lord.
-    "wickeddwarf": {
-        "recruit": [trta_set("dwarf", "tierthreechain", "evildwarfhelmetmedium", "evildwarfarmormedium", "evildwarfleggingsmedium")],
-        "warrior": [trta_set("dwarf", "tierfourplate", "evildwarfhelmetheavy", "evildwarfarmorheavy", "evildwarfleggingsheavy")],
-        "captain": [trta_set("dwarf", "tierfiveplate", "evildwarfhelmetheavier", "evildwarfarmorheavier", "evildwarfleggingsheavier")],
-    },
-    # Haradrim, Easterlings and tormented elves have no armor mod of their own. 0.0.41 (user, 2026-11-03) gives each the
-    # outfit the user picked, mostly vanilla clothing and armor. An item code may end in "@slot" (a gear slot such as
-    # face or neck) to wear it in that slot instead of its usual one, so an NPC can wear two pieces meant for the same
-    # slot; the gear renderer draws every slot.
-    # Haradrim, every rank alike (the user named no rank differences): Nadiyan guard boots, Nadiyan guard or hunter
-    # pants, any Nadiyan cape, a black or red tailored gambeson (body and legs), the Forgotten noble robe, a sturdy
-    # leather belt, the fur wrap (worn in the neck slot, since the cape takes the shoulder slot) and the miner mask.
-    # 0.0.78 (owner, 2026-11-04: "Use these as skins for the haradrim, mostly as a temporary placeholder"): the owner's
-    # three armor models as a separate armor mod, haradrimarmor (tools/haradrim_armor_mod.py, built to
-    # build-inputs/haradrim-armor-<version>.zip): infantry for recruits (and archers), heavy infantry for warriors,
-    # warlord for captains. Without that mod they wear the outfits above (FALLBACK_SETS), never a mix of the two.
-    "haradrim": {"recruit": [HARADRIM_ARMOR["infantry"]], "warrior": [HARADRIM_ARMOR["heavy"]],
-                 "captain": [HARADRIM_ARMOR["warlord"]]},
-    # Easterlings (user): tin bronze brigandine for recruits, tin bronze plate for warriors, and for captains tin bronze
-    # plate with the Woodland Sentinel helmet over an iron chain coif covering the face (worn in the face slot).
-    "easterling": {
-        "recruit": [[van(part, "brigandine-tinbronze") for part in ("head", "body", "legs")]],
-        "warrior": [[van(part, "plate-tinbronze") for part in ("head", "body", "legs")]],
-        "captain": [[trta("wlel", "head", "tierthreescale", "woodlandhelmetmedium"), van("head", "chain-iron") + "@face",
-                     van("body", "plate-tinbronze"), van("legs", "plate-tinbronze")]],
-    },
-    # Tormented elves (user): the Angmar Ranger tunic and leggings, bareheaded, and the captain in the Rotten king crown.
-    "tormentedelf": {
-        "recruit": [ANGMAR_RANGER],
-        "warrior": [ANGMAR_RANGER],
-        "captain": [ANGMAR_RANGER + ["game:clothes-head-rottenking"]],
-    },
-    # Elves (Woodland Realm mod, the only elf armor): Woodland Sentinel, Wood-elf Warrior, Mirkwood Gate Warden.
-    "elf": {
-        "recruit": [trta_set("wlel", "tierthreescale", "woodlandhelmetmedium", "woodlandarmormedium", "woodlandleggingsmedium")],
-        "warrior": [trta_set("wlel", "tierfourscale", "woodlandhelmetheavy", "woodlandarmorheavy", "woodlandleggingsheavy")],
-        "captain": [trta_set("wlel", "tierfivescale", "woodlandhelmetheavier", "woodlandarmorheavier", "woodlandleggingsheavier")],
-    },
-})
-
-
-# Hobbits (0.0.55, user, 2026-11-03: "give them the clothes similar to vanilla traders, minus any helmets. instead
-# maybe a hat on rare occasion"). Vanilla traders' outfits are drawn onto their model, not worn items, so these are
-# vanilla clothes in the same plain, homely trader style: a shirt, trousers or breeches, and a belt, waistcoat, apron
-# or scarf. All vanilla, so they work on both servers. Hobbits stay barefoot. One outfit per hobbit at random; a hat
-# one time in eight.
-def _c(*codes):
-    return ["game:clothes-" + c for c in codes]
-HOBBIT_SETS = [
-    _c("upperbody-peasent-shirt", "lowerbody-braiesbrown", "waist-peasant-strap"),
-    _c("upperbody-homespun-shirt", "lowerbody-homespun-pants", "upperbodyover-quilteddoublet"),
-    _c("upperbody-commoner-shirt", "lowerbody-commoner-trousers", "waist-sturdy-leather-belt"),
-    _c("upperbody-pastoral-shirt", "lowerbody-pastoral-pants", "shoulder-apronbrown"),
-    _c("upperbody-merchant-shirt", "lowerbody-merchant-pants", "waist-merchant-belt"),
-    _c("upperbody-farmhand", "lowerbody-farmhand", "waist-farmhand"),
-    _c("upperbody-ruralfarmer", "lowerbody-braiesplain", "waist-ruralfarmer"),
-    _c("upperbody-linen-tunic", "lowerbody-workmans-gown", "shoulder-woolen-scarf"),
-    _c("upperbody-woolen-shirt", "lowerbody-shepherd-pants", "upperbodyover-commoner-coat"),
-    _c("upperbody-tailor-blouse", "lowerbody-tailor-trousers", "upperbodyover-tailor-jacket"),
-    _c("upperbody-messenger-shirt", "lowerbody-messenger-trousers", "waist-messenger-belt"),
-    _c("upperbody-marketeer", "lowerbody-marketeer", "waist-marketeer"),
-]
-HOBBIT_GEAR = HOBBIT_SETS[0]
-HOBBIT_HATS = {"chance": 0.125, "items": _c("head-straw-hat", "head-roll-hat", "head-broadbrim", "head-thrumcap",
-                                              "head-capotain", "head-merchant-hat")}
-HATS = {"hobbit": HOBBIT_HATS}
-FACTION_SETS["hobbit"] = {"recruit": HOBBIT_SETS}
-# Archers wear their faction's recruit armor, with the same helmets: Mordor's light Orc Raider mail since 0.0.55, the
-# other factions' recruit sets since 0.0.69/0.0.70 (Gundabad's bone armor is the same for every rank).
+# What each race wears (1.0.4, outside review: armor "needs an easy way" to change and to add factions): the outfits by
+# race and rank, the Haradrim's outfits without their armor mod, who always wears a helmet and the hobbits' hats are
+# in tools/data/armor.json, with a note on each race's choices. lotrnpcs:startinggear picks one complete outfit at
+# random and falls back to the vanilla rank outfit above when an armor mod isn't installed. The owner's choices behind
+# them (0.0.35 to 0.0.159) are in that file's notes and this file's git history.
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "armor.json"), encoding="utf-8") as f:
+    ARMOR = loads(f.read())
+FACTION_SETS = ARMOR["armor"]
+# Archers wear their race's recruit outfits unless it lists its own (Gondor's Rangers).
 for _f in ARCHER_RACES:
-    FACTION_SETS[_f]["archer"] = [list(st) for st in FACTION_SETS[_f]["recruit"]]
-# 0.0.82 (owner's list): "Gondorian Ranger: Ranger set only, not chainmail variant."
-FACTION_SETS["gondor"]["archer"] = [[gond("head", "tiertwogambeson", "gondorrangerhelmet", last="gondorrangermask"),
-                                     gond("body", "tiertwogambeson", "gondorrangerarmor"), gond("legs", "tiertwogambeson", "gondorrangerleggings")]]
-
-# Spawning bare-headed (0.0.82, owner's list: "All orcs and uruks can be unhelmed unless otherwise noted", plus each
-# unit marked "can be unhelmed"; owner: "all units should still have the option to be unhelmeted", so every unit keeps
-# "No helmet" in the looks menu). A unit listed False always spawns with its helmet; True rolls HelmetChance. Factions
-# the list doesn't cover keep rolling as before.
+    FACTION_SETS[_f].setdefault("archer", [list(st) for st in FACTION_SETS[_f]["recruit"]])
+FALLBACK_SETS = {race: {rank: sets for rank in ("recruit", "warrior", "captain", "archer")}
+                 for race, sets in ARMOR["armorWithoutMods"].items()}
+HATS = ARMOR["hats"]
+HOBBIT_GEAR = FACTION_SETS["hobbit"]["recruit"][0]
+# Spawning bare-headed (0.0.82, owner's list: "All orcs and uruks can be unhelmed unless otherwise noted"; owner: "all
+# units should still have the option to be unhelmeted", so every unit keeps "No helmet" in the looks menu).
 ORC_RACES = {"mordororc", "angmarorc", "goblin", "uruk", "gundabadorc"}
-HELMET_ALWAYS = {
-    "gondor": {"recruit", "warrior", "captain", "archer"},
-    "rohan": {"recruit", "archer"},
-    "dunlending": {"captain"},
-    "elf": {"recruit", "warrior", "captain", "archer"},
-    "dwarf": {"captain"}, "wickeddwarf": {"captain"},
-    "dale": {"recruit", "warrior", "archer"},
-    "arnor": {"recruit", "archer"},
-    "blacknumenorean": {"recruit", "warrior", "captain", "archer"},
-}
+HELMET_ALWAYS = {race: set(ranks) for race, ranks in ARMOR["alwaysHelmeted"].items()}
+
+
 def helmet_optional(faction, rank):
     if faction in ORC_RACES:
         return True
     return rank not in HELMET_ALWAYS.get(faction, set())
 
 
-# Sets worn only when none of a type's FACTION_SETS is complete (0.0.78): the Haradrim's 0.0.41 outfits stand in when
-# the haradrimarmor mod isn't installed. Archers wear the recruit ones, as with FACTION_SETS.
-FALLBACK_SETS = {"haradrim": {rank: HARADRIM_OUTFITS for rank in ("recruit", "warrior", "captain", "archer")}}
+# Helmets that also hide beards and mustaches (0.0.81, owner: "beards cannot be worn with these helmets either", the
+# Haradrim helmets: veils and a mask over the face). Wildcards, read by lotrnpcs:helmethidehair.
+BEARD_HIDING_HELMETS = ["haradrimarmor:armor-head-*"]
+# 0.0.96 (owner, 2026-11-07: "with the new gundabad helmet, the ears stick out from the sides"): helmets that also hide
+# the ears skin part (orc ears), so they don't poke out of the helmet's sides. Only the owner's Gundabad Helmet.
+EAR_HIDING_HELMETS = ["gundabad:armor-head-tierfourplate-gundabadhelmetone-gundabadhelmetone-none"]
 
 
 def ranks(race, people, model, skin):
