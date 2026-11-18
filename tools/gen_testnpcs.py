@@ -9,6 +9,9 @@ import os
 import shutil
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from jsonfmt import dumps  # noqa: E402  (readable, patchable JSON with blank lines between big sections)
+
 out = sys.argv[1]
 A = os.path.join(out, "assets", "lotrnpcs")
 
@@ -17,8 +20,7 @@ def write(rel, data):
     path = os.path.join(A, rel)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w") as f:
-        json.dump(data, f, indent=2)
-        f.write("\n")
+        f.write(dumps(data))
 
 
 ANIMS = [
@@ -2140,7 +2142,7 @@ write("../game/lang/en.json", {
     "creaturegroup-tameddeer-caribou": "Caribou"})
 
 with open(os.path.join(out, "modinfo.json"), "w") as f:
-    json.dump({
+    f.write(dumps({
         "type": "code",
         "modid": "lotrnpcs",
         "name": "LOTR NPCs",
@@ -2154,5 +2156,4 @@ with open(os.path.join(out, "modinfo.json"), "w") as f:
         "side": "Universal",
         "requiredOnClient": True,
         "requiredOnServer": True,
-    }, f, indent=2)
-    f.write("\n")
+    }))

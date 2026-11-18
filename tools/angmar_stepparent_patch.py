@@ -12,6 +12,9 @@ import re
 import sys
 import zipfile
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from jsonfmt import dumps  # noqa: E402
+
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "patches", "angmar-stepparent.json")
 
 
@@ -42,7 +45,7 @@ def main():
     assert patches, "no empty step parent names found"
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
-        f.write("[\n" + ",\n".join(json.dumps(p, separators=(",", ":")) for p in patches) + "\n]\n")
+        f.write(dumps(patches))
     print(len(patches), "patches in", len({p["file"] for p in patches}), "shapes ->", OUT)
 
 

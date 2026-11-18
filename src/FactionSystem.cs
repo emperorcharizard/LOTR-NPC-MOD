@@ -182,7 +182,7 @@ namespace LotrNpcs
             }
             FactionConfig config = FactionConfig.FromFile(loaded, out bool store);
             SetConfig(config);
-            if (store || LinesChanged) sapi.StoreModConfig(config, ConfigFile);
+            if (store || LinesChanged) SpacedConfig.Store(sapi, config, ConfigFile);
             sapi.Logger.Notification("[lotrnpcs] Factions from " + ConfigFile + ": " + string.Join(", ", Config.Factions.Keys) + ".");
         }
 

@@ -181,6 +181,18 @@ public static class Program {
         Check(!fs.Config.Factions.ContainsKey("dunlendings") && fs.Config.Factions["mordor"].FriendlyRaces.SequenceEqual(new[] { "lrc:uruk" }), "edits in the file replace the defaults, nothing gets re-added");
         Check(!json.Contains("Bloc"), "the file has no sides any more");
 
+        // 1.0.4 (owner: "Break up wordy sections with blank space"): the stored file has a blank line around each
+        // faction and each big top-level block, and between the #Instructions lines.
+        {
+            string spaced = SpacedConfig.Spaced(Newtonsoft.Json.JsonConvert.SerializeObject(FactionConfig.FromFile(null, out _), Newtonsoft.Json.Formatting.Indented));
+            var sl = spaced.Replace("\r\n", "\n").Split('\n');
+            int Before(string start) => Array.FindIndex(sl, l => l.StartsWith(start));
+            File.WriteAllText(Path.Combine(Path.GetTempPath(), "lotrnpcs-factions-sample.json"), spaced);
+            Check(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(spaced).Factions.Count == 17 && sl[Before("    \"gondor\": {") - 1] != "" && sl[Before("    \"rohan\": {") - 1] == ""
+                && sl[Before("  \"Factions\": {") - 1] == "" && sl[Before("    \"--- Recruits ---") - 1] == "" && sl.Count(l => l == "") > 40 && !sl.Any(l => l.Length > 0 && l.Trim().Length == 0),
+                "the config file is spaced out: a blank line before each faction and each big block, never inside a short one, and it still reads back");
+        }
+
         // migrating older files
         var freshCfg = FactionConfig.FromFile(null, out bool storeFresh);
         Check(storeFresh && freshCfg.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 36 && json.Contains("\"Version\": 36") && json.Contains("\"NpcVsNpcDamageMultiplier\": 0.5") && !json.Contains("\"RosterPerCaptain\":") && json.Contains("\"MaxCaptains\": 1") && json.Contains("\"RecruitExtraFollowers\": 1") && !json.Contains("MaxHirelings") && json.Contains("\"ShieldChance\": 0.5") && json.Contains("\"HelmetChance\": 0.6") && json.Contains("\"CaptainsAlwaysHelmeted\": false") && json.Contains("\"MaxAttackersPerTarget\": 4") && json.Contains("\"CombatSpacing\": 1.5") && json.Contains("\"BattleLines\": true") && json.Contains("\"DuelDistanceMin\": 1.0") && json.Contains("\"DuelDistanceMax\": 1.6") && json.Contains("\"LineHoldRange\": 6.0") && json.Contains("\"MaxRecruits\": 16") && json.Contains("\"MaxFollowers\": 3") && json.Contains("\"GuardRadius\": 16") && json.Contains("\"HealthRegenSpeed\": 30.0") && json.Contains("\"Allies\": [\"rohan\", \"dale\", \"arnor\", \"dwarves\", \"shire\", \"woodelves\"]") && json.Contains("\"Allies\": []") && freshCfg.Relations.Count == 0, "a new file is written with version 36 (no MaxHirelings), each faction's Enemies and Allies on one line and no pair entries, the battle spacing, helmet and shield settings, the regen settings, the guard radius and the hire and follow caps");

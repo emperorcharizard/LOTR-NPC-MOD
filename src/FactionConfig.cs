@@ -52,7 +52,7 @@ namespace LotrNpcs
         public int? MaxFollowers, MaxRecruits;
         // false leaves this faction out of the join menu. Admins can still set anyone to it.
         public bool Joinable = true;
-        // Health and damage per hit by rank (recruit, warrior, captain, archer, guard, shock) for this faction's
+        // Health and damage per hit by rank (recruit, warrior, captain, archer) for this faction's
         // NPCs. A rank without an entry (or a rankless NPC) keeps its type's own. Null until FillDefaults: the tier's
         // table.
         public Dictionary<string, float> Health, Damage;
@@ -369,9 +369,9 @@ namespace LotrNpcs
             "Stance: \"aggressive\" attacks every non-member player on sight; \"defensive\" only fights players who hurt it or its allies.",
             "Members: a player belongs to the faction they pick in the join menu (opens on first join; /recruits join reopens it until they pick). The pick is permanent; admins change it with /recruits faction set or clear. Joinable: false hides the faction from the menu.",
             "HireCoin and HirePrices: the coin item (default game:gear-rusty, the rusty gear) and how many it costs to hire each rank (recruit, warrior, captain, archer). 0 = free.",
-            "PromotePrices: coins to promote a recruit to each rank. Default: the hire price less 3 coins, or less 4 for a captain (12 to warrior, guard, shock or archer; 36 to captain or rider).",
+            "PromotePrices: coins to promote a recruit to each rank. Default: the hire price less 3 coins, or less 4 for a captain (12 to warrior or archer; 36 to captain or rider).",
             "MaxFollowers and MaxRecruits: how many of this faction's recruits may follow a player at once (default 3) and how many they may own (default 16). Each recruit uses 1/MaxFollowers of the following and 1/MaxRecruits of the roster, so a player can mix factions as long as the shares add up to 1. The values at the top of the file are used by factions without their own.",
-            "Health and Damage (by rank): health and damage per hit for recruit, warrior, captain, archer, guard and shock. Every faction ships the same numbers: health 22/34/48/35, damage 3.15/3.95/7/3.05 (recruit/warrior/captain/archer). Riders use warrior numbers x1.25. Captains hit other NPCs x1.5 and take x0.5 from them.",
+            "Health and Damage (by rank): health and damage per hit for recruit, warrior, captain and archer. Every faction ships the same numbers: health 22/34/48/35, damage 3.15/3.95/7/3.05 (recruit/warrior/captain/archer). Riders use warrior numbers x1.25. Captains hit other NPCs x1.5 and take x0.5 from them.",
             "FriendlyRaces and FriendlyGroups: only used when RaceAndGroupMembership is true.",
             "--- Between factions ---",
             "Enemies and Allies (in each faction): the factions it fights and the ones it fights beside. A faction in neither line is neutral: they leave each other alone. To change a pair, move the name from one line to the other; one faction's line is enough, and the mod copies the change to the other faction on /recruits faction reload. Allies win: if either lists the other as an ally they are allies. To make allies enemies again, move the name back in both factions.",
@@ -654,8 +654,8 @@ namespace LotrNpcs
             return true;
         }
 
-        // Both leave out the guard and shock branches, which FillDefaults adds to every file before Migrate compares
-        // it with the tables and prices older versions shipped without them.
+        // Both leave out the retired guard and shock ranks, which files from 0.0.113 to 1.0.3 list, so those compare
+        // equal to the tables and prices older versions shipped.
         static bool SameTable(Dictionary<string, float> a, Dictionary<string, float> b) =>
             a != null && b != null && NoBranches(a).Count() == NoBranches(b).Count() && NoBranches(b).All(kv => a.TryGetValue(kv.Key, out float v) && Math.Abs(v - kv.Value) < 1e-4);
 
