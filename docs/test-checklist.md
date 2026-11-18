@@ -902,3 +902,16 @@ Owner 2026-11-17: "set all the relationships for the factions ... a faction name
 - [ ] 171.3 A Gondor player walks past wild Rohan NPCs unharmed, and the talk menu won't hire them.
 - [ ] 171.4 Move "mordor" from Dale's Enemies to Allies, `/recruits faction reload`: Dale and Mordor stop fighting, and Mordor's lines in the file now list "dale" under Allies.
 - [ ] 171.5 A wicked dwarf promoted to rider gets a giant boar (with Teapot's Giant Boar installed).
+
+## 172. Outside review fixes (1.0.4)
+
+Install LOTR Races and Classes 0.4.1 (now required) and `lotrnpcs_1.0.4-test.zip`; restart fully. Owner 2026-11-18 on an outside review: "3. Make it a dependency. 5. Remove both. Fix everything else mentioned"; "Be sure to do what they mentioned with the reformatted jsons"; "Break up wordy sections with blank space".
+
+- [ ] 172.1 The game starts with no lotrnpcs or Player Model Lib errors in the client and server logs (a duplicated "Eyes" attachment point warning for LRC's own ear and goblin face parts is expected: we no longer carry our fixed copies).
+- [ ] 172.2 Spawn one warrior of each faction: every one has its race's body, size and looks (Gondor dark hair, Rohan fair, dwarves bearded, goblins with goblin faces, Mordor orcs smaller with plump or arrow ears, Gundabad orcs lighter skinned). None is invisible or a plain seraph.
+- [ ] 172.3 A Mordor orc with the poleaxe and a dwarf with the battleaxe hold and swing them two-handed (our animations patched onto LRC's bodies).
+- [ ] 172.4 NPCs from before 1.0.4 in the world still look like themselves (or close; their hair or beard may be picked again), with no errors.
+- [ ] 172.5 A guard or shock trooper from before 1.0.4 loads as a plain warrior with its XP; a guard or shock recruit as a plain recruit. A tormented elf disappears and frees its roster place.
+- [ ] 172.6 The looks menu on a Gondor recruit offers only Gondor's hair colours; on a dwarf only dwarf beards. The talk menu has no "change your class" option and promotion offers warrior or archer, then captain or rider.
+- [ ] 172.7 `ModConfig/lotrnpcs-factions.json` is version 36, lists `woodelves` (with any values you had set for `elves`), has no `tormentedelves` or guard/shock values, and has a blank line between factions and between the `#Instructions` lines.
+- [ ] 172.8 The join menu shows "Wood elves" under Free Peoples and only the Dunlendings under Others; the creative tab has no guard, shock or tormented elf units.

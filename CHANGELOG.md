@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.4 (2026-11-18)
+Changes from an outside review of 1.0.3 (owner: "Make it a dependency", "Remove both", "Fix everything else mentioned").
+- LOTR Races and Classes is a required mod (`lrc` 0.4.1 in modinfo). Nothing of it is copied any more: most races use LRC's own model (Gondor, Rohan, Dale and Arnor all use `lrc:freepeople`), and what each faction may look like (hair, skin, eyes) is a list of limits in `tools/data/races.json`. Only the goblin, Mordor orc and Uruk-hai bodies are models of ours, made from LRC's with looks it doesn't have. Our weapon animations go onto LRC's bodies by a JSON patch. NPCs saved with an old model take their type's. Zip 2.35 MB to 1.44 MB.
+- Guard and shock classes removed (warriors' branches and recruits' classes, and the "change your class" talk option). Existing ones become plain warriors or recruits and keep their XP.
+- Tormented elves removed. Existing ones are removed when they load.
+- The elves are the Wood Elves (`woodelves`). Config version 36 renames `elves`, keeping its values, and drops `tormentedelves` and the guard and shock values.
+- All generated JSON is readable and patchable: short lists on one line, long ones split, blank lines between big sections. The server config is written the same way.
+- Armor by race and rank is in `tools/data/armor.json`, with a note per race; `tools/data/README.md` explains the data files and how to add a faction.
+
 ## 1.0.3 (2026-11-17)
 - Sides: each faction in `lotrnpcs-factions.json` has an `Enemies` line and an `Allies` line. Move a name from one to the other to change a pair; the mod copies it to the other faction. A faction in neither line is neutral. Config version 35.
 - Default sides: the Free Peoples (Gondor, Rohan, Dale, Arnor, dwarves, the Shire, elves) are allies, the Shadow (Mordor, Angmar, Misty Mountains, Gundabad, Isengard, Haradrim, Easterlings, Black Númenóreans, wicked dwarves) are allies, and the two are enemies. Dunlendings and tormented elves fight everyone. Old pair entries in `Relations` are dropped once, except alliances with `ShareFriends`.

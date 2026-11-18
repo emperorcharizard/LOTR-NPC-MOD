@@ -12,7 +12,7 @@ Right-click one of your faction's NPCs to talk, and choose **"I'd like to hire y
 
 | Rank | Price | What it is |
 | --- | --- | --- |
-| Recruit | 5 | Cheap fighter. Can be a plain, guard (tougher) or shock (harder-hitting) recruit. |
+| Recruit | 5 | Cheap fighter. |
 | Warrior | 15 | Solid line fighter. |
 | Archer | 15 | Shoots from range, every faction but the Shire. |
 | Captain | 40 | Strongest fighter. **One per player.** |
@@ -28,7 +28,6 @@ Right-click your own recruit:
 - **Follow me / Hold your position here / Guard this area**: guards patrol 16 blocks round their post and attack intruders, even while you're offline.
 - **Guard this area for our people**: members of your `/group` may borrow this guard ("Come with me").
 - **Let me change how you look**: name, helmet, weapon, shield.
-- **Let me change your class**: a recruit switches between plain, guard and shock recruit, for free.
 - **Promote...**: appears once it has enough XP (below).
 - **I don't need you any more**: dismiss (coins aren't refunded).
 
@@ -45,12 +44,12 @@ Tips: soldiers hit from behind take **x1.5 damage**, so flank. Followers in a fo
 
 Your recruits and warriors earn **1 XP** for each enemy NPC that dies within 10 seconds of their hit. Look at a recruit to see its `XP: (x/y)`. When it's full you get a message; talk to it and choose **Promote...** (costs rusty gears).
 
-- **Recruit, 15 XP:** warrior, guard, shock trooper or archer (12 gears each).
-- **Warrior, guard or shock, 40 XP:** **captain** or **rider** (36 each).
+- **Recruit, 15 XP:** warrior or archer (12 gears each).
+- **Warrior, 40 XP:** **captain** or **rider** (36 each).
 
 A promoted soldier keeps its name, looks and orders, and puts on the new rank's armor.
 
-**Riders** come on their own mount: horses for Men and most others, dire wolves for orcs and Uruk-hai, boars for dwarves, caribou for elves (the mount needs its mod on the server). Their charge hits do x2.5. Riders hunt archers and beat a couple of warriors, but lose to a captain.
+**Riders** come on their own mount: horses for Men and most others, dire wolves for orcs and Uruk-hai, boars for dwarves, caribou for Wood Elves (the mount needs its mod on the server). Their charge hits do x2.5. Riders hunt archers and beat a couple of warriors, but lose to a captain.
 
 ## 6. Keep track
 
