@@ -20,7 +20,7 @@ A = os.path.join(out, "assets", "lotrnpcs")
 def write(rel, data):
     path = os.path.join(A, rel)
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write(dumps(data))
 
 
@@ -1814,7 +1814,7 @@ write("../game/lang/en.json", {
     "deathmsg-tameddeer-caribou-*": "Player {0} was killed by a caribou.",
     "creaturegroup-tameddeer-caribou": "Caribou"})
 
-with open(os.path.join(out, "modinfo.json"), "w") as f:
+with open(os.path.join(out, "modinfo.json"), "w", encoding="utf-8") as f:
     f.write(dumps({
         "type": "code",
         "modid": "lotrnpcs",
