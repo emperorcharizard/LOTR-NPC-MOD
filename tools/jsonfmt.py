@@ -39,8 +39,13 @@ def _format(value, indent, key_len):
         return "[\n" + ",\n".join(pad + l for l in lines) + "\n" + " " * indent + "]"
     if isinstance(value, list):
         items = [_format(v, inner, 0) for v in value]
-        sep = ",\n\n" if any("\n" in i for i in items) and all(isinstance(v, (dict, list)) for v in value) else ",\n"
-        return "[\n" + sep.join(pad + i for i in items) + "\n" + " " * indent + "]"
+        # A blank line around each entry that spans several lines; one-line entries stay together.
+        text = ""
+        for i, item in enumerate(items):
+            if i:
+                text += ",\n\n" if "\n" in item or "\n" in items[i - 1] else ",\n"
+            text += pad + item
+        return "[\n" + text + "\n" + " " * indent + "]"
     parts = []
     for k, v in value.items():
         key = json.dumps(k, ensure_ascii=False) + ": "
