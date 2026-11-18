@@ -85,15 +85,9 @@ def dedupe_skins(assets):
 
 
 def packed(path):
-    """0.0.134: JSON goes into the zip without indentation (about half the unpacked size). Files the strict parser
-    can't read (// credit comments, trailing commas) go in as they are."""
-    data = open(path, "rb").read()
-    if not path.endswith(".json"):
-        return data
-    try:
-        return json.dumps(json.loads(data.decode("utf-8-sig")), separators=(",", ":"), ensure_ascii=False).encode("utf-8")
-    except ValueError:
-        return data
+    """JSON goes into the zip as generated (indented), so people reading or patching the mod's files can find their
+    way; zip compression makes the indentation nearly free."""
+    return open(path, "rb").read()
 
 
 def main():
