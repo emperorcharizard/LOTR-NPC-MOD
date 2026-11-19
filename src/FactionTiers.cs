@@ -142,21 +142,15 @@ namespace LotrNpcs
             ["goblin"] = H(3, 9, 25, 9), ["elf"] = H(6, 19, 50, 19), ["dwarf"] = H(6, 19, 50, 19),
         };
 
-        static readonly Dictionary<string, FactionTier> ByFaction = new Dictionary<string, FactionTier>
-        {
-            ["gondor"] = Men, ["rohan"] = Men, ["dale"] = Men, ["arnor"] = Men, ["haradrim"] = Men, ["easterlings"] = Men,
-            ["blacknumenoreans"] = Men, ["shire"] = Men,
-            ["isengard"] = Uruk,
-            ["dunlendings"] = Levy,
-            ["mordor"] = Orc, ["angmar"] = Orc, ["gundabad"] = Orc,
-            ["mistymountains"] = Goblin,
-            ["woodelves"] = Elf,
-            ["dwarves"] = Dwarf, ["wickeddwarves"] = Dwarf,
-        };
+        static readonly Dictionary<string, FactionTier> ByName = new[] { Men, Uruk, Levy, Orc, Goblin, Elf, Dwarf }.ToDictionary(t => t.Name);
 
-        /// <summary>The tier of a faction id (any case); the Men's for ids the mod doesn't ship.</summary>
+        /// <summary>Whether a tier of this name exists (men, uruk, levy, orc, goblin, elf, dwarf).</summary>
+        public static bool IsTier(string name) => name != null && ByName.ContainsKey(name);
+
+        /// <summary>The tier of a faction id (any case), as its mod's faction file names it (FactionRegistry); the
+        /// Men's for ids no mod defines.</summary>
         public static FactionTier Of(string faction) =>
-            faction != null && ByFaction.TryGetValue(faction.Trim().ToLowerInvariant(), out FactionTier tier) ? tier : Men;
+            FactionRegistry.Get(faction)?.Tier is string name && ByName.TryGetValue(name, out FactionTier tier) ? tier : Men;
 
         /// <summary>Rounds half up, as the tables do (22 x 0.66 = 14.52 -> 15, 12.5 -> 13).</summary>
         public static int Round(double value) => (int)Math.Floor(value + 0.5 + 1e-9);

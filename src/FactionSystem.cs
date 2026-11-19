@@ -94,6 +94,7 @@ namespace LotrNpcs
         public override void StartServerSide(ICoreServerAPI api)
         {
             sapi = api;
+            FactionRegistry.Load(api);
             Hiring = api.ModLoader.GetModSystem<HiringSystem>();
             LoadConfig();
             api.Event.SaveGameLoaded += LoadAssigned;

@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.5 (in progress)
+- Factions are data: `tools/data/factions.json` lists each faction's id, side, stance, tier and member races, and the mod reads it at start instead of fixed lists in the code (default factions and sides, hire tiers, spawn zone factions, join menu order). Another mod can add a faction file of its own. New config files list the factions in join menu order. No other behaviour change; generated NPC files are identical to 1.0.4.
+
 ## 1.0.4 (2026-11-18)
 Changes from an outside review of 1.0.3 (owner: "Make it a dependency", "Remove both", "Fix everything else mentioned").
 - LOTR Races and Classes is a required mod (`lrc` 0.4.1 in modinfo). Nothing of it is copied any more: most races use LRC's own model (Gondor, Rohan, Dale and Arnor all use `lrc:freepeople`), and what each faction may look like (hair, skin, eyes) is a list of limits in `tools/data/races.json`. Only the goblin, Mordor orc and Uruk-hai bodies are models of ours, made from LRC's with looks it doesn't have. Our weapon animations go onto LRC's bodies by a JSON patch. NPCs saved with an old model take their type's. Zip 2.35 MB to 1.44 MB.

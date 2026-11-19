@@ -1,0 +1,45 @@
+{
+  // The factions, in the order the join menu and the creative tab list them. python tools/build.py turns this into
+  // assets/lotrnpcs/config/lotrnpcs-factions/lotrnpcs.json, which the mod reads when the server starts. Another mod
+  // can add factions with its own assets/<its id>/config/lotrnpcs-factions/<any name>.json in the same format (a list
+  // of factions); they come after these.
+  //
+  // id:            the faction id: lotrnpcsFaction on its NPC types, /recruits zone, the server config's Factions.
+  // races:         the race part of its NPC type codes (test-<race>-<rank>). Only the build uses this.
+  // side:          "free" or "shadow": allied by default to the rest of that side, enemies of the other, and listed
+  //                under it in the join menu. "none": an enemy of everyone, listed under Others.
+  // stance:        "aggressive" attacks enemies on sight; "defensive" only fights back.
+  // tier:          the balance tier for its default prices and limits: men, uruk, levy, orc, goblin, elf or dwarf
+  //                (src/FactionTiers.cs).
+  // friendlyRaces: Player Model Lib races whose players count as members (with RaceAndGroupMembership on).
+  //
+  // A new faction also needs its NPC types: see tools/data/README.md.
+
+  "factions": [
+    {"id": "shire", "races": ["hobbit"], "side": "free", "stance": "defensive", "tier": "men",
+     "friendlyRaces": ["lrc:harfoot", "lrc:stoor", "lrc:fallohide"]},
+    {"id": "gondor", "races": ["gondor"], "side": "free", "stance": "aggressive", "tier": "men", "friendlyRaces": []},
+    {"id": "rohan", "races": ["rohan"], "side": "free", "stance": "aggressive", "tier": "men", "friendlyRaces": []},
+    {"id": "arnor", "races": ["arnor"], "side": "free", "stance": "aggressive", "tier": "men", "friendlyRaces": []},
+    {"id": "dale", "races": ["dale"], "side": "free", "stance": "aggressive", "tier": "men", "friendlyRaces": []},
+    {"id": "dwarves", "races": ["dwarf"], "side": "free", "stance": "aggressive", "tier": "dwarf",
+     "friendlyRaces": ["lrc:longbeard", "lrc:firebeardsandbroadbeams"]},
+    {"id": "woodelves", "races": ["elf"], "side": "free", "stance": "aggressive", "tier": "elf",
+     "friendlyRaces": ["lrc:sindar", "lrc:avari"]},
+    {"id": "mordor", "races": ["mordororc"], "side": "shadow", "stance": "aggressive", "tier": "orc", "friendlyRaces": []},
+    {"id": "angmar", "races": ["angmarorc"], "side": "shadow", "stance": "aggressive", "tier": "orc", "friendlyRaces": []},
+    {"id": "mistymountains", "races": ["goblin"], "side": "shadow", "stance": "aggressive", "tier": "goblin", "friendlyRaces": []},
+    {"id": "gundabad", "races": ["gundabadorc"], "side": "shadow", "stance": "aggressive", "tier": "orc", "friendlyRaces": []},
+    {"id": "isengard", "races": ["uruk"], "side": "shadow", "stance": "aggressive", "tier": "uruk", "friendlyRaces": []},
+    {"id": "haradrim", "races": ["haradrim"], "side": "shadow", "stance": "aggressive", "tier": "men",
+     "friendlyRaces": ["lrc:haradrim"]},
+    {"id": "easterlings", "races": ["easterling"], "side": "shadow", "stance": "aggressive", "tier": "men",
+     "friendlyRaces": ["lrc:easterling"]},
+    {"id": "dunlendings", "races": ["dunlending"], "side": "none", "stance": "aggressive", "tier": "levy",
+     "friendlyRaces": ["lrc:wildmen"]},
+    {"id": "blacknumenoreans", "races": ["blacknumenorean"], "side": "shadow", "stance": "aggressive", "tier": "men",
+     "friendlyRaces": ["lrc:bnumenorean"]},
+    {"id": "wickeddwarves", "races": ["wickeddwarf"], "side": "shadow", "stance": "aggressive", "tier": "dwarf",
+     "friendlyRaces": ["lrc:wickeddwarf"]}
+  ]
+}

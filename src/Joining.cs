@@ -58,24 +58,21 @@ namespace LotrNpcs
         // How long after joining the menu waits for a player whose character creation the game hasn't marked done
         // (servers without it, or another character mod); the client still waits for any creation dialog to close.
         public const double WaitForCharacterSeconds = 15;
-        // The order factions are listed in (as the creative tab: free peoples, then the shadow, then the rest).
-        public static readonly string[] Order = { "shire", "gondor", "rohan", "arnor", "dale", "dwarves", "woodelves", "mordor", "angmar",
-            "mistymountains", "gundabad", "isengard", "haradrim", "easterlings", "dunlendings", "blacknumenoreans", "wickeddwarves" };
-
         // The menu's sections, the lore blocs of the design doc: Free Peoples, Shadow (with Gundabad and the wicked
-        // dwarves) and Others (the Dunlendings and any faction an admin adds). Only the layout
-        // uses this: it allies nobody.
+        // dwarves) and Others (the Dunlendings and any faction on no side). Only the layout uses this: it allies
+        // nobody. A faction's section is its side in its mod's faction file (FactionRegistry).
         public static readonly string[] Blocs = { "free", "shadow", "other" };
-        static readonly Dictionary<string, string> BlocByFaction = new Dictionary<string, string>
-        {
-            ["shire"] = "free", ["gondor"] = "free", ["rohan"] = "free", ["arnor"] = "free", ["dale"] = "free", ["dwarves"] = "free", ["woodelves"] = "free",
-            ["mordor"] = "shadow", ["angmar"] = "shadow", ["mistymountains"] = "shadow", ["gundabad"] = "shadow", ["isengard"] = "shadow",
-            ["haradrim"] = "shadow", ["easterlings"] = "shadow", ["blacknumenoreans"] = "shadow", ["wickeddwarves"] = "shadow",
-        };
 
         /// <summary>The menu section of a faction id: free, shadow or other.</summary>
-        public static string BlocOf(string faction) =>
-            faction != null && BlocByFaction.TryGetValue(faction.Trim().ToLowerInvariant(), out string bloc) ? bloc : "other";
+        public static string BlocOf(string faction) => FactionRegistry.SideOf(faction) is string side && side != "none" ? side : "other";
+
+        /// <summary>A faction's place in the menu: the order the mods define the factions in.</summary>
+        static int OrderOf(string faction)
+        {
+            IReadOnlyList<FactionInfo> all = FactionRegistry.All;
+            for (int i = 0; i < all.Count; i++) if (all[i].Id == faction) return i;
+            return all.Count;
+        }
 
         // Which unit's portrait stands for a faction: a warrior if it has one, else a recruit, a captain, an archer,
         // then any of its types (rankless ones such as the hobbit).
@@ -146,7 +143,7 @@ namespace LotrNpcs
         {
             if (config?.Factions == null) return new List<JoinOption>();
             return config.Factions.Where(kv => kv.Value != null && kv.Value.Joinable)
-                .OrderBy(kv => Array.IndexOf(Order, kv.Key) is int i && i >= 0 ? i : Order.Length).ThenBy(kv => kv.Key)
+                .OrderBy(kv => OrderOf(kv.Key)).ThenBy(kv => kv.Key)
                 .Select(kv => new JoinOption { Faction = kv.Key, Stance = kv.Value.Stance, Followers = config.FollowersOf(kv.Key), Roster = config.RosterOf(kv.Key), Bloc = BlocOf(kv.Key) })
                 .ToList();
         }

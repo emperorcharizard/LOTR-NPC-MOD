@@ -21,6 +21,8 @@ public static class Program {
     const int Mid = 512000, Ground = 100;
 
     public static int Main(string[] argv) {
+        // 1.0.5: the factions come from the built faction file (FactionRegistry), next to the entities folder.
+        FactionRegistry.LoadFiles(new[] { Path.Combine(argv[0], "..", "config", "lotrnpcs-factions", "lotrnpcs.json") });
         // --- generated entity JSON ---
         var types = new List<EntityProperties>();
         int withSpawn = 0;

@@ -426,17 +426,15 @@ namespace LotrNpcs
             return id != null && RenamedFactions.TryGetValue(id, out string now) ? now : id;
         }
 
-        // The shipped sides: each alliance's members are allies, the two alliances enemies, and a faction in neither
-        // (the Dunlendings, any faction an admin adds) is an enemy of everyone.
-        public static readonly string[] FreePeoples = { "gondor", "rohan", "dale", "arnor", "dwarves", "shire", "woodelves" };
-        public static readonly string[] Shadow = { "mordor", "angmar", "mistymountains", "gundabad", "isengard", "haradrim", "easterlings", "blacknumenoreans", "wickeddwarves" };
-
-        /// <summary>A faction's shipped Enemies and Allies lines among these factions.</summary>
+        /// <summary>A faction's default Enemies and Allies lines among these factions: the others on its side
+        /// (FactionRegistry: free or shadow) are allies, every other one an enemy. A faction on no side (the
+        /// Dunlendings) is an enemy of all.</summary>
         public static (List<string> Enemies, List<string> Allies) DefaultLines(string faction, IEnumerable<string> all)
         {
-            string[] side = Array.IndexOf(FreePeoples, faction) >= 0 ? FreePeoples : Array.IndexOf(Shadow, faction) >= 0 ? Shadow : new string[0];
+            string side = FactionRegistry.SideOf(faction);
+            bool Ally(string f) => side != "none" && FactionRegistry.SideOf(f) == side;
             List<string> others = all.Select(f => f?.Trim().ToLowerInvariant()).Where(f => !string.IsNullOrEmpty(f) && f != faction).Distinct().ToList();
-            return (others.Where(f => Array.IndexOf(side, f) < 0).ToList(), others.Where(f => Array.IndexOf(side, f) >= 0).ToList());
+            return (others.Where(f => !Ally(f)).ToList(), others.Where(Ally).ToList());
         }
 
         /// <summary>The config to use for what LoadModConfig returned (null: no file yet), with defaults filled in
@@ -670,35 +668,9 @@ namespace LotrNpcs
             return (ra == a && rb == b) || (ra == b && rb == a);
         }
 
-        // The shipped factions. Men: Gondor, Rohan, Dale, Arnor, Haradrim, Dunland, Black Numenoreans, Easterlings.
-        // Hobbits are one faction (the Shire), dwarves two (Longbeards and Firebeards; wicked dwarves), the elves are
-        // the Wood Elves (more elf factions can come with their own armor), orcs five by region. The races listed only count with
-        // RaceAndGroupMembership on; Gondor, Rohan, Dale and Arnor share one race, so they list none. Every faction
-        // but the Shire attacks non-members on sight.
-        public static Dictionary<string, FactionDef> DefaultFactions()
-        {
-            FactionDef F(string stance, params string[] races) =>
-                new FactionDef { Stance = stance, FriendlyRaces = races.ToList(), FriendlyGroups = new List<string>() };
-            return new Dictionary<string, FactionDef>
-            {
-                ["gondor"] = F("aggressive"),
-                ["rohan"] = F("aggressive"),
-                ["dale"] = F("aggressive"),
-                ["arnor"] = F("aggressive"),
-                ["haradrim"] = F("aggressive", "lrc:haradrim"),
-                ["dunlendings"] = F("aggressive", "lrc:wildmen"),
-                ["blacknumenoreans"] = F("aggressive", "lrc:bnumenorean"),
-                ["easterlings"] = F("aggressive", "lrc:easterling"),
-                ["dwarves"] = F("aggressive", "lrc:longbeard", "lrc:firebeardsandbroadbeams"),
-                ["wickeddwarves"] = F("aggressive", "lrc:wickeddwarf"),
-                ["shire"] = F("defensive", "lrc:harfoot", "lrc:stoor", "lrc:fallohide"),
-                ["woodelves"] = F("aggressive", "lrc:sindar", "lrc:avari"),
-                ["mordor"] = F("aggressive"),
-                ["angmar"] = F("aggressive"),
-                ["mistymountains"] = F("aggressive"),
-                ["gundabad"] = F("aggressive"),
-                ["isengard"] = F("aggressive"),
-            };
-        }
+        /// <summary>The factions a new config file starts with: every faction the installed mods define
+        /// (FactionRegistry), with its stance and member races.</summary>
+        public static Dictionary<string, FactionDef> DefaultFactions() =>
+            FactionRegistry.All.ToDictionary(f => f.Id, f => new FactionDef { Stance = f.Stance, FriendlyRaces = f.FriendlyRaces.ToList(), FriendlyGroups = new List<string>() });
     }
 }

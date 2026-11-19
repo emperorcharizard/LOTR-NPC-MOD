@@ -1166,12 +1166,20 @@ TEST_NPCS += [(code.removesuffix("-recruit") + "-" + branch, name.removesuffix("
 # zones (/recruits zone) that list their faction, one group every 3 to 5 minutes near a player. SpawnZones.cs does all
 # of it, finding the NPC types by these lotrnpcsFaction and lotrnpcsRank attributes; there are no vanilla spawn
 # rules, because a vanilla spawn chance can't promise a steady rate (0.0.29 used them).
-# Every NPC's faction id (the code's race part -> faction), read by the faction system from lotrnpcsFaction.
-FACTION_OF = {"mordororc": "mordor", "angmarorc": "angmar", "goblin": "mistymountains", "uruk": "isengard", "gundabadorc": "gundabad",
-              "gondor": "gondor", "rohan": "rohan", "dale": "dale", "arnor": "arnor", "haradrim": "haradrim",
-              "dunlending": "dunlendings", "blacknumenorean": "blacknumenoreans", "easterling": "easterlings",
-              "dwarf": "dwarves", "wickeddwarf": "wickeddwarves", "hobbit": "shire", "elf": "woodelves",
-              "tormentedelf": "tormentedelves"}
+# The factions (tools/data/factions.json, 1.0.5): their ids, order, sides, stances, tiers and member races. The mod reads
+# them from config/lotrnpcs-factions/lotrnpcs.json (FactionRegistry); FACTION_OF maps each NPC code's race part to its
+# faction id, read by the faction system from lotrnpcsFaction. The retired tormented elves stay mapped so their hidden
+# types still build.
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "factions.json"), encoding="utf-8") as f:
+    FACTIONS = loads(f.read())["factions"]
+for fac in FACTIONS:
+    assert fac["side"] in ("free", "shadow", "none"), f"factions.json: {fac['id']} side {fac['side']}"
+    assert fac["stance"] in ("aggressive", "defensive"), f"factions.json: {fac['id']} stance {fac['stance']}"
+    assert fac["tier"] in ("men", "uruk", "levy", "orc", "goblin", "elf", "dwarf"), f"factions.json: {fac['id']} tier {fac['tier']}"
+assert len({fac["id"] for fac in FACTIONS}) == len(FACTIONS), "factions.json: an id appears twice"
+FACTION_OF = {race: fac["id"] for fac in FACTIONS for race in fac["races"]} | {"tormentedelf": "tormentedelves"}
+write("config/lotrnpcs-factions/lotrnpcs.json",
+      [{k: fac[k] for k in ("id", "side", "stance", "tier", "friendlyRaces")} for fac in FACTIONS])
 # NPCs whose code doesn't end in their rank. Hobbits have one rank, farmers, which counts as the Shire's recruit rank
 # (user, 2026-11-02: "make them recruit equivalent"), so they get recruit stats and Shire zones spawn them.
 RANK_OF = {"test-hobbit": "recruit"}
@@ -1331,9 +1339,7 @@ for code, name, race_code, skin_texture, gear in TEST_NPCS:
 write_weapons()
 
 # The creative tab's order (0.0.71): free peoples, then the Shadow, each faction's units together, recruit to archer.
-CREATIVE_FACTIONS = ["shire", "gondor", "rohan", "arnor", "dale", "dwarves", "woodelves",
-                     "mordor", "angmar", "mistymountains", "gundabad", "isengard", "haradrim", "easterlings", "dunlendings",
-                     "blacknumenoreans", "wickeddwarves", "tormentedelves"]
+CREATIVE_FACTIONS = [fac["id"] for fac in FACTIONS] + ["tormentedelves"]
 CREATIVE_RANKS = ["recruit", "warrior", "captain", "rider", "archer"]
 def _creative_key(code):
     race, _, rank = code.removeprefix("test-").partition("-")
@@ -1819,7 +1825,7 @@ with open(os.path.join(out, "modinfo.json"), "w", encoding="utf-8") as f:
         "type": "code",
         "modid": "lotrnpcs",
         "name": "LOTR NPCs",
-        "version": "1.0.4",
+        "version": "1.0.5",
         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Needs LOTR Races "
                        "and Classes (by Dango Dango Dango, Shakgriig and Buggoi) for the race models.",

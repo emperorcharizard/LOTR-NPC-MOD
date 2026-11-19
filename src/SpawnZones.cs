@@ -124,9 +124,9 @@ namespace LotrNpcs
     /// </summary>
     public class SpawnZoneSystem : ModSystem
     {
-        // Every faction with ranked NPCs. The Shire has only recruits, its hobbit farmers.
-        public static readonly string[] Factions = { "mordor", "angmar", "mistymountains", "gundabad", "isengard", "gondor", "rohan", "dale", "arnor", "haradrim",
-            "dunlendings", "blacknumenoreans", "easterlings", "dwarves", "wickeddwarves", "woodelves", "shire" };
+        // The factions a zone may list: every faction the installed mods define (FactionRegistry). The Shire has only
+        // recruits, its hobbit farmers.
+        public static string[] Factions => FactionRegistry.Ids.ToArray();
         const string SaveKey = "lotrnpcs:spawnzones";
         const string ConfigFile = "lotrnpcs-spawning.json";
         public const string OriginAttr = "lotrnpcsOrigin";
@@ -180,6 +180,7 @@ namespace LotrNpcs
         public override void StartServerSide(ICoreServerAPI api)
         {
             sapi = api;
+            FactionRegistry.Load(api);
             config = LoadConfig(api);
             api.Event.SaveGameLoaded += LoadZones;
             api.Event.GameWorldSave += SaveZones;

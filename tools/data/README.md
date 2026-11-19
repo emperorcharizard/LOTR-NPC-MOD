@@ -35,23 +35,25 @@ Each race's Player Model Lib model and the looks its NPCs may have.
 
 Race codes are the middle of the NPC type codes, `test-<race>-<rank>`. `elf` is the Wood Elves.
 
+## factions.json
+
+The factions, in the order the join menu and the creative tab list them: id, the race part of their NPC type codes,
+side (`free`, `shadow` or `none`), stance, balance tier and member races. The build writes
+`config/lotrnpcs-factions/lotrnpcs.json`, which the mod reads when the server starts (`src/FactionRegistry.cs`); the
+default sides, tiers, zone factions and join menu all come from it. Another mod can add factions with its own
+`assets/<its id>/config/lotrnpcs-factions/<name>.json` in the same format; it still needs NPC types for them.
+
 ## Adding a faction
 
-A new faction still needs code as well as data. Use an existing faction as the pattern.
+A new faction now needs data only, plus a build. Use an existing faction as the pattern.
 
-1. `tools/gen_testnpcs.py`:
-   - its NPC types (`ranks(...)` in `TEST_NPCS`);
-   - `FACTION_OF`;
-   - `CREATIVE_FACTIONS`;
-   - names (`NAMES_OF`) and weapons (`WEAPONS_OF` or `WEAPON_PREFS`);
-   - mounts (`MOUNTS_OF`).
+1. `factions.json`: its id, races, side, stance, tier and member races.
 2. `races.json`: its race and model.
 3. `armor.json`: its outfits.
-4. `src/FactionConfig.cs`:
-   - `DefaultFactions`;
-   - its side in `FreePeoples` or `Shadow`.
-5. `src/FactionTiers.cs`: its tier.
-6. `src/SpawnZones.cs`: the faction list.
-7. `src/Joining.cs`: the join menu's order and section.
+4. `tools/gen_testnpcs.py`:
+   - its NPC types (`ranks(...)` in `TEST_NPCS`);
+   - names (`NAMES_OF`) and weapons (`WEAPONS_OF` or `WEAPON_PREFS`);
+   - mounts (`MOUNTS_OF`);
+   - talk lines and folk name (`FACTION_TALK`, `FOLK`).
 
 The offline tests in `tools/tests` name the places they find missing.

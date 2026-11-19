@@ -41,6 +41,23 @@ public static class Program {
     }
 
     public static int Main(string[] argv) {
+        // 1.0.5: the factions come from the built faction file (FactionRegistry), next to the entities folder.
+        FactionRegistry.LoadFiles(new[] { Path.Combine(argv[0], "..", "config", "lotrnpcs-factions", "lotrnpcs.json") });
+        {
+            // 1.0.5: factions come from mods' faction files; a later file can add one but not redefine one.
+            var errs = new List<string>();
+            var parsed = FactionRegistry.Parse(new[] {
+                ("lotrnpcs:a", "[{\"id\": \"gondor\", \"side\": \"free\", \"tier\": \"men\"}]"),
+                ("pack:b", "{\"id\": \"Lothlorien\", \"side\": \"free\", \"tier\": \"elf\", \"stance\": \"Defensive\", \"friendlyRaces\": [\"lrc:sindar\"]}"),
+                ("pack:c", "[{\"id\": \"gondor\"}, {\"id\": \"bad id\"}, {\"id\": \"umbar\", \"side\": \"evil\", \"tier\": \"pirate\"}]"),
+                ("pack:d", "not json") }, errs.Add);
+            Check(parsed.Select(f => f.Id).SequenceEqual(new[] { "gondor", "lothlorien", "umbar" }) && parsed[1].Stance == "defensive" && parsed[1].Tier == "elf"
+                && parsed[2].Side == "none" && parsed[2].Tier == "men" && errs.Count == 5,
+                "faction files: ids lower-cased, a repeated or bad id skipped, an unknown side or tier falls back, an unreadable file reported");
+            Check(FactionRegistry.All.Count == 17 && FactionRegistry.Get("shire").Stance == "defensive" && FactionTiers.Of("isengard").Name == "uruk" && FactionTiers.Of("nobody").Name == "men"
+                && JoinSystem.BlocOf("dunlendings") == "other" && JoinSystem.BlocOf("mordor") == "shadow" && SpawnZoneSystem.Factions.Length == 17,
+                "the shipped faction file gives the 17 factions, their tiers, join sections and zone factions");
+        }
         var types = new Dictionary<string, EntityProperties>();
         foreach (string file in Directory.GetFiles(argv[0], "*.json")) {
             JObject jo = JObject.Parse(File.ReadAllText(file)); jo.Remove("sounds"); jo.Remove("tags");
@@ -188,24 +205,24 @@ public static class Program {
             var sl = spaced.Replace("\r\n", "\n").Split('\n');
             int Before(string start) => Array.FindIndex(sl, l => l.StartsWith(start));
             File.WriteAllText(Path.Combine(Path.GetTempPath(), "lotrnpcs-factions-sample.json"), spaced);
-            Check(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(spaced).Factions.Count == 17 && sl[Before("    \"gondor\": {") - 1] != "" && sl[Before("    \"rohan\": {") - 1] == ""
+            Check(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(spaced).Factions.Count == 17 && sl[Before("    \"shire\": {") - 1] != "" && sl[Before("    \"gondor\": {") - 1] == ""
                 && sl[Before("  \"Factions\": {") - 1] == "" && sl[Before("    \"--- Recruits ---") - 1] == "" && sl.Count(l => l == "") > 40 && !sl.Any(l => l.Length > 0 && l.Trim().Length == 0),
                 "the config file is spaced out: a blank line before each faction and each big block, never inside a short one, and it still reads back");
         }
 
         // migrating older files
         var freshCfg = FactionConfig.FromFile(null, out bool storeFresh);
-        Check(storeFresh && freshCfg.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 36 && json.Contains("\"Version\": 36") && json.Contains("\"NpcVsNpcDamageMultiplier\": 0.5") && !json.Contains("\"RosterPerCaptain\":") && json.Contains("\"MaxCaptains\": 1") && json.Contains("\"RecruitExtraFollowers\": 1") && !json.Contains("MaxHirelings") && json.Contains("\"ShieldChance\": 0.5") && json.Contains("\"HelmetChance\": 0.6") && json.Contains("\"CaptainsAlwaysHelmeted\": false") && json.Contains("\"MaxAttackersPerTarget\": 4") && json.Contains("\"CombatSpacing\": 1.5") && json.Contains("\"BattleLines\": true") && json.Contains("\"DuelDistanceMin\": 1.0") && json.Contains("\"DuelDistanceMax\": 1.6") && json.Contains("\"LineHoldRange\": 6.0") && json.Contains("\"MaxRecruits\": 16") && json.Contains("\"MaxFollowers\": 3") && json.Contains("\"GuardRadius\": 16") && json.Contains("\"HealthRegenSpeed\": 30.0") && json.Contains("\"Allies\": [\"rohan\", \"dale\", \"arnor\", \"dwarves\", \"shire\", \"woodelves\"]") && json.Contains("\"Allies\": []") && freshCfg.Relations.Count == 0, "a new file is written with version 36 (no MaxHirelings), each faction's Enemies and Allies on one line and no pair entries, the battle spacing, helmet and shield settings, the regen settings, the guard radius and the hire and follow caps");
+        Check(storeFresh && freshCfg.Version == FactionConfig.CurrentVersion && FactionConfig.CurrentVersion == 36 && json.Contains("\"Version\": 36") && json.Contains("\"NpcVsNpcDamageMultiplier\": 0.5") && !json.Contains("\"RosterPerCaptain\":") && json.Contains("\"MaxCaptains\": 1") && json.Contains("\"RecruitExtraFollowers\": 1") && !json.Contains("MaxHirelings") && json.Contains("\"ShieldChance\": 0.5") && json.Contains("\"HelmetChance\": 0.6") && json.Contains("\"CaptainsAlwaysHelmeted\": false") && json.Contains("\"MaxAttackersPerTarget\": 4") && json.Contains("\"CombatSpacing\": 1.5") && json.Contains("\"BattleLines\": true") && json.Contains("\"DuelDistanceMin\": 1.0") && json.Contains("\"DuelDistanceMax\": 1.6") && json.Contains("\"LineHoldRange\": 6.0") && json.Contains("\"MaxRecruits\": 16") && json.Contains("\"MaxFollowers\": 3") && json.Contains("\"GuardRadius\": 16") && json.Contains("\"HealthRegenSpeed\": 30.0") && json.Contains("\"Allies\": [\"shire\", \"rohan\", \"arnor\", \"dale\", \"dwarves\", \"woodelves\"]") && json.Contains("\"Allies\": []") && freshCfg.Relations.Count == 0, "a new file is written with version 36 (no MaxHirelings), each faction's Enemies and Allies on one line and no pair entries, the battle spacing, helmet and shield settings, the regen settings, the guard radius and the hire and follow caps");
         var current = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(json.Replace("\"Stance\": \"aggressive\"", "\"Stance\": \"defensive\"")), out bool storeCurrent);
         Check(!storeCurrent && current.Factions["gondor"].Stance == "defensive", "a current file is left alone, even with defensive factions");
         // Shipped sides and the Enemies and Allies lines (config version 35)
         {
             var sfs = new FactionSystem(); var sc = new FactionConfig(); sfs.SetConfig(sc);
-            string[] freeP = FactionConfig.FreePeoples, shadow = FactionConfig.Shadow, lone = { "dunlendings" };
+            string[] freeP = FactionRegistry.All.Where(f => f.Side == "free").Select(f => f.Id).ToArray(), shadow = FactionRegistry.All.Where(f => f.Side == "shadow").Select(f => f.Id).ToArray(), lone = { "dunlendings" };
             bool All(IEnumerable<string> xs, IEnumerable<string> ys, FactionRelation rel) => xs.All(a => ys.All(b => a == b || sfs.Relation(a, b) == rel));
             Check(All(freeP, freeP, FactionRelation.Ally) && All(shadow, shadow, FactionRelation.Ally), "shipped sides: the Free Peoples are allies, and so is the Shadow");
             Check(All(freeP, shadow, FactionRelation.Enemy) && All(lone, sc.Factions.Keys, FactionRelation.Enemy) && sc.Factions.Count == freeP.Length + shadow.Length + lone.Length, "...the two are enemies, and the Dunlendings fight everyone");
-            Check(!sfs.LinesChanged && sc.Factions["gondor"].Allies.SequenceEqual(new[] { "rohan", "dale", "arnor", "dwarves", "shire", "woodelves" }) && !sc.Factions["gondor"].Enemies.Contains("rohan"), "the shipped lines need no rewrite");
+            Check(!sfs.LinesChanged && sc.Factions["gondor"].Allies.SequenceEqual(new[] { "shire", "rohan", "arnor", "dale", "dwarves", "woodelves" }) && !sc.Factions["gondor"].Enemies.Contains("rohan"), "the shipped lines need no rewrite");
             var gp = Player(null); sfs.SetAssigned(gp.PlayerUID, "Gp", "gondor");
             Check(!sfs.WantsToAttack("rohan", gp) && !sfs.WantsToAttack("shire", gp) && sfs.WantsToAttack("mordor", gp) && sfs.WantsToAttack("dunlendings", gp) && sfs.IsFriend("gondor", gp) && !sfs.IsFriend("rohan", gp),
                 "a Gondor player is safe from allied Rohan NPCs but can hire only Gondor's (owner's choice); the Shadow and the Dunlendings attack them");
