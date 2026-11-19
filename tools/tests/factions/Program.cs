@@ -57,6 +57,35 @@ public static class Program {
             Check(FactionRegistry.All.Count == 17 && FactionRegistry.Get("shire").Stance == "defensive" && FactionTiers.Of("isengard").Name == "uruk" && FactionTiers.Of("nobody").Name == "men"
                 && JoinSystem.BlocOf("dunlendings") == "other" && JoinSystem.BlocOf("mordor") == "shadow" && SpawnZoneSystem.Factions.Length == 17,
                 "the shipped faction file gives the 17 factions, their tiers, join sections and zone factions");
+            // Faction packs: another mod's faction joins old config files once, on its side, and NPC types copy a template.
+            var shipped = FactionRegistry.All.ToList();
+            var pack = FactionRegistry.Parse(new[] { ("lorienpack:config/lotrnpcs-factions/lorien.json",
+                "{\"id\": \"lothlorien\", \"side\": \"free\", \"tier\": \"elf\", \"template\": \"WoodElves\", \"model\": \"lrc:sindar\", \"names\": [\"Haldor\"], \"mounts\": [\"game:horse\"],"
+                + " \"parts\": {\"haircolor\": [\"wheat\"]}, \"armor\": {\"recruit\": [[\"x:armor-head-a\", \"x:armor-body-a\"]], \"warrior\": [[\"x:armor-head-b\"]]}}") }, null);
+            FactionRegistry.Set(shipped.Concat(pack));
+            var old = FactionConfig.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<FactionConfig>(Newtonsoft.Json.JsonConvert.SerializeObject(FactionConfig.FromFile(null, out _).Also(c => c.Factions.Remove("lothlorien")).Also(c => c.AddedFactions = null).Also(c => { foreach (var d in c.Factions.Values) { d.Allies.Remove("lothlorien"); d.Enemies.Remove("lothlorien"); } }))), out bool storeOld);
+            Check(storeOld && old.Factions.ContainsKey("lothlorien") && old.Factions["lothlorien"].Allies.Contains("gondor") && old.Factions["lothlorien"].Enemies.Contains("mordor") && old.Factions["gondor"].Allies.Contains("lothlorien")
+                && old.Factions["mordor"].Enemies.Contains("lothlorien") && old.Factions["lothlorien"].HirePrices.Count > 0 && old.AddedFactions.SequenceEqual(new[] { "lothlorien" }) && pack[0].Template == "woodelves" && !pack[0].Shipped,
+                "a pack's faction joins an older config file with its side's lines, and the others list it");
+            old.Factions.Remove("lothlorien");
+            Check(!old.AddNewFactions() && !old.Factions.ContainsKey("lothlorien"), "...and once removed by the admin it stays removed");
+            var tpl = JObject.Parse(File.ReadAllText(Path.Combine(argv[0], "test-elf-warrior.json")));
+            var made = FactionPackSystem.Entity(tpl, "test-lothlorien-warrior", pack[0], "warrior");
+            var mBeh = made["server"]["behaviors"].First(b => (string)b["code"] == "lotrnpcs:startinggear");
+            Check((string)made["code"] == "test-lothlorien-warrior" && (string)made["attributes"]["lotrnpcsFaction"] == "lothlorien" && (string)made["attributes"]["lotrnpcsNames"][0] == "Haldor"
+                && (string)made["attributes"]["lotrnpcsSkinParts"]["haircolor"][0] == "wheat" && made["attributes"]["lotrnpcsHelmets"].Select(h => (string)h).SequenceEqual(new[] { "x:armor-head-b", "x:armor-head-a" })
+                && (string)mBeh["sets"][0][0] == "x:armor-head-b" && made["client"]["behaviors"].Concat(made["server"]["behaviors"]).Where(b => (string)b["code"] == "lotrnpcs:presetskinmodel").All(b => (string)b["skinModel"] == "lrc:sindar")
+                && (string)tpl["attributes"]["lotrnpcsFaction"] == "woodelves" && (string)made["attributes"]["lotrnpcsRank"] == "warrior",
+                "a pack's NPC type copies its template with the pack's faction, names, looks, outfits, helmets and model, leaving the template as it was");
+            var rider = FactionPackSystem.Entity(JObject.Parse(File.ReadAllText(Path.Combine(argv[0], "test-elf-rider.json"))), "test-lothlorien-rider", pack[0], "rider");
+            Check((string)rider["attributes"]["lotrnpcsMounts"][0] == "game:horse" && (string)rider["server"]["behaviors"].First(b => (string)b["code"] == "lotrnpcs:startinggear")["sets"][0][0] == "x:armor-head-b", "...riders take the pack's mounts and the warriors' outfits");
+            var creature = JObject.Parse(File.ReadAllText(Path.Combine(argv[0], "..", "itemtypes", "creature.json")));
+            FactionPackSystem.AddSpawnItem(creature, "test-elf-warrior", "test-lothlorien-warrior", made, pack[0]);
+            Check(creature["variantgroups"][0]["states"].Any(s => (string)s == "test-lothlorien-warrior") && (string)creature["attributesByType"]["*-test-lothlorien-warrior"]["lotrnpcsPortrait"]["model"] == "lrc:sindar"
+                && (string)creature["attributesByType"]["*-test-lothlorien-warrior"]["lotrnpcsPortrait"]["sets"][0][0] == "x:armor-head-b" && creature["texturesByType"]["*-test-lothlorien-warrior"] != null
+                && creature["creativeinventoryStacksByType"]["*-test-goblin"][0]["stacks"].Last()["code"].ToString() == "lotrnpcs:creature-test-lothlorien-warrior",
+                "...and a spawn item with its portrait, last in the LOTR NPCs tab");
+            FactionRegistry.Set(shipped);
         }
         var types = new Dictionary<string, EntityProperties>();
         foreach (string file in Directory.GetFiles(argv[0], "*.json")) {

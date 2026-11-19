@@ -1,0 +1,10 @@
+{
+  "type": "content",
+  "modid": "lindonnpcs",
+  "name": "LOTR NPCs: Lindon (example faction pack)",
+  "description": "An example faction pack for LOTR NPCs: the elves of Lindon, made from the Wood Elves' NPCs with the Noldor model and vanilla armor. Copy it to make your own.",
+  "authors": ["emperorcharizard"],
+  "version": "0.1.0",
+  "side": "Universal",
+  "dependencies": { "lotrnpcs": "1.0.5", "lrc": "0.4.1" }
+}

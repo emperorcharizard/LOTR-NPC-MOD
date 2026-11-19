@@ -116,6 +116,10 @@ namespace LotrNpcs
 
         // ---- Factions and relations ----
         public Dictionary<string, FactionDef> Factions;
+        // Factions from other mods' faction files (FactionRegistry) that this file has taken in, so one an admin
+        // removes stays removed.
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public List<string> AddedFactions;
         public List<FactionRelationDef> Relations;
         // Players join by the menu; true also counts race (FriendlyRaces) and /group (FriendlyGroups).
         public bool RaceAndGroupMembership = false;
@@ -437,6 +441,33 @@ namespace LotrNpcs
             return (others.Where(f => !Ally(f)).ToList(), others.Where(Ally).ToList());
         }
 
+        /// <summary>Takes in factions another installed mod defines that this file hasn't seen yet: each gets its
+        /// default values and lines, and the factions already here list it as an ally or an enemy by its side. True if
+        /// anything was added.</summary>
+        public bool AddNewFactions()
+        {
+            bool changed = false;
+            foreach (FactionInfo info in FactionRegistry.All.Where(f => !f.Shipped))
+            {
+                AddedFactions = AddedFactions ?? new List<string>();
+                if (AddedFactions.Contains(info.Id)) continue;
+                AddedFactions.Add(info.Id);
+                changed = true;
+                if (Factions.ContainsKey(info.Id)) continue;
+                (List<string> enemies, List<string> allies) = DefaultLines(info.Id, Factions.Keys);
+                foreach (KeyValuePair<string, FactionDef> kv in Factions.Where(kv => kv.Value != null))
+                {
+                    kv.Value.Enemies = kv.Value.Enemies ?? new List<string>();
+                    kv.Value.Allies = kv.Value.Allies ?? new List<string>();
+                    if (kv.Value.Enemies.Contains(info.Id) || kv.Value.Allies.Contains(info.Id)) continue;
+                    (allies.Contains(kv.Key) ? kv.Value.Allies : kv.Value.Enemies).Add(info.Id);
+                }
+                Factions[info.Id] = new FactionDef { Stance = info.Stance, FriendlyRaces = info.FriendlyRaces.ToList(), FriendlyGroups = new List<string>(), Enemies = enemies, Allies = allies };
+            }
+            if (changed) FillDefaults();
+            return changed;
+        }
+
         /// <summary>The config to use for what LoadModConfig returned (null: no file yet), with defaults filled in
         /// and older formats updated. store: write it back to the file.</summary>
         public static FactionConfig FromFile(FactionConfig loaded, out bool store)
@@ -445,6 +476,7 @@ namespace LotrNpcs
             FactionConfig config = loaded ?? new FactionConfig { Version = CurrentVersion };
             config.FillDefaults();
             if (config.Migrate()) store = true;
+            if (config.AddNewFactions()) store = true;
             if (config.Instructions == null || !config.Instructions.SequenceEqual(InstructionText)) store = true;
             config.Instructions = new List<string>(InstructionText);
             return config;

@@ -122,6 +122,16 @@ def main():
                 # Forward slashes: the game can't read zip entries with backslashes.
                 z.writestr(os.path.relpath(path, GEN).replace(os.sep, "/"), packed(path), zipfile.ZIP_DEFLATED, 9)
     print("wrote", out)
+    # 1.0.5: the example faction pack (tools/examplepack), a content mod adding the Lindon faction.
+    pack = os.path.join(ROOT, "tools", "examplepack")
+    pack_version = json.load(open(os.path.join(pack, "modinfo.json"), encoding="utf-8"))["version"]
+    pack_out = os.path.join(ROOT, "releases", f"lindonnpcs_{pack_version}.zip")
+    with zipfile.ZipFile(pack_out, "w", zipfile.ZIP_DEFLATED) as z:
+        for folder, _, files in os.walk(pack):
+            for name in sorted(files):
+                path = os.path.join(folder, name)
+                z.write(path, os.path.relpath(path, pack).replace(os.sep, "/"))
+    print("wrote", pack_out)
 
     if opts.publish:
         gh = shutil.which("gh") or r"C:\Program Files\GitHub CLI\gh.exe"

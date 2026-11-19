@@ -1,0 +1,18 @@
+{
+  "lotrnpcs:item-creature-test-lindon-recruit": "Lindon recruit",
+  "lotrnpcs:entity-test-lindon-recruit": "Lindon recruit",
+  "lotrnpcs:prefixandcreature-test-lindon-recruit": "a Lindon recruit",
+  "lotrnpcs:item-creature-test-lindon-warrior": "Lindon warrior",
+  "lotrnpcs:entity-test-lindon-warrior": "Lindon warrior",
+  "lotrnpcs:prefixandcreature-test-lindon-warrior": "a Lindon warrior",
+  "lotrnpcs:item-creature-test-lindon-captain": "Lindon captain",
+  "lotrnpcs:entity-test-lindon-captain": "Lindon captain",
+  "lotrnpcs:prefixandcreature-test-lindon-captain": "a Lindon captain",
+  "lotrnpcs:item-creature-test-lindon-archer": "Lindon archer",
+  "lotrnpcs:entity-test-lindon-archer": "Lindon archer",
+  "lotrnpcs:prefixandcreature-test-lindon-archer": "a Lindon archer",
+  "lotrnpcs:item-creature-test-lindon-rider": "Lindon rider",
+  "lotrnpcs:entity-test-lindon-rider": "Lindon rider",
+  "lotrnpcs:prefixandcreature-test-lindon-rider": "a Lindon rider",
+  "lotrnpcs:folk-lindon": "Elves of Lindon"
+}

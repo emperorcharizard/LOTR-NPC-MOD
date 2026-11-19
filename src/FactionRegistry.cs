@@ -16,6 +16,26 @@ namespace LotrNpcs
         [JsonProperty("stance")] public string Stance = "aggressive";
         [JsonProperty("tier")] public string Tier = "men";
         [JsonProperty("friendlyRaces")] public List<string> FriendlyRaces = new List<string>();
+        // The mod (asset domain) whose file defines it: lotrnpcs for ours.
+        [JsonIgnore] public string Source;
+        public bool Shipped => Source == "lotrnpcs";
+
+        // ---- Faction packs (FactionPackSystem): NPC types made at load from a shipped faction's ----
+        // The shipped faction whose NPC types this one copies (AI, stats, sounds, weapons). Null: the faction brings
+        // its own NPC types, as the shipped ones do.
+        [JsonProperty("template")] public string Template;
+        // Player Model Lib model code (such as lrc:sindar), the skin texture for the spawn item's fallback icon, and
+        // the skin parts its NPCs may have (part -> variants). Missing: the template's.
+        [JsonProperty("model")] public string Model;
+        [JsonProperty("skin")] public string Skin;
+        [JsonProperty("parts")] public Dictionary<string, List<string>> Parts;
+        // Names its NPCs get when hired. Missing: the template's.
+        [JsonProperty("names")] public List<string> Names;
+        // Outfits by rank (recruit, warrior, captain, archer), each a list of item codes, as tools/data/armor.json.
+        // Riders wear the warriors', archers the recruits' unless listed. Missing ranks: the template's.
+        [JsonProperty("armor")] public Dictionary<string, List<List<string>>> Armor;
+        // Mount entity codes for its riders. Missing: the template's.
+        [JsonProperty("mounts")] public List<string> Mounts;
     }
 
     /// <summary>
@@ -51,13 +71,14 @@ namespace LotrNpcs
                 .OrderBy(a => a.Location.Domain == "lotrnpcs" ? 0 : 1).ThenBy(a => a.Location.Domain, StringComparer.Ordinal)
                 .ThenBy(a => a.Location.Path, StringComparer.Ordinal)
                 .Select(a => (a.Location.ToString(), a.ToText())).ToList();
+            // The source is the asset's domain (lotrnpcs:config/... -> lotrnpcs).
             Set(Parse(files, msg => api.Logger.Error("[lotrnpcs] " + msg)));
             api.Logger.Notification("[lotrnpcs] {0} factions: {1}", all.Length, string.Join(", ", Ids));
         }
 
         /// <summary>Reads faction files from disk, for the offline tests.</summary>
         public static void LoadFiles(IEnumerable<string> paths) =>
-            Set(Parse(paths.Select(p => (p, System.IO.File.ReadAllText(p))), msg => Console.WriteLine("faction file: " + msg)));
+            Set(Parse(paths.Select(p => ("lotrnpcs:" + System.IO.Path.GetFileName(p), System.IO.File.ReadAllText(p))), msg => Console.WriteLine("faction file: " + msg)));
 
         /// <summary>The factions in these files, in order, skipping bad entries and ids seen before (each reported to
         /// error). A file holds a list of factions or one faction.</summary>
@@ -93,6 +114,8 @@ namespace LotrNpcs
                         continue;
                     }
                     info.Id = id;
+                    info.Source = source.Contains(":") ? source.Substring(0, source.IndexOf(':')) : "lotrnpcs";
+                    info.Template = string.IsNullOrWhiteSpace(info.Template) ? null : info.Template.Trim().ToLowerInvariant();
                     info.Side = info.Side?.Trim().ToLowerInvariant();
                     if (Array.IndexOf(Sides, info.Side) < 0)
                     {

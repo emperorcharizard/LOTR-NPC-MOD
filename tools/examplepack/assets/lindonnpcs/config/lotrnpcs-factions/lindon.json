@@ -1,0 +1,22 @@
+{
+  "id": "lindon",
+  "side": "free",
+  "stance": "aggressive",
+  "tier": "elf",
+  "friendlyRaces": ["lrc:noldor"],
+
+  "template": "woodelves",
+  "model": "lrc:noldor",
+  "skin": "lrc:entity/humanoid/skinparts/elf/elfskin1",
+  "parts": {
+    "underwear": ["breeches"],
+    "haircolor": ["eerieblack", "silverchalice", "wheat", "lightgray"],
+    "brows": ["eerieblack", "silverchalice", "wheat", "lightgray"]
+  },
+  "names": ["Aerandir", "Celebrindal", "Erestor", "Gildor", "Lindir", "Menelion", "Nimloth", "Saelon", "Tinwe", "Voronwe"],
+  "armor": {
+    "recruit": [["game:armor-head-brigandine-steel", "game:armor-body-brigandine-steel", "game:armor-legs-brigandine-steel"]],
+    "warrior": [["game:armor-head-plate-steel", "game:armor-body-plate-steel", "game:armor-legs-plate-steel"]],
+    "captain": [["game:armor-head-plate-gold", "game:armor-body-plate-gold", "game:armor-legs-plate-gold"]]
+  }
+}
