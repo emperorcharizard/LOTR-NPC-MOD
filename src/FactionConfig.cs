@@ -86,6 +86,9 @@ namespace LotrNpcs
     public class AssignedPlayer
     {
         public string Name, Faction;
+        // A rebel (1.0.5, owner: civil wars such as Gondor against Gondor): still a member of the faction, but at war
+        // with its loyal players and their recruits. Set with /recruits faction set <player> <faction> rebel.
+        public bool Rebel;
     }
 
     /// <summary>

@@ -86,12 +86,37 @@ namespace LotrNpcs
         /// <summary>The faction an admin set for this player, or null.</summary>
         public string AssignedFaction(string playerUid) => playerUid != null && assigned.TryGetValue(playerUid, out AssignedPlayer a) ? a.Faction : null;
 
-        /// <summary>Sets (faction null: clears) the faction for a player. Public for tests.</summary>
-        public void SetAssigned(string playerUid, string name, string faction)
+        /// <summary>Sets (faction null: clears) the faction for a player, as a rebel or loyal. Public for tests.</summary>
+        public void SetAssigned(string playerUid, string name, string faction, bool rebel = false)
         {
             if (faction == null) assigned.Remove(playerUid);
-            else assigned[playerUid] = new AssignedPlayer { Name = name, Faction = faction.Trim().ToLowerInvariant() };
+            else assigned[playerUid] = new AssignedPlayer { Name = name, Faction = faction.Trim().ToLowerInvariant(), Rebel = rebel };
             ForgetSide(playerUid);
+        }
+
+        /// <summary>The faction this player rebels against (their admin-set faction, if set as a rebel), or null.</summary>
+        public string RebelFaction(string playerUid) =>
+            playerUid != null && assigned.TryGetValue(playerUid, out AssignedPlayer a) && a.Rebel ? a.Faction : null;
+
+        /// <summary>
+        /// Civil war (1.0.5): is one of these players a rebel of a faction the other is a loyal member of? Loyal
+        /// members are the faction's players who aren't its rebels. Rebels of one faction are one side, so two of them
+        /// aren't at war; nor is a rebel at war with players of the faction's allies.
+        /// </summary>
+        public bool CivilWar(string uidA, string uidB)
+        {
+            if (uidA == null || uidB == null || uidA == uidB) return false;
+            string ra = RebelFaction(uidA), rb = RebelFaction(uidB);
+            if (ra == rb) return false;
+            return (ra != null && rb != ra && SideOf(uidB).FriendOf.Contains(ra)) || (rb != null && ra != rb && SideOf(uidA).FriendOf.Contains(rb));
+        }
+
+        /// <summary>Is the target a rebel, or a rebel's recruit, at war with this loyal owner's faction?</summary>
+        bool RebelTargetOf(string loyalOwnerUid, Entity target)
+        {
+            if (RebelFaction(loyalOwnerUid) != null) return false;
+            string other = target is EntityPlayer p ? Attrs.Uid(p) : Recruit.OwnerUidOf(target);
+            return other != null && CivilWar(loyalOwnerUid, other);
         }
 
         public IEnumerable<AssignedPlayer> AssignedPlayers => assigned.Values;
@@ -204,11 +229,15 @@ namespace LotrNpcs
             // (UpdateFollowFight).
             if (Hiring != null && Hiring.HasTeamGrudge(ownerUid, target.EntityId)) return true;
             if (HiringSystem.IsTargetingTeam(target, ownerUid)) return true;
-            if (stance == Recruit.Defensive) return false;
+            // Loyal recruits attack their faction's rebels and the rebels' recruits on sight, even when defensive
+            // (owner: "Loyalists attack on sight").
+            bool rebelTarget = RebelTargetOf(ownerUid, target);
+            if (stance == Recruit.Defensive && !rebelTarget) return false;
             // No fights started with players near the world spawn (fighting back is above).
             if (target is EntityPlayer && NearWorldSpawn(target)) return false;
             bool guarding = Recruit.OrderOf(recruit) == Recruit.Guard;
             if (guarding && !InGuardArea(recruit, target)) return false;
+            if (rebelTarget && (target is not EntityPlayer tp || CanBeAttacked(tp))) return true;
             if (stance == Recruit.Raid) return RaidTarget(recruit, ownerUid, target);
             if (guarding && IsIntruder(ownerUid, target)) return true;
             // Players of an enemy side (survival mode) and their recruits are fought on sight, so two hired armies of
@@ -229,6 +258,7 @@ namespace LotrNpcs
         public bool EnemyForces(Entity recruit, string ownerUid, string otherUid, Entity otherRecruit)
         {
             if (otherUid == null || ownerUid == null || otherUid == ownerUid || Friendly(ownerUid, otherUid)) return false;
+            if (CivilWar(ownerUid, otherUid)) return true;
             HashSet<string> mine = SideOf(ownerUid).FriendOf, theirs = SideOf(otherUid).FriendOf;
             string mineExtra = FactionOf(recruit), theirsExtra = otherRecruit == null ? null : FactionOf(otherRecruit);
             bool war = false;
@@ -303,6 +333,8 @@ namespace LotrNpcs
             if (Recruit.OwnerUidOf(target) is string otherOwner) return !Friendly(ownerUid, otherOwner);
             if (FactionOf(target) is string faction)
             {
+                // A rebel's raiders attack their own faction's wild NPCs, who otherwise leave the rebel alone.
+                if (RebelFaction(ownerUid) == faction) return true;
                 if (FactionOf(recruit) is string own && Relation(own, faction) == FactionRelation.Ally) return false;
                 return !SideOf(ownerUid).AlliedTo.Contains(faction);
             }
@@ -326,10 +358,13 @@ namespace LotrNpcs
             if (uidA == null || uidB == null) return false;
             if (uidA == uidB) return true;
             PlayerSide a = SideOf(uidA), b = SideOf(uidB);
+            // A rebel and their faction's loyalists are enemies (a shared /group still makes them one side).
+            bool civilWar = CivilWar(uidA, uidB);
             foreach (string g in a.Groups)
             {
                 if (Array.IndexOf(b.Groups, g) >= 0) return true;
             }
+            if (civilWar) return false;
             foreach (string f in b.FriendOf)
             {
                 if (a.AlliedTo.Contains(f)) return true;
@@ -403,10 +438,15 @@ namespace LotrNpcs
             string faction = (args[1] as string)?.ToLowerInvariant();
             if (faction == null || !Config.Factions.ContainsKey(faction))
                 return TextCommandResult.Error("Unknown faction '" + args[1] + "'. Factions: " + string.Join(", ", Config.Factions.Keys));
+            string flag = (args[2] as string)?.Trim().ToLowerInvariant();
+            if (!string.IsNullOrEmpty(flag) && flag != "rebel") return TextCommandResult.Error("Add 'rebel' to make them a rebel, or nothing.");
+            bool rebel = flag == "rebel";
             if (!(FindPlayer(sapi, args[0] as string) is (string uid, string name))) return TextCommandResult.Error("No player called '" + args[0] + "' has joined this world.");
-            SetAssigned(uid, name, faction);
+            bool wasRebel = RebelFaction(uid) != null;
+            SetAssigned(uid, name, faction, rebel);
             SaveAssigned();
-            string text = name + " is now a member of " + faction + ".";
+            string text = rebel ? name + " is now a rebel of " + faction + ": at war with its loyal players and their recruits; its wild NPCs leave them alone unless their recruits raid."
+                : name + " is now a member of " + faction + "." + (wasRebel ? " Their rebellion is over; their recruits stay with them." : "");
             if (OnlinePlayer(sapi, name)?.Entity is EntityPlayer entity) text += "\n" + DescribePlayer(name, RaceOf(entity), GroupsOf(entity), faction);
             return TextCommandResult.Success(text);
         }
@@ -426,7 +466,7 @@ namespace LotrNpcs
             string faction = (args[0] as string)?.ToLowerInvariant();
             List<AssignedPlayer> list = assigned.Values.Where(a => faction == null || a.Faction == faction).OrderBy(a => a.Faction).ThenBy(a => a.Name).ToList();
             if (list.Count == 0) return TextCommandResult.Success(faction == null ? "No player has a faction yet." : "No player is a member of " + faction + ".");
-            return TextCommandResult.Success(string.Join("\n", list.Select(a => a.Name + ": " + a.Faction)));
+            return TextCommandResult.Success(string.Join("\n", list.Select(a => a.Name + ": " + a.Faction + (a.Rebel ? " (rebel)" : ""))));
         }
 
         public string DescribePlayer(string name, string race, List<string> groups, string assignedFaction = null)

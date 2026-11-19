@@ -2,6 +2,8 @@
 
 ## 1.0.5 (in progress)
 - Factions are data: `tools/data/factions.json` lists each faction's id, side, stance, tier and member races, and the mod reads it at start instead of fixed lists in the code (default factions and sides, hire tiers, spawn zone factions, join menu order). Another mod can add a faction file of its own. New config files list the factions in join menu order. No other behaviour change; generated NPC files are identical to 1.0.4.
+- Faction packs: a content mod can add a whole faction with one file, `assets/<its id>/config/lotrnpcs-factions/<name>.json`, naming a shipped faction as its template plus its own model, looks, names, armor by rank and mounts. lotrnpcs makes its NPC types and spawn items when the server loads; names come from the pack's lang file. A config file takes in a new pack faction once, on its side. Example pack: `tools/examplepack` (Lindon), built as `lindonnpcs_0.1.0.zip`.
+- Rebels: `/recruits faction set <player> <faction> rebel`. A rebel stays in the faction but is at war with its loyal players: loyal recruits attack the rebel and their recruits on sight (even on Defensive), and the rebel's recruits fight loyalists. The faction's wild NPCs leave rebels alone unless the rebel's band is on Raid. A faction's rebels are one side. Only an admin ends it, by setting the faction again without `rebel`; the band stays.
 
 ## 1.0.4 (2026-11-18)
 Changes from an outside review of 1.0.3 (owner: "Make it a dependency", "Remove both", "Fix everything else mentioned").
