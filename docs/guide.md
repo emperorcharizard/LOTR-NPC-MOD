@@ -16,7 +16,7 @@ The mod is a C# DLL plus generated JSON files. You don't need to read the code t
 
 | Part | What it does | Main files |
 | --- | --- | --- |
-| Factions | Who is in which faction, who fights whom, rebels | `FactionSystem.cs`, `FactionSystem.Sides.cs`, `FactionConfig.cs` |
+| Factions | Who is in which faction, who fights whom | `FactionSystem.cs`, `FactionSystem.Sides.cs`, `FactionConfig.cs` |
 | Faction list | Reads the factions from faction files at start | `FactionRegistry.cs` |
 | Faction packs | Makes NPC types for factions that add-on mods define | `FactionPacks.cs` |
 | Spawning | Groups spawning in admin zones, patrols | `SpawnZones.cs`, `ZonePatrol.cs` |
@@ -107,21 +107,21 @@ When the server starts, the new faction appears in the join menu, the creative t
 
 **What a pack can't do.** It can't make a new race model or new armor: those come from their own mods, which the pack points to. Our swing animations exist only on LOTR Races and Classes bodies, so a race from another mod may swing with vanilla animations.
 
-## 5. Rebels (civil wars)
+## 5. Civil wars
 
-An admin makes a player a rebel against their faction:
+For a civil war, such as Gondor against Gondor, make the rebels a faction of their own:
 
+1. Add a faction pack with a faction file like this one, so the rebels have soldiers to hire and spawn. They copy Gondor's.
+
+```json
+{ "id": "gondorrebels", "side": "none", "tier": "men", "template": "gondor" }
 ```
-/recruits faction set <player> gondor rebel
-```
 
-- The rebel stays in Gondor and can still hire Gondor's NPCs.
-- Loyal Gondor players' NPCs attack the rebel and the rebel's NPCs on sight, even on Defensive.
-- The rebel's NPCs fight loyal Gondor players and their NPCs.
-- Gondor's wild NPCs leave the rebel alone, unless the rebel's band is on Raid.
-- All Gondor rebels are on one side.
+2. Name its units in the pack's lang file ("Gondor rebel warrior" and so on).
+3. Restart the server. `gondorrebels` is added to `lotrnpcs-factions.json`. A faction on no side is an enemy of everyone; move names to its `Allies` line if it should have friends, then `/recruits faction reload`.
+4. Move each rebel player with `/recruits faction set <player> gondorrebels`.
 
-To end it, set the faction again without `rebel`. The rebel keeps their NPCs, who stop fighting loyalists.
+From then on they are an ordinary faction: they hire rebel soldiers, and Gondor's NPCs fight them on sight.
 
 ## 6. Commands
 
@@ -133,7 +133,7 @@ Every command starts with `/recruits`.
 | `orders` | Players | Orders menu (also: hold R) |
 | `roster` | Players | Every recruit you have |
 | `whitelist` | Players | Players your recruits never attack |
-| `faction set <player> <faction> [rebel]` | Admins | Put a player in a faction, or make them a rebel |
+| `faction set <player> <faction>` | Admins | Put a player in a faction |
 | `faction clear <player>` | Admins | Let a player pick again |
 | `faction members` / `list` / `check <player>` | Admins | Who is where, and who fights whom |
 | `faction reload` | Admins | Apply config edits |

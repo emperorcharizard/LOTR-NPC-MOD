@@ -396,33 +396,6 @@ public static class Program {
         Check(fs.RecruitWantsToAttack(guard, uid, enemyLord) && fs.RecruitWantsToAttack(guard, uid, enemyOrc) && fs.RecruitWantsToAttack(enemyOrc, enemyLord.PlayerUID, guard) && fs.RecruitWantsToAttack(enemyOrc, enemyLord.PlayerUID, lord),
             "0.0.102: a Gondor member's recruits attack a Mordor member and their recruits on sight, and the other way round");
         Check(!fs.RecruitWantsToAttack(guard, uid, enemyMan), "...but not a Gondor-looking recruit of theirs (the same faction counts as allied)");
-        {
-            // 1.0.5 rebels (owner, 2026-11-19): civil war inside a faction.
-            var rebel = Player(null); fs.SetAssigned(rebel.PlayerUID, "Rebel", "gondor", true); var rebelMan = Hired("test-gondor-warrior", rebel.PlayerUID);
-            var rebel2 = Player(null); fs.SetAssigned(rebel2.PlayerUID, "Rebel2", "gondor", true); var rebel2Man = Hired("test-gondor-recruit", rebel2.PlayerUID);
-            var rohirrim2 = Member(null, "rohan"); var rohanMan = Hired("test-rohan-warrior", rohirrim2.PlayerUID);
-            Check(fs.RecruitWantsToAttack(guard, uid, rebel) && fs.RecruitWantsToAttack(guard, uid, rebelMan) && fs.RecruitWantsToAttack(rebelMan, rebel.PlayerUID, guard) && fs.RecruitWantsToAttack(rebelMan, rebel.PlayerUID, lord),
-                "rebels: a loyal Gondor member's recruits attack a Gondor rebel and their recruits on sight, and the rebel's recruits attack the loyalists");
-            Recruit.SetStance(guard, Recruit.Defensive);
-            bool defensiveHunts = fs.RecruitWantsToAttack(guard, uid, rebelMan);
-            Recruit.SetStance(guard, Recruit.Passive);
-            bool passiveRests = !fs.RecruitWantsToAttack(guard, uid, rebelMan);
-            Recruit.SetStance(guard, Recruit.Aggressive);
-            Check(defensiveHunts && passiveRests, "...loyalists attack rebels on sight even when defensive (owner's choice); passive ones still never fight");
-            Check(!fs.RecruitWantsToAttack(rebelMan, rebel.PlayerUID, rebel2Man) && !fs.RecruitWantsToAttack(rebel2Man, rebel2.PlayerUID, rebel) && fs.AlliedPlayers(rebel.PlayerUID, rebel2.PlayerUID)
-                && !fs.AlliedPlayers(rebel.PlayerUID, uid) && fs.RecruitWantsToAttack(rohanMan, rohirrim2.PlayerUID, rebelMan),
-                "...a faction's rebels are one side, and other factions treat them as members of their faction (Rohan is Gondor's enemy here)");
-            Check(!fs.WantsToAttack("gondor", rebel) && !fs.WantsToAttack("gondor", rebelMan) && !fs.RecruitWantsToAttack(rebelMan, rebel.PlayerUID, wildGondor),
-                "...Gondor's wild NPCs leave rebels alone, and an aggressive rebel band leaves them alone too");
-            Recruit.SetStance(rebelMan, Recruit.Raid);
-            bool raids = fs.RecruitWantsToAttack(rebelMan, rebel.PlayerUID, wildGondor);
-            Recruit.SetStance(rebelMan, Recruit.Aggressive);
-            Check(raids, "...but on Raid a rebel band attacks its own faction's wild NPCs");
-            fs.SetAssigned(rebel.PlayerUID, "Rebel", "gondor");
-            Check(!fs.RecruitWantsToAttack(guard, uid, rebelMan) && !fs.RecruitWantsToAttack(rebelMan, rebel.PlayerUID, guard) && fs.RebelFaction(rebel.PlayerUID) == null && Recruit.OwnerUidOf(rebelMan) == rebel.PlayerUID,
-                "...setting the faction again without rebel ends it, and the band stays with its owner, loyal again");
-            fs.SetAssigned(rebel2.PlayerUID, null, null);
-        }
         var friendGondor = Member(null, "gondor"); var friendsMan = Hired("test-gondor-warrior", friendGondor.PlayerUID);
         var shireling = Member(null, "shire"); var shiresHobbit = Hired("test-hobbit", shireling.PlayerUID);
         Check(!fs.RecruitWantsToAttack(guard, uid, friendGondor) && !fs.RecruitWantsToAttack(guard, uid, friendsMan) && !fs.RecruitWantsToAttack(guard, uid, shireling) && !fs.RecruitWantsToAttack(guard, uid, shiresHobbit),

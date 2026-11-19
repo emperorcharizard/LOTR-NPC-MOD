@@ -14,7 +14,7 @@ The mod has two config files in the server's `ModConfig` folder, plus one small 
 
 Each server file starts with a `#Instructions` list explaining it. That list is rewritten on every start, so edit the settings below it, not the list itself. Don't change `Version`.
 
-**1.0.5.** Factions are defined in faction files that any mod can add (see "Adding a faction" in `docs/guide.md`); a new add-on faction joins this file once, on its side, and is listed under `AddedFactions`. Rebels: `/recruits faction set <player> <faction> rebel` (see "Rebels" below).
+**1.0.5.** Factions are defined in faction files that any mod can add (see "Adding a faction" in `docs/guide.md`); a new add-on faction joins this file once, on its side, and is listed under `AddedFactions`. For a civil war, add a faction (a pack copying the faction's soldiers) and move players to it with `/recruits faction set`.
 
 **1.0.4 (after an outside review).** LOTR Races and Classes is now a required mod: the NPCs use its own race models instead of bundled copies. The guard and shock classes are gone: guards and shock troops already in a world become plain warriors (guard and shock recruits plain recruits), keeping their XP. The tormented elves are gone: their NPCs are removed when they load, which frees their places on rosters. The elves are now the Wood Elves, id `woodelves`. Your file is moved to version 36 once: `elves` becomes `woodelves` with your values, and `tormentedelves` and the guard and shock values are dropped. The file is now written with a blank line between factions and between the `#Instructions` lines.
 
@@ -42,7 +42,6 @@ A player's faction is the one they pick from the join menu, or the one an admin 
 - After the pick only an admin changes it: `/recruits faction set <player> <faction>` moves them, `/recruits faction clear <player>` lets them pick again. `/recruits faction members` lists who is in what.
 - Allies with `ShareFriends` treat each other's members as friends, and let them hire each other's NPCs.
 
-**Rebels (1.0.5).** `/recruits faction set <player> <faction> rebel` makes a player a rebel: still a member, able to hire the faction's NPCs, but at war with its loyal players. Loyal players' recruits attack the rebel and the rebel's recruits on sight, even on Defensive (Passive never fights). The rebel's recruits fight the loyalists. The faction's wild NPCs leave rebels alone, unless the rebel's band is on Raid. All rebels of one faction are one side. Only an admin ends it, by setting the faction again without `rebel`; the band stays with the player.
 
 | Setting | Default | What it does |
 | --- | --- | --- |
@@ -202,7 +201,7 @@ Every command is under `/recruits` (`/help recruits` lists them; `/help recruits
 | Command | What it does |
 | --- | --- |
 | `/recruits faction check <player>` | Which factions treat a player as a friend, and which attack them on sight. |
-| `/recruits faction set <player> <faction> [rebel]` / `clear <player>` | Put a player in a faction (as a rebel with `rebel`), or let them pick again. |
+| `/recruits faction set <player> <faction>` / `clear <player>` | Put a player in a faction, or let them pick again. |
 | `/recruits faction members [faction]` / `list` | Players in each faction; every faction's stance and allies. |
 | `/recruits faction reload` | Apply edits to lotrnpcs-factions.json without a restart. |
 | `/recruits zone add x z x z <factions>` | Mark a spawn zone between two corners. Zones may overlap and list several factions. |
