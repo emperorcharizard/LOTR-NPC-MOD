@@ -1,6 +1,6 @@
 # LOTR NPCs: config guide
 
-Nov 19, 2026 (updated for 1.0.5, faction file version 36, spawning file version 1; release 1.0.0) · @Emperorcharizar
+Nov 19, 2026 (updated for 1.0.6, faction file version 36, spawning file version 1; release 1.0.0) · @Emperorcharizar
 
 ## Overview
 

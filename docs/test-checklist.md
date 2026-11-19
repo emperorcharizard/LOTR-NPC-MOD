@@ -920,6 +920,8 @@ Install LOTR Races and Classes 0.4.1 (now required) and `lotrnpcs_1.0.4-test.zip
 
 Install `lotrnpcs_1.0.5-test.zip` and, for 173.3 to 173.6, the example pack `lindonnpcs_0.1.0.zip` (both on the v1.0.5 GitHub release); restart fully. Owner 2026-11-19: admins should add factions with new races and armor without a rebuild ("Other server admins too"); civil wars are a new faction the admin sets players to.
 
+Since 1.0.6 (owner: "publish as 1.06"), test with `lotrnpcs_1.0.6-test.zip`.
+
 - [ ] 173.1 Without the pack: the server log says "17 factions: shire, gondor, ...", and the join menu, creative tab and `/recruits zone add` work as in 1.0.4.
 - [ ] 173.2 A new `ModConfig/lotrnpcs-factions.json` (rename the old one first, then put it back) lists the factions in join menu order. An existing file keeps its values.
 - [ ] 173.3 With the pack: the log says "Faction packs: made 5 NPC types for lindon (from woodelves)" and shows no errors. The config gains `lindon` (allied to the Free Peoples, enemy of the Shadow) and an `AddedFactions` line.

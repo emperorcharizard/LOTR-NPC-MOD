@@ -1825,7 +1825,7 @@ with open(os.path.join(out, "modinfo.json"), "w", encoding="utf-8") as f:
         "type": "code",
         "modid": "lotrnpcs",
         "name": "LOTR NPCs",
-        "version": "1.0.5",
+        "version": "1.0.6",
         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Needs LOTR Races "
                        "and Classes (by Dango Dango Dango, Shakgriig and Buggoi) for the race models.",

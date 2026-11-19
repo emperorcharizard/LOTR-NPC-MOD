@@ -1,6 +1,6 @@
 # LOTR NPCs: how it works and how to set it up
 
-Version 1.0.5 · November 2026
+Version 1.0.6 · November 2026
 
 This is the short version. Every setting is listed in `docs/config-guide.md`.
 
