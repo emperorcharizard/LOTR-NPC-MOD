@@ -353,7 +353,8 @@
     },
 
     // Mordor orcs (Mordor mod): Orc Raider or Orc Warrior for recruits (Mordor or Angmar helmet), Orc Warrior
-    // (black or red) for warriors, red Orc Warrior with the red-masked Servant of the Eye helmet for captains.
+    // (black or red) for warriors, red Orc Warrior with the Gundabad tusked or Gundabad Warlord helmet (Northern Orcs
+    // mod) for captains (owner, 2026-11-26; was the red-masked Servant of the Eye helmet).
     "mordororc": {
       "recruit": [
         [
@@ -421,7 +422,13 @@
 
       "captain": [
         [
-          "mord:armor-head-tierfourplate-servanthelmethumanheavy-servanthelmethumanheavy-maskred",
+          "norc:armor-head-tierfourplate-norchelmetheavytwo-norchelmetheavytwo-none",
+          "mord:armor-body-tierfourplate-servantarmororcheavy-servantarmororcheavyred-none",
+          "mord:armor-legs-tierfourplate-servantleggingsorcheavy-servantleggingsorcheavyred-none"
+        ],
+
+        [
+          "norc:armor-head-tierfiveplate-norchelmetheavier-norchelmetheavier-none",
           "mord:armor-body-tierfourplate-servantarmororcheavy-servantarmororcheavyred-none",
           "mord:armor-legs-tierfourplate-servantleggingsorcheavy-servantleggingsorcheavyred-none"
         ]

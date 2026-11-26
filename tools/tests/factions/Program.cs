@@ -1454,11 +1454,11 @@ public static class Program {
                 .SelectMany(st => st.Select(c => (string)c)).Where(c => c.Contains("armor-head-") && !c.Contains('@')).Distinct().ToArray();
             var orcUnits = entityFiles.Keys.Where(c => new[] { "mordororc", "angmarorc", "goblin", "uruk", "gundabadorc" }.Any(f => c.StartsWith("test-" + f + "-"))).ToArray();
             Check(orcUnits.Length >= 15 && orcUnits.All(c => TypeHelmets(c).SequenceEqual(OwnHelmets(c)))
-                && TypeHelmets("test-mordororc-captain").SequenceEqual(new[] { "mord:armor-head-tierfourplate-servanthelmethumanheavy-servanthelmethumanheavy-maskred" })
+                && TypeHelmets("test-mordororc-captain").OrderBy(h => h).SequenceEqual(new[] { "norc:armor-head-tierfiveplate-norchelmetheavier-norchelmetheavier-none", "norc:armor-head-tierfourplate-norchelmetheavytwo-norchelmetheavytwo-none" }.OrderBy(h => h))
                 && TypeHelmets("test-mordororc-warrior").SequenceEqual(new[] { "mord:armor-head-tierfourplate-servanthelmetorcheavy-servanthelmetorcheavy-none" })
                 && TypeHelmets("test-uruk-captain").All(c => c.Contains("urukhaihelmetgeneral")) && TypeHelmets("test-uruk-warrior").All(c => !c.Contains("scout") && !c.Contains("general"))
                 && TypeHelmets("test-gondor-recruit").All(TypeHelmets("test-gondor-captain").Contains),
-                "0.0.112: each orc and Uruk unit may choose only its own helmets (a Mordor captain the red mask, a Black Uruk the Orc Warrior helmet, Uruk captains the General helmets); other factions' ranks still choose the helmets beneath them (0.0.76)");
+                "0.0.112: each orc and Uruk unit may choose only its own helmets (a Mordor captain, since 1.0.7, the Gundabad tusked or warlord helmet, a Black Uruk the Orc Warrior helmet, Uruk captains the General helmets); other factions' ranks still choose the helmets beneath them (0.0.76)");
             Check(TypeHelmets("test-easterling-captain").All(c => !c.Contains('@')) && TypeHelmets("test-easterling-captain").Any(c => c.Contains("woodlandhelmetmedium")),
                 "the Easterling captain's face coif isn't offered as a helmet");
             Check(TypeHelmets("test-hobbit").Length == 0, "hobbits have no helmets to choose (their hats aren't helmets)");
@@ -1520,7 +1520,7 @@ public static class Program {
                 "every colour variant is worn as a whole set: body and legs the same colour");
             bool ownBodies = new[] { "mordororc", "angmarorc", "goblin" }.All(f => new[] { "recruit", "warrior" }.All(r => Sets($"test-{f}-{r}").All(st => st.Select(c => (string)c).Where(c => !c.Contains(":armor-head-")).All(c => c.StartsWith(f == "mordororc" ? "mord:" : f == "angmarorc" ? "angmar:" : "norc:")))));
             Check(ownBodies, "...each still wears its own faction's body and leg armor");
-            Check(Sets("test-mordororc-captain").Count == 1 && Sets("test-angmarorc-captain").Count == 2 && Sets("test-goblin-captain").Count == 2 && Sets("test-uruk-recruit").Count == 1 && Sets("test-uruk-warrior").Count == 6
+            Check(Sets("test-mordororc-captain").Count == 2 && Sets("test-angmarorc-captain").Count == 2 && Sets("test-goblin-captain").Count == 2 && Sets("test-uruk-recruit").Count == 1 && Sets("test-uruk-warrior").Count == 6
                 && Heads("test-uruk-recruit").All(h => h.StartsWith("iseng:")) && Heads("test-uruk-warrior").All(h => !h.Contains("scout") && !h.Contains("general")) && Heads("test-uruk-captain").All(h => h.Contains("general")),
                 "0.0.82: captains keep their own faction's helmets (Gundabad warlords may wear the Gundabad orc helmet too); Uruk-hai warriors any Uruk helmet but scout and general, captains only general ones");
             Check((string)Sets("test-mordororc-recruit")[0][0] == mRaid && (string)Sets("test-angmarorc-warrior")[0][0] == aSol && (string)Sets("test-goblin-recruit")[0][0] == moria, "each faction's own helmet stays first, so portraits look as before");

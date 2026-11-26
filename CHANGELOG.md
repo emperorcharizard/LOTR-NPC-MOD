@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.7 (in progress)
+- Angmar captains are Black Numenoreans (the Wight Guard armor is cut for a Man) (owner).
+- Mordor orc captains wear the Gundabad tusked or Gundabad warlord helmet with their red heavy armor (owner).
+
 ## 1.0.6 (2026-11-19)
 - Rebels (in the 1.0.5 test release) removed: a civil war is a new faction the admin sets players to (owner).
 

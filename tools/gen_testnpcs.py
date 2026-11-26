@@ -1095,7 +1095,9 @@ TEST_NPCS = [
     # Angmar orcs (user): their own faction, same race model and stats as Mordor orcs, Angmar armor.
     ("test-angmarorc-recruit", "Angmar orc recruit", "lotrnpcs:mordororc", ORC_SKIN, RECRUIT_GEAR),
     ("test-angmarorc-warrior", "Angmar orc warrior", "lotrnpcs:mordororc", ORC_SKIN, WARRIOR_GEAR),
-    ("test-angmarorc-captain", "Angmar orc captain", "lotrnpcs:mordororc", ORC_SKIN, CAPTAIN_GEAR),
+    # 1.0.7 (owner, 2026-11-26: "Angmar captain should use the black numenorean model, since that's what the armor is
+    # for"): the Wight Guard armor is cut for a Man, so Angmar's captains are Black Numenoreans.
+    ("test-angmarorc-captain", "Angmar captain", "lotrnpcs:blacknumenorean", SKINS + "human/blacknumenor/humanskin17", CAPTAIN_GEAR),
     ("test-angmarorc-archer", "Angmar orc archer", "lotrnpcs:mordororc", ORC_SKIN, RECRUIT_GEAR),
     ("test-angmarorc-guard", "Angmar orc guard", "lotrnpcs:mordororc", ORC_SKIN, WARRIOR_GEAR),
     ("test-angmarorc-shock", "Angmar orc shock trooper", "lotrnpcs:mordororc", ORC_SKIN, WARRIOR_GEAR),
