@@ -194,9 +194,9 @@ namespace LotrNpcs
 
         /// <summary>A random name from the NPC type's "lotrnpcsNames" list, with a random "lotrnpcsSurnames" entry
         /// after it when the type has those (hobbits), or null when it has no list.</summary>
-        public static string RandomName(EntityProperties type, Random rand)
+        public static string RandomName(EntityProperties type, Random rand, string model = null)
         {
-            string[] names = type?.Attributes?["lotrnpcsNames"].AsArray<string>(null);
+            string[] names = ByModel(type?.Attributes, model)?["names"].AsArray<string>(null) ?? type?.Attributes?["lotrnpcsNames"].AsArray<string>(null);
             if (names == null || names.Length == 0) return null;
             string name = names[rand.Next(names.Length)];
             string[] surnames = type.Attributes["lotrnpcsSurnames"].AsArray<string>(null);
@@ -207,7 +207,7 @@ namespace LotrNpcs
         public static bool NameOnHire(Entity npc, Random rand)
         {
             if (npc.WatchedAttributes.GetBool(NamedAttr)) return false;
-            string name = RandomName(npc.Properties, rand);
+            string name = RandomName(npc.Properties, rand, Attrs.String(npc.WatchedAttributes, "skinModel"));
             if (name == null) return false;
             SetName(npc, name);
             return true;
@@ -237,14 +237,24 @@ namespace LotrNpcs
         public static Dictionary<string, string[]> PartsFor(Entity npc)
         {
             Dictionary<string, string[]> all = PartsOf(npc.Api, Attrs.String(npc.WatchedAttributes, "skinModel"));
-            return Limit(all, SkinLimits(npc.Properties?.Attributes));
+            return Limit(all, SkinLimits(npc.Properties?.Attributes, Attrs.String(npc.WatchedAttributes, "skinModel")));
         }
 
-        /// <summary>A type's part limits (attributes.lotrnpcsSkinParts): part code -> the variants it may have.</summary>
-        public static Dictionary<string, string[]> SkinLimits(JsonObject typeAttributes)
+        /// <summary>1.0.7: a type with more than one model (lotrnpcs:presetskinmodel skinModels) keeps each model's own
+        /// looks and names in lotrnpcsByModel: model -> {parts, names}. Null when it has none for this model.</summary>
+        public static JsonObject ByModel(JsonObject typeAttributes, string model)
+        {
+            if (model == null) return null;
+            JsonObject entry = typeAttributes?["lotrnpcsByModel"]?[model];
+            return entry != null && entry.Exists ? entry : null;
+        }
+
+        /// <summary>A type's part limits (attributes.lotrnpcsSkinParts, or its model's in lotrnpcsByModel): part code
+        /// -> the variants it may have.</summary>
+        public static Dictionary<string, string[]> SkinLimits(JsonObject typeAttributes, string model = null)
         {
             var limits = new Dictionary<string, string[]>();
-            JsonObject parts = typeAttributes?["lotrnpcsSkinParts"];
+            JsonObject parts = ByModel(typeAttributes, model)?["parts"] ?? typeAttributes?["lotrnpcsSkinParts"];
             if (parts == null || !parts.Exists || !(parts.Token is JObject obj)) return limits;
             foreach (JProperty p in obj.Properties())
             {

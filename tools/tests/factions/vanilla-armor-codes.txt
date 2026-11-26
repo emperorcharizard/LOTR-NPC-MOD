@@ -1,4 +1,5 @@
 # Vanilla armor item codes (game domain), as named by Combat Overhaul 0.18.9's armor patches and recipes. Used to check the mixed outfits.
+# 1.0.7: plus the bear hide armor (armor-*-hide-bear-black/brown), from the same patches.
 armor-body-antique-blackguard-broken
 armor-body-antique-blackguard-damaged
 armor-body-antique-blackguard-pristine
@@ -200,3 +201,9 @@ armor-legs-tailored-purple-linen
 armor-legs-tailored-red-linen
 armor-legs-tailored-white-linen
 armor-legs-tailored-yellow-linen
+armor-body-hide-bear-black
+armor-body-hide-bear-brown
+armor-legs-hide-bear-black
+armor-legs-hide-bear-brown
+armor-head-hide-bear-black
+armor-head-hide-bear-brown

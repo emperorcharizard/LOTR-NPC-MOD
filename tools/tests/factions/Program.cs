@@ -77,6 +77,13 @@ public static class Program {
                 && (string)mBeh["sets"][0][0] == "x:armor-head-b" && made["client"]["behaviors"].Concat(made["server"]["behaviors"]).Where(b => (string)b["code"] == "lotrnpcs:presetskinmodel").All(b => (string)b["skinModel"] == "lrc:sindar")
                 && (string)tpl["attributes"]["lotrnpcsFaction"] == "woodelves" && (string)made["attributes"]["lotrnpcsRank"] == "warrior",
                 "a pack's NPC type copies its template with the pack's faction, names, looks, outfits, helmets and model, leaving the template as it was");
+            var aTpl = JObject.Parse(File.ReadAllText(Path.Combine(argv[0], "test-angmarorc-recruit.json")));
+            var aMade = FactionPackSystem.Entity(aTpl, "test-lothlorien-recruit", pack[0], "recruit");
+            var aKept = FactionPackSystem.Entity(aTpl, "test-rhudaur-recruit", new FactionInfo { Id = "rhudaur" }, "recruit");
+            Check(aMade["client"]["behaviors"].Concat(aMade["server"]["behaviors"]).Where(b => (string)b["code"] == "lotrnpcs:presetskinmodel").All(b => b["skinModels"] == null && (string)b["skinModel"] == "lrc:sindar")
+                && aMade["attributes"]["lotrnpcsByModel"] == null && aKept["attributes"]["lotrnpcsByModel"] != null
+                && aKept["client"]["behaviors"].First(b => (string)b["code"] == "lotrnpcs:presetskinmodel")["skinModels"] is JArray,
+                "1.0.7: a pack copying Angmar's mixed recruits with a model of its own has only that model and its own looks and names; without one it keeps Angmar's mix");
             var rider = FactionPackSystem.Entity(JObject.Parse(File.ReadAllText(Path.Combine(argv[0], "test-elf-rider.json"))), "test-lothlorien-rider", pack[0], "rider");
             Check((string)rider["attributes"]["lotrnpcsMounts"][0] == "game:horse" && (string)rider["server"]["behaviors"].First(b => (string)b["code"] == "lotrnpcs:startinggear")["sets"][0][0] == "x:armor-head-b", "...riders take the pack's mounts and the warriors' outfits");
             var creature = JObject.Parse(File.ReadAllText(Path.Combine(argv[0], "..", "itemtypes", "creature.json")));
@@ -603,16 +610,19 @@ public static class Program {
                 string gWarlordHead = "norc:armor-head-tierfiveplate-norchelmetheavier-norchelmetheavier-none", gOwner = "gundabad:armor-head-tierfourplate-gundabadhelmetone-gundabadhelmetone-none";
                 string[] gWarrior = { "norc:armor-body-tierfourplate-norcarmorheavy-norcarmorheavy-none", "norc:armor-legs-tierfourplate-norcleggingsheavy-norcleggingsheavy-none" };
                 string[] gWarlord = { "norc:armor-body-tierfiveplate-norcarmorheavier-norcarmorheavier-none", "norc:armor-legs-tierfiveplate-norcleggingsheavier-norcleggingsheavier-none" };
-                var want = r == "recruit" ? new[] { gBone } : r == "warrior" ? new[] { gWarrior.Prepend(gHelm).ToArray(), gWarrior.Prepend(gTusk).ToArray() }
+                // 1.0.7 (owner): recruits wear vanilla bear hide armor, black or brown, with the Mordor Orc Raider helmet.
+                string mRaider = "mord:armor-head-tierthreechain-servanthelmetorcmedium-servanthelmetorcmedium-none";
+                var gBear = new[] { "black", "brown" }.Select(c => new[] { mRaider, "game:armor-body-hide-bear-" + c, "game:armor-legs-hide-bear-" + c }).ToArray();
+                var want = r == "recruit" ? gBear : r == "warrior" ? new[] { gWarrior.Prepend(gHelm).ToArray(), gWarrior.Prepend(gTusk).ToArray() }
                     : new[] { gWarlord.Prepend(gWarlordHead).ToArray(), gWarlord.Prepend(gTusk).ToArray(), gWarlord.Prepend(gOwner).ToArray() };
                 // 0.0.112: orcs offer only their own unit's helmets (no lower ranks').
                 string[] helms = r == "warrior" ? new[] { gHelm, gTusk } : new[] { gWarlordHead, gTusk, gOwner };
                 return sets.Count() == want.Length && want.Select((w, i) => sets[i].Select(c => (string)c).SequenceEqual(w)).All(b => b) && fallback.All(c => !c.Contains("armor-head-")) && fallback.Any()
-                    && (r == "recruit" ? g["attributes"]["lotrnpcsHelmets"] == null : g["attributes"]["lotrnpcsHelmets"].Select(c => (string)c).SequenceEqual(helms))
+                    && (r == "recruit" ? g["attributes"]["lotrnpcsHelmets"].Select(c => (string)c).SequenceEqual(new[] { mRaider }) : g["attributes"]["lotrnpcsHelmets"].Select(c => (string)c).SequenceEqual(helms))
                     && (string)g["attributes"]["lotrnpcsFaction"] == "gundabad" && (string)g["attributes"]["lotrnpcsRank"] == r
                     && (string)g["client"]["behaviors"].First(b => (string)b["code"] == "lotrnpcs:presetskinmodel")["skinModel"] == "lotrnpcs:mordororc";
             }) && lang.Properties().All(p => !((string)p.Value).Contains("(WIP)")) && SpawnZoneSystem.Factions.Contains("gundabad"),
-            "Gundabad orcs: the Mordor orc model with their own skins (0.0.63; their own model until 1.0.4), bone armor for recruits, the norc Gundabad set for warriors (0.0.76) with the tusked helmet too, captains the warlord set with three helmets (0.0.95; no bone armor since 0.0.96), no helmet without the mod, no \"(WIP)\" (0.0.76), and zones accept them");
+            "Gundabad orcs: the Mordor orc model with their own skins (0.0.63; their own model until 1.0.4), bear hide armor and the Mordor raider helmet for recruits (1.0.7; was bone armor), the norc Gundabad set for warriors (0.0.76) with the tusked helmet too, captains the warlord set with three helmets (0.0.95; no bone armor since 0.0.96), no helmet without the mod, no \"(WIP)\" (0.0.76), and zones accept them");
         // 1.0.4 (outside review, owner: "Make it a dependency"): LOTR Races and Classes is required and its models are
         // used as they are, one per race; each faction's looks are limits on its types (tools/data/races.json).
         {
@@ -629,6 +639,32 @@ public static class Program {
             Check(EntityBehaviorPresetSkinModel.IsRetiredModel("lotrnpcs:gondor") && EntityBehaviorPresetSkinModel.IsRetiredModel("lotrnpcs:gundabadorc") && !EntityBehaviorPresetSkinModel.IsRetiredModel("lotrnpcs:mordororc")
                 && !EntityBehaviorPresetSkinModel.IsRetiredModel("lrc:freepeople") && !EntityBehaviorPresetSkinModel.IsRetiredModel(null),
                 "1.0.4: an NPC saved with one of the old per-faction models takes its type's model when it loads");
+            // 1.0.7 (owner, 2026-11-26): Angmar recruits are orcs or Men, warriors Wildmen or Black Numenoreans, captains Black Numenoreans.
+            JsonObject Preset(string code) => new JsonObject(entityFiles[code]["client"]["behaviors"].First(b => (string)b["code"] == "lotrnpcs:presetskinmodel"));
+            string[] aRecruit = EntityBehaviorPresetSkinModel.ModelsOf(Preset("test-angmarorc-recruit")), aWarrior = EntityBehaviorPresetSkinModel.ModelsOf(Preset("test-angmarorc-warrior"));
+            var pickRand = new Random(7);
+            var picked = Enumerable.Range(0, 400).Select(_ => EntityBehaviorPresetSkinModel.PickModel(aRecruit, null, pickRand)).ToList();
+            JsonObject aAttrs = new JsonObject(entityFiles["test-angmarorc-warrior"]["attributes"]);
+            Check(aRecruit.Distinct().OrderBy(m => m).SequenceEqual(new[] { "lotrnpcs:mordororc", "lrc:bnumenorean", "lrc:wildmen" }) && picked.Count(m => m == "lotrnpcs:mordororc") is int orcs && orcs > 160 && orcs < 240
+                && aWarrior.OrderBy(m => m).SequenceEqual(new[] { "lrc:bnumenorean", "lrc:wildmen" })
+                && EntityBehaviorPresetSkinModel.ModelsOf(Preset("test-angmarorc-captain")).SequenceEqual(new[] { "lrc:bnumenorean" })
+                && EntityBehaviorPresetSkinModel.ModelsOf(Preset("test-angmarorc-rider")).OrderBy(m => m).SequenceEqual(aWarrior.OrderBy(m => m))
+                && EntityBehaviorPresetSkinModel.ModelsOf(Preset("test-gondor-warrior")).SequenceEqual(new[] { "lrc:freepeople" }),
+                "1.0.7: Angmar recruits and archers are half orcs, half Wildmen or Black Numenoreans; warriors and riders Wildmen or Black Numenoreans; captains Black Numenoreans; other types keep one model");
+            Check(EntityBehaviorPresetSkinModel.PickModel(aWarrior, "lrc:wildmen", new Random(1)) == "lrc:wildmen"
+                && aWarrior.Contains(EntityBehaviorPresetSkinModel.PickModel(aWarrior, "lotrnpcs:mordororc", new Random(1)))
+                && EntityBehaviorPresetSkinModel.PickModel(new[] { "lrc:bnumenorean" }, "lotrnpcs:mordororc", new Random(1)) == "lrc:bnumenorean"
+                && EntityBehaviorPresetSkinModel.PickModel(new[] { "lrc:freepeople" }, "lotrnpcs:gondor", new Random(1)) == "lrc:freepeople"
+                && EntityBehaviorPresetSkinModel.PickModel(Array.Empty<string>(), "lrc:wildmen", new Random(1)) == null,
+                "1.0.7: an NPC keeps its model if its type has it; an Angmar orc promoted to warrior or captain becomes one of the new type's Men");
+            string[] bnNames = aAttrs["lotrnpcsByModel"]["lrc:bnumenorean"]["names"].AsArray<string>(), wildNames = aAttrs["lotrnpcsByModel"]["lrc:wildmen"]["names"].AsArray<string>();
+            var aType = types["test-angmarorc-warrior"];
+            Check(bnNames.Contains(Looks.RandomName(aType, new Random(2), "lrc:bnumenorean")) && wildNames.Contains(Looks.RandomName(aType, new Random(2), "lrc:wildmen"))
+                && bnNames.Contains(Looks.RandomName(types["test-angmarorc-captain"], new Random(2), "lrc:bnumenorean"))
+                && !bnNames.Intersect(types["test-mordororc-recruit"].Attributes["lotrnpcsNames"].AsArray<string>()).Any()
+                && Looks.SkinLimits(aAttrs, "lrc:wildmen")["haircolor"].Contains("russet") && !Looks.SkinLimits(aAttrs, "lrc:bnumenorean")["haircolor"].Contains("russet")
+                && Looks.SkinLimits(new JsonObject(entityFiles["test-angmarorc-recruit"]["attributes"]), "lotrnpcs:mordororc").Count > 0,
+                "1.0.7: each Angmar race gets its own names and looks (Wildmen the Dunlending ones, Black Numenoreans theirs, orcs the orc ones)");
             var looks = Npc("test-rohan-warrior");
             var applied = new TreeAttribute(); applied.SetString("haircolor", "eerieblack"); applied.SetString("brows", "steelblue"); applied.SetString("hairbase", "afro"); applied.SetString("eyecolor", "azure");
             var skinTree = new TreeAttribute(); skinTree["appliedParts"] = applied; looks.WatchedAttributes["skinConfig"] = skinTree;
@@ -1988,8 +2024,8 @@ public static class Program {
                 && lang["item-orcweapon-hdsword"]?.ToString() == "Haradrim sword" && lang["item-orcweapon-hdheavyshield"]?.ToString() == "Haradrim heavy shield",
                 "Haradrim: the owner's sword and curved sword, one-handed slashes; the light shield for recruits, the heavy one for warriors and captains, none for archers");
             // 0.0.96 (owner: "the gundabad captain should not spawn in the bone armor like it does").
-            Check(!entityFiles["test-gundabadorc-captain"].ToString().Contains("gundabadbonearmor") && entityFiles["test-gundabadorc-recruit"].ToString().Contains("gundabadbonearmor"),
-                "Gundabad captains never wear the bone armor; recruits still do");
+            Check(!entityFiles["test-gundabadorc-captain"].ToString().Contains("gundabadbonearmor"),
+                "Gundabad captains never wear the bone armor (since 1.0.7 no Gundabad rank does)");
             // 0.0.96 (owner: "Let the gundabad orcs use the moria spear"): Gundabad's dagger, axe and the Moria spear, held
             // like the Misty Mountains orcs hold it.
             var gbAnims = entityFiles["test-gundabadorc-warrior"]["client"]["animations"].ToDictionary(a => (string)a["code"], a => a);

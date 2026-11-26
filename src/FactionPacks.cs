@@ -93,6 +93,9 @@ namespace LotrNpcs
             copy["code"] = code;
             JObject attrs = (JObject)copy["attributes"];
             attrs["lotrnpcsFaction"] = pack.Id;
+            // A template with several models (Angmar's orcs and Men) keeps per-model looks and names; the pack's own
+            // model, looks or names replace them all.
+            if (pack.Model != null || pack.Parts != null || pack.Names?.Count > 0) attrs.Remove("lotrnpcsByModel");
             if (pack.Parts != null) attrs["lotrnpcsSkinParts"] = JObject.FromObject(pack.Parts);
             if (pack.Names != null && pack.Names.Count > 0)
             {
@@ -114,7 +117,11 @@ namespace LotrNpcs
                 foreach (JObject behavior in (copy[side]?["behaviors"] as JArray)?.OfType<JObject>() ?? Enumerable.Empty<JObject>())
                 {
                     string b = (string)behavior["code"];
-                    if (b == "lotrnpcs:presetskinmodel" && pack.Model != null) behavior["skinModel"] = pack.Model;
+                    if (b == "lotrnpcs:presetskinmodel" && pack.Model != null)
+                    {
+                        behavior["skinModel"] = pack.Model;
+                        behavior.Remove("skinModels");
+                    }
                     if (b == "lotrnpcs:startinggear" && sets != null) behavior["sets"] = JArray.FromObject(sets);
                 }
             }

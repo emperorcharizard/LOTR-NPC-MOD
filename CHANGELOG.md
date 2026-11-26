@@ -1,7 +1,9 @@
 # Changelog
 
-## 1.0.7 (in progress)
+## 1.0.7 (2026-11-26)
 - Angmar captains are Black Numenoreans (the Wight Guard armor is cut for a Man) (owner).
+- Angmar recruits and archers are half orcs, half Men (Wildmen or Black Numenoreans); warriors and riders are Wildmen or Black Numenoreans (owner). Each race has its own looks and names. An orc promoted to warrior becomes a Man with new looks (it keeps its name). Units are now "Angmar recruit" and so on, the folk "Servants of Angmar". An NPC type can now list several models (`skinModels` on `lotrnpcs:presetskinmodel`, with per-model looks and names in `lotrnpcsByModel`).
+- Gundabad orc recruits wear vanilla bear hide armor, black or brown, with the Mordor Orc Raider helmet (owner; was the Gundabad bone armor).
 - Mordor orc captains wear the Gundabad tusked or Gundabad warlord helmet with their red heavy armor (owner).
 
 ## 1.0.6 (2026-11-19)

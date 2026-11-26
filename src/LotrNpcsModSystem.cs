@@ -577,15 +577,38 @@ namespace LotrNpcs
         public override void Initialize(EntityProperties properties, JsonObject attributes)
         {
             base.Initialize(properties, attributes);
-            limits = Looks.SkinLimits(properties.Attributes);
-
             // Before Player Model Lib's own behavior (listed after this one), which reads the model.
-            string model = attributes["skinModel"].AsString(null);
+            string[] models = ModelsOf(attributes);
             string stored = Attrs.String(entity.WatchedAttributes, "skinModel");
-            if (model == null || (stored != null && !IsRetiredModel(stored))) return;
+            string model = PickModel(models, stored, entity.World?.Rand ?? new Random());
+            if (model != null && model != stored)
+            {
+                // 1.0.7: a model its type doesn't have (an Angmar orc promoted to a warrior, who are Men) gets new
+                // looks from Player Model Lib for the new model.
+                if (stored != null && !IsRetiredModel(stored)) entity.WatchedAttributes.RemoveAttribute("skinConfig");
+                entity.WatchedAttributes.SetString("skinModel", model);
+                entity.WatchedAttributes.MarkPathDirty("skinModel");
+            }
+            limits = Looks.SkinLimits(properties.Attributes, model ?? stored);
+        }
 
-            entity.WatchedAttributes.SetString("skinModel", model);
-            entity.WatchedAttributes.MarkPathDirty("skinModel");
+        /// <summary>The type's models: "skinModels" (1.0.7, one picked at random; a model listed twice is twice as
+        /// likely), else "skinModel".</summary>
+        public static string[] ModelsOf(JsonObject attributes)
+        {
+            string[] list = attributes?["skinModels"].AsArray<string>(null)?.Where(m => !string.IsNullOrEmpty(m)).ToArray();
+            if (list != null && list.Length > 0) return list;
+            string one = attributes?["skinModel"].AsString(null);
+            return one == null ? Array.Empty<string>() : new[] { one };
+        }
+
+        /// <summary>The model an NPC should have: the one it has if its type has it, else one of its type's at
+        /// random. Null when the type names none. Public for tests.</summary>
+        public static string PickModel(string[] models, string stored, Random rand)
+        {
+            if (models == null || models.Length == 0) return null;
+            if (stored != null && !IsRetiredModel(stored) && Array.IndexOf(models, stored) >= 0) return stored;
+            return models[rand.Next(models.Length)];
         }
 
         public override void AfterInitialized(bool onFirstSpawn)

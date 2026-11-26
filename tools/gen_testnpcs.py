@@ -1084,6 +1084,9 @@ def ranks(race, people, model, skin):
                                ("guard", WARRIOR_GEAR), ("shock", WARRIOR_GEAR))]
 
 
+ANGMAR_MEN = ["lotrnpcs:dunlending", "lotrnpcs:blacknumenorean"]
+ANGMAR_RECRUITS = ["lotrnpcs:mordororc", "lotrnpcs:mordororc"] + ANGMAR_MEN
+
 TEST_NPCS = [
     ("test-goblin", "Goblin", "lotrnpcs:goblin", SKINS + "orc/orcskin6", []),
     ("test-mordororc-recruit", "Mordor orc recruit", "lotrnpcs:mordororc", ORC_SKIN, RECRUIT_GEAR),
@@ -1092,13 +1095,16 @@ TEST_NPCS = [
     ("test-mordororc-archer", "Mordor orc archer", "lotrnpcs:mordororc", ORC_SKIN, RECRUIT_GEAR),
     ("test-mordororc-guard", "Mordor orc guard", "lotrnpcs:mordororc", ORC_SKIN, WARRIOR_GEAR),
     ("test-mordororc-shock", "Mordor orc shock trooper", "lotrnpcs:mordororc", ORC_SKIN, WARRIOR_GEAR),
-    # Angmar orcs (user): their own faction, same race model and stats as Mordor orcs, Angmar armor.
-    ("test-angmarorc-recruit", "Angmar orc recruit", "lotrnpcs:mordororc", ORC_SKIN, RECRUIT_GEAR),
-    ("test-angmarorc-warrior", "Angmar orc warrior", "lotrnpcs:mordororc", ORC_SKIN, WARRIOR_GEAR),
+    # Angmar (user): their own faction, same stats as Mordor orcs, Angmar armor.
     # 1.0.7 (owner, 2026-11-26: "Angmar captain should use the black numenorean model, since that's what the armor is
-    # for"): the Wight Guard armor is cut for a Man, so Angmar's captains are Black Numenoreans.
-    ("test-angmarorc-captain", "Angmar captain", "lotrnpcs:blacknumenorean", SKINS + "human/blacknumenor/humanskin17", CAPTAIN_GEAR),
-    ("test-angmarorc-archer", "Angmar orc archer", "lotrnpcs:mordororc", ORC_SKIN, RECRUIT_GEAR),
+    # for"; "make angmar recruits vary between orc and human, then the warriors and captains can both be humans.
+    # (wildmen, black numenoreans)"): recruits and archers are half orcs, half Men (Wildmen, LRC's wildmen model, or
+    # Black Numenoreans); warriors are Men, captains ("captains black numenoreans only") Black Numenoreans, all with
+    # their own race's names. An orc promoted to warrior becomes a Man with new looks.
+    ("test-angmarorc-recruit", "Angmar recruit", ANGMAR_RECRUITS, ORC_SKIN, RECRUIT_GEAR),
+    ("test-angmarorc-warrior", "Angmar warrior", ANGMAR_MEN, SKINS + "human/blacknumenor/humanskin17", WARRIOR_GEAR),
+    ("test-angmarorc-captain", "Angmar captain", ["lotrnpcs:blacknumenorean"], SKINS + "human/blacknumenor/humanskin17", CAPTAIN_GEAR),
+    ("test-angmarorc-archer", "Angmar archer", ANGMAR_RECRUITS, ORC_SKIN, RECRUIT_GEAR),
     ("test-angmarorc-guard", "Angmar orc guard", "lotrnpcs:mordororc", ORC_SKIN, WARRIOR_GEAR),
     ("test-angmarorc-shock", "Angmar orc shock trooper", "lotrnpcs:mordororc", ORC_SKIN, WARRIOR_GEAR),
     ("test-uruk", "Uruk-hai", "lotrnpcs:uruk", SKINS + "orc/orcskin9", []),
@@ -1278,9 +1284,18 @@ with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "race
     RACES = json.load(f)
 
 for code, name, race_code, skin_texture, gear in TEST_NPCS:
-    race = RACES[race_code.split(":", 1)[1]]
+    # 1.0.7: a list of races gives the type several models, one picked at random per NPC (a race listed twice is
+    # twice as likely); each keeps its own looks and names (lotrnpcsByModel). The first is the portrait's.
+    race_keys = [r.split(":", 1)[1] for r in ([race_code] if isinstance(race_code, str) else race_code)]
+    race = RACES[race_keys[0]]
     model = race["model"]
     preset = {"code": "lotrnpcs:presetskinmodel", "skinModel": model}
+    by_model = {}
+    if not isinstance(race_code, str):
+        if len(race_keys) > 1:
+            preset["skinModels"] = [RACES[r]["model"] for r in race_keys]
+        for r in dict.fromkeys(race_keys):
+            by_model[RACES[r]["model"]] = {"parts": RACES[r]["parts"], "names": NAMES[NAMES_OF[r]]}
     skin = [preset, {"code": "PlayerModelLib:ExtraSkinnable"}]
     # The gear inventory goes after Player Model Lib, which swaps in the race model that the gear is added onto.
     # 0.0.80 (owner: "when the helmet is on, hide the hair options underneath"): after the gear, so it can see a helmet.
@@ -1299,6 +1314,8 @@ for code, name, race_code, skin_texture, gear in TEST_NPCS:
     gear_textures = [{"code": "lotrnpcs:geartextures"}] if gear else []
     health, armor_tier, melee = RANK_STATS.get(rank, RANKLESS_STATS)
     attributes = {"lotrnpcsFaction": FACTION_OF[faction], "lotrnpcsSkinParts": race["parts"]}
+    if by_model:
+        attributes["lotrnpcsByModel"] = by_model
     if code in HIDDEN:
         attributes["inCreativeInventory"] = False
     if rank in RANK_STATS:
@@ -1793,7 +1810,7 @@ assert set(FACTION_TALK) == set(FACTION_OF.values()), "talk lines for every fact
 FOLK = {
     "gondor": "Men of Gondor", "rohan": "Riders of Rohan", "dale": "Men of Dale", "arnor": "Dunedain of Arnor",
     "haradrim": "Haradrim", "easterlings": "Easterlings", "blacknumenoreans": "Black Numenoreans", "dunlendings": "Dunlendings",
-    "isengard": "Uruk-hai", "mordor": "Mordor orcs", "angmar": "Angmar orcs", "gundabad": "Gundabad orcs",
+    "isengard": "Uruk-hai", "mordor": "Mordor orcs", "angmar": "Servants of Angmar", "gundabad": "Gundabad orcs",
     "mistymountains": "Goblins of the Misty Mountains", "woodelves": "Wood elves", "tormentedelves": "Tormented elves",
     "dwarves": "Dwarves", "wickeddwarves": "Wicked dwarves", "shire": "Hobbits",
 }
@@ -1827,7 +1844,7 @@ with open(os.path.join(out, "modinfo.json"), "w", encoding="utf-8") as f:
         "type": "code",
         "modid": "lotrnpcs",
         "name": "LOTR NPCs",
-        "version": "1.0.6",
+        "version": "1.0.7",
         "description": "Recruits, warriors and captains of every Middle-earth faction. They spawn in admin zones (/recruits zone), "
                        "fight by faction, and can be hired and commanded (talk to them; hold R for orders). Needs LOTR Races "
                        "and Classes (by Dango Dango Dango, Shakgriig and Buggoi) for the race models.",

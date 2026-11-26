@@ -551,13 +551,21 @@
       ]
     },
 
-    // Gundabad orcs: the owner's Gundabad Bone Armor for recruits, the Northern Orcs Gundabad set for warriors
-    // (also the tusked helmet), the Gundabad Warlord set with three helmets for captains.
+    // Gundabad orcs: vanilla bear hide armor, black or brown, with the Mordor Orc Raider helmet for recruits (owner,
+    // 2026-11-26; was the Gundabad Bone Armor), the Northern Orcs Gundabad set for warriors (also the tusked helmet),
+    // the Gundabad Warlord set with three helmets for captains.
     "gundabadorc": {
       "recruit": [
         [
-          "gundabad:armor-body-tierthreebrig-gundabadbonearmor-gundabadbonearmor-none",
-          "gundabad:armor-legs-tierthreebrig-gundabadboneleggings-gundabadboneleggings-none"
+          "mord:armor-head-tierthreechain-servanthelmetorcmedium-servanthelmetorcmedium-none",
+          "game:armor-body-hide-bear-black",
+          "game:armor-legs-hide-bear-black"
+        ],
+
+        [
+          "mord:armor-head-tierthreechain-servanthelmetorcmedium-servanthelmetorcmedium-none",
+          "game:armor-body-hide-bear-brown",
+          "game:armor-legs-hide-bear-brown"
         ]
       ],
 

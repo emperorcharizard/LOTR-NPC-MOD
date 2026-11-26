@@ -928,3 +928,11 @@ Since 1.0.6 (owner: "publish as 1.06"), test with `lotrnpcs_1.0.6-test.zip`.
 - [ ] 173.4 The creative tab ends with five Lindon units with portraits, named "Lindon recruit" and so on. Spawned, they have the Noldor body, dark or silver hair, steel brigandine (recruit), steel plate (warrior) and gold plate (captain).
 - [ ] 173.5 A Lindon warrior fights a Mordor warrior and leaves a Gondor warrior alone. Hired, it gets a Lindon name.
 - [ ] 173.6 `/recruits zone add` accepts `lindon`, and Lindon groups spawn there. `/recruits faction set <player> lindon` works.
+
+## 174. Owner's look changes (1.0.7)
+- [ ] Angmar recruits spawn as orcs about half the time, otherwise Wildmen or Black Numenoreans, each with its own looks
+- [ ] Angmar warriors and riders are Wildmen or Black Numenoreans; captains are Black Numenoreans in the Wight Guard armor
+- [ ] A hired Angmar orc recruit promoted to warrior becomes a Man with new looks and keeps its name, rank and owner
+- [ ] Angmar Men hired fresh get Dunlending (Wildmen) or Black Numenorean names
+- [ ] Mordor orc captains wear the Gundabad tusked or warlord helmet with the red heavy armor
+- [ ] Gundabad recruits wear black or brown bear hide armor with the Mordor Orc Raider helmet
