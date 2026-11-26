@@ -645,12 +645,12 @@ public static class Program {
             var pickRand = new Random(7);
             var picked = Enumerable.Range(0, 400).Select(_ => EntityBehaviorPresetSkinModel.PickModel(aRecruit, null, pickRand)).ToList();
             JsonObject aAttrs = new JsonObject(entityFiles["test-angmarorc-warrior"]["attributes"]);
-            Check(aRecruit.Distinct().OrderBy(m => m).SequenceEqual(new[] { "lotrnpcs:mordororc", "lrc:bnumenorean", "lrc:wildmen" }) && picked.Count(m => m == "lotrnpcs:mordororc") is int orcs && orcs > 160 && orcs < 240
+            Check(aRecruit.OrderBy(m => m).SequenceEqual(new[] { "lotrnpcs:mordororc", "lrc:wildmen" }) && picked.Count(m => m == "lotrnpcs:mordororc") is int orcs && orcs > 160 && orcs < 240
                 && aWarrior.OrderBy(m => m).SequenceEqual(new[] { "lrc:bnumenorean", "lrc:wildmen" })
                 && EntityBehaviorPresetSkinModel.ModelsOf(Preset("test-angmarorc-captain")).SequenceEqual(new[] { "lrc:bnumenorean" })
                 && EntityBehaviorPresetSkinModel.ModelsOf(Preset("test-angmarorc-rider")).OrderBy(m => m).SequenceEqual(aWarrior.OrderBy(m => m))
                 && EntityBehaviorPresetSkinModel.ModelsOf(Preset("test-gondor-warrior")).SequenceEqual(new[] { "lrc:freepeople" }),
-                "1.0.7: Angmar recruits and archers are half orcs, half Wildmen or Black Numenoreans; warriors and riders Wildmen or Black Numenoreans; captains Black Numenoreans; other types keep one model");
+                "1.0.7: Angmar recruits and archers are half orcs, half Wildmen (never Black Numenoreans); warriors and riders Wildmen or Black Numenoreans; captains Black Numenoreans; other types keep one model");
             Check(EntityBehaviorPresetSkinModel.PickModel(aWarrior, "lrc:wildmen", new Random(1)) == "lrc:wildmen"
                 && aWarrior.Contains(EntityBehaviorPresetSkinModel.PickModel(aWarrior, "lotrnpcs:mordororc", new Random(1)))
                 && EntityBehaviorPresetSkinModel.PickModel(new[] { "lrc:bnumenorean" }, "lotrnpcs:mordororc", new Random(1)) == "lrc:bnumenorean"

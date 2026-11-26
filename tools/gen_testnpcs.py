@@ -1085,7 +1085,7 @@ def ranks(race, people, model, skin):
 
 
 ANGMAR_MEN = ["lotrnpcs:dunlending", "lotrnpcs:blacknumenorean"]
-ANGMAR_RECRUITS = ["lotrnpcs:mordororc", "lotrnpcs:mordororc"] + ANGMAR_MEN
+ANGMAR_RECRUITS = ["lotrnpcs:mordororc", "lotrnpcs:dunlending"]
 
 TEST_NPCS = [
     ("test-goblin", "Goblin", "lotrnpcs:goblin", SKINS + "orc/orcskin6", []),
@@ -1098,8 +1098,8 @@ TEST_NPCS = [
     # Angmar (user): their own faction, same stats as Mordor orcs, Angmar armor.
     # 1.0.7 (owner, 2026-11-26: "Angmar captain should use the black numenorean model, since that's what the armor is
     # for"; "make angmar recruits vary between orc and human, then the warriors and captains can both be humans.
-    # (wildmen, black numenoreans)"): recruits and archers are half orcs, half Men (Wildmen, LRC's wildmen model, or
-    # Black Numenoreans); warriors are Men, captains ("captains black numenoreans only") Black Numenoreans, all with
+    # (wildmen, black numenoreans)"): recruits and archers are half orcs, half Wildmen (LRC's wildmen model; "recruits
+    # cannot be black numenoreans"); warriors are Wildmen or Black Numenoreans, captains ("captains black numenoreans only") Black Numenoreans, all with
     # their own race's names. An orc promoted to warrior becomes a Man with new looks.
     ("test-angmarorc-recruit", "Angmar recruit", ANGMAR_RECRUITS, ORC_SKIN, RECRUIT_GEAR),
     ("test-angmarorc-warrior", "Angmar warrior", ANGMAR_MEN, SKINS + "human/blacknumenor/humanskin17", WARRIOR_GEAR),

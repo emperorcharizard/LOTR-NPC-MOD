@@ -4,7 +4,7 @@ description: Where the lotrnpcs work stands and what's next; read first, update 
 ---
 
 # Update 2026-11-26: 1.0.7 on main (not released)
-Owner's look changes: Angmar recruits half orcs / half Men, warriors Wildmen or Black Numenoreans, captains Black Numenoreans (types can list several models: skinModels + lotrnpcsByModel); Mordor captains wear Gundabad tusked or warlord helmets; Gundabad recruits vanilla bear hide armor + Mordor raider helmet. Untested in game (checklist 174). Owner will send name additions and a lang file.
+Owner's look changes: Angmar recruits half orcs / half Wildmen, warriors Wildmen or Black Numenoreans, captains Black Numenoreans (types can list several models: skinModels + lotrnpcsByModel); Mordor captains wear Gundabad tusked or warlord helmets; Gundabad recruits vanilla bear hide armor + Mordor raider helmet. Untested in game (checklist 174). Owner will send name additions and a lang file.
 
 # Where we are (updated 2026-11-18: 1.0.4 RELEASED on GitHub (from an outside review, see first entry); 1.0.1 (blow timing fix) installed in the test world, not released. Open: Gondor now beats Mordor 4/4 in equal 9 v 9s (was Mordor 3/3 on 0.0.168); owner sign-offs on hiring, menus, looks, two players, optional mods; the server without LRC)
 
